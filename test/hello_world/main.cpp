@@ -8,13 +8,12 @@ int main() {
 
   Ref << ::cxxg::Screen::ClearScreenStr;
   ::std::string EmptyStr;
-  EmptyStr.resize(11*80, ' ');
+  EmptyStr.resize(11 * 80, ' ');
   Ref << EmptyStr;
   EmptyStr.resize(34, ' ');
   Ref << EmptyStr << "Hello World!" << EmptyStr;
-  EmptyStr.resize(12*80, ' ');
+  EmptyStr.resize(12 * 80, ' ');
   Ref << EmptyStr;
-
 
   ::cxxg::Screen Screen(80, 24, SS);
   Screen[11][34] = "Hello World!";
