@@ -9,4 +9,7 @@ set(COMMON_COMPILE_OPTIONS
   $<$<CONFIG:RELEASE>:-Werror>
 )
 
+enable_testing()
+
 add_subdirectory(common)
+add_subdirectory(test)
