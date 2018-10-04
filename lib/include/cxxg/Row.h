@@ -38,7 +38,7 @@ public:
 
 private:
   Row &Rw;
-  size_t Offset;
+  size_t Offset; // TODO allow accesses to negative offset
 };
 
 class Row {

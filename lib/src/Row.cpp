@@ -27,20 +27,24 @@ RowAccessor::~RowAccessor() {
 }
 
 RowAccessor &RowAccessor::operator=(::std::string const &Str) {
-  if (Offset + Str.size() > Rw.Buffer.size()) {
-    throw ::std::out_of_range("todo");
+  if (Offset >= Rw.Buffer.size()) {
+    ::std::stringstream SS;
+    SS << "RowAccessor out of range: " << Offset << " >= " << Rw.Buffer.size();
   }
-  ::std::copy(Str.begin(), Str.end(), Rw.Buffer.begin() + Offset);
+
+  size_t Count = ::std::min(Rw.Buffer.size() - Offset, Str.size());
+  ::std::copy(Str.begin(), Str.begin() + Count, Rw.Buffer.begin() + Offset);
 
   // update offset of accessor by the amount of characters we already wrote
-  Offset += Str.size();
+  Offset += Count;
 
   return *this;
 }
 
 RowAccessor &RowAccessor::operator<<(Color Cl) {
   if (Offset >= Rw.Buffer.size()) {
-    throw ::std::out_of_range("todo");
+    ::std::stringstream SS;
+    SS << "RowAccessor out of range: " << Offset << " >= " << Rw.Buffer.size();
   }
 
   Row::ColorInfo CI{Offset, Cl};
