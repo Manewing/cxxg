@@ -1,6 +1,6 @@
 #include <cxxg/Row.h>
 
-#include <vector>
+#include <stdexcept>
 
 namespace cxxg {
 

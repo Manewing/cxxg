@@ -1,8 +1,9 @@
+#ifndef CXXG_GAME_H
+#define CXXG_GAME_H
+
 #include <cxxg/Screen.h>
 
-namespace terminos {
-struct terminos;
-}
+#include <memory>
 
 namespace cxxg {
 
@@ -12,23 +13,21 @@ public:
   virtual ~Game();
 
   /// Initializes environment
-  virtual void initialize(bool BufferedInput = true);
+  virtual void initialize(bool BufferedInput);
 
   void run();
 
-  virtual bool handleInput(int Char) = 0;
+  virtual void handleInput(int Char) = 0;
 
   virtual void draw() = 0;
 
-  virtual void handleGameOver(bool Victory = false);
-
-protected:
-  void switchBufferedInput();
+  virtual void handleGameOver(bool Victory) = 0;
 
 protected:
   Screen Scr;
-  ::std::shared_ptr<::terminos::terminos> TermAttrOld;
   bool GameRunning;
 };
 
 }; // namespace cxxg
+
+#endif // #ifndef CXXG_GAME_H

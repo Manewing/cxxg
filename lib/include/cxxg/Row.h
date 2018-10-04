@@ -1,6 +1,8 @@
-#include <iostream>
+#ifndef CXXG_ROW_H
+#define CXXG_ROW_H
+
 #include <set>
-#include <stdexcept>
+#include <sstream>
 #include <string>
 
 namespace cxxg {
@@ -27,6 +29,12 @@ public:
 
   RowAccessor &operator<<(Color Cl);
   RowAccessor &operator<<(::std::string const &Str);
+
+  template <typename Type> RowAccessor &operator<<(Type const &T) {
+    ::std::stringstream SS;
+    SS << T;
+    return operator<<(SS.str());
+  }
 
 private:
   Row &Rw;
@@ -63,3 +71,5 @@ private:
 } // namespace cxxg
 
 ::std::ostream &operator<<(::std::ostream &Out, ::cxxg::Row const &Rw);
+
+#endif // #ifndef CXXG_ROW_H

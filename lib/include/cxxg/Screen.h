@@ -1,9 +1,11 @@
+#ifndef CXXG_SCREEN_H
+#define CXXG_SCREEN_H
+
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
-#include "Row.h"
+#include <cxxg/Row.h>
 
 namespace cxxg {
 
@@ -24,4 +26,7 @@ private:
   ::std::ostream &Out;
   ::std::vector<Row> Rows;
 };
+
 } // namespace cxxg
+
+#endif // #ifndef CXXG_SCREEN_H
