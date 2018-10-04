@@ -2,15 +2,28 @@
 #define CXXG_UTILS_HH
 
 #include <functional>
+#include <string>
 
 namespace cxxg {
 
 namespace utils {
 
+/// Helper function for registering a handler (e.g. a lambda) for
+/// a SIGINT signal (after Ctrl+C). Note that only one handler can
+/// be registered.
+/// @param[in] Handler - Handler to register
 void registerSigintHandler(::std::function<void()> const &Handler);
 
+/// Returns true if the terminal input is buffered or not. Buffered means
+/// that a Return is needed after input.
 bool hasBufferedInput();
+
+/// Switches the input from buffered to un-buffered or vice versa.
 void switchBufferedInput();
+
+/// Returns the path to the home directory if it could be acquired or
+/// empty string if not.
+::std::string getHomeDir();
 
 } // namespace utils
 

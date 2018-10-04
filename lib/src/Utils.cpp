@@ -48,6 +48,13 @@ void switchBufferedInput() {
   }
 }
 
+::std::string getHomeDir() {
+  if (auto HomeDir = getenv("HOME")) {
+    return HomeDir;
+  }
+  return "";
+}
+
 } // namespace utils
 
 } // namespace cxxg
