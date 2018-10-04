@@ -6,20 +6,23 @@ namespace cxxg {
 
 namespace {
 
-// TODO move/refactor
-static ::std::string const &getColorStr(ColorInfo::ColorCode Color) {
-  static ::std::vector<::std::string> Colors = {
-      "\033[0m", "\033[31m", "\033[32m", "\033[33m", "\033[34m"};
-  return Colors.at(Color);
+static ::std::string getColorStr(Color Cl) {
+  return "\033[" + ::std::to_string(Cl.Value) + "m";
 }
 
 } // namespace
+
+Color Color::NONE = {0};
+Color Color::RED = {31};
+Color Color::GREEN = {32};
+Color Color::YELLOW = {33};
+Color Color::BLUE = {34};
 
 RowAccessor::RowAccessor(Row &Rw, size_t Offset) : Rw(Rw), Offset(Offset) {}
 
 RowAccessor::~RowAccessor() {
   if (Offset < Rw.Buffer.size()) {
-    Rw.ColorInfos.insert({Offset, ColorInfo::ColorCode::NONE});
+    Rw.ColorInfos.insert({Offset, Color::NONE});
   }
 }
 
@@ -35,12 +38,12 @@ RowAccessor &RowAccessor::operator=(::std::string const &Str) {
   return *this;
 }
 
-RowAccessor &RowAccessor::operator<<(ColorInfo::ColorCode Color) {
+RowAccessor &RowAccessor::operator<<(Color Cl) {
   if (Offset >= Rw.Buffer.size()) {
     throw ::std::out_of_range("todo");
   }
 
-  ColorInfo CI{Offset, Color};
+  Row::ColorInfo CI{Offset, Cl};
   Rw.ColorInfos.erase(CI);
   Rw.ColorInfos.insert(CI);
   return *this;
@@ -66,15 +69,16 @@ RowAccessor Row::operator[](size_t X) { return RowAccessor(*this, X); }
   size_t Offset = 0;
 
   for (auto const &CI : ColorInfos) {
-    Out << Buffer.substr(Offset, CI.Offset - Offset) << getColorStr(CI.Color);
+    Out << Buffer.substr(Offset, CI.Offset - Offset) << getColorStr(CI.Cl);
     Offset = CI.Offset;
   }
 
   Out << Buffer.substr(Offset, Buffer.size() - Offset)
-      << getColorStr(ColorInfo::ColorCode::NONE);
+      << getColorStr(Color::NONE);
 
   return Out;
 }
+
 } // namespace cxxg
 
 ::std::ostream &operator<<(::std::ostream &Out, ::cxxg::Row const &Rw) {

@@ -5,13 +5,15 @@
 
 namespace cxxg {
 
-struct ColorInfo {
-  typedef enum { NONE, RED, GREEN, YELLOW, BLUE } ColorCode;
+// TODO move?
+struct Color {
+  static Color NONE;
+  static Color RED;
+  static Color GREEN;
+  static Color YELLOW;
+  static Color BLUE;
 
-  size_t Offset;
-  ColorCode Color;
-
-  bool operator<(ColorInfo const &Other) const { return Offset < Other.Offset; }
+  int Value;
 };
 
 class Row;
@@ -23,7 +25,7 @@ public:
 
   RowAccessor &operator=(::std::string const &Str);
 
-  RowAccessor &operator<<(ColorInfo::ColorCode Color);
+  RowAccessor &operator<<(Color Cl);
   RowAccessor &operator<<(::std::string const &Str);
 
 private:
@@ -33,6 +35,16 @@ private:
 
 class Row {
   friend RowAccessor;
+
+public:
+  struct ColorInfo {
+    size_t Offset;
+    Color Cl;
+
+    bool operator<(ColorInfo const &Other) const {
+      return Offset < Other.Offset;
+    }
+  };
 
 public:
   Row(size_t Size);
