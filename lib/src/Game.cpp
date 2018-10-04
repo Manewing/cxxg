@@ -6,8 +6,7 @@ namespace termios {
 
 namespace Game {
 
-Game::Game(size_t SizeX, size_t SizeY): Scr(SizeX, SizeY) {
-}
+Game::Game(size_t SizeX, size_t SizeY) : Scr(SizeX, SizeY) {}
 
 Game::~Game() {
   if (TermAttrOld) {
@@ -31,7 +30,6 @@ void Game::run() {
 void Game::handleGameOver(bool Victory) {
   (void)Victory;
 
-
   exit(0);
 }
 
@@ -48,4 +46,4 @@ void Game::switchBufferedInput() {
   }
 }
 
-};
+}; // namespace Game

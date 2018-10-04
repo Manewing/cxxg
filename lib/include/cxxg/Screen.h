@@ -18,10 +18,10 @@ public:
 
   Row const &operator[](size_t Y) const;
 
-  void update() const;
+  void update();
 
 private:
   ::std::ostream &Out;
   ::std::vector<Row> Rows;
 };
-}
+} // namespace cxxg

@@ -13,10 +13,11 @@ Row &Screen::operator[](size_t Y) { return Rows.at(Y); }
 
 Row const &Screen::operator[](size_t Y) const { return Rows.at(Y); }
 
-void Screen::update() const {
+void Screen::update() {
   Out << ClearScreenStr;
-  for (auto const &Row : Rows) {
+  for (auto &Row : Rows) {
     Out << Row;
+    Row.clear();
   }
 }
-}
+} // namespace cxxg
