@@ -1,12 +1,28 @@
 #include "Game2048.h"
 
 #include <algorithm>
+#include <fstream>
 
 // TODO get terminal size and adapt to it
-// load Highscore from file
-Game2048::Game2048() : Game(80, 24), Score(0), Highscore(0), State(Running) {
+Game2048::Game2048(::std::string const &HighScoreFile)
+    : Game(::cxxg::ScreenSize{80, 24}), Score(0), HighScore(0), State(Running),
+      HighScoreFile(HighScoreFile) {
   Board.resize(4, ::std::vector<unsigned>{0, 0, 0, 0});
+
+  if (!HighScoreFile.empty()) {
+    ::std::ifstream File(HighScoreFile.c_str(), ::std::ios::in);
+    if (File.is_open()) {
+      File >> HighScore;
+    } else {
+      ::std::stringstream SS;
+      SS << "Could not open highscore file: '" << HighScoreFile
+         << "' for reading.";
+      warn(SS.str());
+    }
+  }
 }
+
+Game2048::~Game2048() { handleExit(); }
 
 void Game2048::initialize(bool BufferedInput) {
   ::cxxg::Game::initialize(BufferedInput);
@@ -54,7 +70,7 @@ void Game2048::draw() {
 
   // draw the score board
   Scr[3][Offset] << ::cxxg::Color::BLUE << "Score: " << Score;
-  Scr[4][Offset] << ::cxxg::Color::GREEN << "Highscore: " << Highscore;
+  Scr[4][Offset] << ::cxxg::Color::GREEN << "HighScore: " << HighScore;
 
   // draw the board outline
   for (size_t Y = 0; Y < 8; Y += 2) {
@@ -92,7 +108,7 @@ void Game2048::draw() {
     State = Running;
   }
 
-  Scr.update();
+  ::cxxg::Game::draw();
 }
 
 void Game2048::handleGameOver(bool VC) {
@@ -100,8 +116,25 @@ void Game2048::handleGameOver(bool VC) {
     State = Victory;
   } else {
     State = GameOver;
+    HighScore = ::std::max(Score, HighScore);
     GameRunning = false;
   }
+}
+
+void Game2048::handleExit() {
+  if (!HighScoreFile.empty()) {
+    ::std::ofstream File(HighScoreFile.c_str(), ::std::ios::out);
+    if (File.is_open()) {
+      File << HighScore;
+    } else {
+      ::std::stringstream SS;
+      SS << "Could not open highscore file: '" << HighScoreFile
+         << "' for writing.";
+      warn(SS.str());
+    }
+  }
+
+  draw();
 }
 
 void Game2048::addNewElement() {

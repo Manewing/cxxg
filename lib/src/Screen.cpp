@@ -2,10 +2,10 @@
 
 namespace cxxg {
 
-Screen::Screen(size_t SizeX, size_t SizeY, ::std::ostream &Out) : Out(Out) {
-  Rows.reserve(SizeY);
-  for (size_t Y = 0; Y < SizeY; Y++) {
-    Rows.push_back(Row(SizeX));
+Screen::Screen(ScreenSize Size, ::std::ostream &Out) : Out(Out), Size(Size) {
+  Rows.reserve(Size.Y);
+  for (size_t Y = 0; Y < Size.Y; Y++) {
+    Rows.push_back(Row(Size.X));
   }
 }
 

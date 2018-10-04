@@ -9,12 +9,19 @@
 
 namespace cxxg {
 
+struct ScreenSize {
+  size_t X;
+  size_t Y;
+};
+
 class Screen {
 public:
   static auto constexpr ClearScreenStr = "\e[1;1H\e[2J";
 
 public:
-  Screen(size_t SizeX, size_t SizeY, ::std::ostream &Out = ::std::cout);
+  Screen(ScreenSize Size, ::std::ostream &Out = ::std::cout);
+
+  ScreenSize getSize() const { return Size; }
 
   Row &operator[](size_t Y);
 
@@ -25,6 +32,7 @@ public:
 private:
   ::std::ostream &Out;
   ::std::vector<Row> Rows;
+  ScreenSize Size;
 };
 
 } // namespace cxxg

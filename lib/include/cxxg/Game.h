@@ -4,12 +4,14 @@
 #include <cxxg/Screen.h>
 
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace cxxg {
 
 class Game {
 public:
-  Game(size_t SizeX, size_t SizeY);
+  Game(ScreenSize Size);
   virtual ~Game();
 
   /// Initializes environment
@@ -19,13 +21,16 @@ public:
 
   virtual void handleInput(int Char) = 0;
 
-  virtual void draw() = 0;
+  virtual void draw();
 
   virtual void handleGameOver(bool Victory) = 0;
+
+  void warn(::std::string Warnings);
 
 protected:
   Screen Scr;
   bool GameRunning;
+  ::std::vector<::std::string> Warnings;
 };
 
 }; // namespace cxxg

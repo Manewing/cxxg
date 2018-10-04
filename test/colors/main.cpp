@@ -4,7 +4,7 @@
 #include <sstream>
 
 int main() {
-  ::cxxg::Screen Screen(80, 24);
+  ::cxxg::Screen Screen(::cxxg::ScreenSize{80, 24});
 
   for (int l = 0; l < 10; l++) {
     Screen[11][34] << ::cxxg::Color{l % 4 + 31} << "Hello World!";

@@ -5,7 +5,8 @@ public:
   typedef enum { Running, GameOver, Victory } GameState;
 
 public:
-  Game2048();
+  Game2048(::std::string const &HighScoreFile);
+  virtual ~Game2048();
 
   void initialize(bool BufferedInput = true) final;
 
@@ -14,6 +15,8 @@ public:
   void draw() final;
 
   void handleGameOver(bool Victory) final;
+
+  void handleExit();
 
   void addNewElement();
 
@@ -32,7 +35,8 @@ public:
 
 private:
   unsigned Score;
-  unsigned Highscore;
+  unsigned HighScore;
   ::std::vector<::std::vector<unsigned>> Board;
   GameState State;
+  ::std::string HighScoreFile;
 };

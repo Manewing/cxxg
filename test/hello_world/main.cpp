@@ -14,7 +14,7 @@ int main() {
 
   // buffer in string stream to check results later
   ::std::stringstream SS;
-  ::cxxg::Screen Screen(80, 24, SS);
+  ::cxxg::Screen Screen(::cxxg::ScreenSize{80, 24}, SS);
 
   // string stream for generating reference
   ::std::string EmptyStr;
