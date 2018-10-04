@@ -5,8 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(COMMON_COMPILE_OPTIONS
-  -Wall
-  $<$<CONFIG:RELEASE>:-Werror>
+  -Wall -Wextra -Werror
 )
 
 enable_testing()
