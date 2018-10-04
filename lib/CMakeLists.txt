@@ -1,4 +1,4 @@
-set(TARGET common)
+set(TARGET cxxg)
 
 set(HEADER_FILES
   include/cxxg/Row.h

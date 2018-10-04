@@ -11,5 +11,5 @@ set(COMMON_COMPILE_OPTIONS
 
 enable_testing()
 
-add_subdirectory(common)
+add_subdirectory(lib)
 add_subdirectory(test)

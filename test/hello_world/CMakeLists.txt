@@ -4,5 +4,5 @@ add_executable(${TARGET}
 )
 add_test(unittest_hello_world ${TARGET})
 target_link_libraries(${TARGET}
-  common
+  cxxg
 )
