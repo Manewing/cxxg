@@ -30,18 +30,18 @@ int main() {
   }
 
   // check that reference matches
-  EXPECT_EQ(SS.str(), Ref.str());
+  EXPECT_EQ_MSG(SS.str(), Ref.str(), "Hello World");
   SS.str("");
   Ref.str("");
 
-  // check that last update cleared the screen, another update
-  // will write last state into SS
+  // check that clear screen works correctly
+  Screen.clear();
   Screen.update();
   Ref << ::cxxg::Screen::ClearScreenStr;
   for (int l = 0; l < 24; l++) {
     Ref << EmptyStr << "\033[0m";
   }
-  EXPECT_EQ(SS.str(), Ref.str());
+  EXPECT_EQ_MSG(SS.str(), Ref.str(), "Clear Screen");
   SS.clear();
   Ref.clear();
 
