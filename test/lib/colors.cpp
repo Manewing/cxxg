@@ -1,7 +1,6 @@
+#include "Common.h"
 #include <cxxg/Screen.h>
 #include <unistd.h>
-
-#include <sstream>
 
 // TODO Currently this is only a manual test, but it should be an automatic
 //      test.
@@ -18,5 +17,5 @@ int main() {
     usleep(10000);
   }
 
-  return 0;
+  RETURN_SUCCESS;
 }

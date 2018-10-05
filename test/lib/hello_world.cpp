@@ -1,17 +1,7 @@
+#include "Common.h"
 #include <cxxg/Screen.h>
 
-#include <sstream>
-
-#define EXPECT_TRUE(stmt)                                                      \
-  if (!(stmt)) {                                                               \
-    ::std::cerr << "ERROR: expected statement '" << #stmt << "' to be true"    \
-                << ::std::endl;                                                \
-    Success = false;                                                           \
-  }
-
 int main() {
-  bool Success = true;
-
   // buffer in string stream to check results later
   ::std::stringstream SS;
   ::cxxg::Screen Screen(::cxxg::ScreenSize{80, 24}, SS);
@@ -40,7 +30,7 @@ int main() {
   }
 
   // check that reference matches
-  EXPECT_TRUE(SS.str() == Ref.str());
+  EXPECT_EQ(SS.str(), Ref.str());
   SS.str("");
   Ref.str("");
 
@@ -51,12 +41,9 @@ int main() {
   for (int l = 0; l < 24; l++) {
     Ref << EmptyStr << "\033[0m";
   }
-  EXPECT_TRUE(SS.str() == Ref.str());
+  EXPECT_EQ(SS.str(), Ref.str());
   SS.clear();
   Ref.clear();
 
-  if (Success) {
-    return 0;
-  }
-  return 1;
+  RETURN_SUCCESS;
 }

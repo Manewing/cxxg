@@ -7,6 +7,9 @@ add_test(unittest_hello_world ${TARGET})
 target_link_libraries(${TARGET}
   cxxg
 )
+target_include_directories(${TARGET}
+  PUBLIC ../common/
+)
 
 # unit test for colors
 set(TARGET test_colors)
@@ -17,5 +20,6 @@ add_test(unittest_colors ${TARGET})
 target_link_libraries(${TARGET}
   cxxg
 )
-
-
+target_include_directories(${TARGET}
+  PUBLIC ../common/
+)

@@ -7,4 +7,7 @@ add_test(unittest_2048 ${TARGET})
 target_link_libraries(${TARGET}
   cxxg
 )
-target_include_directories(${TARGET} PUBLIC ../../games/2048/include/)
+target_include_directories(${TARGET}
+  PUBLIC ../../games/2048/include/
+  PUBLIC ../common/
+)

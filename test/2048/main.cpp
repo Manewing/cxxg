@@ -1,21 +1,5 @@
 #include "Game2048.h"
-
-#include <sstream>
-
-// TODO google test....
-bool Success = true;
-#define EXPECT_EQ(a, b)                                                        \
-  if (!((a) == (b))) {                                                         \
-    ::std::cerr << "ERROR: expected '" << #a << "' = " << a                    \
-                << " to be equal to '" << #b << "' = " << b << ::std::endl;    \
-    Success = false;                                                           \
-  }
-#define EXPECT_EQ_MSG(a, b, msg)                                               \
-  if (!((a) == (b))) {                                                         \
-    ::std::cerr << "ERROR[" << msg << "]: expected '" << #a << "' = " << a     \
-                << " to be equal to '" << #b << "' = " << b << ::std::endl;    \
-    Success = false;                                                           \
-  }
+#include "Common.h"
 
 bool operator==(::cxxg::Color A, ::cxxg::Color B) { return A.Value == B.Value; }
 
@@ -158,5 +142,5 @@ int main() {
     EXPECT_EQ_MSG(Board, BoardRef, "moveUp");
   }
 
-  return Success ? 0 : 1;
+  RETURN_SUCCESS;
 }
