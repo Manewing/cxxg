@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <fstream>
+#include <time.h>
 
 // TODO get terminal size and adapt to it
 Game2048::Game2048(::std::string const &HighScoreFile)
@@ -20,6 +21,9 @@ Game2048::Game2048(::std::string const &HighScoreFile)
       warn(SS.str());
     }
   }
+
+  // set seed for rand
+  srand(time(0));
 }
 
 Game2048::~Game2048() { handleExit(); }
