@@ -143,6 +143,7 @@ void Game2048::addNewElement() {
   // if not the game is over and the player has lost
   if (!hasFreeSpace(Board)) {
     handleGameOver(false);
+    return;
   }
 
   // get a random empty position on the board
