@@ -2,7 +2,7 @@
 
 class Game2048 : public ::cxxg::Game {
 public:
-  typedef enum { Running, GameOver, Victory } GameState;
+  typedef enum { Running, GameOver, NewGame } GameState;
 
 public:
   Game2048(::std::string const &HighScoreFile);
@@ -14,7 +14,7 @@ public:
 
   void draw() final;
 
-  void handleGameOver(bool Victory) final;
+  void handleGameOver() final;
 
   void handleExit();
 

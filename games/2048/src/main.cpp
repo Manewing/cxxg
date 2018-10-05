@@ -13,7 +13,7 @@ int main() {
 
   // register handler for Ctrl+C
   ::cxxg::utils::registerSigintHandler([&Game]() {
-    Game.handleGameOver(false);
+    Game.handleGameOver();
     Game.handleExit();
     exit(0);
   });

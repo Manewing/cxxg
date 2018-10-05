@@ -6,7 +6,7 @@
 
 // TODO get terminal size and adapt to it
 Game2048::Game2048(::std::string const &HighScoreFile)
-    : Game(::cxxg::ScreenSize{80, 24}), Score(0), HighScore(0), State(Running),
+    : Game(::cxxg::ScreenSize{80, 24}), Score(0), HighScore(0), State(NewGame),
       HighScoreFile(HighScoreFile) {
   Board.resize(4, ::std::vector<unsigned>{0, 0, 0, 0});
 
@@ -40,7 +40,7 @@ void Game2048::initialize(bool BufferedInput) {
 
 void Game2048::handleInput(int Char) {
   if (Char == -1) {
-    handleGameOver(false);
+    handleGameOver();
   }
 
   bool HasMoved = true;
@@ -58,7 +58,7 @@ void Game2048::handleInput(int Char) {
     Score += moveDown(Board);
     break;
   case 'q':
-    handleGameOver(false);
+    handleGameOver();
   default:
     HasMoved = false;
     break;
@@ -105,8 +105,8 @@ void Game2048::draw() {
   // draw message if necessary
   if (State == GameOver) {
     Scr[MsgOffsetY][MsgOffsetX] << ::cxxg::Color::RED << " GAME OVER ";
-  } else if (State == Victory) {
-    Scr[MsgOffsetY][MsgOffsetX + 1] << ::cxxg::Color::RED << " VICTORY ";
+  } else if (State == NewGame) {
+    Scr[MsgOffsetY][MsgOffsetX] << ::cxxg::Color::YELLOW << " NEW  GAME ";
 
     // we want to be able to keep playing
     State = Running;
@@ -115,14 +115,10 @@ void Game2048::draw() {
   ::cxxg::Game::draw();
 }
 
-void Game2048::handleGameOver(bool VC) {
-  if (VC) {
-    State = Victory;
-  } else {
-    State = GameOver;
-    HighScore = ::std::max(Score, HighScore);
-    GameRunning = false;
-  }
+void Game2048::handleGameOver() {
+  State = GameOver;
+  HighScore = ::std::max(Score, HighScore);
+  GameRunning = false;
 }
 
 void Game2048::handleExit() {
@@ -146,7 +142,7 @@ void Game2048::addNewElement() {
   // check if we have a free space to add a new element
   // if not the game is over and the player has lost
   if (!hasFreeSpace(Board)) {
-    handleGameOver(false);
+    handleGameOver();
     return;
   }
 

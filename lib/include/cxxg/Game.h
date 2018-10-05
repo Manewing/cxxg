@@ -23,7 +23,7 @@ public:
 
   virtual void draw();
 
-  virtual void handleGameOver(bool Victory) = 0;
+  virtual void handleGameOver() = 0;
 
   void warn(::std::string Warnings);
 
