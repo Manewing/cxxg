@@ -3,6 +3,8 @@
 
 #include <sstream>
 
+// TODO Currently this is only a manual test, but it should be an automatic
+//      test.
 int main() {
   ::cxxg::Screen Screen(::cxxg::ScreenSize{80, 24});
 
@@ -13,7 +15,7 @@ int main() {
     Screen[11][10] << "XXX";
     Screen[11][67] << "XXX";
     Screen.update();
-    usleep(1000000);
+    usleep(10000);
   }
 
   return 0;
