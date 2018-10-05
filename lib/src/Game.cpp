@@ -37,6 +37,7 @@ void Game::draw() {
   Warnings.clear();
 
   Scr.update();
+  Scr.clear();
 }
 
 void Game::warn(::std::string Warning) {
