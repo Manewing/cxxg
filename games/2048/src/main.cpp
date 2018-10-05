@@ -1,6 +1,7 @@
 #include "Game2048.h"
 
 #include <cxxg/Utils.h>
+#include <stdexcept>
 
 int main() {
 
@@ -19,8 +20,13 @@ int main() {
   });
 
   // run game
-  Game.initialize();
-  Game.run();
+  try {
+    Game.initialize();
+    Game.run();
+  } catch (::std::exception const &E) {
+    ::std::cerr << "ERROR: " << E.what() << ::std::endl;
+    exit(1);
+  }
 
   return 0;
 }

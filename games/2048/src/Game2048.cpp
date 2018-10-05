@@ -6,7 +6,7 @@
 
 // TODO get terminal size and adapt to it
 Game2048::Game2048(::std::string const &HighScoreFile)
-    : Game(::cxxg::ScreenSize{80, 24}), Score(0), HighScore(0), State(NewGame),
+    : Game(), Score(0), HighScore(0), State(NewGame),
       HighScoreFile(HighScoreFile) {
   Board.resize(4, ::std::vector<unsigned>{0, 0, 0, 0});
 
@@ -70,18 +70,35 @@ void Game2048::handleInput(int Char) {
 }
 
 void Game2048::draw() {
-  auto const Offset = 29, MsgOffsetX = 34, MsgOffsetY = 10;
+  // get screen size
+  auto const Size = Scr.getSize();
+
+  // define game size
+  ::cxxg::ScreenSize const GameSize{22, 12};
+
+  // check that screen size is sufficient
+  if (Size.X < GameSize.X || Size.Y < GameSize.Y) {
+    ::std::stringstream SS;
+    SS << "Screen size { " << Size.X << ", " << Size.Y << " } to small";
+    throw ::std::out_of_range(SS.str());
+  }
+
+  // get offsets
+  ::cxxg::ScreenSize const Offset{(Size.X - GameSize.X) / 2,
+                                  (Size.Y - GameSize.Y) / 2};
+  ::cxxg::ScreenSize const MsgOffset{Offset.X + 5, Offset.Y + 7};
 
   // draw the score board
-  Scr[3][Offset] << ::cxxg::Color::BLUE << "Score: " << Score;
-  Scr[4][Offset] << ::cxxg::Color::GREEN << "HighScore: " << HighScore;
+  Scr[Offset.Y][Offset.X] << ::cxxg::Color::BLUE << "Score: " << Score;
+  Scr[Offset.Y + 1][Offset.X] << ::cxxg::Color::GREEN
+                              << "HighScore: " << HighScore;
 
   // draw the board outline
   for (size_t Y = 0; Y < 8; Y += 2) {
-    Scr[6 + Y][Offset] << "+----+----+----+----+";
-    Scr[7 + Y][Offset] << "|    |    |    |    |";
+    Scr[Offset.Y + 3 + Y][Offset.X] << "+----+----+----+----+";
+    Scr[Offset.Y + 4 + Y][Offset.X] << "|    |    |    |    |";
   }
-  Scr[14][Offset] << "+----+----+----+----+";
+  Scr[Offset.Y + 11][Offset.X] << "+----+----+----+----+";
 
   // fill the board
   for (size_t X = 0; X < 4; X++) {
@@ -92,10 +109,10 @@ void Game2048::draw() {
         continue;
 
       // get Y offset, we start at line 7 and take every second line
-      size_t OffY = Y * 2 + 7;
+      size_t OffY = Y * 2 + Offset.Y + 4;
 
       // get X offset, we start at first box each has size 5
-      size_t OffX = Offset + 1 + X * 5;
+      size_t OffX = Offset.X + 1 + X * 5;
 
       // draw the element
       Scr[OffY][OffX] << getColor(Board[Y][X]) << Board[Y][X];
@@ -104,9 +121,9 @@ void Game2048::draw() {
 
   // draw message if necessary
   if (State == GameOver) {
-    Scr[MsgOffsetY][MsgOffsetX] << ::cxxg::Color::RED << " GAME OVER ";
+    Scr[MsgOffset.Y][MsgOffset.X] << ::cxxg::Color::RED << " GAME OVER ";
   } else if (State == NewGame) {
-    Scr[MsgOffsetY][MsgOffsetX] << ::cxxg::Color::YELLOW << " NEW  GAME ";
+    Scr[MsgOffset.Y][MsgOffset.X] << ::cxxg::Color::YELLOW << " NEW  GAME ";
 
     // we want to be able to keep playing
     State = Running;

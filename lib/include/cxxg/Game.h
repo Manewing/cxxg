@@ -11,7 +11,7 @@ namespace cxxg {
 
 class Game {
 public:
-  Game(ScreenSize Size);
+  Game();
   virtual ~Game();
 
   /// Initializes environment

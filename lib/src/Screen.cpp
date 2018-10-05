@@ -8,7 +8,7 @@ namespace cxxg {
 ScreenSize Screen::getTerminalSize() {
   winsize Ws;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &Ws);
-  return { Ws.ws_col, Ws.ws_row };
+  return {Ws.ws_col, Ws.ws_row};
 }
 
 Screen::Screen(ScreenSize Size, ::std::ostream &Out) : Out(Out), Size(Size) {
