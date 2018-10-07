@@ -18,22 +18,67 @@ Color Color::GREEN = {32};
 Color Color::YELLOW = {33};
 Color Color::BLUE = {34};
 
-RowAccessor::RowAccessor(Row &Rw, size_t Offset) : Rw(Rw), Offset(Offset) {}
+RowAccessor::RowAccessor(Row &Rw, int Offset) : Rw(Rw), Offset(Offset),
+CurrentColor(Color::NONE) {}
 
-RowAccessor::~RowAccessor() {
-  if (Offset < Rw.Buffer.size()) {
-    Rw.ColorInfos.insert({Offset, Color::NONE});
+RowAccessor &RowAccessor::operator = (Color Cl) {
+  // check if the access is out of range, if so ignore it
+  if (Offset >= static_cast<int>(Rw.ColorInfo.size()) || Offset < 0) {
+    return *this;
   }
+  Rw.ColorInfo[Offset] = Cl;
+  return *this;
 }
 
-RowAccessor &RowAccessor::operator=(::std::string const &Str) {
-  if (Offset >= Rw.Buffer.size()) {
-    ::std::stringstream SS;
-    SS << "RowAccessor out of range: " << Offset << " >= " << Rw.Buffer.size();
+RowAccessor &RowAccessor::operator = (char C) {
+  // check if the access is out of range, if so ignore it
+  if (Offset >= static_cast<int>(Rw.Buffer.size()) || Offset < 0) {
+    return *this;
+  }
+  Rw.Buffer[Offset] = C;
+  return *this;
+}
+
+RowAccessor &RowAccessor::operator<<(Color Cl) {
+  CurrentColor = Cl;
+  return *this;
+}
+
+RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
+  // check if the access is out of range, if so ignore it
+  if (Offset >= static_cast<int>(Rw.Buffer.size()) || Offset + Str.size() <= 0) {
+    return *this;
   }
 
-  size_t Count = ::std::min(Rw.Buffer.size() - Offset, Str.size());
-  ::std::copy(Str.begin(), Str.begin() + Count, Rw.Buffer.begin() + Offset);
+  // get row buffer and color info
+  auto &Buffer = Rw.Buffer;
+  auto &ColorInfo = Rw.ColorInfo;
+
+  // keep track of how much we moved offset
+  size_t Count;
+
+  // We have got three cases
+  if (Offset < 0) {
+    // First case: Writing before row with part of string overlapping into
+    // the row, we need to clip string at the beginning
+    Count = Str.size() + Offset;
+    ::std::copy(Str.begin() + (-Offset), Str.end(), Buffer.begin());
+    ::std::fill(ColorInfo.begin(), ColorInfo.begin() + Count, CurrentColor);
+  } else if (Str.size() + Offset <= Buffer.size()) {
+    // Second case: Writing inside of the row, no clipping needed just copy
+    // the complete string to buffer with offset
+    Count = Str.size();
+    ::std::copy(Str.begin(), Str.end(), Buffer.begin() + Offset);
+    ::std::fill(ColorInfo.begin() + Offset,
+                ColorInfo.begin() + Offset + Count, CurrentColor);
+  } else {
+    // Third case: Writing inside of the buffer with part of string exceeding
+    // the end of the buffer, we need to clip string at the end
+    Count = Buffer.size() - Offset;
+    ::std::copy(Str.begin(), Str.begin() + Count, Buffer.begin() + Offset);
+    ::std::fill(ColorInfo.begin() + Offset,
+                ColorInfo.begin() + Offset + Count, CurrentColor);
+  }
 
   // update offset of accessor by the amount of characters we already wrote
   Offset += Count;
@@ -41,44 +86,40 @@ RowAccessor &RowAccessor::operator=(::std::string const &Str) {
   return *this;
 }
 
-RowAccessor &RowAccessor::operator<<(Color Cl) {
-  if (Offset >= Rw.Buffer.size()) {
-    ::std::stringstream SS;
-    SS << "RowAccessor out of range: " << Offset << " >= " << Rw.Buffer.size();
-  }
-
-  Row::ColorInfo CI{Offset, Cl};
-  Rw.ColorInfos.erase(CI);
-  Rw.ColorInfos.insert(CI);
-  return *this;
+Row::Row(size_t Size) {
+  Buffer.resize(Size, ' ');
+  ColorInfo.resize(Size, Color::NONE);
 }
-
-RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
-  return this->operator=(Str);
-}
-
-Row::Row(size_t Size) { Buffer.resize(Size, ' '); }
 
 void Row::clear() {
   // clear buffer
   ::std::fill(Buffer.begin(), Buffer.end(), ' ');
 
   // clear color infos
-  ColorInfos.clear();
+  ::std::fill(ColorInfo.begin(), ColorInfo.end(), Color::NONE);
 }
 
-RowAccessor Row::operator[](size_t X) { return RowAccessor(*this, X); }
+::std::string const &Row::getBuffer() const {
+  return Buffer;
+}
+
+::std::vector<Color> const &Row::getColorInfo() const {
+  return ColorInfo;
+}
+
+RowAccessor Row::operator[](int X) { return RowAccessor(*this, X); }
 
 ::std::ostream &Row::dump(::std::ostream &Out) const {
-  size_t Offset = 0;
+  Color LastColor = Color::NONE;
 
-  for (auto const &CI : ColorInfos) {
-    Out << Buffer.substr(Offset, CI.Offset - Offset) << getColorStr(CI.Cl);
-    Offset = CI.Offset;
+  for (size_t L = 0; L < Buffer.size(); L++) {
+    if (LastColor != ColorInfo.at(L)) {
+      Out << getColorStr(ColorInfo.at(L));
+      LastColor = ColorInfo.at(L);
+    }
+    Out << Buffer.at(L);
   }
-
-  Out << Buffer.substr(Offset, Buffer.size() - Offset)
-      << getColorStr(Color::NONE);
+  Out << getColorStr(Color::NONE);
 
   return Out;
 }

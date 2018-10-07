@@ -1,35 +1,8 @@
-#include "Game2048.h"
 #include "Common.h"
-
-bool operator==(::cxxg::Color A, ::cxxg::Color B) { return A.Value == B.Value; }
+#include "Game2048.h"
 
 ::std::ostream &operator<<(::std::ostream &Out, ::cxxg::Color Cl) {
   Out << Cl.Value;
-  return Out;
-}
-
-template <typename T>
-bool operator==(::std::vector<T> const &A, ::std::vector<T> const &B) {
-  if (A.size() != B.size())
-    return false;
-
-  for (size_t X = 0; X < A.size(); X++) {
-    if (A.at(X) != B.at(X))
-      return false;
-  }
-
-  return true;
-}
-
-::std::ostream &operator<<(::std::ostream &Out,
-                           ::std::vector<unsigned> const &Line) {
-  auto Pred = "";
-  Out << "{ ";
-  for (auto Elem : Line) {
-    Out << Pred << Elem;
-    Pred = ", ";
-  }
-  Out << " }";
   return Out;
 }
 

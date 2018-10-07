@@ -1,21 +1,50 @@
 #include "Common.h"
-#include <cxxg/Screen.h>
-#include <unistd.h>
+#include <cxxg/Row.h>
 
-// TODO Currently this is only a manual test, but it should be an automatic
-//      test.
+::std::ostream &operator<<(::std::ostream &Out, ::cxxg::Color Cl) {
+  Out << Cl.Value;
+  return Out;
+}
+
 int main() {
-  ::cxxg::Screen Screen(::cxxg::ScreenSize{80, 24});
+  // create row
+  ::cxxg::Row Row(10);
+  ::std::stringstream SS;
 
-  for (int l = 0; l < 10; l++) {
-    Screen[11][34] << ::cxxg::Color{l % 4 + 31} << "Hello World!";
-    Screen[11][0] << ::cxxg::Color{(l + 1) % 4 + 31} << "Test";
-    Screen[11][76] << ::cxxg::Color{(l + 2) % 4 + 31} << "Test";
-    Screen[11][10] << "XXX";
-    Screen[11][67] << "XXX";
-    Screen.update();
-    usleep(10000);
-  }
+  // for generating references
+  ::std::stringstream Ref;
+  ::std::vector<::cxxg::Color> ColorRef;
+  ColorRef.resize(10, ::cxxg::Color::NONE);
+
+  // check that init worked correctly
+  EXPECT_EQ_MSG(Row.getColorInfo(), ColorRef, "RowColorInit");
+
+  // check adding new color works correctly
+  Row[0] << ::cxxg::Color::BLUE << "test";
+  ::std::fill(ColorRef.begin(), ColorRef.begin() + 4, ::cxxg::Color::BLUE);
+  EXPECT_EQ_MSG(Row.getColorInfo(), ColorRef, "RowBasicColor");
+
+  // check adding new color with positive offset works correctly
+  Row[8] << ::cxxg::Color::GREEN << "test";
+  ::std::fill(ColorRef.begin() + 8, ColorRef.end(), ::cxxg::Color::GREEN);
+  EXPECT_EQ_MSG(Row.getColorInfo(), ColorRef, "RowOffsetPositive");
+
+  // check adding new color with negative offset works correctly
+  Row[-2] << ::cxxg::Color::RED << "test";
+  ::std::fill(ColorRef.begin(), ColorRef.begin() + 2, ::cxxg::Color::RED);
+  EXPECT_EQ_MSG(Row.getColorInfo(), ColorRef, "RowOffsetNegative");
+
+  // check clear
+  Row.clear();
+  ::std::fill(ColorRef.begin(), ColorRef.begin(), ::cxxg::Color::NONE);
+
+  // check output
+  Row[0] << ::cxxg::Color::RED << "test";
+  Row[1] = ::cxxg::Color::GREEN;
+  Row[2] = ::cxxg::Color::BLUE;
+  Row.dump(SS);
+  Ref << "\033[31mt\033[32me\033[34ms\033[31mt\033[0m      \033[0m";
+  EXPECT_EQ_MSG(SS.str(), Ref.str(), "RowColoredOutput");
 
   RETURN_SUCCESS;
 }

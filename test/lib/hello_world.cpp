@@ -11,7 +11,7 @@ int main() {
   ::std::stringstream Ref;
 
   // test simple writing of hello world
-  Screen[11][34] = "Hello World!";
+  Screen[11][34] << "Hello World!";
   Screen.update();
   ::std::cout << SS.str() << ::std::endl;
 
@@ -22,8 +22,7 @@ int main() {
     Ref << EmptyStr << "\033[0m";
   }
   EmptyStr.resize(34, ' ');
-  Ref << EmptyStr << "Hello World!"
-      << "\033[0m" << EmptyStr << "\033[0m";
+  Ref << EmptyStr << "Hello World!" << EmptyStr << "\033[0m";
   EmptyStr.resize(80, ' ');
   for (int l = 0; l < 12; l++) {
     Ref << EmptyStr << "\033[0m";

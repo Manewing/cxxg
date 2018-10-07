@@ -39,11 +39,11 @@ public:
 
   /// Returns the given row based on the Y-position
   /// @param[in] Y - The column/Y-position
-  Row &operator[](size_t Y);
+  Row &operator[](int Y);
 
   /// Returns the given row based on the Y-position
   /// @param[in] Y - The column/Y-position
-  Row const &operator[](size_t Y) const;
+  Row const &operator[](int Y) const;
 
   /// Updates the screen by writing buffer to output stream
   void update() const;
@@ -58,6 +58,9 @@ private:
 
   /// Rows of the screen
   ::std::vector<Row> Rows;
+
+  /// Dummy row for out of range accesses
+  Row DummyRow;
 
   /// The screen size
   ScreenSize Size;
