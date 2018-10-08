@@ -23,6 +23,12 @@ public:
   /// String for clearing the terminal
   static auto constexpr ClearScreenStr = "\e[1;1H\e[2J";
 
+  /// String for turning off cursor in terminal
+  static auto constexpr HideCursorStr = "\e[?25l";
+
+  /// String for turning on cursor in terminal
+  static auto constexpr ShowCursorStr = "\e[?25h";
+
 public:
   /// Returns the current terminal size
   /// @return The current terminal size in columns and rows
@@ -44,6 +50,13 @@ public:
   /// Returns the given row based on the Y-position
   /// @param[in] Y - The column/Y-position
   Row const &operator[](int Y) const;
+
+  /// Sets the color for the rectangle defined by [Top, Bottom]
+  /// to the given color.
+  /// @param[in] Top    - Top corner of the rectangle
+  /// @param[in] Bottom - Bottom corner of the rectangle
+  /// @param[in] Cl     - Color to set
+  void setColor(ScreenSize Top, ScreenSize Bottom, Color Cl);
 
   /// Updates the screen by writing buffer to output stream
   void update() const;

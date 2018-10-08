@@ -1,9 +1,9 @@
 #ifndef CXXG_ROW_H
 #define CXXG_ROW_H
 
-#include <vector>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace cxxg {
 
@@ -15,6 +15,7 @@ struct Color {
   static Color GREEN;
   static Color YELLOW;
   static Color BLUE;
+  static Color GREY;
 
   /// The color code for terminal, output as "\033$Value[0m"
   int Value;
@@ -22,16 +23,12 @@ struct Color {
   /// Compares if the other color value is equal
   /// @param[in] Other - The other color to compare to
   /// @return True if equal
-  bool operator == (Color const &Other) const {
-    return Value == Other.Value;
-  }
+  bool operator==(Color const &Other) const { return Value == Other.Value; }
 
   /// Compares if the other color value is un-equal
   /// @param[in] Other - The other color to compare to
   /// @return True if un-equal
-  bool operator != (Color const &Other) const {
-    return !(*this == Other);
-  }
+  bool operator!=(Color const &Other) const { return !(*this == Other); }
 };
 
 // Forward declaration
@@ -47,11 +44,11 @@ public:
 
   /// Sets color for the current index/offset
   /// @param[in] Cl - Color to set character to
-  RowAccessor &operator = (Color Cl);
+  RowAccessor &operator=(Color Cl);
 
   /// Sets character at the current index/offset
   /// @param[in] C - Character to set
-  RowAccessor &operator = (char C);
+  RowAccessor &operator=(char C);
 
   /// Sets new color for current accessor, everything following will
   /// have the given color
@@ -106,6 +103,13 @@ public:
   /// Provides access to the row with a given X offset
   /// @param[in] X - The offset for the access
   RowAccessor operator[](int X);
+
+  /// Sets the color for the interval [StartX, EndX] to the given
+  /// color.
+  /// @param[in] StartX - Start of interval (included)
+  /// @param[in] EndX   - End of internval (included)
+  /// @param[in] Cl     - The color to set
+  void setColor(int StartX, int EndX, Color Cl);
 
   /// Dumps the row to given stream
   /// @param[in/out] Out - The output stream to dump the row to

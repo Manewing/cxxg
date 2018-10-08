@@ -77,7 +77,8 @@ int main() {
   Screen[10][0] << "test";
   Screen.update();
   EmptyStr.resize(10, ' ');
-  Ref << ::cxxg::Screen::ClearScreenStr << EmptyStr << "\033[0m";
+  Ref << ::cxxg::Screen::ClearScreenStr << ::cxxg::Screen::HideCursorStr
+      << EmptyStr << "\033[0m" << ::cxxg::Screen::ShowCursorStr;
   EXPECT_EQ_MSG(SS.str(), Ref.str(), "RowOutOfRange");
 
   RETURN_SUCCESS;

@@ -27,6 +27,9 @@ public:
 
   void warn(::std::string Warnings);
 
+  void checkSize(ScreenSize GameSize) const;
+  ScreenSize getOffset(ScreenSize GameSize) const;
+
 protected:
   Screen Scr;
   bool GameRunning;

@@ -35,11 +35,18 @@ Row const &Screen::operator[](int Y) const {
   return Rows.at(Y);
 }
 
+void Screen::setColor(ScreenSize Top, ScreenSize Bottom, Color Cl) {
+  for (size_t Y = Top.Y; Y <= Bottom.Y; Y++) {
+    operator[](Y).setColor(Top.X, Bottom.X, Cl);
+  }
+}
+
 void Screen::update() const {
-  Out << ClearScreenStr;
+  Out << ClearScreenStr << HideCursorStr;
   for (auto &Row : Rows) {
     Out << Row;
   }
+  Out << ShowCursorStr;
 }
 
 void Screen::clear() {

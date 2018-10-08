@@ -17,11 +17,12 @@ Color Color::RED = {31};
 Color Color::GREEN = {32};
 Color Color::YELLOW = {33};
 Color Color::BLUE = {34};
+Color Color::GREY = {90};
 
-RowAccessor::RowAccessor(Row &Rw, int Offset) : Rw(Rw), Offset(Offset),
-CurrentColor(Color::NONE) {}
+RowAccessor::RowAccessor(Row &Rw, int Offset)
+    : Rw(Rw), Offset(Offset), CurrentColor(Color::NONE) {}
 
-RowAccessor &RowAccessor::operator = (Color Cl) {
+RowAccessor &RowAccessor::operator=(Color Cl) {
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.ColorInfo.size()) || Offset < 0) {
     return *this;
@@ -30,7 +31,7 @@ RowAccessor &RowAccessor::operator = (Color Cl) {
   return *this;
 }
 
-RowAccessor &RowAccessor::operator = (char C) {
+RowAccessor &RowAccessor::operator=(char C) {
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.Buffer.size()) || Offset < 0) {
     return *this;
@@ -46,7 +47,8 @@ RowAccessor &RowAccessor::operator<<(Color Cl) {
 
 RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
   // check if the access is out of range, if so ignore it
-  if (Offset >= static_cast<int>(Rw.Buffer.size()) || Offset + Str.size() <= 0) {
+  if (Offset >= static_cast<int>(Rw.Buffer.size()) ||
+      Offset + Str.size() <= 0) {
     return *this;
   }
 
@@ -69,15 +71,15 @@ RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
     // the complete string to buffer with offset
     Count = Str.size();
     ::std::copy(Str.begin(), Str.end(), Buffer.begin() + Offset);
-    ::std::fill(ColorInfo.begin() + Offset,
-                ColorInfo.begin() + Offset + Count, CurrentColor);
+    ::std::fill(ColorInfo.begin() + Offset, ColorInfo.begin() + Offset + Count,
+                CurrentColor);
   } else {
     // Third case: Writing inside of the buffer with part of string exceeding
     // the end of the buffer, we need to clip string at the end
     Count = Buffer.size() - Offset;
     ::std::copy(Str.begin(), Str.begin() + Count, Buffer.begin() + Offset);
-    ::std::fill(ColorInfo.begin() + Offset,
-                ColorInfo.begin() + Offset + Count, CurrentColor);
+    ::std::fill(ColorInfo.begin() + Offset, ColorInfo.begin() + Offset + Count,
+                CurrentColor);
   }
 
   // update offset of accessor by the amount of characters we already wrote
@@ -99,15 +101,17 @@ void Row::clear() {
   ::std::fill(ColorInfo.begin(), ColorInfo.end(), Color::NONE);
 }
 
-::std::string const &Row::getBuffer() const {
-  return Buffer;
-}
+::std::string const &Row::getBuffer() const { return Buffer; }
 
-::std::vector<Color> const &Row::getColorInfo() const {
-  return ColorInfo;
-}
+::std::vector<Color> const &Row::getColorInfo() const { return ColorInfo; }
 
 RowAccessor Row::operator[](int X) { return RowAccessor(*this, X); }
+
+void Row::setColor(int StartX, int EndX, Color Cl) {
+  int Start = ::std::max(StartX, 0);
+  int End = ::std::min(EndX, static_cast<int>(ColorInfo.size()));
+  ::std::fill(ColorInfo.begin() + Start, ColorInfo.begin() + End, Cl);
+}
 
 ::std::ostream &Row::dump(::std::ostream &Out) const {
   Color LastColor = Color::NONE;

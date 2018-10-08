@@ -13,6 +13,7 @@ public:
   void handleInput(int Char) final;
 
   void draw() final;
+  void drawLogoAnimation();
 
   void handleGameOver() final;
 

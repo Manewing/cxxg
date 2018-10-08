@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <time.h>
+#include <unistd.h>
 
 // TODO get terminal size and adapt to it
 Game2048::Game2048(::std::string const &HighScoreFile)
@@ -30,6 +31,9 @@ Game2048::~Game2048() { handleExit(); }
 
 void Game2048::initialize(bool BufferedInput) {
   ::cxxg::Game::initialize(BufferedInput);
+
+  // draw some nice animation
+  drawLogoAnimation();
 
   // add first two initial elements to the board
   addNewElement();
@@ -70,22 +74,13 @@ void Game2048::handleInput(int Char) {
 }
 
 void Game2048::draw() {
-  // get screen size
-  auto const Size = Scr.getSize();
-
   // define game size
   ::cxxg::ScreenSize const GameSize{22, 12};
 
-  // check that screen size is sufficient
-  if (Size.X < GameSize.X || Size.Y < GameSize.Y) {
-    ::std::stringstream SS;
-    SS << "Screen size { " << Size.X << ", " << Size.Y << " } to small";
-    throw ::std::out_of_range(SS.str());
-  }
+  // get game offset
+  ::cxxg::ScreenSize const Offset = getOffset(GameSize);
 
-  // get offsets
-  ::cxxg::ScreenSize const Offset{(Size.X - GameSize.X) / 2,
-                                  (Size.Y - GameSize.Y) / 2};
+  // get message offsets
   ::cxxg::ScreenSize const MsgOffset{Offset.X + 5, Offset.Y + 7};
 
   // draw the score board
@@ -130,6 +125,39 @@ void Game2048::draw() {
   }
 
   ::cxxg::Game::draw();
+}
+
+void Game2048::drawLogoAnimation() {
+  // define size of logo and get offset
+  ::cxxg::ScreenSize const LogoSize{38, 7};
+  ::cxxg::ScreenSize const Offset = getOffset(LogoSize);
+
+  // print characters of logo
+  Scr[Offset.Y + 0][Offset.X] << " 222222    000000   44    44   888888 ";
+  Scr[Offset.Y + 1][Offset.X] << "22    22  000   00  44    44  88    88";
+  Scr[Offset.Y + 2][Offset.X] << "      22  0000  00  44    44  88    88";
+  Scr[Offset.Y + 3][Offset.X] << " 222222   00 00 00  44444444   888888 ";
+  Scr[Offset.Y + 4][Offset.X] << "22        00  0000        44  88    88";
+  Scr[Offset.Y + 5][Offset.X] << "22        00   000        44  88    88";
+  Scr[Offset.Y + 6][Offset.X] << "22222222   000000         44   888888 ";
+
+  // animate the colors
+  for (int L = 0; L < 10; L++) {
+    Scr.setColor({Offset.X, Offset.Y}, {Offset.X + 8, Offset.Y + 6},
+                 ::cxxg::Color{(L + 0) % 4 + 31});
+    Scr.setColor({Offset.X + 10, Offset.Y}, {Offset.X + 18, Offset.Y + 6},
+                 ::cxxg::Color{(L + 1) % 4 + 31});
+    Scr.setColor({Offset.X + 20, Offset.Y}, {Offset.X + 28, Offset.Y + 6},
+                 ::cxxg::Color{(L + 2) % 4 + 31});
+    Scr.setColor({Offset.X + 30, Offset.Y}, {Offset.X + 38, Offset.Y + 6},
+                 ::cxxg::Color{(L + 3) % 4 + 31});
+
+    // update screen and wait some time
+    Scr.update();
+    usleep(60000);
+  }
+
+  Scr.clear();
 }
 
 void Game2048::handleGameOver() {

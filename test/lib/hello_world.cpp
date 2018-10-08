@@ -16,7 +16,7 @@ int main() {
   ::std::cout << SS.str() << ::std::endl;
 
   // create reference
-  Ref << ::cxxg::Screen::ClearScreenStr;
+  Ref << ::cxxg::Screen::ClearScreenStr << ::cxxg::Screen::HideCursorStr;
   EmptyStr.resize(80, ' ');
   for (int l = 0; l < 11; l++) {
     Ref << EmptyStr << "\033[0m";
@@ -27,6 +27,7 @@ int main() {
   for (int l = 0; l < 12; l++) {
     Ref << EmptyStr << "\033[0m";
   }
+  Ref << ::cxxg::Screen::ShowCursorStr;
 
   // check that reference matches
   EXPECT_EQ_MSG(SS.str(), Ref.str(), "Hello World");
@@ -36,10 +37,11 @@ int main() {
   // check that clear screen works correctly
   Screen.clear();
   Screen.update();
-  Ref << ::cxxg::Screen::ClearScreenStr;
+  Ref << ::cxxg::Screen::ClearScreenStr << ::cxxg::Screen::HideCursorStr;
   for (int l = 0; l < 24; l++) {
     Ref << EmptyStr << "\033[0m";
   }
+  Ref << ::cxxg::Screen::ShowCursorStr;
   EXPECT_EQ_MSG(SS.str(), Ref.str(), "Clear Screen");
   SS.clear();
   Ref.clear();
