@@ -5,7 +5,7 @@
 
 namespace cxxg {
 
-Game::Game() : Scr(Screen::getTerminalSize()) {}
+Game::Game() : Scr(Screen::getTerminalSize()), GameRunning(true) {}
 
 Game::~Game() {
   if (!utils::hasBufferedInput()) {

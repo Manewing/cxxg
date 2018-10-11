@@ -1,10 +1,4 @@
 #include "Common.h"
-#include <cxxg/Row.h>
-
-::std::ostream &operator<<(::std::ostream &Out, ::cxxg::Color Cl) {
-  Out << Cl.Value;
-  return Out;
-}
 
 int main() {
   // create row

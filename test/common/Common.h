@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <cxxg/Screen.h>
 
 // TODO Replace this file with google test....
 
@@ -37,6 +38,11 @@ bool operator==(::std::vector<T> const &A, ::std::vector<T> const &B) {
   }
 
   return true;
+}
+
+::std::ostream &operator<<(::std::ostream &Out, ::cxxg::Color Cl) {
+  Out << Cl.Value;
+  return Out;
 }
 
 template <typename T>
