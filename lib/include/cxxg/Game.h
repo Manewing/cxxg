@@ -25,7 +25,7 @@ public:
 
   virtual void handleGameOver() = 0;
 
-  void warn(::std::string Warnings);
+  RowAccessor warn();
 
   void checkSize(ScreenSize GameSize) const;
   ScreenSize getOffset(ScreenSize GameSize) const;
@@ -33,7 +33,7 @@ public:
 protected:
   Screen Scr;
   bool GameRunning;
-  ::std::vector<::std::string> Warnings;
+  ::std::vector<Row> Warnings;
 };
 
 }; // namespace cxxg

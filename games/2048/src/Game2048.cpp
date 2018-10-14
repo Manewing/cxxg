@@ -16,10 +16,8 @@ Game2048::Game2048(::std::string const &HighScoreFile)
     if (File.is_open()) {
       File >> HighScore;
     } else {
-      ::std::stringstream SS;
-      SS << "Could not open highscore file: '" << HighScoreFile
-         << "' for reading.";
-      warn(SS.str());
+      warn() << "Could not open highscore file: '" << HighScoreFile
+             << "' for reading.";
     }
   }
 
@@ -172,10 +170,8 @@ void Game2048::handleExit() {
     if (File.is_open()) {
       File << HighScore;
     } else {
-      ::std::stringstream SS;
-      SS << "Could not open highscore file: '" << HighScoreFile
-         << "' for writing.";
-      warn(SS.str());
+      warn() << "Could not open highscore file: '" << HighScoreFile
+             << "' for writing.";
     }
   }
 

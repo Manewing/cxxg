@@ -32,7 +32,7 @@ void Game::draw() {
     auto Y = Scr.getSize().Y - Warnings.size() + L;
 
     // print warning
-    Scr[Y][0] << ::cxxg::Color::YELLOW << "WARNING: " << Warnings.at(L);
+    Scr[Y] = Warnings.at(L);
   }
   Warnings.clear();
 
@@ -40,8 +40,9 @@ void Game::draw() {
   Scr.clear();
 }
 
-void Game::warn(::std::string Warning) {
-  Warnings.push_back(::std::move(Warning));
+RowAccessor Game::warn() {
+  Warnings.push_back(Row(Scr.getSize().X));
+  return (Warnings.back()[0] << ::cxxg::Color::YELLOW << "WARNING: ");
 }
 
 void Game::checkSize(ScreenSize GameSize) const {
