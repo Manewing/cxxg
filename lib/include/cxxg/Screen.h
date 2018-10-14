@@ -10,12 +10,14 @@
 namespace cxxg {
 
 /// Screen size in rows and columns
+// TODO create "type" namespace and header, move it there
+// make proper distinction between size and point
 struct ScreenSize {
   /// Size X, Colums
-  size_t X;
+  int X;
 
   /// Size Y, Rows
-  size_t Y;
+  int Y;
 };
 
 class Screen {

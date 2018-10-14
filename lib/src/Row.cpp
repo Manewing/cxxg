@@ -109,8 +109,11 @@ RowAccessor Row::operator[](int X) { return RowAccessor(*this, X); }
 
 void Row::setColor(int StartX, int EndX, Color Cl) {
   int Start = ::std::max(StartX, 0);
-  int End = ::std::min(EndX, static_cast<int>(ColorInfo.size()));
-  ::std::fill(ColorInfo.begin() + Start, ColorInfo.begin() + End, Cl);
+  int End = ::std::max(0, ::std::min(EndX, static_cast<int>(ColorInfo.size())));
+
+  if (End > Start) {
+    ::std::fill(ColorInfo.begin() + Start, ColorInfo.begin() + End, Cl);
+  }
 }
 
 ::std::ostream &Row::dump(::std::ostream &Out) const {

@@ -14,7 +14,7 @@ ScreenSize Screen::getTerminalSize() {
 Screen::Screen(ScreenSize Size, ::std::ostream &Out)
     : Out(Out), DummyRow(0), Size(Size) {
   Rows.reserve(Size.Y);
-  for (size_t Y = 0; Y < Size.Y; Y++) {
+  for (int Y = 0; Y < Size.Y; Y++) {
     Rows.push_back(Row(Size.X));
   }
 }
@@ -36,7 +36,7 @@ Row const &Screen::operator[](int Y) const {
 }
 
 void Screen::setColor(ScreenSize Top, ScreenSize Bottom, Color Cl) {
-  for (size_t Y = Top.Y; Y <= Bottom.Y; Y++) {
+  for (int Y = Top.Y; Y <= Bottom.Y; Y++) {
     operator[](Y).setColor(Top.X, Bottom.X, Cl);
   }
 }
@@ -46,7 +46,7 @@ void Screen::update() const {
   for (auto &Row : Rows) {
     Out << Row;
   }
-  Out << ShowCursorStr;
+  Out << ShowCursorStr << ::std::flush;
 }
 
 void Screen::clear() {
