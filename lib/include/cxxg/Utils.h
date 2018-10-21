@@ -2,7 +2,16 @@
 #define CXXG_UTILS_HH
 
 #include <functional>
+#include <sstream>
+#include <stdexcept>
 #include <string>
+
+#define THROW_CXXG_ERROR(msg)                                                  \
+  {                                                                            \
+    ::std::stringstream cxxg__SS;                                              \
+    cxxg__SS << "cxxg:" << msg;                                                \
+    throw ::std::runtime_error(cxxg__SS.str());                                \
+  }
 
 namespace cxxg {
 
