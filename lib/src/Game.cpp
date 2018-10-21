@@ -1,11 +1,13 @@
 #include <cxxg/Game.h>
 
+#include <chrono>
 #include <cxxg/Utils.h>
-#include <stdio.h>
 
 namespace cxxg {
 
-Game::Game() : Scr(Screen::getTerminalSize()), GameRunning(true) {}
+Game::Game()
+    : Scr(Screen::getTerminalSize()), GameRunning(true),
+      RngEngine(utils::getTimeStamp()) {}
 
 Game::~Game() {
   if (!utils::hasBufferedInput()) {
@@ -63,6 +65,10 @@ ScreenSize Game::getOffset(ScreenSize GameSize) const {
   auto const Size = Scr.getSize();
   checkSize(GameSize);
   return {(Size.X - GameSize.X) / 2, (Size.Y - GameSize.Y) / 2};
+}
+
+void Game::setRandomSeed(size_t Seed) {
+  RngEngine = ::std::default_random_engine(Seed);
 }
 
 }; // namespace cxxg

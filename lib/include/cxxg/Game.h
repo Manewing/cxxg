@@ -4,6 +4,7 @@
 #include <cxxg/Screen.h>
 
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -28,12 +29,16 @@ public:
   RowAccessor warn();
 
   void checkSize(ScreenSize GameSize) const;
+
   ScreenSize getOffset(ScreenSize GameSize) const;
+
+  void setRandomSeed(size_t Seed);
 
 protected:
   Screen Scr;
   bool GameRunning;
   ::std::vector<Row> Warnings;
+  ::std::default_random_engine RngEngine;
 };
 
 }; // namespace cxxg
