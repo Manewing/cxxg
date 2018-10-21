@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <time.h>
 #include <unistd.h>
 
 // TODO get terminal size and adapt to it
@@ -20,9 +19,6 @@ Game2048::Game2048(::std::string const &HighScoreFile)
              << "' for reading.";
     }
   }
-
-  // set seed for rand
-  srand(time(0));
 }
 
 Game2048::~Game2048() { handleExit(); }
@@ -190,12 +186,12 @@ void Game2048::addNewElement() {
   // get a random empty position on the board
   size_t X, Y;
   do {
-    X = rand() & 0x3;
-    Y = rand() & 0x3;
+    X = RndEngine() & 0x3;
+    Y = RndEngine() & 0x3;
   } while (Board[Y][X] != 0);
 
   // add a random element
-  Board[Y][X] = rand() & 0x1 ? 2 : 4;
+  Board[Y][X] = RndEngine() & 0x1 ? 2 : 4;
 }
 
 int Game2048::getPowerOfTwo(unsigned Element) {

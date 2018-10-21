@@ -7,7 +7,7 @@ namespace cxxg {
 
 Game::Game()
     : Scr(Screen::getTerminalSize()), GameRunning(true),
-      RngEngine(utils::getTimeStamp()) {}
+      RndEngine(utils::getTimeStamp()) {}
 
 Game::~Game() {
   if (!utils::hasBufferedInput()) {
@@ -68,7 +68,7 @@ ScreenSize Game::getOffset(ScreenSize GameSize) const {
 }
 
 void Game::setRandomSeed(size_t Seed) {
-  RngEngine = ::std::default_random_engine(Seed);
+  RndEngine = ::std::default_random_engine(Seed);
 }
 
 }; // namespace cxxg

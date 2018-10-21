@@ -38,7 +38,7 @@ protected:
   Screen Scr;
   bool GameRunning;
   ::std::vector<Row> Warnings;
-  ::std::default_random_engine RngEngine;
+  ::std::default_random_engine RndEngine;
 };
 
 }; // namespace cxxg

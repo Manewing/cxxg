@@ -347,7 +347,7 @@ MasterMind::Pins MasterMind::getRandomCode(size_t CodeSize, size_t PinCount) {
     Elem += static_cast<Pin>(PinCount-- % MaxPinCount);
   }
 
-  ::std::shuffle(Code.begin(), Code.end(), RngEngine);
+  ::std::shuffle(Code.begin(), Code.end(), RndEngine);
   Code.erase(Code.begin() + CodeSize, Code.end());
 
   return Code;
