@@ -1,5 +1,6 @@
 #include <cxxg/Utils.h>
 
+#include <chrono>
 #include <signal.h>
 #include <termios.h>
 #include <unistd.h>
@@ -53,6 +54,10 @@ void switchBufferedInput() {
     return HomeDir;
   }
   return "";
+}
+
+size_t getTimeStamp() {
+  return ::std::chrono::system_clock::now().time_since_epoch().count();
 }
 
 } // namespace utils

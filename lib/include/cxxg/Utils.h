@@ -34,6 +34,9 @@ void switchBufferedInput();
 /// empty string if not.
 ::std::string getHomeDir();
 
+/// Returns the time stamp in nano seconds since the start of the epoch.
+size_t getTimeStamp();
+
 } // namespace utils
 
 } // namespace cxxg
