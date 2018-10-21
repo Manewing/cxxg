@@ -1,29 +1,37 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <cxxg/Screen.h>
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include <cxxg/Screen.h>
 
 // TODO Replace this file with google test....
 
 bool Success = true;
 
-#define EXPECT_EQ(a, b)                                                        \
+#define EXPECT_EQ_BASE(a, b, msg)                                              \
   if (!((a) == (b))) {                                                         \
-    ::std::cerr << "ERROR: expected '" << #a << "' = '" << a                   \
+    ::std::cerr << "ERROR" << msg << ": expected '" << #a << "' = '" << a      \
                 << "' to be equal to '" << #b << "' = '" << b << "'"           \
                 << ::std::endl;                                                \
     Success = false;                                                           \
   }
-#define EXPECT_EQ_MSG(a, b, msg)                                               \
-  if (!((a) == (b))) {                                                         \
-    ::std::cerr << "ERROR[" << msg << "]: expected '" << #a << "' = '" << a    \
-                << "' to be equal to '" << #b << "' = '" << b << "'"           \
-                << ::std::endl;                                                \
+#define EXPECT_EQ(a, b) EXPECT_EQ_BASE(a, b, "")
+#define EXPECT_EQ_MSG(a, b, msg) EXPECT_EQ_BASE(a, b, "[" << msg << "]")
+
+#define EXPECT_THROW_BASE(stmt, except, msg)                                   \
+  try {                                                                        \
+    stmt;                                                                      \
+    ::std::cerr << "ERROR" << msg << ": expected '" << #stmt                   \
+                << "' to throw an exception" << ::std::endl;                   \
     Success = false;                                                           \
+  } catch (except const &E) {                                                  \
+    ::std::cerr << "INFO: " << E.what() << ::std::endl;                        \
   }
+#define EXPECT_THROW(stmt, except) EXPECT_THROW_BASE(stmt, except, "")
+#define EXPECT_THROW_MSG(stmt, except, msg)                                    \
+  EXPECT_THROW_BASE(stmt, except, "[" << msg << "]")
 
 #define RETURN_SUCCESS return Success ? 0 : 1;
 
@@ -46,8 +54,7 @@ bool operator==(::std::vector<T> const &A, ::std::vector<T> const &B) {
 }
 
 template <typename T>
-::std::ostream &operator<<(::std::ostream &Out,
-                           ::std::vector<T> const &Elems) {
+::std::ostream &operator<<(::std::ostream &Out, ::std::vector<T> const &Elems) {
   auto Pred = "";
   Out << "{ ";
   for (auto Elem : Elems) {

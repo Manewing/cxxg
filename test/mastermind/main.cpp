@@ -32,5 +32,19 @@ int main() {
   EXPECT_EQ_MSG(::MasterMind::getWhites(Code, Guess), 0, "CorrectGuess");
   EXPECT_EQ_MSG(::MasterMind::getBlacks(Code, Guess), 4, "CorrectGuess");
 
+  Guess = {};
+  EXPECT_THROW(::MasterMind::getWhites(Code, Guess), ::std::runtime_error);
+  EXPECT_THROW(::MasterMind::getBlacks(Code, Guess), ::std::runtime_error);
+
+  // check random code generation
+  ::MasterMind MM;
+
+  EXPECT_EQ(::MasterMind::isValidGuess(MM.getRandomCode(1, 1)), true);
+  EXPECT_EQ(::MasterMind::isValidGuess(MM.getRandomCode(1, 10)), true);
+  EXPECT_EQ(::MasterMind::isValidGuess(MM.getRandomCode(10, 10)), true);
+  EXPECT_EQ(::MasterMind::isValidGuess(MM.getRandomCode(5, 10)), true);
+  EXPECT_THROW(MM.getRandomCode(1, 0), ::std::runtime_error);
+  EXPECT_THROW(MM.getRandomCode(10, 1000), ::std::runtime_error);
+
   RETURN_SUCCESS;
 }

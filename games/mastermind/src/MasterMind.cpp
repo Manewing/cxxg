@@ -1,25 +1,20 @@
 #include "MasterMind.h"
 
 #include <algorithm>
-#include <assert.h>
-#include <random>
-#include <time.h>
+#include <cxxg/Utils.h>
 #include <iomanip>
+#include <stdexcept>
 #include <unistd.h>
 
 ::std::map<char, ::cxxg::Color> MasterMind::Colors = {
-  { ' ', ::cxxg::Color::NONE },
-  { 'a', ::cxxg::Color::RED },
-  { 'b', ::cxxg::Color::GREEN },
-  { 'c', ::cxxg::Color::BLUE },
-  { 'd', ::cxxg::Color::YELLOW },
-  { 'e', ::cxxg::Color::RED },
-  { 'f', ::cxxg::Color::GREEN },
-  { 'g', ::cxxg::Color::BLUE },
-  { 'h', ::cxxg::Color::YELLOW }
-};
+    {' ', ::cxxg::Color::NONE},   {'a', ::cxxg::Color::RED},
+    {'b', ::cxxg::Color::GREEN},  {'c', ::cxxg::Color::BLUE},
+    {'d', ::cxxg::Color::YELLOW}, {'e', ::cxxg::Color::RED},
+    {'f', ::cxxg::Color::GREEN},  {'g', ::cxxg::Color::BLUE},
+    {'h', ::cxxg::Color::YELLOW}};
 
-::std::string MasterMind::formatTime(size_t Seconds) {
+::std::string MasterMind::formatTime(size_t NanoSeconds) {
+  size_t Seconds = NanoSeconds * 1e-9;
   size_t Minutes = Seconds / 60;
   Seconds -= Minutes * 60;
 
@@ -37,7 +32,7 @@
 MasterMind::MasterMind()
     : State(Running), InputPosition(0), Code(getRandomCode(4, 8)) {
   CurrentGuess.resize(4, ' ');
-  GameStartTimeStamp = time(NULL);
+  GameStartTimeStamp = ::cxxg::utils::getTimeStamp();
 }
 
 void MasterMind::initialize(bool BufferedInput) {
@@ -83,7 +78,7 @@ void MasterMind::handleReturn() {
   // add guess to history
   size_t Blacks = getBlacks(Code, CurrentGuess);
   size_t Whites = getWhites(Code, CurrentGuess);
-  size_t TimeStamp = time(NULL) - GameStartTimeStamp;
+  size_t TimeStamp = ::cxxg::utils::getTimeStamp() - GameStartTimeStamp;
   HistGuess HG{CurrentGuess, Blacks, Whites, TimeStamp};
   History.push_back(HG);
 
@@ -157,7 +152,7 @@ void MasterMind::draw() {
   Scr[Y][Offset.X] << "+---+---+---+---+";
 
   // create lambda for drawing guess at given Y position
-  auto drawGuess = [&] (Pins const &Guess, size_t Y) {
+  auto drawGuess = [&](Pins const &Guess, size_t Y) {
     for (int X = Offset.X + 2, L = 0; X < Offset.X + 16; X += 4) {
       Scr[Y][X] = Guess.at(L);
       Scr[Y][X] = Colors.at(Guess.at(L++));
@@ -295,8 +290,12 @@ bool MasterMind::isValidGuess(Pins const &Guess) {
 }
 
 size_t MasterMind::getBlacks(Pins const &Code, Pins const &Guess) {
-  // TODO use exception
-  assert(Code.size() == Guess.size());
+  if (Code.size() != Guess.size()) {
+    THROW_CXXG_ERROR("MasterMind: Code size (" << Code.size() << ") does not"
+                                               << " match Guess size ("
+                                               << Guess.size() << ")");
+  }
+
   size_t Count = 0;
 
   for (size_t L = 0; L < Code.size(); L++) {
@@ -309,8 +308,12 @@ size_t MasterMind::getBlacks(Pins const &Code, Pins const &Guess) {
 }
 
 size_t MasterMind::getWhites(Pins const &Code, Pins const &Guess) {
-  // TODO use exception
-  assert(Code.size() == Guess.size());
+  if (Code.size() != Guess.size()) {
+    THROW_CXXG_ERROR("MasterMind: Code size (" << Code.size() << ") does not"
+                                               << " match Guess size ("
+                                               << Guess.size() << ")");
+  }
+
   size_t Count = 0;
 
   for (auto Elem : Guess) {
@@ -323,18 +326,28 @@ size_t MasterMind::getWhites(Pins const &Code, Pins const &Guess) {
 }
 
 MasterMind::Pins MasterMind::getRandomCode(size_t CodeSize, size_t PinCount) {
-  // TODO use exception
-  assert(PinCount < static_cast<size_t>('z' - 'a'));
-  assert(CodeSize <= PinCount);
+  auto const MaxPinCount = static_cast<size_t>('z' - 'a');
+
+  if (PinCount >= MaxPinCount) {
+    THROW_CXXG_ERROR("MasterMind: Cannot create code, pin count "
+                     << "(" << PinCount << ") must be smaller than ("
+                     << MaxPinCount << ")");
+  }
+
+  if (CodeSize > PinCount) {
+    THROW_CXXG_ERROR("MasterMind: Cannot create code ("
+                     << CodeSize << ") which is greater than pin count ("
+                     << PinCount << ")");
+  }
 
   Pins Code;
   Code.resize(PinCount, 'a');
 
   for (auto &Elem : Code) {
-    Elem += static_cast<Pin>(PinCount-- % ('z' - 'a'));
+    Elem += static_cast<Pin>(PinCount-- % MaxPinCount);
   }
 
-  ::std::random_shuffle(Code.begin(), Code.end());
+  ::std::shuffle(Code.begin(), Code.end(), RngEngine);
   Code.erase(Code.begin() + CodeSize, Code.end());
 
   return Code;
