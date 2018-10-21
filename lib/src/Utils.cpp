@@ -60,6 +60,8 @@ size_t getTimeStamp() {
   return ::std::chrono::system_clock::now().time_since_epoch().count();
 }
 
+void sleep(size_t MicroSeconds) { usleep(MicroSeconds); }
+
 } // namespace utils
 
 } // namespace cxxg

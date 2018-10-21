@@ -37,6 +37,9 @@ void switchBufferedInput();
 /// Returns the time stamp in nano seconds since the start of the epoch.
 size_t getTimeStamp();
 
+/// Sleeps for the given amount of micro-seconds.
+void sleep(size_t MicroSeconds);
+
 } // namespace utils
 
 } // namespace cxxg

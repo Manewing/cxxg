@@ -4,7 +4,6 @@
 #include <cxxg/Utils.h>
 #include <iomanip>
 #include <stdexcept>
-#include <unistd.h>
 
 ::std::map<char, ::cxxg::Color> MasterMind::Colors = {
     {' ', ::cxxg::Color::NONE},   {'a', ::cxxg::Color::RED},
@@ -241,15 +240,13 @@ void MasterMind::drawLogoAnimation() {
     Scr.setColor({X, Offset.Y}, {X + 1, Offset.Y + LogoSize.Y},
                  ::cxxg::Color::NONE);
     Scr.update();
-    // TODO add sleep function to game base
-    usleep(30000);
+    ::cxxg::utils::sleep(30000);
   }
 
   Scr.setColor(Offset, {Offset.X + LogoSize.X, Offset.Y + LogoSize.Y},
                ::cxxg::Color::NONE);
   Scr.update();
-  // TODO add sleep function to game base
-  usleep(500000);
+  ::cxxg::utils::sleep(500000);
 
   Scr.clear();
 }

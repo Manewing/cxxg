@@ -1,10 +1,9 @@
 #include "Game2048.h"
 
 #include <algorithm>
+#include <cxxg/Utils.h>
 #include <fstream>
-#include <unistd.h>
 
-// TODO get terminal size and adapt to it
 Game2048::Game2048(::std::string const &HighScoreFile)
     : Game(), Score(0), HighScore(0), State(NewGame),
       HighScoreFile(HighScoreFile) {
@@ -148,7 +147,7 @@ void Game2048::drawLogoAnimation() {
 
     // update screen and wait some time
     Scr.update();
-    usleep(60000);
+    ::cxxg::utils::sleep(60000);
   }
 
   Scr.clear();
