@@ -19,9 +19,9 @@ In order to build `cxxg` you need `cmake (version >= 3.5)` and optionally if you
     wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
     tar -xzf release-1.8.0.tar.gz && cd googletest-release-1.8.0
     mkdir build && cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX=INSTALL -DCMAKE_CXX_STANDARD=11
+    cmake .. -DCMAKE_INSTALL_PREFIX=install -DCMAKE_CXX_STANDARD=11
     make && make install
-    export GTEST_ROOT=`pwd`/INSTALL
+    export GTEST_ROOT=`pwd`/install
     export GMOCK_ROOT=$GTEST_ROOT
     ```
 

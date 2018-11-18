@@ -24,6 +24,7 @@ target_link_libraries(${TARGET}
   cxxg
   ${GTEST_LIBRARIES}
   ${GTEST_MAIN_LIBRARY}
+  pthread
 )
 
 target_include_directories(${TARGET}
