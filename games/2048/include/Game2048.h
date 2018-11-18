@@ -12,10 +12,10 @@ public:
 
   void handleInput(int Char) final;
 
-  void draw() final;
+  void handleDraw() final;
   void drawLogoAnimation();
 
-  void handleGameOver() final;
+  void handleGameOver();
 
   void handleExit() final;
 

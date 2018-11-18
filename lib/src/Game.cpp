@@ -20,11 +20,11 @@ void Game::initialize(bool BufferedInput) {
 void Game::run() {
   while (GameRunning) {
     handleInput(getchar());
-    draw();
+    handleDraw();
   }
 }
 
-void Game::draw() {
+void Game::handleDraw() {
   for (size_t L = 0; L < Warnings.size(); L++) {
     // get position for warning
     auto Y = Scr.getSize().Y - Warnings.size() + L;

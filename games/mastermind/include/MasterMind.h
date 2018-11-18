@@ -32,10 +32,10 @@ public:
   void handleLeft();
   void handleRight();
 
-  void draw() final;
+  void handleDraw() final;
   void drawLogoAnimation();
 
-  void handleGameOver() final;
+  void handleGameOver();
 
   static bool hasDuplicates(Pins const &Guess);
   static bool isComplete(Pins const &Guess);

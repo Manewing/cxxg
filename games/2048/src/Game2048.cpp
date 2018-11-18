@@ -32,7 +32,7 @@ void Game2048::initialize(bool BufferedInput) {
   addNewElement();
   addNewElement();
 
-  draw();
+  handleDraw();
 }
 
 void Game2048::handleInput(int Char) {
@@ -66,7 +66,7 @@ void Game2048::handleInput(int Char) {
   }
 }
 
-void Game2048::draw() {
+void Game2048::handleDraw() {
   // define game size
   ::cxxg::ScreenSize const GameSize{22, 12};
 
@@ -117,7 +117,7 @@ void Game2048::draw() {
     State = Running;
   }
 
-  ::cxxg::Game::draw();
+  ::cxxg::Game::handleDraw();
 }
 
 void Game2048::drawLogoAnimation() {
@@ -170,7 +170,7 @@ void Game2048::handleExit() {
     }
   }
 
-  draw();
+  handleDraw();
 
   ::cxxg::Game::handleExit();
 }

@@ -43,7 +43,7 @@ void MasterMind::initialize(bool BufferedInput) {
 
   drawLogoAnimation();
 
-  draw();
+  handleDraw();
 }
 
 void MasterMind::handleInput(int Char) {
@@ -114,7 +114,7 @@ void MasterMind::handleRight() {
   }
 }
 
-void MasterMind::draw() {
+void MasterMind::handleDraw() {
   // define game size
   ::cxxg::ScreenSize GameSize{22, 29};
 
@@ -221,7 +221,7 @@ void MasterMind::draw() {
     Scr[Offset.Y + GameSize.Y / 2][Offset.X + 4] << " CRACKED ";
   }
 
-  ::cxxg::Game::draw();
+  ::cxxg::Game::handleDraw();
 }
 
 void MasterMind::drawLogoAnimation() {
