@@ -24,8 +24,9 @@ public:
 
 public:
   MasterMind();
+  virtual ~MasterMind();
 
-  void initialize(bool BufferedInput = true) final;
+  void initialize(bool BufferedInput = false) final;
   void handleInput(int Char) final;
   void handleReturn();
   void handleLeft();
@@ -35,7 +36,6 @@ public:
   void drawLogoAnimation();
 
   void handleGameOver() final;
-  void handleExit();
 
   static bool hasDuplicates(Pins const &Guess);
   static bool isComplete(Pins const &Guess);

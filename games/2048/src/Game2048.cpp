@@ -171,6 +171,8 @@ void Game2048::handleExit() {
   }
 
   draw();
+
+  ::cxxg::Game::handleExit();
 }
 
 void Game2048::addNewElement() {

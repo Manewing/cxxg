@@ -9,14 +9,10 @@ Game::Game()
     : Scr(Screen::getTerminalSize()), GameRunning(true),
       RndEngine(utils::getTimeStamp()) {}
 
-Game::~Game() {
-  if (!utils::hasBufferedInput()) {
-    utils::switchBufferedInput();
-  }
-}
-
 void Game::initialize(bool BufferedInput) {
-  if (BufferedInput && utils::hasBufferedInput()) {
+  // switch input if requested input type buffered/un-buffered does not match
+  // the current one
+  if (BufferedInput != utils::hasBufferedInput()) {
     utils::switchBufferedInput();
   }
 }
@@ -40,6 +36,13 @@ void Game::draw() {
 
   Scr.update();
   Scr.clear();
+}
+
+void Game::handleExit() {
+  // set input back to buffered input
+  if (!utils::hasBufferedInput()) {
+    utils::switchBufferedInput();
+  }
 }
 
 RowAccessor Game::warn() {

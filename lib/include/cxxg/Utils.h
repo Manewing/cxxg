@@ -24,10 +24,11 @@ namespace utils {
 void registerSigintHandler(::std::function<void()> const &Handler);
 
 /// Returns true if the terminal input is buffered or not. Buffered means
-/// that a Return is needed after input.
+/// that a '\n' is needed after input.
 bool hasBufferedInput();
 
-/// Switches the input from buffered to un-buffered or vice versa.
+/// Switches the input from buffered ('\n' needed after input) to
+/// un-buffered (no '\n' needed for character input) or vice versa.
 void switchBufferedInput();
 
 /// Returns the path to the home directory if it could be acquired or

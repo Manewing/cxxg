@@ -8,7 +8,7 @@ public:
   Game2048(::std::string const &HighScoreFile);
   virtual ~Game2048();
 
-  void initialize(bool BufferedInput = true) final;
+  void initialize(bool BufferedInput = false) final;
 
   void handleInput(int Char) final;
 
@@ -17,7 +17,7 @@ public:
 
   void handleGameOver() final;
 
-  void handleExit();
+  void handleExit() final;
 
   void addNewElement();
 

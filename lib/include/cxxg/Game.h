@@ -13,7 +13,6 @@ namespace cxxg {
 class Game {
 public:
   Game();
-  virtual ~Game();
 
   /// Initializes environment
   virtual void initialize(bool BufferedInput);
@@ -26,6 +25,8 @@ public:
 
   virtual void handleGameOver() = 0;
 
+  virtual void handleExit();
+
   RowAccessor warn();
 
   void checkSize(ScreenSize GameSize) const;
@@ -35,9 +36,16 @@ public:
   void setRandomSeed(size_t Seed);
 
 protected:
+  /// Screen on which the game will be displayed
   Screen Scr;
+
+  /// Flag for game loop determining whether the game is running
   bool GameRunning;
+
+  /// Buffer for warnings to display
   ::std::vector<Row> Warnings;
+
+  /// Random engine for generating random numbers in games
   ::std::default_random_engine RndEngine;
 };
 

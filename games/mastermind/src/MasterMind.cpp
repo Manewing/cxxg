@@ -34,6 +34,10 @@ MasterMind::MasterMind()
   GameStartTimeStamp = ::cxxg::utils::getTimeStamp();
 }
 
+MasterMind::~MasterMind() {
+  handleExit();
+}
+
 void MasterMind::initialize(bool BufferedInput) {
   ::cxxg::Game::initialize(BufferedInput);
 
@@ -255,8 +259,6 @@ void MasterMind::handleGameOver() {
   State = State == Running ? GameOver : State;
   GameRunning = false;
 }
-
-void MasterMind::handleExit() {}
 
 bool MasterMind::hasDuplicates(Pins const &Guess) {
   Pins Unique = Guess;
