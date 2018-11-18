@@ -1,7 +1,9 @@
 #include "Common.h"
 #include <cxxg/Screen.h>
 
-int main() {
+namespace {
+
+TEST(cxxg, Accesses) {
   // buffer in string stream to check results later
   ::std::stringstream SS;
   ::cxxg::Screen Screen(::cxxg::ScreenSize{10, 1}, SS);
@@ -15,7 +17,7 @@ int main() {
   Row[0] << "test";
   EmptyStr.resize(6, ' ');
   Ref << "test" << EmptyStr;
-  EXPECT_EQ_MSG(Row.getBuffer(), Ref.str(), "RowAccessZeroOffset");
+  EXPECT_EQ(Row.getBuffer(), Ref.str()) << "RowAccessZeroOffset";
 
   // clear everything
   Screen.clear();
@@ -28,7 +30,7 @@ int main() {
   EmptyStr.resize(4, ' ');
   Ref << "  "
       << "test" << EmptyStr;
-  EXPECT_EQ_MSG(Row.getBuffer(), Ref.str(), "RowAccessPositiveOffset");
+  EXPECT_EQ(Row.getBuffer(), Ref.str()) << "RowAccessPositiveOffset";
 
   // clear everything
   Screen.clear();
@@ -40,7 +42,7 @@ int main() {
   Row[-2] << "test";
   EmptyStr.resize(8, ' ');
   Ref << "st" << EmptyStr;
-  EXPECT_EQ_MSG(Row.getBuffer(), Ref.str(), "RowAcessNegativeOffset");
+  EXPECT_EQ(Row.getBuffer(), Ref.str()) << "RowAcessNegativeOffset";
 
   // clear everything
   Screen.clear();
@@ -52,7 +54,7 @@ int main() {
   Row[8] << "test";
   EmptyStr.resize(8, ' ');
   Ref << EmptyStr << "te";
-  EXPECT_EQ_MSG(Row.getBuffer(), Ref.str(), "AccessRowOffsetEnd");
+  EXPECT_EQ(Row.getBuffer(), Ref.str()) << "AccessRowOffsetEnd";
 
   // clear everything
   Screen.clear();
@@ -64,7 +66,7 @@ int main() {
   Row[10] << "test";
   EmptyStr.resize(10, ' ');
   Ref << EmptyStr;
-  EXPECT_EQ_MSG(Row.getBuffer(), Ref.str(), "AccessRowOffsetEnd");
+  EXPECT_EQ(Row.getBuffer(), Ref.str()) << "AccessRowOffsetEnd";
 
   // clear everything
   Screen.clear();
@@ -79,7 +81,7 @@ int main() {
   EmptyStr.resize(10, ' ');
   Ref << ::cxxg::Screen::ClearScreenStr << ::cxxg::Screen::HideCursorStr
       << EmptyStr << "\033[0m" << ::cxxg::Screen::ShowCursorStr;
-  EXPECT_EQ_MSG(SS.str(), Ref.str(), "RowOutOfRange");
-
-  RETURN_SUCCESS;
+  EXPECT_EQ(SS.str(), Ref.str()) << "RowOutOfRange";
 }
+
+} // namespace

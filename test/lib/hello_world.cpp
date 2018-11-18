@@ -1,7 +1,9 @@
 #include "Common.h"
 #include <cxxg/Screen.h>
 
-int main() {
+namespace {
+
+TEST(cxxg, HelloWorld) {
   // buffer in string stream to check results later
   ::std::stringstream SS;
   ::cxxg::Screen Screen(::cxxg::ScreenSize{80, 24}, SS);
@@ -30,7 +32,7 @@ int main() {
   Ref << ::cxxg::Screen::ShowCursorStr;
 
   // check that reference matches
-  EXPECT_EQ_MSG(SS.str(), Ref.str(), "Hello World");
+  EXPECT_EQ(SS.str(), Ref.str()) << "Hello World";
   SS.str("");
   Ref.str("");
 
@@ -42,9 +44,9 @@ int main() {
     Ref << EmptyStr << "\033[0m";
   }
   Ref << ::cxxg::Screen::ShowCursorStr;
-  EXPECT_EQ_MSG(SS.str(), Ref.str(), "Clear Screen");
+  EXPECT_EQ(SS.str(), Ref.str()) << "Clear Screen";
   SS.clear();
   Ref.clear();
-
-  RETURN_SUCCESS;
 }
+
+} // namespace

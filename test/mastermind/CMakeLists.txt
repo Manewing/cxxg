@@ -1,13 +1,14 @@
-set(TARGET test_mastermind)
-add_executable(${TARGET}
+set(SOURCES
   main.cpp
   ../../games/mastermind/src/MasterMind.cpp
 )
-add_test(unittest_mastermind ${TARGET})
-target_link_libraries(${TARGET}
-  cxxg
-)
-target_include_directories(${TARGET}
+
+set(INCLUDES
   PUBLIC ../../games/mastermind/include/
-  PUBLIC ../common/
+)
+
+add_cxxg_unittest(
+  NAME mastermind
+  SOURCES ${SOURCES}
+  INCLUDES ${INCLUDES}
 )

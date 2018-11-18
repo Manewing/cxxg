@@ -1,13 +1,14 @@
-set(TARGET test_2048)
-add_executable(${TARGET}
+set(SOURCES
   main.cpp
   ../../games/2048/src/Game2048.cpp
 )
-add_test(unittest_2048 ${TARGET})
-target_link_libraries(${TARGET}
-  cxxg
-)
-target_include_directories(${TARGET}
+
+set(INCLUDES
   PUBLIC ../../games/2048/include/
-  PUBLIC ../common/
+)
+
+add_cxxg_unittest(
+  NAME 2048
+  SOURCES ${SOURCES}
+  INCLUDES ${INCLUDES}
 )
