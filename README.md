@@ -3,10 +3,8 @@
 A set of C++ console games for Unix systems together with a small library for accessing and modifiying the terminal screen.
 
 List of games:
-  - 2048:
-    ![Screenshot](doc/screenshots/2048.png)
-  - MasterMind:
-    ![Screenshot](doc/screenshots/mastermind.png)
+- 2048:
+- MasterMind:
 
 # Build
 In order to build `cxxg` you need `cmake (version >= 3.5)` and optionally if you want to build the unit-tests `google-test (version >= 1.8)`. 
@@ -34,3 +32,9 @@ In order to build `cxxg` you need `cmake (version >= 3.5)` and optionally if you
     cmake ../ -DBUILD_TESTS=[ON/OFF]
     make
     ```
+    
+# Screenshots
+## 2048
+![Screenshot 2048](doc/screenshots/2048.png)
+## MasterMind
+![Screenshot MasterMind](doc/screenshots/mastermind.png)
