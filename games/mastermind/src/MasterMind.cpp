@@ -34,9 +34,7 @@ MasterMind::MasterMind()
   GameStartTimeStamp = ::cxxg::utils::getTimeStamp();
 }
 
-MasterMind::~MasterMind() {
-  handleExit();
-}
+MasterMind::~MasterMind() { handleExit(); }
 
 void MasterMind::initialize(bool BufferedInput) {
   ::cxxg::Game::initialize(BufferedInput);

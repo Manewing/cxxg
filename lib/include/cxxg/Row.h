@@ -19,17 +19,23 @@ struct Color {
 
   /// The color code for terminal, output as "\033$Value[0m"
   int Value;
-
-  /// Compares if the other color value is equal
-  /// @param[in] Other - The other color to compare to
-  /// @return True if equal
-  bool operator==(Color const &Other) const { return Value == Other.Value; }
-
-  /// Compares if the other color value is un-equal
-  /// @param[in] Other - The other color to compare to
-  /// @return True if un-equal
-  bool operator!=(Color const &Other) const { return !(*this == Other); }
 };
+
+/// Compares if the given two colors are equal
+/// @param[in] A - The first color
+/// @param[in] B - The first color
+/// @return True if equal
+inline bool operator==(Color const &A, Color const &B) noexcept {
+  return A.Value == B.Value;
+}
+
+/// Compares if the given two colors are un-equal
+/// @param[in] A - The first color
+/// @param[in] B - The first color
+/// @return True if un-equal
+inline bool operator!=(Color const &A, Color const &B) noexcept {
+  return A.Value != B.Value;
+}
 
 // Forward declaration
 class Row;
