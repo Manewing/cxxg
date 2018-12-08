@@ -6,19 +6,9 @@
 #include <vector>
 
 #include <cxxg/Row.h>
+#include <cxxg/Types.h>
 
 namespace cxxg {
-
-/// Screen size in rows and columns
-// TODO create "type" namespace and header, move it there
-// make proper distinction between size and point
-struct ScreenSize {
-  /// Size X, Colums
-  int X;
-
-  /// Size Y, Rows
-  int Y;
-};
 
 class Screen {
 public:
@@ -34,16 +24,16 @@ public:
 public:
   /// Returns the current terminal size
   /// @return The current terminal size in columns and rows
-  static ScreenSize getTerminalSize();
+  static types::Size getTerminalSize();
 
 public:
   /// Constructs new screen with given size and output stream
   /// @param[in] Size - Size of the screen in rows and columns
   /// @param[in] Out  - Output stream (default = ::std::cout)
-  Screen(ScreenSize Size, ::std::ostream &Out = ::std::cout);
+  Screen(types::Size Size, ::std::ostream &Out = ::std::cout);
 
   /// Returns the size of the screen
-  ScreenSize getSize() const { return Size; }
+  inline types::Size getSize() const { return Size; }
 
   /// Returns the given row based on the Y-position
   /// @param[in] Y - The column/Y-position
@@ -53,12 +43,18 @@ public:
   /// @param[in] Y - The column/Y-position
   Row const &operator[](int Y) const;
 
+  /// Returns a row accessor based on the given position
+  /// @param[in] Pos - Position to get the row accessor for
+  inline RowAccessor operator[](types::Position const Pos) {
+    return operator[](Pos.Y)[Pos.X];
+  }
+
   /// Sets the color for the rectangle defined by [Top, Bottom]
   /// to the given color.
   /// @param[in] Top    - Top corner of the rectangle
   /// @param[in] Bottom - Bottom corner of the rectangle
   /// @param[in] Cl     - Color to set
-  void setColor(ScreenSize Top, ScreenSize Bottom, Color Cl);
+  void setColor(types::Position Top, types::Position Bottom, types::Color Cl);
 
   /// Updates the screen by writing buffer to output stream
   void update() const;
@@ -78,7 +74,7 @@ private:
   Row DummyRow;
 
   /// The screen size
-  ScreenSize Size;
+  types::Size Size;
 };
 
 } // namespace cxxg

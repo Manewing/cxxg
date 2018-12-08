@@ -68,17 +68,17 @@ void Game2048::handleInput(int Char) {
 
 void Game2048::handleDraw() {
   // define game size
-  ::cxxg::ScreenSize const GameSize{22, 12};
+  ::cxxg::types::Size const GameSize{22, 12};
 
   // get game offset
-  ::cxxg::ScreenSize const Offset = getOffset(GameSize);
+  auto const Offset = getOffset(GameSize);
 
   // get message offsets
-  ::cxxg::ScreenSize const MsgOffset{Offset.X + 5, Offset.Y + 7};
+  auto const MsgOffset = Offset + ::cxxg::types::Size{5, 7};
 
   // draw the score board
-  Scr[Offset.Y][Offset.X] << ::cxxg::Color::BLUE << "Score: " << Score;
-  Scr[Offset.Y + 1][Offset.X] << ::cxxg::Color::GREEN
+  Scr[Offset] << ::cxxg::types::Color::BLUE << "Score: " << Score;
+  Scr[Offset.Y + 1][Offset.X] << ::cxxg::types::Color::GREEN
                               << "HighScore: " << HighScore;
 
   // draw the board outline
@@ -109,9 +109,9 @@ void Game2048::handleDraw() {
 
   // draw message if necessary
   if (State == GameOver) {
-    Scr[MsgOffset.Y][MsgOffset.X] << ::cxxg::Color::RED << " GAME OVER ";
+    Scr[MsgOffset] << ::cxxg::types::Color::RED << " GAME OVER ";
   } else if (State == NewGame) {
-    Scr[MsgOffset.Y][MsgOffset.X] << ::cxxg::Color::YELLOW << " NEW  GAME ";
+    Scr[MsgOffset] << ::cxxg::types::Color::YELLOW << " NEW  GAME ";
 
     // we want to be able to keep playing
     State = Running;
@@ -122,8 +122,8 @@ void Game2048::handleDraw() {
 
 void Game2048::drawLogoAnimation() {
   // define size of logo and get offset
-  ::cxxg::ScreenSize const LogoSize{38, 7};
-  ::cxxg::ScreenSize const Offset = getOffset(LogoSize);
+  ::cxxg::types::Size const LogoSize{38, 7};
+  auto const Offset = getOffset(LogoSize);
 
   // print characters of logo
   Scr[Offset.Y + 0][Offset.X] << " 222222    000000   44    44   888888 ";
@@ -136,14 +136,26 @@ void Game2048::drawLogoAnimation() {
 
   // animate the colors
   for (int L = 0; L < 10; L++) {
-    Scr.setColor({Offset.X, Offset.Y}, {Offset.X + 8, Offset.Y + 6},
-                 ::cxxg::Color{(L + 0) % 4 + 31});
-    Scr.setColor({Offset.X + 10, Offset.Y}, {Offset.X + 18, Offset.Y + 6},
-                 ::cxxg::Color{(L + 1) % 4 + 31});
-    Scr.setColor({Offset.X + 20, Offset.Y}, {Offset.X + 28, Offset.Y + 6},
-                 ::cxxg::Color{(L + 2) % 4 + 31});
-    Scr.setColor({Offset.X + 30, Offset.Y}, {Offset.X + 38, Offset.Y + 6},
-                 ::cxxg::Color{(L + 3) % 4 + 31});
+    auto Start = Offset;
+    auto End = Offset + ::cxxg::types::Size{8, 6};
+
+    // 2
+    Scr.setColor(Start, End, ::cxxg::types::Color{(L + 0) % 4 + 31});
+
+    // 0
+    Start += {10, 0};
+    End += {10, 0};
+    Scr.setColor(Start, End, ::cxxg::types::Color{(L + 1) % 4 + 31});
+
+    // 4
+    Start += {10, 0};
+    End += {10, 0};
+    Scr.setColor(Start, End, ::cxxg::types::Color{(L + 2) % 4 + 31});
+
+    // 8
+    Start += {10, 0};
+    End += {10, 0};
+    Scr.setColor(Start, End, ::cxxg::types::Color{(L + 3) % 4 + 31});
 
     // update screen and wait some time
     Scr.update();
@@ -205,25 +217,25 @@ int Game2048::getPowerOfTwo(unsigned Element) {
   return PowerOfTwo;
 }
 
-::cxxg::Color Game2048::getColor(unsigned Element) {
+::cxxg::types::Color Game2048::getColor(unsigned Element) {
   auto PowerOfTwo = getPowerOfTwo(Element);
 
   // get color for the power of two
   switch ((PowerOfTwo - 1) % 4) {
   case 0: // 2, 32, ...
-    return ::cxxg::Color::BLUE;
+    return ::cxxg::types::Color::BLUE;
   case 1: // 4, 64, ...
-    return ::cxxg::Color::GREEN;
+    return ::cxxg::types::Color::GREEN;
   case 2: // 8, 128, ...
-    return ::cxxg::Color::YELLOW;
+    return ::cxxg::types::Color::YELLOW;
   case 3: // 16, 256, ...
-    return ::cxxg::Color::RED;
+    return ::cxxg::types::Color::RED;
   default:
     // should not happen
     break;
   }
 
-  return ::cxxg::Color::RED;
+  return ::cxxg::types::Color::RED;
 }
 
 bool Game2048::hasFreeSpace(::std::vector<::std::vector<unsigned>> &Board) {

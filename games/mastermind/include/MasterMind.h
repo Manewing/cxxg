@@ -18,7 +18,7 @@ public:
     size_t TimeStamp;
   };
 
-  static ::std::map<char, ::cxxg::Color> Colors;
+  static ::std::map<char, ::cxxg::types::Color> Colors;
 
   static ::std::string formatTime(size_t Seconds);
 

@@ -5,12 +5,12 @@
 #include <iomanip>
 #include <stdexcept>
 
-::std::map<char, ::cxxg::Color> MasterMind::Colors = {
-    {' ', ::cxxg::Color::NONE},   {'a', ::cxxg::Color::RED},
-    {'b', ::cxxg::Color::GREEN},  {'c', ::cxxg::Color::BLUE},
-    {'d', ::cxxg::Color::YELLOW}, {'e', ::cxxg::Color::RED},
-    {'f', ::cxxg::Color::GREEN},  {'g', ::cxxg::Color::BLUE},
-    {'h', ::cxxg::Color::YELLOW}};
+::std::map<char, ::cxxg::types::Color> MasterMind::Colors = {
+    {' ', ::cxxg::types::Color::NONE},   {'a', ::cxxg::types::Color::RED},
+    {'b', ::cxxg::types::Color::GREEN},  {'c', ::cxxg::types::Color::BLUE},
+    {'d', ::cxxg::types::Color::YELLOW}, {'e', ::cxxg::types::Color::RED},
+    {'f', ::cxxg::types::Color::GREEN},  {'g', ::cxxg::types::Color::BLUE},
+    {'h', ::cxxg::types::Color::YELLOW}};
 
 ::std::string MasterMind::formatTime(size_t NanoSeconds) {
   size_t Seconds = NanoSeconds * 1e-9;
@@ -114,23 +114,23 @@ void MasterMind::handleRight() {
 
 void MasterMind::handleDraw() {
   // define game size
-  ::cxxg::ScreenSize GameSize{22, 29};
+  ::cxxg::types::Size GameSize{22, 29};
 
   // get the offsets
-  ::cxxg::ScreenSize const Offset = getOffset(GameSize);
+  ::cxxg::types::Size const Offset = getOffset(GameSize);
 
   // draw the board outline
   int Y = Offset.Y;
 
-  ::cxxg::Color CodeColor = ::cxxg::Color::NONE;
+  ::cxxg::types::Color CodeColor = ::cxxg::types::Color::NONE;
   if (State == GameOver) {
-    CodeColor = ::cxxg::Color::RED;
+    CodeColor = ::cxxg::types::Color::RED;
   } else if (State == Victory) {
-    CodeColor = ::cxxg::Color::GREEN;
+    CodeColor = ::cxxg::types::Color::GREEN;
   }
   Scr[Y++][Offset.X] << CodeColor << "+---+---+---+---+";
   Scr[Y][Offset.X] << CodeColor << "|   |   |   |   |";
-  Scr[Y++].setColor(Offset.X + 1, Offset.X + 15, ::cxxg::Color::GREY);
+  Scr[Y++].setColor(Offset.X + 1, Offset.X + 15, ::cxxg::types::Color::GREY);
   Scr[Y++][Offset.X] << CodeColor << "+---+---+---+---+";
 
   // one line gap
@@ -139,8 +139,8 @@ void MasterMind::handleDraw() {
   for (size_t L = 0; L < 10; L++) {
     Scr[Y++][Offset.X] << "+---+---+---+---+  +-+-+-+-+";
     Scr[Y][Offset.X] << "|   |   |   |   |  | | | | |";
-    Scr[Y].setColor(Offset.X + 1, Offset.X + 15, ::cxxg::Color::GREY);
-    Scr[Y++].setColor(Offset.X + 20, Offset.X + 27, ::cxxg::Color::GREY);
+    Scr[Y].setColor(Offset.X + 1, Offset.X + 15, ::cxxg::types::Color::GREY);
+    Scr[Y++].setColor(Offset.X + 20, Offset.X + 27, ::cxxg::types::Color::GREY);
   }
   Scr[Y++][Offset.X] << "+---+---+---+---+  +-+-+-+-+";
 
@@ -149,12 +149,12 @@ void MasterMind::handleDraw() {
 
   Scr[Y++][Offset.X] << "+---+---+---+---+";
   Scr[Y][Offset.X] << "|   |   |   |   |";
-  Scr[Y++].setColor(Offset.X + 1, Offset.X + 15, ::cxxg::Color::GREY);
+  Scr[Y++].setColor(Offset.X + 1, Offset.X + 15, ::cxxg::types::Color::GREY);
   Scr[Y][Offset.X] << "+---+---+---+---+";
 
   // create lambda for drawing guess at given Y position
   auto drawGuess = [&](Pins const &Guess, size_t Y) {
-    for (int X = Offset.X + 2, L = 0; X < Offset.X + 16; X += 4) {
+    for (size_t X = Offset.X + 2, L = 0; X < Offset.X + 16; X += 4) {
       Scr[Y][X] = Guess.at(L);
       Scr[Y][X] = Colors.at(Guess.at(L++));
     }
@@ -171,7 +171,7 @@ void MasterMind::handleDraw() {
     int EndX = Offset.X + 20 + Elem.Blacks * 2;
     for (; X < EndX; X += 2) {
       Scr[Y][X] = '#';
-      Scr[Y][X] = ::cxxg::Color::NONE;
+      Scr[Y][X] = ::cxxg::types::Color::NONE;
     }
 
     // draw white pins
@@ -179,7 +179,7 @@ void MasterMind::handleDraw() {
     EndX = Offset.X + 20 + Elem.Blacks * 2 + Elem.Whites * 2;
     for (; X < EndX; X += 2) {
       Scr[Y][X] = '+';
-      Scr[Y][X] = ::cxxg::Color::NONE;
+      Scr[Y][X] = ::cxxg::types::Color::NONE;
     }
 
     // FIXME this will be clipped of if screen is to small
@@ -190,7 +190,7 @@ void MasterMind::handleDraw() {
   }
 
   // draw game input
-  ::cxxg::ScreenSize const InputOffset = {Offset.X, Offset.Y + GameSize.Y - 2};
+  ::cxxg::types::Size const InputOffset = {Offset.X, Offset.Y + GameSize.Y - 2};
 
   // draw current guess
   drawGuess(CurrentGuess, InputOffset.Y);
@@ -198,19 +198,19 @@ void MasterMind::handleDraw() {
   // highlight input position, TODO cleanup
   int InputStartX = 1 + Offset.X + InputPosition * 4;
   int InputEndX = 4 + Offset.X + InputPosition * 4;
-  ::cxxg::Color const HlCl{7};
-  Scr[InputOffset.Y][InputStartX - 1] = ::cxxg::Color::NONE;
+  ::cxxg::types::Color const HlCl{7};
+  Scr[InputOffset.Y][InputStartX - 1] = ::cxxg::types::Color::NONE;
   Scr[InputOffset.Y].setColor(InputStartX, InputEndX, HlCl);
-  Scr[InputOffset.Y][InputEndX] = ::cxxg::Color::NONE;
+  Scr[InputOffset.Y][InputEndX] = ::cxxg::types::Color::NONE;
 
   // draw current code
-  ::cxxg::ScreenSize const CodeOffset = {Offset.X, Offset.Y + 1};
+  ::cxxg::types::Size const CodeOffset = {Offset.X, Offset.Y + 1};
 
   for (int L = 0; L < 4; L++) {
     int X = 2 + Offset.X + L * 4;
     Scr[CodeOffset.Y][X] = State == Running ? '?' : Code.at(L);
     Scr[CodeOffset.Y][X] =
-        State == Running ? ::cxxg::Color::GREY : Colors.at(Code.at(L));
+        State == Running ? ::cxxg::types::Color::GREY : Colors.at(Code.at(L));
   }
 
   if (State == GameOver) {
@@ -223,7 +223,7 @@ void MasterMind::handleDraw() {
 }
 
 void MasterMind::drawLogoAnimation() {
-  ::cxxg::ScreenSize const LogoSize{27, 8};
+  ::cxxg::types::Size const LogoSize{27, 8};
   auto const Offset = getOffset(LogoSize);
 
   int Y = 0;
@@ -235,18 +235,22 @@ void MasterMind::drawLogoAnimation() {
   Scr[Offset.Y + Y++][Offset.X] << "888  Y8P  888 888  Y8P  888";
   Scr[Offset.Y + Y++][Offset.X] << "888       888 888       888";
   Scr[Offset.Y + Y++][Offset.X] << "888       888 888       888";
-  Scr.setColor(Offset, {Offset.X + LogoSize.X, Offset.Y + LogoSize.Y},
-               ::cxxg::Color::GREY);
+  Scr.setColor(Offset, Offset + LogoSize, ::cxxg::types::Color::GREY);
 
-  for (int X = Offset.X; X < Offset.X + LogoSize.X; X++) {
-    Scr.setColor({X, Offset.Y}, {X + 1, Offset.Y + LogoSize.Y},
-                 ::cxxg::Color::NONE);
+  for (size_t X = Offset.X; X < Offset.X + LogoSize.X; X++) {
+    auto Start = Offset, End = Offset + LogoSize;
+
+    // adapt to current column
+    Start.X = X;
+    End.X = X + 1;
+
+    Scr.setColor(Start, End, ::cxxg::types::Color::NONE);
     Scr.update();
     ::cxxg::utils::sleep(30000);
   }
 
-  Scr.setColor(Offset, {Offset.X + LogoSize.X, Offset.Y + LogoSize.Y},
-               ::cxxg::Color::NONE);
+  Scr.setColor(Offset, Offset + LogoSize, ::cxxg::types::Color::NONE);
+
   Scr.update();
   ::cxxg::utils::sleep(500000);
 

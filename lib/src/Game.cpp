@@ -47,10 +47,10 @@ void Game::handleExit() {
 
 RowAccessor Game::warn() {
   Warnings.push_back(Row(Scr.getSize().X));
-  return (Warnings.back()[0] << ::cxxg::Color::YELLOW << "WARNING: ");
+  return (Warnings.back()[0] << ::cxxg::types::Color::YELLOW << "WARNING: ");
 }
 
-void Game::checkSize(ScreenSize GameSize) const {
+void Game::checkSize(types::Size GameSize) const {
   // get screen size
   auto const Size = Scr.getSize();
 
@@ -63,7 +63,7 @@ void Game::checkSize(ScreenSize GameSize) const {
   }
 }
 
-ScreenSize Game::getOffset(ScreenSize GameSize) const {
+types::Size Game::getOffset(types::Size GameSize) const {
   // get screen size and check game size
   auto const Size = Scr.getSize();
   checkSize(GameSize);

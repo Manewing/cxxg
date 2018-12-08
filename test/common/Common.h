@@ -9,11 +9,6 @@
 
 namespace {
 
-inline ::std::ostream &operator<<(::std::ostream &Out, ::cxxg::Color Cl) {
-  Out << Cl.Value;
-  return Out;
-}
-
 template <typename T>
 inline ::std::ostream &operator<<(::std::ostream &Out,
                                   ::std::vector<T> const &Elems) {

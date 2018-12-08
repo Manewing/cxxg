@@ -27,11 +27,11 @@ TEST(Game2048, GetPowerOfTwo) {
 
 // check correct switching between colors
 TEST(Game2048, ColorCodes) {
-  EXPECT_EQ(Game2048::getColor(2), ::cxxg::Color::BLUE);
-  EXPECT_EQ(Game2048::getColor(32), ::cxxg::Color::BLUE);
-  EXPECT_EQ(Game2048::getColor(64), ::cxxg::Color::GREEN);
-  EXPECT_EQ(Game2048::getColor(8), ::cxxg::Color::YELLOW);
-  EXPECT_EQ(Game2048::getColor(16), ::cxxg::Color::RED);
+  EXPECT_EQ(Game2048::getColor(2), ::cxxg::types::Color::BLUE);
+  EXPECT_EQ(Game2048::getColor(32), ::cxxg::types::Color::BLUE);
+  EXPECT_EQ(Game2048::getColor(64), ::cxxg::types::Color::GREEN);
+  EXPECT_EQ(Game2048::getColor(8), ::cxxg::types::Color::YELLOW);
+  EXPECT_EQ(Game2048::getColor(16), ::cxxg::types::Color::RED);
 }
 
 TEST(Game2048, MoveLineRight) {

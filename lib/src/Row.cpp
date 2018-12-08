@@ -4,25 +4,10 @@
 
 namespace cxxg {
 
-namespace {
-
-static ::std::string getColorStr(Color Cl) {
-  return "\033[" + ::std::to_string(Cl.Value) + "m";
-}
-
-} // namespace
-
-Color Color::NONE = {0};
-Color Color::RED = {31};
-Color Color::GREEN = {32};
-Color Color::YELLOW = {33};
-Color Color::BLUE = {34};
-Color Color::GREY = {90};
-
 RowAccessor::RowAccessor(Row &Rw, int Offset)
-    : Rw(Rw), Offset(Offset), CurrentColor(Color::NONE) {}
+    : Rw(Rw), Offset(Offset), CurrentColor(types::Color::NONE) {}
 
-RowAccessor &RowAccessor::operator=(Color Cl) {
+RowAccessor &RowAccessor::operator=(types::Color Cl) {
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.ColorInfo.size()) || Offset < 0) {
     return *this;
@@ -40,7 +25,7 @@ RowAccessor &RowAccessor::operator=(char C) {
   return *this;
 }
 
-RowAccessor &RowAccessor::operator<<(Color Cl) {
+RowAccessor &RowAccessor::operator<<(types::Color Cl) {
   CurrentColor = Cl;
   return *this;
 }
@@ -90,7 +75,7 @@ RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
 
 Row::Row(size_t Size) {
   Buffer.resize(Size, ' ');
-  ColorInfo.resize(Size, Color::NONE);
+  ColorInfo.resize(Size, types::Color::NONE);
 }
 
 void Row::clear() {
@@ -98,16 +83,18 @@ void Row::clear() {
   ::std::fill(Buffer.begin(), Buffer.end(), ' ');
 
   // clear color infos
-  ::std::fill(ColorInfo.begin(), ColorInfo.end(), Color::NONE);
+  ::std::fill(ColorInfo.begin(), ColorInfo.end(), types::Color::NONE);
 }
 
 ::std::string const &Row::getBuffer() const { return Buffer; }
 
-::std::vector<Color> const &Row::getColorInfo() const { return ColorInfo; }
+::std::vector<types::Color> const &Row::getColorInfo() const {
+  return ColorInfo;
+}
 
 RowAccessor Row::operator[](int X) { return RowAccessor(*this, X); }
 
-void Row::setColor(int StartX, int EndX, Color Cl) {
+void Row::setColor(int StartX, int EndX, types::Color Cl) {
   int Start = ::std::max(StartX, 0);
   int End = ::std::max(0, ::std::min(EndX, static_cast<int>(ColorInfo.size())));
 
@@ -117,16 +104,16 @@ void Row::setColor(int StartX, int EndX, Color Cl) {
 }
 
 ::std::ostream &Row::dump(::std::ostream &Out) const {
-  Color LastColor = Color::NONE;
+  types::Color LastColor = types::Color::NONE;
 
   for (size_t L = 0; L < Buffer.size(); L++) {
     if (LastColor != ColorInfo.at(L)) {
-      Out << getColorStr(ColorInfo.at(L));
+      Out << ColorInfo.at(L);
       LastColor = ColorInfo.at(L);
     }
     Out << Buffer.at(L);
   }
-  Out << getColorStr(Color::NONE);
+  Out << types::Color::NONE;
 
   return Out;
 }

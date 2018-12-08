@@ -1,41 +1,12 @@
 #ifndef CXXG_ROW_H
 #define CXXG_ROW_H
 
+#include <cxxg/Types.h>
 #include <sstream>
 #include <string>
 #include <vector>
 
 namespace cxxg {
-
-// TODO move?
-/// Typesafe struct for holding color information
-struct Color {
-  static Color NONE;
-  static Color RED;
-  static Color GREEN;
-  static Color YELLOW;
-  static Color BLUE;
-  static Color GREY;
-
-  /// The color code for terminal, output as "\033$Value[0m"
-  int Value;
-};
-
-/// Compares if the given two colors are equal
-/// @param[in] A - The first color
-/// @param[in] B - The first color
-/// @return True if equal
-inline bool operator==(Color const &A, Color const &B) noexcept {
-  return A.Value == B.Value;
-}
-
-/// Compares if the given two colors are un-equal
-/// @param[in] A - The first color
-/// @param[in] B - The first color
-/// @return True if un-equal
-inline bool operator!=(Color const &A, Color const &B) noexcept {
-  return A.Value != B.Value;
-}
 
 // Forward declaration
 class Row;
@@ -50,7 +21,7 @@ public:
 
   /// Sets color for the current index/offset
   /// @param[in] Cl - Color to set character to
-  RowAccessor &operator=(Color Cl);
+  RowAccessor &operator=(types::Color Cl);
 
   /// Sets character at the current index/offset
   /// @param[in] C - Character to set
@@ -59,7 +30,7 @@ public:
   /// Sets new color for current accessor, everything following will
   /// have the given color
   /// @param[in] Cl - The color to set the output to
-  RowAccessor &operator<<(Color Cl);
+  RowAccessor &operator<<(types::Color Cl);
 
   /// Outputs the given string to the row, will increase the access offset
   /// by the amount of characters written for the string
@@ -83,7 +54,7 @@ private:
   int Offset;
 
   /// The current color for output
-  Color CurrentColor;
+  types::Color CurrentColor;
 };
 
 /// Class for representing a row in the screen (terminal), provides
@@ -104,7 +75,7 @@ public:
   ::std::string const &getBuffer() const;
 
   /// Returns the internal color information of the row
-  ::std::vector<Color> const &getColorInfo() const;
+  ::std::vector<types::Color> const &getColorInfo() const;
 
   /// Provides access to the row with a given X offset
   /// @param[in] X - The offset for the access
@@ -115,7 +86,7 @@ public:
   /// @param[in] StartX - Start of interval (included)
   /// @param[in] EndX   - End of internval (included)
   /// @param[in] Cl     - The color to set
-  void setColor(int StartX, int EndX, Color Cl);
+  void setColor(int StartX, int EndX, types::Color Cl);
 
   /// Dumps the row to given stream
   /// @param[in/out] Out - The output stream to dump the row to
@@ -127,7 +98,7 @@ private:
   ::std::string Buffer;
 
   /// Color information of the row
-  ::std::vector<Color> ColorInfo;
+  ::std::vector<types::Color> ColorInfo;
 };
 
 } // namespace cxxg

@@ -22,7 +22,7 @@ public:
   void addNewElement();
 
   static int getPowerOfTwo(unsigned Element);
-  static ::cxxg::Color getColor(unsigned Element);
+  static ::cxxg::types::Color getColor(unsigned Element);
 
   static bool hasFreeSpace(::std::vector<::std::vector<unsigned>> &Board);
 

@@ -6,7 +6,7 @@ namespace {
 TEST(cxxg, Accesses) {
   // buffer in string stream to check results later
   ::std::stringstream SS;
-  ::cxxg::Screen Screen(::cxxg::ScreenSize{10, 1}, SS);
+  ::cxxg::Screen Screen(::cxxg::types::Size{10, 1}, SS);
   ::cxxg::Row Row(10);
 
   // string stream for generating reference

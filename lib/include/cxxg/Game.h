@@ -46,13 +46,13 @@ public:
   /// @param[in] GameSize - The required game size to check the screen size for
   /// @throws ::std::out_of_range if screen size is insufficient
   /// TODO rename to assertSize and make add function checkSize return bool
-  void checkSize(ScreenSize GameSize) const;
+  void checkSize(types::Size GameSize) const;
 
   /// Calculates the offset into the game screen for the required game size
   /// such that the game is positioned central.
   /// @param[in] GameSize - The game size to get the offset for
   /// @throws ::std::out_of_range if screen size is insufficient for game size
-  ScreenSize getOffset(ScreenSize GameSize) const;
+  types::Size getOffset(types::Size GameSize) const;
 
   /// Sets the seed for the random number generator
   /// @param[in] Seed - The seed to set

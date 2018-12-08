@@ -5,16 +5,16 @@
 
 namespace cxxg {
 
-ScreenSize Screen::getTerminalSize() {
+types::Size Screen::getTerminalSize() {
   winsize Ws;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &Ws);
   return {Ws.ws_col, Ws.ws_row};
 }
 
-Screen::Screen(ScreenSize Size, ::std::ostream &Out)
+Screen::Screen(types::Size Size, ::std::ostream &Out)
     : Out(Out), DummyRow(0), Size(Size) {
   Rows.reserve(Size.Y);
-  for (int Y = 0; Y < Size.Y; Y++) {
+  for (size_t Y = 0; Y < Size.Y; Y++) {
     Rows.push_back(Row(Size.X));
   }
 }
@@ -35,7 +35,8 @@ Row const &Screen::operator[](int Y) const {
   return Rows.at(Y);
 }
 
-void Screen::setColor(ScreenSize Top, ScreenSize Bottom, Color Cl) {
+void Screen::setColor(types::Position Top, types::Position Bottom,
+                      types::Color Cl) {
   for (int Y = Top.Y; Y <= Bottom.Y; Y++) {
     operator[](Y).setColor(Top.X, Bottom.X, Cl);
   }
