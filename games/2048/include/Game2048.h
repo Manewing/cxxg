@@ -5,7 +5,7 @@ public:
   typedef enum { Running, GameOver, NewGame } GameState;
 
 public:
-  Game2048(::std::string const &HighScoreFile);
+  Game2048(::cxxg::Screen &Scr, ::std::string const &HighScoreFile);
   virtual ~Game2048();
 
   void initialize(bool BufferedInput = false) final;

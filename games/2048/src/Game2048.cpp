@@ -4,8 +4,8 @@
 #include <cxxg/Utils.h>
 #include <fstream>
 
-Game2048::Game2048(::std::string const &HighScoreFile)
-    : Game(), Score(0), HighScore(0), State(NewGame),
+Game2048::Game2048(cxxg::Screen &Scr, std::string const &HighScoreFile)
+    : cxxg::Game(Scr), Score(0), HighScore(0), State(NewGame),
       HighScoreFile(HighScoreFile) {
   Board.resize(4, ::std::vector<unsigned>{0, 0, 0, 0});
 

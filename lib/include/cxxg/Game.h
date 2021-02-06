@@ -17,7 +17,7 @@ public:
   /// Creates new game instance, uses current terminal size for screen size,
   /// and initilizes random engine with current time stamp. The Flag
   // 'GameRunning' is set to true.
-  Game();
+  explicit Game(Screen &Scr);
 
   /// Initializes environment and configures the input type to the requested
   /// one.
@@ -60,7 +60,7 @@ public:
 
 protected:
   /// Screen on which the game will be displayed
-  Screen Scr;
+  Screen &Scr;
 
   /// Flag for game loop determining whether the game is running
   bool GameRunning;

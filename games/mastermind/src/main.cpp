@@ -4,8 +4,11 @@
 
 int main() {
 
+  // Create the screen
+  ::cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
+
   // create game instance
-  MasterMind Game;
+  MasterMind Game(Scr);
 
   // register handler for Ctrl+C
   ::cxxg::utils::registerSigintHandler([&Game]() {

@@ -28,8 +28,9 @@
   return SS.str();
 }
 
-MasterMind::MasterMind()
-    : State(Running), InputPosition(0), Code(getRandomCode(4, 8)) {
+MasterMind::MasterMind(cxxg::Screen &Scr)
+    : cxxg::Game(Scr), State(Running), InputPosition(0),
+      Code(getRandomCode(4, 8)) {
   CurrentGuess.resize(4, ' ');
   GameStartTimeStamp = ::cxxg::utils::getTimeStamp();
 }

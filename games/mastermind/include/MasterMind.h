@@ -23,7 +23,7 @@ public:
   static ::std::string formatTime(size_t Seconds);
 
 public:
-  MasterMind();
+  MasterMind(cxxg::Screen &Scr);
   virtual ~MasterMind();
 
   void initialize(bool BufferedInput = false) final;

@@ -5,9 +5,8 @@
 
 namespace cxxg {
 
-Game::Game()
-    : Scr(Screen::getTerminalSize()), GameRunning(true),
-      RndEngine(utils::getTimeStamp()) {}
+Game::Game(Screen &Scr)
+    : Scr(Scr), GameRunning(true), RndEngine(utils::getTimeStamp()) {}
 
 void Game::initialize(bool BufferedInput) {
   // switch input if requested input type buffered/un-buffered does not match
