@@ -1,4 +1,5 @@
 # cxxg
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 A set of C++ console games for Unix systems together with a small library for accessing and modifiying the terminal screen.
 
