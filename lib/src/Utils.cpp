@@ -56,8 +56,9 @@ void switchBufferedInput() {
   return "";
 }
 
-size_t getTimeStamp() {
-  return ::std::chrono::system_clock::now().time_since_epoch().count();
+std::time_t getTimeStamp() {
+  auto Now = std::chrono::system_clock::now();
+  return std::chrono::system_clock::to_time_t(Now);
 }
 
 void sleep(size_t MicroSeconds) { usleep(MicroSeconds); }

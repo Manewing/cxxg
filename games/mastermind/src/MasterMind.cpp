@@ -12,19 +12,10 @@
     {'f', ::cxxg::types::Color::GREEN},  {'g', ::cxxg::types::Color::BLUE},
     {'h', ::cxxg::types::Color::YELLOW}};
 
-::std::string MasterMind::formatTime(size_t NanoSeconds) {
-  size_t Seconds = NanoSeconds * 1e-9;
-  size_t Minutes = Seconds / 60;
-  Seconds -= Minutes * 60;
-
-  ::std::stringstream SS;
-  if (Minutes) {
-    SS << ::std::setw(2) << Minutes << "m ";
-  } else {
-    SS << ::std::string(4, ' ');
-  }
-  SS << ::std::setw(2) << Seconds << "s";
-
+::std::string MasterMind::formatMinutesSeconds(std::time_t TimeStamp) {
+  std::stringstream SS;
+  std::tm Tm = *std::localtime(&TimeStamp);
+  SS << std::put_time(&Tm, "%Mm %Ss");
   return SS.str();
 }
 
@@ -80,7 +71,7 @@ void MasterMind::handleReturn() {
   // add guess to history
   size_t Blacks = getBlacks(Code, CurrentGuess);
   size_t Whites = getWhites(Code, CurrentGuess);
-  size_t TimeStamp = ::cxxg::utils::getTimeStamp() - GameStartTimeStamp;
+  auto TimeStamp = ::cxxg::utils::getTimeStamp() - GameStartTimeStamp;
   HistGuess HG{CurrentGuess, Blacks, Whites, TimeStamp};
   History.push_back(HG);
 
@@ -184,7 +175,7 @@ void MasterMind::handleDraw() {
     }
 
     // FIXME this will be clipped of if screen is to small
-    auto TimeStampStr = formatTime(Elem.TimeStamp);
+    auto TimeStampStr = formatMinutesSeconds(Elem.TimeStamp);
     Scr[Y][Offset.X - TimeStampStr.size() - 1] << TimeStampStr;
 
     Y -= 2;
