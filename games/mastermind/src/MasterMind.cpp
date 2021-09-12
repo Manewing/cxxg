@@ -214,6 +214,9 @@ void MasterMind::handleDraw() {
         State == Running ? ::cxxg::types::Color::GREY : Colors.at(Code.at(L));
   }
 
+  auto const ScrSize = Scr.getSize();
+  Scr[ScrSize.Y - 1][0] << "[Q]uit | Controls: [LEFT] [RIGHT] [a]-[h]";
+
   if (State == GameOver) {
     Scr[Offset.Y + GameSize.Y / 2][Offset.X + 4] << " FAILURE ";
   } else if (State == Victory) {
