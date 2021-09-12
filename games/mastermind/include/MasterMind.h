@@ -15,12 +15,12 @@ public:
     Pins Guess;
     size_t Blacks;
     size_t Whites;
-    size_t TimeStamp;
+    std::time_t TimeStamp;
   };
 
   static ::std::map<char, ::cxxg::types::Color> Colors;
 
-  static ::std::string formatTime(size_t Seconds);
+  static ::std::string formatMinutesSeconds(std::time_t TimeStamp);
 
 public:
   MasterMind(cxxg::Screen &Scr);
@@ -51,7 +51,7 @@ private:
   int InputPosition;
   Pins Code;
   Pins CurrentGuess;
-  size_t GameStartTimeStamp;
+  std::time_t GameStartTimeStamp;
   ::std::vector<HistGuess> History;
 };
 

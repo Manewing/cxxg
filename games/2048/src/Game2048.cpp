@@ -107,6 +107,9 @@ void Game2048::handleDraw() {
     }
   }
 
+  auto const ScrSize = Scr.getSize();
+  Scr[ScrSize.Y - 1][0] << "[Q]uit | Controls: [UP] [DOWN] [LEFT] [RIGHT]";
+
   // draw message if necessary
   if (State == GameOver) {
     Scr[MsgOffset] << ::cxxg::types::Color::RED << " GAME OVER ";
