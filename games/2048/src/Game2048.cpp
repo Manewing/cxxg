@@ -22,8 +22,8 @@ Game2048::Game2048(cxxg::Screen &Scr, std::string const &HighScoreFile)
 
 Game2048::~Game2048() { handleExit(); }
 
-void Game2048::initialize(bool BufferedInput) {
-  ::cxxg::Game::initialize(BufferedInput);
+void Game2048::initialize(bool BufferedInput, unsigned TickDelayUs) {
+  ::cxxg::Game::initialize(BufferedInput, TickDelayUs);
 
   // draw some nice animation
   drawLogoAnimation();
@@ -42,20 +42,22 @@ void Game2048::handleInput(int Char) {
 
   bool HasMoved = true;
   switch (Char) {
-  case 68:
+  case cxxg::utils::KEY_LEFT:
     Score += moveLeft(Board);
     break;
-  case 67:
+  case cxxg::utils::KEY_RIGHT:
     Score += moveRight(Board);
     break;
-  case 65:
+  case cxxg::utils::KEY_UP:
     Score += moveUp(Board);
     break;
-  case 66:
+  case cxxg::utils::KEY_DOWN:
     Score += moveDown(Board);
     break;
   case 'q':
     handleGameOver();
+    HasMoved = false;
+    break;
   default:
     HasMoved = false;
     break;

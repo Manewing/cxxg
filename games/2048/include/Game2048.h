@@ -8,7 +8,7 @@ public:
   Game2048(::cxxg::Screen &Scr, ::std::string const &HighScoreFile);
   virtual ~Game2048();
 
-  void initialize(bool BufferedInput = false) final;
+  void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0) final;
 
   void handleInput(int Char) final;
 
