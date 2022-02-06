@@ -41,6 +41,13 @@ inline Position operator-(Position const A, Position const B) {
   return {A.X - B.X, A.Y - B.Y};
 }
 
+inline bool operator==(const Position &Lhs, const Position &Rhs) {
+  return Lhs.X == Rhs.X && Lhs.Y == Rhs.Y;
+}
+inline bool operator!=(const Position &Lhs, const Position &Rhs) {
+  return !(Lhs == Rhs);
+}
+
 /// Size in rows and columns
 struct Size {
   /// Size X, Columns
