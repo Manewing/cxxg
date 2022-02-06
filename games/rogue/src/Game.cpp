@@ -4,7 +4,21 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Types.h>
 #include <cxxg/Utils.h>
+#include <gtest/gtest.h>
 #include <ymir/Algorithm/LineOfSight.hpp>
+#include <ymir/Config/Parser.hpp>
+#include <ymir/Config/Types.hpp>
+#include <ymir/Dungeon/BuilderPass.hpp>
+#include <ymir/Dungeon/CaveRoomGenerator.hpp>
+#include <ymir/Dungeon/CelAltMapFiller.hpp>
+#include <ymir/Dungeon/ChestPlacer.hpp>
+#include <ymir/Dungeon/LoopPlacer.hpp>
+#include <ymir/Dungeon/MapFiller.hpp>
+#include <ymir/Dungeon/RandomRoomGenerator.hpp>
+#include <ymir/Dungeon/RectRoomGenerator.hpp>
+#include <ymir/Dungeon/StartEndPlacer.hpp>
+#include <ymir/Dungeon/FilterPlacer.hpp>
+#include <ymir/Dungeon/RoomPlacer.hpp>
 #include <ymir/Map.hpp>
 #include <ymir/Terminal.hpp>
 
@@ -19,24 +33,85 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
 }
 
 Game::Game(cxxg::Screen &Scr)
-    : cxxg::Game(Scr), LevelMap(80, 24), VisibleMap(80, 24) {}
+    : cxxg::Game(Scr), LevelMap(1, {80, 24}), VisibleMap(80, 24) {}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   // FIXME
   PlayerPos = {37, 11};
 
-  const cxxg::types::ColoredChar WallChar('#',
-                                          cxxg::types::RgbColor{255, 255, 255});
-  const cxxg::types::ColoredChar GroundChar(' ');
-  LevelMap.fill(WallChar);
-  LevelMap.fillRect(GroundChar, ymir::Rect2d<int>({36, 10}, {8, 4}));
-  LevelMap.fillRect(GroundChar, ymir::Rect2d<int>({44, 13}, {12, 1}));
-  LevelMap.fillRect(GroundChar, ymir::Rect2d<int>({46, 12}, {12, 8}));
-  LevelMap.fillRect(GroundChar, ymir::Rect2d<int>({30, 11}, {6, 1}));
-  LevelMap.fillRect(GroundChar, ymir::Rect2d<int>({20, 10}, {10, 4}));
+  generateLevel(0);
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
   handleDraw();
+}
+
+
+template <typename TileType, typename TileCord, typename RandEngType>
+void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
+  using T = TileType;
+  using U = TileCord;
+  using RE = RandEngType;
+  Pass.registerBuilder<ymir::Dungeon::CaveRoomGenerator<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::RectRoomGenerator<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::RandomRoomGenerator<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::ChestPlacer<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::RoomPlacer<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::LoopPlacer<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::MapFiller<T, U>>();
+  Pass.registerBuilder<ymir::Dungeon::CelAltMapFiller<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::StartEndPlacer<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::FilterPlacer<T, U, RE>>();
+}
+
+cxxg::types::ColoredChar parseColoredChar(const std::string &Value) {
+  static const std::regex Regex("\\{('..?'), (\"#[0-9a-fA-F]+\")\\}");
+  std::smatch Match;
+  if (std::regex_match(Value, Match, Regex)) {
+    auto Char = ymir::Config::Parser::parseChar(Match[1]);
+    auto Color = ymir::Config::parseRgbColor(Match[2]);
+    cxxg::types::RgbColor CxxColor{Color.R, Color.G, Color.B, Color.Foreground};
+    std::cerr << "Parsed char: '" << Char << "'" << std::endl;
+    return cxxg::types::ColoredChar(Char, CxxColor);
+  }
+  throw std::runtime_error("Invalid colored char format: " + Value);
+}
+
+void registerParserTypes(ymir::Config::Parser &P) {
+  P.registerType("CC", parseColoredChar);
+}
+
+void Game::generateLevel(unsigned Seed) {
+  using namespace cxxg::types;
+
+   // Load configuration file
+  ymir::Config::Parser CfgParser;
+  ymir::Config::registerYmirTypes<int>(CfgParser);
+  registerParserTypes(CfgParser);
+  std::filesystem::path CfgFile = "level.cfg";
+  CfgParser.parse(CfgFile);
+  auto &Cfg = CfgParser.getCfg();
+
+  Cfg["dungeon/seed"] = Seed;
+
+  // Create new builder pass and register builders at it
+  ymir::Dungeon::BuilderPass Pass;
+  registerBuilders<ColoredChar, int, ymir::WyHashRndEng>(Pass);
+
+  for (auto const &[Alias, Builder] :
+       Cfg.getSubDict("builder_alias/").toVec<std::string>()) {
+    Pass.setBuilderAlias(Builder, Alias);
+  }
+  Pass.setSequence(Cfg.getSubDict("sequence/").values<std::string>());
+  Pass.configure(Cfg);
+
+  const auto Layers = Cfg.getSubDict("layers/").values<std::string>();
+  const auto Size = Cfg.get<ymir::Size2d<int>>("dungeon/size");
+  ymir::LayeredMap<ColoredChar> Map(Layers, Size);
+  ymir::Dungeon::Context<ColoredChar, int> Ctx(Map);
+
+  Pass.init(Ctx);
+  Pass.run(Ctx);
+  LevelMap = Ctx.Map;
 }
 
 void Game::handleInput(int Char) {
@@ -83,28 +158,33 @@ void Game::handleDraw() {
 
 void Game::renderShadow(unsigned char Darkness) {
   const cxxg::types::RgbColor ShadowColor{Darkness, Darkness, Darkness};
-  LevelMap.forEach([this, ShadowColor](auto Pos, const auto &Tile) {
+  LevelMap.render().forEach([this, ShadowColor](auto Pos, const auto &Tile) {
     VisibleMap.getTile(Pos) = Tile;
     VisibleMap.getTile(Pos).Color = ShadowColor;
   });
 }
 
 void Game::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
+  // FIXME this is shitty and inefficient
+  auto RenderedLevelMap = LevelMap.render();
+
   ymir::Algorithm::traverseLOS(
-      [this](auto Pos) -> bool {
-        if (!LevelMap.contains(Pos)) {
+      [this, &RenderedLevelMap](auto Pos) -> bool {
+        if (!VisibleMap.contains(Pos)) {
           return false;
         }
-        auto &Tile = LevelMap.getTile(Pos);
-        auto &RenderTile = VisibleMap.getTile(Pos);
-        switch (Tile.Char) {
+        auto &Tile = VisibleMap.getTile(Pos);
+        auto &RenderedTile = RenderedLevelMap.getTile(Pos);
+        switch (RenderedTile.Char) {
         case '#':
-          RenderTile.Color = cxxg::types::RgbColor{255, 255, 255};
+          Tile.Color = RenderedTile.Color;
           return false;
         case ' ':
-          RenderTile.Char = '.';
+          Tile.Char = '.';
+          Tile.Color = RenderedTile.Color;
           break;
         default:
+          Tile.Color = RenderedTile.Color;
           break;
         }
         return true;
@@ -114,7 +194,9 @@ void Game::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
 
 void Game::movePlayer(ymir::Dir2d Dir) {
   auto NewPos = PlayerPos + Dir;
-  if (LevelMap.getTile(NewPos).Char == ' ') {
+  if (LevelMap.get("walls").getTile(NewPos).Char != '#') {
     PlayerPos += Dir;
+  } else {
+    warn() << "Can't move";
   }
 }
