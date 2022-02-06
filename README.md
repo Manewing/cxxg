@@ -6,6 +6,7 @@ A set of C++ console games for Unix systems together with a small library for ac
 List of games:
 - 2048:
 - MasterMind:
+- Tetris
 
 # Build
 In order to build `cxxg` you need `cmake (version >= 3.5)` and optionally if you want to build the unit-tests `google-test (version >= 1.8)`. 
