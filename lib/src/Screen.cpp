@@ -36,7 +36,7 @@ Row const &Screen::operator[](int Y) const {
 }
 
 void Screen::setColor(types::Position Top, types::Position Bottom,
-                      types::Color Cl) {
+                      types::TermColor Cl) {
   for (int Y = Top.Y; Y <= Bottom.Y; Y++) {
     operator[](Y).setColor(Top.X, Bottom.X, Cl);
   }

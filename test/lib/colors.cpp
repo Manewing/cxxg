@@ -9,7 +9,7 @@ TEST(cxxg, Colors) {
 
   // for generating references
   ::std::stringstream Ref;
-  ::std::vector<::cxxg::types::Color> ColorRef;
+  ::std::vector<::cxxg::types::TermColor> ColorRef;
   ColorRef.resize(10, ::cxxg::types::Color::NONE);
 
   // check that init worked correctly

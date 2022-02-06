@@ -3,6 +3,7 @@
 
 #include <cxxg/Types.h>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -21,16 +22,20 @@ public:
 
   /// Sets color for the current index/offset
   /// @param[in] Cl - Color to set character to
-  RowAccessor &operator=(types::Color Cl);
+  RowAccessor &operator=(types::TermColor Cl);
 
   /// Sets character at the current index/offset
   /// @param[in] C - Character to set
   RowAccessor &operator=(char C);
 
+  /// Sets character at the current index/offset
+  /// @param[in] C - Character to set
+  RowAccessor &operator=(types::ColoredChar C);
+
   /// Sets new color for current accessor, everything following will
   /// have the given color
   /// @param[in] Cl - The color to set the output to
-  RowAccessor &operator<<(types::Color Cl);
+  RowAccessor &operator<<(types::TermColor Cl);
 
   /// Outputs the given string to the row, will increase the access offset
   /// by the amount of characters written for the string
@@ -54,7 +59,7 @@ private:
   int Offset;
 
   /// The current color for output
-  types::Color CurrentColor;
+  types::TermColor CurrentColor;
 };
 
 /// Class for representing a row in the screen (terminal), provides
@@ -75,7 +80,7 @@ public:
   ::std::string const &getBuffer() const;
 
   /// Returns the internal color information of the row
-  ::std::vector<types::Color> const &getColorInfo() const;
+  ::std::vector<types::TermColor> const &getColorInfo() const;
 
   /// Provides access to the row with a given X offset
   /// @param[in] X - The offset for the access
@@ -86,7 +91,7 @@ public:
   /// @param[in] StartX - Start of interval (included)
   /// @param[in] EndX   - End of internval (included)
   /// @param[in] Cl     - The color to set
-  void setColor(int StartX, int EndX, types::Color Cl);
+  void setColor(int StartX, int EndX, types::TermColor Cl);
 
   /// Dumps the row to given stream
   /// @param[in/out] Out - The output stream to dump the row to
@@ -98,7 +103,7 @@ private:
   ::std::string Buffer;
 
   /// Color information of the row
-  ::std::vector<types::Color> ColorInfo;
+  ::std::vector<types::TermColor> ColorInfo;
 };
 
 } // namespace cxxg

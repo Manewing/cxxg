@@ -1,3 +1,4 @@
+#include "cxxg/Types.h"
 #include <cxxg/Row.h>
 
 #include <stdexcept>
@@ -7,7 +8,7 @@ namespace cxxg {
 RowAccessor::RowAccessor(Row &Rw, int Offset)
     : Rw(Rw), Offset(Offset), CurrentColor(types::Color::NONE) {}
 
-RowAccessor &RowAccessor::operator=(types::Color Cl) {
+RowAccessor &RowAccessor::operator=(types::TermColor Cl) {
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.ColorInfo.size()) || Offset < 0) {
     return *this;
@@ -25,7 +26,13 @@ RowAccessor &RowAccessor::operator=(char C) {
   return *this;
 }
 
-RowAccessor &RowAccessor::operator<<(types::Color Cl) {
+RowAccessor &RowAccessor::operator=(types::ColoredChar C) {
+  *this = C.Color;
+  *this = C.Char;
+  return *this;
+}
+
+RowAccessor &RowAccessor::operator<<(types::TermColor Cl) {
   CurrentColor = Cl;
   return *this;
 }
@@ -88,13 +95,13 @@ void Row::clear() {
 
 ::std::string const &Row::getBuffer() const { return Buffer; }
 
-::std::vector<types::Color> const &Row::getColorInfo() const {
+::std::vector<types::TermColor> const &Row::getColorInfo() const {
   return ColorInfo;
 }
 
 RowAccessor Row::operator[](int X) { return RowAccessor(*this, X); }
 
-void Row::setColor(int StartX, int EndX, types::Color Cl) {
+void Row::setColor(int StartX, int EndX, types::TermColor Cl) {
   int Start = ::std::max(StartX, 0);
   int End = ::std::max(0, ::std::min(EndX, static_cast<int>(ColorInfo.size())));
 
@@ -104,7 +111,7 @@ void Row::setColor(int StartX, int EndX, types::Color Cl) {
 }
 
 ::std::ostream &Row::dump(::std::ostream &Out) const {
-  types::Color LastColor = types::Color::NONE;
+  types::TermColor LastColor = types::Color::NONE;
 
   for (size_t L = 0; L < Buffer.size(); L++) {
     if (LastColor != ColorInfo.at(L)) {

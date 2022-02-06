@@ -19,7 +19,7 @@ public:
     std::time_t TimeStamp;
   };
 
-  static ::std::map<char, ::cxxg::types::Color> Colors;
+  static ::std::map<char, ::cxxg::types::TermColor> Colors;
 
   static ::std::string formatMinutesSeconds(std::time_t TimeStamp);
 

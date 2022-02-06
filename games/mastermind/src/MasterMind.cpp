@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <stdexcept>
 
-::std::map<char, ::cxxg::types::Color> MasterMind::Colors = {
+::std::map<char, ::cxxg::types::TermColor> MasterMind::Colors = {
     {' ', ::cxxg::types::Color::NONE},   {'a', ::cxxg::types::Color::RED},
     {'b', ::cxxg::types::Color::GREEN},  {'c', ::cxxg::types::Color::BLUE},
     {'d', ::cxxg::types::Color::YELLOW}, {'e', ::cxxg::types::Color::RED},
@@ -114,7 +114,7 @@ void MasterMind::handleDraw() {
   // draw the board outline
   int Y = Offset.Y;
 
-  ::cxxg::types::Color CodeColor = ::cxxg::types::Color::NONE;
+  ::cxxg::types::TermColor CodeColor = ::cxxg::types::Color::NONE;
   if (State == GameOver) {
     CodeColor = ::cxxg::types::Color::RED;
   } else if (State == Victory) {
@@ -190,7 +190,7 @@ void MasterMind::handleDraw() {
   // highlight input position, TODO cleanup
   int InputStartX = 1 + Offset.X + InputPosition * 4;
   int InputEndX = 4 + Offset.X + InputPosition * 4;
-  ::cxxg::types::Color const HlCl{7};
+  ::cxxg::types::RgbColor const HlCl{255, 255, 255, false};
   Scr[InputOffset.Y][InputStartX - 1] = ::cxxg::types::Color::NONE;
   Scr[InputOffset.Y].setColor(InputStartX, InputEndX, HlCl);
   Scr[InputOffset.Y][InputEndX] = ::cxxg::types::Color::NONE;

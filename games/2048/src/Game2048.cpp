@@ -105,7 +105,7 @@ void Game2048::handleDraw() {
       size_t OffX = Offset.X + 1 + X * 5;
 
       // draw the element
-      Scr[OffY][OffX] << getColor(Board[Y][X]) << Board[Y][X];
+      Scr[OffY][OffX] << getElemColor(Board[Y][X]) << Board[Y][X];
     }
   }
 
@@ -145,22 +145,22 @@ void Game2048::drawLogoAnimation() {
     auto End = Offset + ::cxxg::types::Size{8, 6};
 
     // 2
-    Scr.setColor(Start, End, ::cxxg::types::Color{(L + 0) % 4 + 31});
+    Scr.setColor(Start, End, getColor(L + 0));
 
     // 0
     Start += {10, 0};
     End += {10, 0};
-    Scr.setColor(Start, End, ::cxxg::types::Color{(L + 1) % 4 + 31});
+    Scr.setColor(Start, End, getColor(L + 1));
 
     // 4
     Start += {10, 0};
     End += {10, 0};
-    Scr.setColor(Start, End, ::cxxg::types::Color{(L + 2) % 4 + 31});
+    Scr.setColor(Start, End, getColor(L + 2));
 
     // 8
     Start += {10, 0};
     End += {10, 0};
-    Scr.setColor(Start, End, ::cxxg::types::Color{(L + 3) % 4 + 31});
+    Scr.setColor(Start, End, getColor(L + 3));
 
     // update screen and wait some time
     Scr.update();
@@ -222,11 +222,8 @@ int Game2048::getPowerOfTwo(unsigned Element) {
   return PowerOfTwo;
 }
 
-::cxxg::types::Color Game2048::getColor(unsigned Element) {
-  auto PowerOfTwo = getPowerOfTwo(Element);
-
-  // get color for the power of two
-  switch ((PowerOfTwo - 1) % 4) {
+::cxxg::types::TermColor Game2048::getColor(unsigned Idx) {
+  switch (Idx % 4) {
   case 0: // 2, 32, ...
     return ::cxxg::types::Color::BLUE;
   case 1: // 4, 64, ...
@@ -239,8 +236,12 @@ int Game2048::getPowerOfTwo(unsigned Element) {
     // should not happen
     break;
   }
-
   return ::cxxg::types::Color::RED;
+}
+
+::cxxg::types::TermColor Game2048::getElemColor(unsigned Element) {
+  auto PowerOfTwo = getPowerOfTwo(Element);
+  return getColor(PowerOfTwo - 1);
 }
 
 bool Game2048::hasFreeSpace(::std::vector<::std::vector<unsigned>> &Board) {

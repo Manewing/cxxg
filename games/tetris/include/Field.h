@@ -13,7 +13,7 @@ class Screen;
 
 struct Block {
     char Char = ' ';
-    cxxg::types::Color Color = cxxg::types::Color::NONE;
+    cxxg::types::TermColor Color = cxxg::types::Color::NONE;
 };
 
 class Field {
