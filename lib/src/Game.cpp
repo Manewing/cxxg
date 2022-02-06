@@ -21,9 +21,6 @@ void Game::initialize(bool BufferedInput, unsigned TDU) {
 void Game::run(bool Blocking) {
   while (GameRunning) {
     int Char = cxxg::utils::getChar(Blocking);
-    if (!Blocking) {
-      cxxg::utils::clearStdin();
-    }
     handleInput(Char);
     handleDraw();
 

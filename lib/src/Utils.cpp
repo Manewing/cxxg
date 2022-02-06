@@ -31,7 +31,6 @@ bool setStdinBlocking(bool Enabled) {
 }
 
 int getCharNonBlock() {
-  setStdinBlocking(false);
   unsigned char Char;
   if (read(STDIN_FILENO, &Char, sizeof(Char)) < 0) {
     return EOF;
@@ -78,7 +77,11 @@ int getChar(bool Blocking) {
   if (Blocking) {
     return getchar();
   }
-  return getCharNonBlockHandleEscape();
+  setStdinBlocking(false);
+  int Char = getCharNonBlockHandleEscape();
+  clearStdin();
+  setStdinBlocking(true);
+  return Char;
 }
 
 void clearStdin() {
