@@ -28,8 +28,8 @@ MasterMind::MasterMind(cxxg::Screen &Scr)
 
 MasterMind::~MasterMind() { handleExit(); }
 
-void MasterMind::initialize(bool BufferedInput) {
-  ::cxxg::Game::initialize(BufferedInput);
+void MasterMind::initialize(bool BufferedInput, unsigned TickDelayUs) {
+  ::cxxg::Game::initialize(BufferedInput, TickDelayUs);
 
   drawLogoAnimation();
 

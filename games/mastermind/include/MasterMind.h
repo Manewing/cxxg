@@ -3,6 +3,7 @@
 
 #include <cxxg/Game.h>
 #include <map>
+#include <ctime>
 
 class MasterMind : public ::cxxg::Game {
 public:
@@ -26,7 +27,7 @@ public:
   MasterMind(cxxg::Screen &Scr);
   virtual ~MasterMind();
 
-  void initialize(bool BufferedInput = false) final;
+  void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0) final;
   void handleInput(int Char) final;
   void handleReturn();
   void handleLeft();

@@ -19,15 +19,17 @@ public:
   // 'GameRunning' is set to true.
   explicit Game(Screen &Scr);
 
+  virtual ~Game() = default;
+
   /// Initializes environment and configures the input type to the requested
   /// one.
   /// @param[in] BufferedInput - If to use buffered input, i.e. a '\n' needs
   ///   to follow after input, otherwise uses un-buffered.
-  virtual void initialize(bool BufferedInput = false);
+  virtual void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0);
 
   /// Game loop, while flag 'GameRunning' is true calls 'handleInput'
   /// and 'handleDraw' continously.
-  void run();
+  void run(bool Blocking = true);
 
   /// Callback for handling new character input, called from game loop.
   /// @param[in] Char - The new character input
@@ -63,7 +65,9 @@ protected:
   Screen &Scr;
 
   /// Flag for game loop determining whether the game is running
-  bool GameRunning;
+  bool GameRunning = false;
+
+  unsigned TickDelayUs = 0;
 
   /// Random engine for generating random numbers in games
   ::std::default_random_engine RndEngine;

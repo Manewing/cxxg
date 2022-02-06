@@ -8,18 +8,28 @@ namespace cxxg {
 Game::Game(Screen &Scr)
     : Scr(Scr), GameRunning(true), RndEngine(utils::getTimeStamp()) {}
 
-void Game::initialize(bool BufferedInput) {
+void Game::initialize(bool BufferedInput, unsigned TDU) {
   // switch input if requested input type buffered/un-buffered does not match
   // the current one
   if (BufferedInput != utils::hasBufferedInput()) {
     utils::switchBufferedInput();
   }
+
+  TickDelayUs = TDU;
 }
 
-void Game::run() {
+void Game::run(bool Blocking) {
   while (GameRunning) {
-    handleInput(getchar());
+    int Char = cxxg::utils::getChar(Blocking);
+    if (!Blocking) {
+      cxxg::utils::clearStdin();
+    }
+    handleInput(Char);
     handleDraw();
+
+    if (TickDelayUs) {
+      cxxg::utils::sleep(TickDelayUs);
+    }
   }
 }
 

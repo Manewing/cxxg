@@ -5,7 +5,7 @@
 int main() {
 
   // Create the screen
-  ::cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
+  cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
 
   // create game instance
   MasterMind Game(Scr);
