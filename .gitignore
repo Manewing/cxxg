@@ -1,2 +1,5 @@
 *.swp
+.cache/
+.vscode/
+compile_commands.json
 build
