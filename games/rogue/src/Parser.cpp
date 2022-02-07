@@ -1,5 +1,5 @@
 #include "Parser.h"
-
+#include "Level.h"
 #include <cxxg/Types.h>
 #include <ymir/Config/Parser.hpp>
 #include <ymir/Config/Types.hpp>
@@ -11,14 +11,20 @@ cxxg::types::ColoredChar parseColoredChar(const std::string &Value) {
     auto Char = ymir::Config::Parser::parseChar(Match[1]);
     auto Color = ymir::Config::parseRgbColor(Match[2]);
     cxxg::types::RgbColor CxxColor{Color.R, Color.G, Color.B, Color.Foreground};
-    std::cerr << "Parsed char: '" << Char << "'" << std::endl;
     return cxxg::types::ColoredChar(Char, CxxColor);
   }
   throw std::runtime_error("Invalid colored char format: " + Value);
 }
 
+Tile parseTile(const std::string &Value) {
+  auto ColoredChar = parseColoredChar(Value);
+  return Tile{ColoredChar};
+}
+
+
 void registerParserTypes(ymir::Config::Parser &P) {
   P.registerType("CC", parseColoredChar);
+  P.registerType("Tile", parseTile);
 }
 
 ymir::Config::AnyDict loadConfigurationFile(const std::filesystem::path &File) {

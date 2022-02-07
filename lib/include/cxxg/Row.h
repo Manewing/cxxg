@@ -42,6 +42,11 @@ public:
   /// @param[in] Str - The string to output
   RowAccessor &operator<<(::std::string const &Str);
 
+  /// Outputs the given string to the row, will increase the access offset
+  /// by the amount of characters written for the string
+  /// @param[in] Str - The string to output
+  RowAccessor &operator<<(::std::string_view const &Str);
+
   /// Outputs the given type to the row, first the the type will be converted
   /// to string via a string stream, the resulting string will the be output
   /// @param[in] T - The variable with type 'T' to output

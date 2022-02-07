@@ -38,6 +38,12 @@ RowAccessor &RowAccessor::operator<<(types::TermColor Cl) {
 }
 
 RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
+  std::string_view StrView = Str;
+  *this << StrView;
+  return *this;
+}
+
+RowAccessor &RowAccessor::operator<<(::std::string_view const &Str) {
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.Buffer.size()) ||
       Offset + Str.size() <= 0) {

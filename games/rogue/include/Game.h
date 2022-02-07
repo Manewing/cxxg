@@ -15,7 +15,8 @@ public:
   virtual ~Game() = default;
 
   void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0) final;
-  void generateLevel(unsigned Seed);
+
+  void switchLevel(int Level);
 
   void handleInput(int Char) final;
   void handleDraw() final;
@@ -25,11 +26,20 @@ public:
 
 
   void movePlayer(ymir::Dir2d Dir);
+  void tryInteract();
 
   ymir::Point2d<int> PlayerPos = {0, 0};
+  struct Interaction {
+    std::string Msg;
+    std::function<void()> Finalize = [](){};
+  };
+  std::optional<Interaction> CurrentInteraction;
+
 
   LevelGenerator LevelGen;
+  int CurrentLevelIdx = 0;
   std::shared_ptr<Level> CurrentLevel;
+  std::vector<std::shared_ptr<Level>> Levels;
 
   ymir::Map<cxxg::types::ColoredChar> VisibleMap;
 };

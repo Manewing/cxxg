@@ -38,7 +38,7 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
 
   // Create new builder pass and register builders at it
   ymir::Dungeon::BuilderPass Pass;
-  registerBuilders<ColoredChar, int, ymir::WyHashRndEng>(Pass);
+  registerBuilders<Tile, int, ymir::WyHashRndEng>(Pass);
 
   for (auto const &[Alias, Builder] :
        Cfg.getSubDict("builder_alias/").toVec<std::string>()) {
@@ -50,7 +50,7 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
   const auto Layers = Cfg.getSubDict("layers/").values<std::string>();
   const auto Size = Cfg.get<ymir::Size2d<int>>("dungeon/size");
   auto NewLevel = std::make_shared<Level>(Layers, Size);
-  ymir::Dungeon::Context<ColoredChar, int> Ctx(NewLevel->Map);
+  ymir::Dungeon::Context<Tile, int> Ctx(NewLevel->Map);
 
   Pass.init(Ctx);
   Pass.run(Ctx);
