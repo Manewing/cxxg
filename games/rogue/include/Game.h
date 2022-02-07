@@ -5,6 +5,9 @@
 #include <ymir/Types.hpp>
 #include <ymir/Map.hpp>
 #include <ymir/LayeredMap.hpp>
+#include "LevelGenerator.h"
+#include "Level.h"
+#include <memory>
 
 class Game : public cxxg::Game {
 public:
@@ -24,7 +27,10 @@ public:
   void movePlayer(ymir::Dir2d Dir);
 
   ymir::Point2d<int> PlayerPos = {0, 0};
-  ymir::LayeredMap<cxxg::types::ColoredChar> LevelMap;
+
+  LevelGenerator LevelGen;
+  std::shared_ptr<Level> CurrentLevel;
+
   ymir::Map<cxxg::types::ColoredChar> VisibleMap;
 };
 

@@ -127,12 +127,13 @@ static constexpr TermColor GREY = RgbColor{100, 100, 100};
 }; // namespace Color
 
 struct ColoredChar {
-  char Char;
+  char Char = 0;
   TermColor Color = NoColor{};
 
-  ColoredChar() = default;
-  ColoredChar(char Char) : Char(Char) {}
-  ColoredChar(char Char, TermColor Color) : Char(Char), Color(Color) {}
+  constexpr ColoredChar() = default;
+  constexpr ColoredChar(char Char) : Char(Char) {}
+  constexpr ColoredChar(char Char, TermColor Color)
+      : Char(Char), Color(Color) {}
   ColoredChar &operator=(char Char);
   ColoredChar &operator=(const TermColor &Color);
 };
