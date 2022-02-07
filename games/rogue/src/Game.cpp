@@ -52,15 +52,19 @@ void Game::switchLevel(int Level) {
 
 void Game::handleInput(int Char) {
   switch (Char) {
+  case 'a':
   case cxxg::utils::KEY_LEFT:
     movePlayer(ymir::Dir2d::LEFT);
     break;
+  case 'd':
   case cxxg::utils::KEY_RIGHT:
     movePlayer(ymir::Dir2d::RIGHT);
     break;
+  case 's':
   case cxxg::utils::KEY_DOWN:
     movePlayer(ymir::Dir2d::DOWN);
     break;
+  case 'w':
   case cxxg::utils::KEY_UP:
     movePlayer(ymir::Dir2d::UP);
     break;

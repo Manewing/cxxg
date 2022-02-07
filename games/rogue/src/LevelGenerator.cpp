@@ -3,7 +3,7 @@
 #include <ymir/Dungeon/BuilderPass.hpp>
 #include <ymir/Dungeon/CaveRoomGenerator.hpp>
 #include <ymir/Dungeon/CelAltMapFiller.hpp>
-#include <ymir/Dungeon/ChestPlacer.hpp>
+#include <ymir/Dungeon/RoomEntityPlacer.hpp>
 #include <ymir/Dungeon/FilterPlacer.hpp>
 #include <ymir/Dungeon/LoopPlacer.hpp>
 #include <ymir/Dungeon/MapFiller.hpp>
@@ -20,7 +20,7 @@ void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
   Pass.registerBuilder<ymir::Dungeon::CaveRoomGenerator<T, U, RE>>();
   Pass.registerBuilder<ymir::Dungeon::RectRoomGenerator<T, U, RE>>();
   Pass.registerBuilder<ymir::Dungeon::RandomRoomGenerator<T, U, RE>>();
-  Pass.registerBuilder<ymir::Dungeon::ChestPlacer<T, U, RE>>();
+  Pass.registerBuilder<ymir::Dungeon::RoomEntityPlacer<T, U, RE>>();
   Pass.registerBuilder<ymir::Dungeon::RoomPlacer<T, U, RE>>();
   Pass.registerBuilder<ymir::Dungeon::LoopPlacer<T, U, RE>>();
   Pass.registerBuilder<ymir::Dungeon::MapFiller<T, U>>();
@@ -44,10 +44,10 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
        Cfg.getSubDict("builder_alias/").toVec<std::string>()) {
     Pass.setBuilderAlias(Builder, Alias);
   }
-  Pass.setSequence(Cfg.getSubDict("sequence/").values<std::string>());
+  Pass.setSequence(Cfg.asList<std::string>("sequence/"));
   Pass.configure(Cfg);
 
-  const auto Layers = Cfg.getSubDict("layers/").values<std::string>();
+  const auto Layers = Cfg.asList<std::string>("layers/");
   const auto Size = Cfg.get<ymir::Size2d<int>>("dungeon/size");
   auto NewLevel = std::make_shared<Level>(Layers, Size);
   ymir::Dungeon::Context<Tile, int> Ctx(NewLevel->Map);
