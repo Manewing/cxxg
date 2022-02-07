@@ -3,12 +3,12 @@
 #include <ymir/Dungeon/BuilderPass.hpp>
 #include <ymir/Dungeon/CaveRoomGenerator.hpp>
 #include <ymir/Dungeon/CelAltMapFiller.hpp>
-#include <ymir/Dungeon/RoomEntityPlacer.hpp>
 #include <ymir/Dungeon/FilterPlacer.hpp>
 #include <ymir/Dungeon/LoopPlacer.hpp>
 #include <ymir/Dungeon/MapFiller.hpp>
 #include <ymir/Dungeon/RandomRoomGenerator.hpp>
 #include <ymir/Dungeon/RectRoomGenerator.hpp>
+#include <ymir/Dungeon/RoomEntityPlacer.hpp>
 #include <ymir/Dungeon/RoomPlacer.hpp>
 #include <ymir/Dungeon/StartEndPlacer.hpp>
 
@@ -55,5 +55,20 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
   Pass.init(Ctx);
   Pass.run(Ctx);
 
+  spawnEnemies(*NewLevel);
+
   return NewLevel;
+}
+
+void LevelGenerator::spawnEnemies(Level &L) {
+  auto &EnemyMap = L.Map.get("enemies");
+  const auto AllEnemyPos = EnemyMap.findTilesNot(Level::EmptyTile);
+  for (const auto &EnemyPos : AllEnemyPos) {
+    spawnEnemy(L, EnemyPos, EnemyMap.getTile(EnemyPos));
+  }
+  EnemyMap.fill(Level::EmptyTile);
+}
+
+void LevelGenerator::spawnEnemy(Level &L, ymir::Point2d<int> Pos, Tile T) {
+  L.Entities.push_back(std::make_shared<Enemy>(Pos, T));
 }

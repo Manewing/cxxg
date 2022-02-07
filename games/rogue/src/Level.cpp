@@ -74,6 +74,10 @@ std::vector<Tile> Level::getInteractables(ymir::Point2d<int> AtPos) const {
   return Objects;
 }
 
+bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
+  return Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile;
+}
+
 bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
   return Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile ||
          Map.get(LayerObjectsIdx).getTile(Pos) != EmptyTile;

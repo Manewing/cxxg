@@ -21,13 +21,10 @@ public:
   void handleInput(int Char) final;
   void handleDraw() final;
 
-  void renderShadow(unsigned char Darkness);
-  void renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range);
-
-
   void movePlayer(ymir::Dir2d Dir);
   void tryInteract();
 
+public: // FIXME
   ymir::Point2d<int> PlayerPos = {0, 0};
   struct Interaction {
     std::string Msg;
@@ -40,8 +37,6 @@ public:
   int CurrentLevelIdx = 0;
   std::shared_ptr<Level> CurrentLevel;
   std::vector<std::shared_ptr<Level>> Levels;
-
-  ymir::Map<cxxg::types::ColoredChar> VisibleMap;
 };
 
 #endif // #ifndef ROGUE_GAME_H

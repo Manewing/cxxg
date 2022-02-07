@@ -7,17 +7,21 @@ if(EXISTS "${YMIR_INSTALL}/include/ymir")
 
 
 set(HEADER_FILES
+  include/Entity.h
   include/Game.h
   include/Level.h
   include/LevelGenerator.h
   include/Parser.h
+  include/Renderer.h
 )
 
 set(SOURCE_FILES
+  src/Entity.cpp
   src/Game.cpp
   src/Level.cpp
   src/LevelGenerator.cpp
   src/Parser.cpp
+  src/Renderer.cpp
   src/main.cpp
 )
 

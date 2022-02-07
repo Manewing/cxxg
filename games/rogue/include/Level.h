@@ -1,21 +1,10 @@
 #ifndef ROGUE_LEVEL_H
 #define ROGUE_LEVEL_H
 
-#include <cxxg/Types.h>
+#include "Entity.h"
+#include "Tile.h"
+#include <memory>
 #include <ymir/LayeredMap.hpp>
-
-struct Tile {
-  cxxg::types::ColoredChar T;
-  char kind() const { return T.Char; }
-  cxxg::types::TermColor color() const { return T.Color; }
-};
-inline bool operator==(const Tile &A, const Tile &B) noexcept {
-  // Ignore coloring when comparing
-  return A.kind() == B.kind();
-}
-inline bool operator!=(const Tile &A, const Tile &B) noexcept {
-  return !(A == B);
-}
 
 class Level {
 public:
@@ -43,9 +32,12 @@ public:
   bool canInteract(ymir::Point2d<int> Pos) const;
   std::vector<Tile> getInteractables(ymir::Point2d<int> Pos) const;
 
+  bool isLOSBlocked(ymir::Point2d<int> Pos) const;
   bool isBodyBlocked(ymir::Point2d<int> Pos) const;
 
+public: // FIXME
   ymir::LayeredMap<Tile> Map;
+  std::vector<std::shared_ptr<Entity>> Entities;
 };
 
 #endif // #ifndef ROGUE_LEVEL_H
