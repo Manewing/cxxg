@@ -91,7 +91,8 @@ bool Game::handleInput(int Char) {
 
 void Game::handleDraw() {
   // Render the current map
-  Renderer Render(*CurrentLevel);
+  const auto RenderSize = ymir::Size2d<int>{80, 24};
+  Renderer Render(RenderSize, *CurrentLevel, Player->Pos);
   Render.renderShadow(/*Darkness=*/30);
   Render.renderLineOfSight(Player->Pos, /*Range=*/Player->LOSRange);
   // Render.renderLineOfSight({50, 14}, /*Range=*/5);

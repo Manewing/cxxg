@@ -10,7 +10,7 @@ class Level;
 
 class Renderer {
 public:
-  Renderer(Level &L);
+  Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center);
 
   void renderShadow(unsigned char Darkness);
   void renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range);
@@ -23,6 +23,7 @@ protected:
 
 private:
   Level &L;
+  ymir::Point2d<int> Offset = {0, 0};
   ymir::Map<Tile> RenderedLevelMap;
   ymir::Map<cxxg::types::ColoredChar> VisibleMap;
 };

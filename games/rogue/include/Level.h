@@ -16,6 +16,7 @@ public:
   static constexpr std::size_t LayerWallsDecoIdx = 4;
 
   static constexpr Tile EmptyTile = Tile{};
+  static constexpr Tile WallTile = Tile{{'#'}};
   static constexpr Tile StartTile = Tile{{'H'}};
   static constexpr Tile EndTile = Tile{{'<'}};
 

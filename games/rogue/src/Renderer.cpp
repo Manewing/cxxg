@@ -2,13 +2,26 @@
 #include "Level.h"
 #include <ymir/Algorithm/LineOfSight.hpp>
 
-Renderer::Renderer(Level &L)
-    : L(L), VisibleMap(L.Map.getSize()) {
+Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
+    : L(L), VisibleMap(Size) {
+  Offset.X = -(Center.X - Size.W / 2);
+  Offset.Y = -(Center.Y - Size.H / 2);
+  std::cout << "Center: " << Center << ", Offset " << Offset << std::endl;
+
   // Render map and copy to visible map
   RenderedLevelMap = L.Map.render();
   renderEntities();
-  RenderedLevelMap.forEach(
-      [this](auto Pos, const auto &Tile) { VisibleMap.getTile(Pos) = Tile.T; });
+
+  // FIXME make this configurable
+  VisibleMap.fill(Level::WallTile.T);
+
+  VisibleMap.forEach([this](auto Pos, auto &Tile) {
+    Pos -= Offset;
+    if (!RenderedLevelMap.contains(Pos)) {
+      return;
+    }
+    Tile = RenderedLevelMap.getTile(Pos).T;
+  });
 }
 
 void Renderer::renderShadow(unsigned char Darkness) {
@@ -19,9 +32,10 @@ void Renderer::renderShadow(unsigned char Darkness) {
 
 void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
   renderVisible(AtPos);
+
   ymir::Algorithm::traverseLOS(
       [this](auto Pos) -> bool {
-        if (!VisibleMap.contains(Pos)) {
+        if (!VisibleMap.contains(Pos + Offset)) {
           return false;
         }
         renderVisible(Pos);
@@ -31,7 +45,7 @@ void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
 }
 
 void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
-  auto &Tile = VisibleMap.getTile(AtPos);
+  auto &Tile = VisibleMap.getTile(AtPos + Offset);
   auto &RenderedTile = RenderedLevelMap.getTile(AtPos);
 
   Tile.Color = RenderedTile.color();
