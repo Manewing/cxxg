@@ -29,8 +29,8 @@ ymir::Point2d<int> Level::getPlayerEndPos() const {
   throw std::runtime_error("Could not find end position for player in level");
 }
 
-std::vector<Entity*> Level::getEntities() {
-  std::vector<Entity*> AllEntities;
+std::vector<Entity *> Level::getEntities() {
+  std::vector<Entity *> AllEntities;
   AllEntities.reserve(Entities.size() + 1);
   for (auto &Entity : Entities) {
     AllEntities.push_back(Entity.get());
@@ -103,6 +103,11 @@ bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
 }
 
 bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
-  return Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile ||
-         Map.get(LayerObjectsIdx).getTile(Pos) != EmptyTile;
+  bool MapBlocked = Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile ||
+                    Map.get(LayerObjectsIdx).getTile(Pos) != EmptyTile;
+  bool EntityBlocked =
+      std::any_of(Entities.begin(), Entities.end(),
+                  [Pos](const auto &Entity) { return Entity->Pos == Pos; });
+  bool PlayerBlocked = Player && Player->Pos == Pos;
+  return MapBlocked || EntityBlocked || PlayerBlocked;
 }
