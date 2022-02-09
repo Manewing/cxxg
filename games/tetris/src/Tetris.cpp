@@ -9,7 +9,7 @@ Tetris::Tetris(cxxg::Screen &Scr)
 
 Tetris::~Tetris() {}
 
-void Tetris::handleInput(int Char) {
+bool Tetris::handleInput(int Char) {
   switch (Char) {
   case cxxg::utils::KEY_LEFT:
     tryMove({-1, 0});
@@ -30,7 +30,7 @@ void Tetris::handleInput(int Char) {
       handleFullLines();
       placeNewTetromino();
     }
-    return;
+    return true;
   default:
     break;
   }
@@ -41,6 +41,7 @@ void Tetris::handleInput(int Char) {
       placeNewTetromino();
     }
   }
+  return true;
 }
 
 void Tetris::handleDraw() {

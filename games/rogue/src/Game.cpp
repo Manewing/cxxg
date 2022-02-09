@@ -52,7 +52,7 @@ void Game::switchLevel(int Level) {
   CurrentLevelIdx = Level;
 }
 
-void Game::handleInput(int Char) {
+bool Game::handleInput(int Char) {
 
   // FIXME play move and attack needs to be handled in update
   switch (Char) {
@@ -76,8 +76,10 @@ void Game::handleInput(int Char) {
     break;
   case 'e':
     tryInteract();
-  default:
     break;
+  default:
+    // Not a valid input do not update
+    return false;
   }
 
   // TODO handle entity actions
@@ -88,6 +90,7 @@ void Game::handleInput(int Char) {
   for (auto &Entity : Entities) {
     Entity->update(*CurrentLevel.get());
   }
+  return true;
 }
 
 void Game::handleDraw() {

@@ -13,7 +13,7 @@ public:
   Tetris(cxxg::Screen &Scr);
   virtual ~Tetris();
 
-  void handleInput(int Char) final;
+  bool handleInput(int Char) final;
 
   void handleDraw() final;
   void drawLogo(cxxg::types::Position Offset);

@@ -21,8 +21,9 @@ void Game::initialize(bool BufferedInput, unsigned TDU) {
 void Game::run(bool Blocking) {
   while (GameRunning) {
     int Char = cxxg::utils::getChar(Blocking);
-    handleInput(Char);
-    handleDraw();
+    if (handleInput(Char)) {
+      handleDraw();
+    }
 
     if (TickDelayUs) {
       cxxg::utils::sleep(TickDelayUs);

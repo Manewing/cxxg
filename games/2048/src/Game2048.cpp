@@ -35,7 +35,7 @@ void Game2048::initialize(bool BufferedInput, unsigned TickDelayUs) {
   handleDraw();
 }
 
-void Game2048::handleInput(int Char) {
+bool Game2048::handleInput(int Char) {
   if (Char == -1) {
     handleGameOver();
   }
@@ -60,12 +60,14 @@ void Game2048::handleInput(int Char) {
     break;
   default:
     HasMoved = false;
-    break;
+    return false;
   }
 
   if (HasMoved) {
     addNewElement();
   }
+
+  return true;
 }
 
 void Game2048::handleDraw() {

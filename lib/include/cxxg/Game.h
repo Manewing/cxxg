@@ -33,7 +33,8 @@ public:
 
   /// Callback for handling new character input, called from game loop.
   /// @param[in] Char - The new character input
-  virtual void handleInput(int Char) = 0;
+  /// @return Returns true if game needs to draw
+  virtual bool handleInput(int Char) = 0;
 
   /// Callback for handling drawing to the game screen, called from game loop.
   virtual void handleDraw();

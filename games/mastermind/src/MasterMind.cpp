@@ -36,7 +36,7 @@ void MasterMind::initialize(bool BufferedInput, unsigned TickDelayUs) {
   handleDraw();
 }
 
-void MasterMind::handleInput(int Char) {
+bool MasterMind::handleInput(int Char) {
   switch (Char) {
   case 68: // left
     handleLeft();
@@ -50,13 +50,21 @@ void MasterMind::handleInput(int Char) {
   case 'q':
     handleGameOver();
     break;
-  default:
-    if ('a' <= Char && Char <= 'h') {
-      CurrentGuess.at(InputPosition) = Char;
-      handleRight();
-    }
+  case 'a':
+  case 'b':
+  case 'c':
+  case 'd':
+  case 'e':
+  case 'f':
+  case 'g':
+  case 'h':
+    CurrentGuess.at(InputPosition) = Char;
+    handleRight();
     break;
+  default:
+    return false;
   }
+  return true;
 }
 
 void MasterMind::handleReturn() {

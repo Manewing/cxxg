@@ -18,7 +18,7 @@ public:
 
   void switchLevel(int Level);
 
-  void handleInput(int Char) final;
+  bool handleInput(int Char) final;
   void handleDraw() final;
 
   void movePlayer(ymir::Dir2d Dir);

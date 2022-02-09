@@ -10,7 +10,7 @@ public:
 
   void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0) final;
 
-  void handleInput(int Char) final;
+  bool handleInput(int Char) final;
 
   void handleDraw() final;
   void drawLogoAnimation();
