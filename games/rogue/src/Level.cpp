@@ -3,6 +3,10 @@
 Level::Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size)
     : Map(Layers, Size) {}
 
+void Level::setPlayer(PlayerEntity *P) { this->Player = P; }
+
+PlayerEntity *Level::getPlayer() { return Player; }
+
 ymir::Point2d<int> Level::getPlayerStartPos() const {
   auto AllStartPos = Map.get(LayerObjectsIdx).findTiles(StartTile);
   for (auto StartPos : AllStartPos) {
@@ -23,6 +27,18 @@ ymir::Point2d<int> Level::getPlayerEndPos() const {
     }
   }
   throw std::runtime_error("Could not find end position for player in level");
+}
+
+std::vector<Entity*> Level::getEntities() {
+  std::vector<Entity*> AllEntities;
+  AllEntities.reserve(Entities.size() + 1);
+  for (auto &Entity : Entities) {
+    AllEntities.push_back(Entity.get());
+  }
+  if (Player) {
+    AllEntities.push_back(Player);
+  }
+  return AllEntities;
 }
 
 std::optional<ymir::Point2d<int>>

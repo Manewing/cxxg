@@ -70,5 +70,5 @@ void LevelGenerator::spawnEnemies(Level &L) {
 }
 
 void LevelGenerator::spawnEnemy(Level &L, ymir::Point2d<int> Pos, Tile T) {
-  L.Entities.push_back(std::make_shared<Enemy>(Pos, T));
+  L.Entities.push_back(std::make_shared<EnemyEntity>(Pos, T));
 }

@@ -24,8 +24,14 @@ public:
   // TODO check that loaded level is valid
   // bool checkIsValid();
 
+  void setPlayer(PlayerEntity *P = nullptr);
+  PlayerEntity *getPlayer();
+
   ymir::Point2d<int> getPlayerStartPos() const;
   ymir::Point2d<int> getPlayerEndPos() const;
+
+  std::vector<Entity *> getEntities();
+
   std::optional<ymir::Point2d<int>>
   getUnblockedPosNextTo(ymir::Point2d<int> AtPos) const;
 
@@ -37,6 +43,7 @@ public:
 
 public: // FIXME
   ymir::LayeredMap<Tile> Map;
+  PlayerEntity *Player = nullptr;
   std::vector<std::shared_ptr<Entity>> Entities;
 };
 

@@ -1,12 +1,13 @@
 #include "Game.h"
+#include "Renderer.h"
 #include <cmath>
 #include <cxxg/Row.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Types.h>
-#include "Renderer.h"
 #include <cxxg/Utils.h>
 #include <gtest/gtest.h>
 #include <ymir/Algorithm/LineOfSight.hpp>
+#include <memory>
 
 template <typename T, typename U>
 cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
@@ -22,8 +23,7 @@ Game::Game(cxxg::Screen &Scr)
     : cxxg::Game(Scr), LevelGen(), CurrentLevel(nullptr) {}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
-  // FIXME
-  PlayerPos = {37, 11};
+  Player = std::make_unique<PlayerEntity>();
 
   switchLevel(0);
 
@@ -36,25 +36,28 @@ void Game::switchLevel(int Level) {
     warn() << "One can never leave...";
     return;
   }
+
   if (Level >= static_cast<int>(Levels.size())) {
     assert((Level - 1) < Levels.size());
     Levels.push_back(LevelGen.generateLevel(Level));
+  } else {
+    CurrentLevel->setPlayer(nullptr);
   }
   CurrentLevel = Levels.at(Level);
 
+  CurrentLevel->setPlayer(Player.get());
   if (CurrentLevelIdx <= Level) {
-    PlayerPos = CurrentLevel->getPlayerStartPos();
+    Player->Pos = CurrentLevel->getPlayerStartPos();
   } else {
-    PlayerPos = CurrentLevel->getPlayerEndPos();
+    Player->Pos = CurrentLevel->getPlayerEndPos();
   }
 
   CurrentLevelIdx = Level;
 }
 
 void Game::handleInput(int Char) {
-  // TODO handle entity actions
 
-  //
+  // FIXME play move and attack needs to be handled in update
   switch (Char) {
   case 'a':
   case cxxg::utils::KEY_LEFT:
@@ -79,13 +82,22 @@ void Game::handleInput(int Char) {
   default:
     break;
   }
+
+  // TODO handle entity actions
+  auto Entities = CurrentLevel->getEntities();
+  std::sort(Entities.begin(), Entities.end(), [](const auto &A, const auto &B) {
+    return A->Agility > B->Agility;
+  });
+  for (auto &Entity : Entities) {
+    Entity->update();
+  }
 }
 
 void Game::handleDraw() {
   // Render the current map
-  Renderer Render(*CurrentLevel, PlayerPos);
+  Renderer Render(*CurrentLevel);
   Render.renderShadow(/*Darkness=*/30);
-  Render.renderLineOfSight(PlayerPos, /*Range=*/8);
+  Render.renderLineOfSight(Player->Pos, /*Range=*/8);
   // Render.renderLineOfSight({50, 14}, /*Range=*/5);
 
   // Draw map
@@ -96,9 +108,9 @@ void Game::handleDraw() {
   Scr[0][0] << "Rogue v0.0 [Level]: " << (CurrentLevelIdx + 1);
 
   std::string_view InteractStr = "";
-  if (CurrentInteraction) {
-    InteractStr = CurrentInteraction->Msg;
-  } else if (CurrentLevel->canInteract(PlayerPos)) {
+  if (Player->CurrentInteraction) {
+    InteractStr = Player->CurrentInteraction->Msg;
+  } else if (CurrentLevel->canInteract(Player->Pos)) {
     InteractStr = "[E] Interact";
   }
   if (!InteractStr.empty()) {
@@ -110,13 +122,13 @@ void Game::handleDraw() {
 
 void Game::movePlayer(ymir::Dir2d Dir) {
   // Abort interaction
-  if (CurrentInteraction) {
-    CurrentInteraction = std::nullopt;
+  if (Player->CurrentInteraction) {
+    Player->CurrentInteraction = std::nullopt;
   }
 
-  auto NewPos = PlayerPos + Dir;
+  auto NewPos = Player->Pos + Dir;
   if (!CurrentLevel->isBodyBlocked(NewPos)) {
-    PlayerPos += Dir;
+    Player->Pos += Dir;
   } else {
     warn() << "Can't move";
   }
@@ -124,13 +136,13 @@ void Game::movePlayer(ymir::Dir2d Dir) {
 
 void Game::tryInteract() {
   // Finalize interaction
-  if (CurrentInteraction) {
-    CurrentInteraction->Finalize();
-    CurrentInteraction = std::nullopt;
+  if (Player->CurrentInteraction) {
+    Player->CurrentInteraction->Finalize();
+    Player->CurrentInteraction = std::nullopt;
     return;
   }
 
-  auto Interactables = CurrentLevel->getInteractables(PlayerPos);
+  auto Interactables = CurrentLevel->getInteractables(Player->Pos);
   if (Interactables.empty()) {
     return;
   }
@@ -139,15 +151,15 @@ void Game::tryInteract() {
   auto &Interactable = Interactables.at(0);
   switch (Interactable.kind()) {
   case 'H':
-    CurrentInteraction = {"[E] Previous level",
+    Player->CurrentInteraction = {"[E] Previous level",
                           [this]() { switchLevel(CurrentLevelIdx - 1); }};
     break;
   case '<':
-    CurrentInteraction = {"[E] Next level",
+    Player->CurrentInteraction = {"[E] Next level",
                           [this]() { switchLevel(CurrentLevelIdx + 1); }};
     break;
   case 'C':
-    CurrentInteraction = {"[E] Close chest"};
+    Player->CurrentInteraction = {"[E] Close chest"};
     break;
   }
 }

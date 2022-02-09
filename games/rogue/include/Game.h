@@ -25,15 +25,8 @@ public:
   void tryInteract();
 
 public: // FIXME
-  ymir::Point2d<int> PlayerPos = {0, 0};
-  struct Interaction {
-    std::string Msg;
-    std::function<void()> Finalize = [](){};
-  };
-  std::optional<Interaction> CurrentInteraction;
-
-
   LevelGenerator LevelGen;
+  std::unique_ptr<PlayerEntity> Player;
   int CurrentLevelIdx = 0;
   std::shared_ptr<Level> CurrentLevel;
   std::vector<std::shared_ptr<Level>> Levels;

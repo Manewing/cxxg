@@ -2,11 +2,11 @@
 #include "Level.h"
 #include <ymir/Algorithm/LineOfSight.hpp>
 
-Renderer::Renderer(Level &L, ymir::Point2d<int> PlayerPos)
+Renderer::Renderer(Level &L)
     : L(L), VisibleMap(L.Map.getSize()) {
   // Render map and copy to visible map
   RenderedLevelMap = L.Map.render();
-  renderEntities(PlayerPos);
+  renderEntities();
   RenderedLevelMap.forEach(
       [this](auto Pos, const auto &Tile) { VisibleMap.getTile(Pos) = Tile.T; });
 }
@@ -44,11 +44,9 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
   }
 }
 
-void Renderer::renderEntities(ymir::Point2d<int> PlayerPos) {
-  for (const auto &Entity : L.Entities) {
+void Renderer::renderEntities() {
+  // FIXME enemies spawn on objects
+  for (const auto *Entity : L.getEntities()) {
     RenderedLevelMap.getTile(Entity->Pos) = Entity->T;
   }
-
-  const Tile PlayerChar{{'@', cxxg::types::RgbColor{255, 255, 50}}};
-  RenderedLevelMap.getTile(PlayerPos) = PlayerChar;
 }
