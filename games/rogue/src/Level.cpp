@@ -10,7 +10,7 @@ PlayerEntity *Level::getPlayer() { return Player; }
 ymir::Point2d<int> Level::getPlayerStartPos() const {
   auto AllStartPos = Map.get(LayerObjectsIdx).findTiles(StartTile);
   for (auto StartPos : AllStartPos) {
-    auto Pos = getUnblockedPosNextTo(StartPos);
+    auto Pos = getNonBodyBlockedPosNextTo(StartPos);
     if (Pos) {
       return *Pos;
     }
@@ -21,7 +21,7 @@ ymir::Point2d<int> Level::getPlayerStartPos() const {
 ymir::Point2d<int> Level::getPlayerEndPos() const {
   auto AllEndPos = Map.get(LayerObjectsIdx).findTiles(EndTile);
   for (auto EndPos : AllEndPos) {
-    auto Pos = getUnblockedPosNextTo(EndPos);
+    auto Pos = getNonBodyBlockedPosNextTo(EndPos);
     if (Pos) {
       return *Pos;
     }
@@ -41,21 +41,29 @@ std::vector<Entity*> Level::getEntities() {
   return AllEntities;
 }
 
-std::optional<ymir::Point2d<int>>
-Level::getUnblockedPosNextTo(ymir::Point2d<int> AtPos) const {
-  std::optional<ymir::Point2d<int>> UnblockedPos;
+std::vector<ymir::Point2d<int>>
+Level::getAllNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const {
+  std::vector<ymir::Point2d<int>> AllUnblockedPos;
   Map.get(LayerObjectsIdx)
       .checkNeighbors(
           AtPos,
-          [this, &UnblockedPos](auto Pos, auto) {
+          [this, &AllUnblockedPos](auto Pos, auto) {
             if (!isBodyBlocked(Pos)) {
-              UnblockedPos = Pos;
-              return false;
+              AllUnblockedPos.push_back(Pos);
             }
             return true;
           },
-          ymir::EightTileDirections<int>());
-  return UnblockedPos;
+          ymir::FourTileDirections<int>());
+  return AllUnblockedPos;
+}
+
+std::optional<ymir::Point2d<int>>
+Level::getNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const {
+  auto AllUnblockedPos = getAllNonBodyBlockedPosNextTo(AtPos);
+  if (AllUnblockedPos.empty()) {
+    return {};
+  }
+  return AllUnblockedPos.at(0);
 }
 
 bool Level::canInteract(ymir::Point2d<int> AtPos) const {

@@ -1,12 +1,9 @@
 #include "Game.h"
 #include "Renderer.h"
-#include <cmath>
 #include <cxxg/Row.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Types.h>
 #include <cxxg/Utils.h>
-#include <gtest/gtest.h>
-#include <ymir/Algorithm/LineOfSight.hpp>
 #include <memory>
 
 template <typename T, typename U>
@@ -89,7 +86,7 @@ void Game::handleInput(int Char) {
     return A->Agility > B->Agility;
   });
   for (auto &Entity : Entities) {
-    Entity->update();
+    Entity->update(CurrentLevel.get());
   }
 }
 

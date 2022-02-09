@@ -5,6 +5,7 @@
 #include "Tile.h"
 #include <memory>
 #include <ymir/LayeredMap.hpp>
+#include <vector>
 
 class Level {
 public:
@@ -32,8 +33,11 @@ public:
 
   std::vector<Entity *> getEntities();
 
+  std::vector<ymir::Point2d<int>>
+  getAllNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const;
+
   std::optional<ymir::Point2d<int>>
-  getUnblockedPosNextTo(ymir::Point2d<int> AtPos) const;
+  getNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const;
 
   bool canInteract(ymir::Point2d<int> Pos) const;
   std::vector<Tile> getInteractables(ymir::Point2d<int> Pos) const;

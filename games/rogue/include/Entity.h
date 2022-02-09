@@ -6,6 +6,8 @@
 #include <optional>
 #include <functional>
 
+class Level;
+
 class Entity {
 public:
   ymir::Point2d<int> Pos;
@@ -14,7 +16,7 @@ public:
   Entity(ymir::Point2d<int> Pos, Tile T) : Pos(Pos), T(T) {}
   virtual ~Entity() = default;
 
-  virtual void update() {}
+  virtual void update(Level*) {}
 
   bool isAlive() const { return Health != 0; }
 
@@ -33,7 +35,10 @@ public:
 
 public:
   using Entity::Entity;
-  void update() override;
+  void update(Level* L) override;
+
+private:
+  void wander(Level *L);
 
 private:
   State CurrentState = State::Idle;
