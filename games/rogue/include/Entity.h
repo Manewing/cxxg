@@ -16,12 +16,13 @@ public:
   Entity(ymir::Point2d<int> Pos, Tile T) : Pos(Pos), T(T) {}
   virtual ~Entity() = default;
 
-  virtual void update(Level*) {}
+  virtual void update(Level&) {}
 
   bool isAlive() const { return Health != 0; }
 
   unsigned Health = 100;
   unsigned Agility = 100;
+  unsigned LOSRange = 8;
 };
 
 // FIXME move
@@ -35,10 +36,11 @@ public:
 
 public:
   using Entity::Entity;
-  void update(Level* L) override;
+  void update(Level& L) override;
 
 private:
-  void wander(Level *L);
+  void wander(Level &L);
+  void checkForPlayer(Level &L);
 
 private:
   State CurrentState = State::Idle;

@@ -86,7 +86,7 @@ void Game::handleInput(int Char) {
     return A->Agility > B->Agility;
   });
   for (auto &Entity : Entities) {
-    Entity->update(CurrentLevel.get());
+    Entity->update(*CurrentLevel.get());
   }
 }
 
@@ -94,7 +94,7 @@ void Game::handleDraw() {
   // Render the current map
   Renderer Render(*CurrentLevel);
   Render.renderShadow(/*Darkness=*/30);
-  Render.renderLineOfSight(Player->Pos, /*Range=*/8);
+  Render.renderLineOfSight(Player->Pos, /*Range=*/Player->LOSRange);
   // Render.renderLineOfSight({50, 14}, /*Range=*/5);
 
   // Draw map
