@@ -1,7 +1,31 @@
 #include "Level.h"
+#include <ymir/Algorithm/Dijkstra.hpp>
 
 Level::Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size)
-    : Map(Layers, Size) {}
+    : Map(Layers, Size), PlayerDijkstraMap(Size) {}
+
+bool Level::update() {
+  updatePlayerDijkstraMap();
+
+  auto AllEntities = getEntities();
+  std::sort(
+      AllEntities.begin(), AllEntities.end(),
+      [](const auto &A, const auto &B) { return A->Agility > B->Agility; });
+  for (auto &Entity : AllEntities) {
+    Entity->update(*this);
+  }
+
+  // Remove dead enemies
+  auto DelIt =
+      std::remove_if(Entities.begin(), Entities.end(),
+                     [](const auto &Entity) { return !Entity->isAlive(); });
+  Entities.erase(DelIt, Entities.end());
+
+  if (Player) {
+    return Player->isAlive();
+  }
+  return true;
+}
 
 void Level::setPlayer(PlayerEntity *P) { this->Player = P; }
 
@@ -39,6 +63,19 @@ std::vector<Entity *> Level::getEntities() {
     AllEntities.push_back(Player);
   }
   return AllEntities;
+}
+
+Entity *Level::getEntityAt(ymir::Point2d<int> Pos) {
+  if (Player && Player->Pos == Pos) {
+    return Player;
+  }
+  auto It =
+      std::find_if(Entities.begin(), Entities.end(),
+                   [Pos](const auto &Entity) { return Entity->Pos == Pos; });
+  if (It == Entities.end()) {
+    return nullptr;
+  }
+  return It->get();
 }
 
 std::vector<ymir::Point2d<int>>
@@ -110,4 +147,28 @@ bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
                   [Pos](const auto &Entity) { return Entity->Pos == Pos; });
   bool PlayerBlocked = Player && Player->Pos == Pos;
   return MapBlocked || EntityBlocked || PlayerBlocked;
+}
+
+const ymir::Map<int, int> Level::getPlayerDijkstraMap() const {
+  return PlayerDijkstraMap;
+}
+
+void Level::updatePlayerDijkstraMap() {
+  if (!Player) {
+    PlayerDijkstraMap.fill(-1);
+    return;
+  }
+
+  PlayerDijkstraMap = ymir::Algorithm::getDijkstraMap(
+      Map.getSize(), Player->Pos,
+      [this](auto Pos) { return isBodyBlocked(Pos) && Player->Pos != Pos; },
+      ymir::FourTileDirections<int>());
+
+  // auto MapCopy = L.Map.get(Level::LayerWallsIdx);
+  // ymir::Map<ymir::ColoredUniChar, int> HM(MapCopy.getSize());
+  // HM.forEach([&MapCopy](auto Pos, auto &Tile) {
+  //  Tile = ymir::ColoredUniChar{MapCopy.getTile(Pos).kind()};
+  //});
+  // auto NewHM = ymir::Algorithm::makeHeatMap(HM, DM);
+  // std::cerr << NewHM << std::endl;
 }

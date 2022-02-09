@@ -82,13 +82,9 @@ bool Game::handleInput(int Char) {
     return false;
   }
 
-  // TODO handle entity actions
-  auto Entities = CurrentLevel->getEntities();
-  std::sort(Entities.begin(), Entities.end(), [](const auto &A, const auto &B) {
-    return A->Agility > B->Agility;
-  });
-  for (auto &Entity : Entities) {
-    Entity->update(*CurrentLevel.get());
+  // Update level and handle entity updates
+  if (!CurrentLevel->update()) {
+    warn() << "dead";
   }
   return true;
 }
@@ -105,7 +101,8 @@ void Game::handleDraw() {
   auto ScrSize = Scr.getSize();
 
   // Draw UI overlay
-  Scr[0][0] << "Rogue v0.0 [Level]: " << (CurrentLevelIdx + 1);
+  Scr[0][0] << "Rogue v0.0 [FLOOR]: " << (CurrentLevelIdx + 1)
+            << " [HEALTH]: " << Player->Health;
 
   std::string_view InteractStr = "";
   if (Player->CurrentInteraction) {
@@ -125,10 +122,18 @@ void Game::movePlayer(ymir::Dir2d Dir) {
   if (Player->CurrentInteraction) {
     Player->CurrentInteraction = std::nullopt;
   }
-
   auto NewPos = Player->Pos + Dir;
+
+  if (auto *Entity = CurrentLevel->getEntityAt(NewPos)) {
+    // TODO check if player can attack entity
+    std::cerr << "Entity: " << Entity->T.T << ", Health: " << Entity->Health
+              << std::endl;
+    Player->attackEntity(*Entity);
+    return;
+  }
+
   if (!CurrentLevel->isBodyBlocked(NewPos)) {
-    Player->Pos += Dir;
+    Player->Pos = NewPos;
   } else {
     warn() << "Can't move";
   }
@@ -151,12 +156,12 @@ void Game::tryInteract() {
   auto &Interactable = Interactables.at(0);
   switch (Interactable.kind()) {
   case 'H':
-    Player->CurrentInteraction = {"[E] Previous level",
-                          [this]() { switchLevel(CurrentLevelIdx - 1); }};
+    Player->CurrentInteraction = {
+        "[E] Previous level", [this]() { switchLevel(CurrentLevelIdx - 1); }};
     break;
   case '<':
-    Player->CurrentInteraction = {"[E] Next level",
-                          [this]() { switchLevel(CurrentLevelIdx + 1); }};
+    Player->CurrentInteraction = {
+        "[E] Next level", [this]() { switchLevel(CurrentLevelIdx + 1); }};
     break;
   case 'C':
     Player->CurrentInteraction = {"[E] Close chest"};

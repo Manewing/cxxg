@@ -20,6 +20,10 @@ public:
 
   bool isAlive() const { return Health != 0; }
 
+  bool canAttack(ymir::Point2d<int> Pos) const;
+  void attackEntity(Entity &Other);
+
+  unsigned Damage = 10;
   unsigned Health = 100;
   unsigned Agility = 100;
   unsigned LOSRange = 8;
@@ -40,7 +44,8 @@ public:
 
 private:
   void wander(Level &L);
-  void checkForPlayer(Level &L);
+  bool checkForPlayer(Level &L);
+  void chasePlayer(Level &L);
 
 private:
   State CurrentState = State::Idle;

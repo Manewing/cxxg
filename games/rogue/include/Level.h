@@ -25,6 +25,9 @@ public:
   // TODO check that loaded level is valid
   // bool checkIsValid();
 
+  // Returns false if game over
+  bool update();
+
   void setPlayer(PlayerEntity *P = nullptr);
   PlayerEntity *getPlayer();
 
@@ -32,6 +35,7 @@ public:
   ymir::Point2d<int> getPlayerEndPos() const;
 
   std::vector<Entity *> getEntities();
+  Entity* getEntityAt(ymir::Point2d<int> Pos);
 
   std::vector<ymir::Point2d<int>>
   getAllNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const;
@@ -45,10 +49,17 @@ public:
   bool isLOSBlocked(ymir::Point2d<int> Pos) const;
   bool isBodyBlocked(ymir::Point2d<int> Pos) const;
 
+  const ymir::Map<int, int> getPlayerDijkstraMap() const;
+
+protected:
+  void updatePlayerDijkstraMap();
+
 public: // FIXME
   ymir::LayeredMap<Tile> Map;
   PlayerEntity *Player = nullptr;
   std::vector<std::shared_ptr<Entity>> Entities;
+
+  ymir::Map<int, int> PlayerDijkstraMap;
 };
 
 #endif // #ifndef ROGUE_LEVEL_H
