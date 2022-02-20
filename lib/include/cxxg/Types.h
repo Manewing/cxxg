@@ -103,11 +103,15 @@ struct RgbColor {
   uint8_t R = 0;
   uint8_t G = 0;
   uint8_t B = 0;
-  bool Foreground = true;
+  bool HasBackground = false;
+  uint8_t BgR = 0;
+  uint8_t BgG = 0;
+  uint8_t BgB = 0;
 };
 inline bool operator==(const RgbColor &Lhs, const RgbColor &Rhs) noexcept {
-  return std::tie(Lhs.R, Lhs.G, Lhs.B, Lhs.Foreground) ==
-         std::tie(Rhs.R, Rhs.G, Rhs.B, Rhs.Foreground);
+  return std::tie(Lhs.R, Lhs.G, Lhs.B, Lhs.HasBackground, Lhs.BgR, Lhs.BgG,
+                  Lhs.BgB) == std::tie(Rhs.R, Rhs.G, Rhs.B, Rhs.HasBackground,
+                                       Rhs.BgR, Rhs.BgG, Rhs.BgB);
 }
 inline bool operator!=(const RgbColor &Lhs, const RgbColor &Rhs) noexcept {
   return !(Lhs == Rhs);

@@ -26,14 +26,15 @@ RgbColor RgbColor::getHeatMapColor(float Min, float Max, float Value) {
 
 std::ostream &operator<<(std::ostream &Out, const RgbColor &Color) {
   // FIXME check if we have a tty, disable if we don't have a terminal
-  Out << "\033[";
-  if (Color.Foreground) {
-    Out << "38";
+  if (Color.HasBackground) {
+    Out << "\033[48;2;" << static_cast<int>(Color.BgR) << ";"
+        << static_cast<int>(Color.BgG) << ";" << static_cast<int>(Color.BgB)
+        << "m";
   } else {
-    Out << "48";
+    Out << DefaultColor{}; // clear everything, include background
   }
-  Out << ";2;" << static_cast<int>(Color.R) << ";" << static_cast<int>(Color.G)
-      << ";" << static_cast<int>(Color.B) << "m";
+  Out << "\033[38;2;" << static_cast<int>(Color.R) << ";"
+      << static_cast<int>(Color.G) << ";" << static_cast<int>(Color.B) << "m";
   return Out;
 }
 
