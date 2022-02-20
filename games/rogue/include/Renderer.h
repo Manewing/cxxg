@@ -13,6 +13,7 @@ public:
   Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center);
 
   void renderShadow(unsigned char Darkness);
+  void renderFogOfWar(const ymir::Map<bool, int> &SeenMap);
   void renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range);
   void renderVisible(ymir::Point2d<int> AtPos);
 

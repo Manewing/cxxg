@@ -50,10 +50,13 @@ public:
   bool isLOSBlocked(ymir::Point2d<int> Pos) const;
   bool isBodyBlocked(ymir::Point2d<int> Pos) const;
 
-  const ymir::Map<int, int> getPlayerDijkstraMap() const;
+  const ymir::Map<int, int> &getPlayerDijkstraMap() const;
+  const ymir::Map<bool, int> &getPlayerSeenMap() const;
+
 
 protected:
   void updatePlayerDijkstraMap();
+  void updatePlayerSeenMap();
 
 public: // FIXME
   ymir::LayeredMap<Tile> Map;
@@ -61,6 +64,7 @@ public: // FIXME
   std::vector<std::shared_ptr<Entity>> Entities;
 
   ymir::Map<int, int> PlayerDijkstraMap;
+  ymir::Map<bool, int> PlayerSeenMap;
 };
 
 #endif // #ifndef ROGUE_LEVEL_H

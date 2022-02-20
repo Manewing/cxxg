@@ -94,6 +94,7 @@ void Game::handleDraw() {
   const auto RenderSize = ymir::Size2d<int>{80, 24};
   Renderer Render(RenderSize, *CurrentLevel, Player->Pos);
   Render.renderShadow(/*Darkness=*/30);
+  Render.renderFogOfWar(CurrentLevel->getPlayerSeenMap());
   Render.renderLineOfSight(Player->Pos, /*Range=*/Player->LOSRange);
   // Render.renderLineOfSight({50, 14}, /*Range=*/5);
 

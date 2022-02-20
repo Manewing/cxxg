@@ -30,14 +30,22 @@ void Renderer::renderShadow(unsigned char Darkness) {
       [ShadowColor](auto, auto &Tile) { Tile.Color = ShadowColor; });
 }
 
+void Renderer::renderFogOfWar(const ymir::Map<bool, int> &SeenMap) {
+  static constexpr Tile FogTile =
+      Tile{{'#', cxxg::types::RgbColor{20, 20, 20, true, 18, 18, 18}}};
+  VisibleMap.forEach([&SeenMap, this](auto Pos, auto &Tile) {
+    if (!SeenMap.contains(Pos - Offset) || !SeenMap.getTile(Pos - Offset)) {
+      Tile = FogTile.T;
+    }
+  });
+  (void)FogTile;
+}
+
 void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
   renderVisible(AtPos);
 
   ymir::Algorithm::traverseLOS(
       [this](auto Pos) -> bool {
-        if (!VisibleMap.contains(Pos + Offset)) {
-          return false;
-        }
         renderVisible(Pos);
         return !L.isLOSBlocked(Pos);
       },
@@ -45,6 +53,9 @@ void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
 }
 
 void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
+  if (!VisibleMap.contains(AtPos + Offset)) {
+    return;
+  }
   auto &Tile = VisibleMap.getTile(AtPos + Offset);
   auto &RenderedTile = RenderedLevelMap.getTile(AtPos);
 
@@ -54,6 +65,7 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
     Tile.Char = '.';
     break;
   default:
+    Tile.Char = RenderedTile.kind();
     break;
   }
 }

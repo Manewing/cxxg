@@ -1,11 +1,15 @@
 #include "Level.h"
 #include <ymir/Algorithm/Dijkstra.hpp>
+#include <ymir/Algorithm/LineOfSight.hpp>
 
 Level::Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size)
-    : Map(Layers, Size), PlayerDijkstraMap(Size) {}
+    : Map(Layers, Size), PlayerDijkstraMap(Size), PlayerSeenMap(Size) {
+  PlayerSeenMap.fill(false);
+}
 
 bool Level::update() {
   updatePlayerDijkstraMap();
+  updatePlayerSeenMap();
 
   auto AllEntities = getEntities();
   std::sort(
@@ -149,8 +153,12 @@ bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
   return MapBlocked || EntityBlocked || PlayerBlocked;
 }
 
-const ymir::Map<int, int> Level::getPlayerDijkstraMap() const {
+const ymir::Map<int, int> &Level::getPlayerDijkstraMap() const {
   return PlayerDijkstraMap;
+}
+
+const ymir::Map<bool, int> &Level::getPlayerSeenMap() const {
+  return PlayerSeenMap;
 }
 
 void Level::updatePlayerDijkstraMap() {
@@ -171,4 +179,19 @@ void Level::updatePlayerDijkstraMap() {
   //});
   // auto NewHM = ymir::Algorithm::makeHeatMap(HM, DM);
   // std::cerr << NewHM << std::endl;
+}
+
+void Level::updatePlayerSeenMap() {
+  if (!Player) {
+    return;
+  }
+  ymir::Algorithm::traverseLOS(
+      [this](auto Pos) -> bool {
+        if (!PlayerSeenMap.contains(Pos)) {
+          return false;
+        }
+        PlayerSeenMap.getTile(Pos) = true;
+        return !isLOSBlocked(Pos);
+      },
+      Player->Pos, Player->LOSRange, 0.01);
 }
