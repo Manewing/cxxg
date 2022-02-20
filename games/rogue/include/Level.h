@@ -4,8 +4,8 @@
 #include "Entity.h"
 #include "Tile.h"
 #include <memory>
-#include <ymir/LayeredMap.hpp>
 #include <vector>
+#include <ymir/LayeredMap.hpp>
 
 class Level {
 public:
@@ -36,7 +36,7 @@ public:
   ymir::Point2d<int> getPlayerEndPos() const;
 
   std::vector<Entity *> getEntities();
-  Entity* getEntityAt(ymir::Point2d<int> Pos);
+  Entity *getEntityAt(ymir::Point2d<int> Pos);
 
   std::vector<ymir::Point2d<int>>
   getAllNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const;
@@ -50,9 +50,10 @@ public:
   bool isLOSBlocked(ymir::Point2d<int> Pos) const;
   bool isBodyBlocked(ymir::Point2d<int> Pos) const;
 
+  ymir::Map<int, int> getDijkstraMap(Tile Target, std::size_t Layer) const;
+
   const ymir::Map<int, int> &getPlayerDijkstraMap() const;
   const ymir::Map<bool, int> &getPlayerSeenMap() const;
-
 
 protected:
   void updatePlayerDijkstraMap();

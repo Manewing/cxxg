@@ -153,6 +153,15 @@ bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
   return MapBlocked || EntityBlocked || PlayerBlocked;
 }
 
+ymir::Map<int, int> Level::getDijkstraMap(Tile Target,
+                                          std::size_t Layer) const {
+  auto &LayerMap = Map.get(Layer);
+  auto TilePos = LayerMap.findTiles(Target);
+  return ymir::Algorithm::getDijkstraMap(
+      Map.getSize(), TilePos, [this](auto Pos) { return isBodyBlocked(Pos); },
+      ymir::FourTileDirections<int>());
+}
+
 const ymir::Map<int, int> &Level::getPlayerDijkstraMap() const {
   return PlayerDijkstraMap;
 }
@@ -169,7 +178,7 @@ void Level::updatePlayerDijkstraMap() {
 
   PlayerDijkstraMap = ymir::Algorithm::getDijkstraMap(
       Map.getSize(), Player->Pos,
-      [this](auto Pos) { return isBodyBlocked(Pos) && Player->Pos != Pos; },
+      [this](auto Pos) { return isBodyBlocked(Pos); },
       ymir::FourTileDirections<int>());
 
   // auto MapCopy = L.Map.get(Level::LayerWallsIdx);

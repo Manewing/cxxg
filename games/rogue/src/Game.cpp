@@ -128,8 +128,6 @@ void Game::movePlayer(ymir::Dir2d Dir) {
 
   if (auto *Entity = CurrentLevel->getEntityAt(NewPos)) {
     // TODO check if player can attack entity
-    std::cerr << "Entity: " << Entity->T.T << ", Health: " << Entity->Health
-              << std::endl;
     Player->attackEntity(*Entity);
     return;
   }

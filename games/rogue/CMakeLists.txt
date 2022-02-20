@@ -20,6 +20,7 @@ set(SOURCE_FILES
   src/Game.cpp
   src/Level.cpp
   src/LevelGenerator.cpp
+  src/NPCEntity.cpp
   src/Parser.cpp
   src/Renderer.cpp
 )
@@ -49,6 +50,8 @@ target_link_libraries(lib${TARGET}
 target_link_libraries(${TARGET}
   lib${TARGET}
 )
+
+add_subdirectory(test)
 
 else()
 

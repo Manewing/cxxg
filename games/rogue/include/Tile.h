@@ -2,6 +2,7 @@
 #define ROGUE_TILE_H
 
 #include <cxxg/Types.h>
+#include <iosfwd>
 
 struct Tile {
   cxxg::types::ColoredChar T;
@@ -15,6 +16,11 @@ inline bool operator==(const Tile &A, const Tile &B) noexcept {
 }
 inline bool operator!=(const Tile &A, const Tile &B) noexcept {
   return !(A == B);
+}
+
+inline std::ostream &operator<<(std::ostream &Out, Tile &T) {
+  Out << T.T;
+  return Out;
 }
 
 #endif // #ifndef ROGUE_LEVEL_H
