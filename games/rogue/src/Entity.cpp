@@ -1,23 +1,24 @@
 #include "Entity.h"
 #include "Level.h"
 #include <random>
+#include <sstream>
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
 #include <ymir/Noise.hpp>
-#include <sstream>
 
 #include <ymir/Algorithm/DijkstraIo.hpp>
 
 // FIXME move this, also should this be based on the level seed?
 static std::random_device RandomEngine;
 
-MovementBlockedException::MovementBlockedException(ymir::Point2d<int> Pos) : Pos(Pos) {
+MovementBlockedException::MovementBlockedException(ymir::Point2d<int> Pos)
+    : Pos(Pos) {
   std::stringstream SS;
   SS << "Movement blocked at " << Pos;
   Msg = SS.str();
 }
 
-const char * MovementBlockedException::what() const noexcept {
+const char *MovementBlockedException::what() const noexcept {
   return Msg.c_str();
 }
 
@@ -31,11 +32,7 @@ bool Entity::canAttack(ymir::Point2d<int> Pos) const {
 }
 
 void Entity::attackEntity(Entity &Other) {
-  int NewHealth = Other.Health - Damage;
-  if (NewHealth < 0) {
-    NewHealth = 0;
-  }
-  Other.Health = NewHealth;
+  Other.damage(Damage);
 }
 
 void Entity::wander(Level &L) {
@@ -46,6 +43,18 @@ void Entity::wander(Level &L) {
     throw MovementBlockedException(Pos);
   }
   Pos = *It;
+}
+
+void Entity::heal(unsigned Amount) {
+  Health = std::min(Health + Amount, MaxHealth);
+}
+
+void Entity::damage(unsigned Amount) {
+  int NewHealth = Health - Amount;
+  if (NewHealth < 0) {
+    NewHealth = 0;
+  }
+  Health = NewHealth;
 }
 
 void EnemyEntity::update(Level &L) {
@@ -79,7 +88,6 @@ void EnemyEntity::update(Level &L) {
     break;
   }
 }
-
 
 bool EnemyEntity::checkForPlayer(Level &L) {
   auto *Player = L.getPlayer();

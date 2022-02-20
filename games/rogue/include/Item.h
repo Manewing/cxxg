@@ -2,6 +2,8 @@
 #define ROGUE_ITEM_H
 
 #include <string>
+#include <memory>
+#include <vector>
 
 enum ItemType {
   // Equipment types
@@ -26,15 +28,39 @@ enum ItemType {
   ANY_MASK = 0xffffffff
 };
 
+class Entity;
+class ItemEffect {
+public:
+  virtual int apply(Entity &E, int Num) const = 0;
+};
+class HealItemEffect : public ItemEffect {
+public:
+  HealItemEffect(unsigned Amount);
+  int apply(Entity &E, int Num) const final;
+
+private:
+  unsigned Amount;
+};
+class DamageItemEffect : public ItemEffect {
+public:
+  DamageItemEffect(unsigned Amount);
+  int apply(Entity &E, int Num) const final;
+
+private:
+  unsigned Amount;
+};
+
 class ItemPrototype {
 public:
   ItemPrototype(int ItemId, std::string Name, ItemType Type,
-                int MaxStatckSize = 1);
+                int MaxStatckSize,
+                std::vector<std::shared_ptr<ItemEffect>> Effects);
 
   int ItemId;
   std::string Name;
   ItemType Type;
   int MaxStatckSize = 1;
+  std::vector<std::shared_ptr<ItemEffect>> Effects;
 };
 
 class Item {

@@ -27,7 +27,7 @@ public:
   ymir::Point2d<int> Pos;
   Tile T;
 
-  Entity(ymir::Point2d<int> Pos, Tile T) : Pos(Pos), T(T) {}
+  Entity(ymir::Point2d<int> Pos, Tile T) : Pos(Pos), T(T), Inv(*this) {}
   virtual ~Entity() = default;
 
   virtual void update(Level&) {}
@@ -38,10 +38,16 @@ public:
   void attackEntity(Entity &Other);
   void wander(Level &L);
 
+  void heal(unsigned Amount);
+  void damage(unsigned Amount);
+
   unsigned Damage = 10;
   unsigned Health = 100;
+  unsigned MaxHealth = 100;
   unsigned Agility = 100;
   unsigned LOSRange = 8;
+
+  Inventory Inv;
 };
 
 // FIXME move
@@ -74,7 +80,6 @@ public:
   };
 
 public:
-  Inventory Inv;
   PlayerEntity(ymir::Point2d<int> Pos = {0, 0});
   std::optional<Interaction> CurrentInteraction;
 };

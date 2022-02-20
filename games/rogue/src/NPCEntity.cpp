@@ -142,6 +142,8 @@ void NPCEntity::handleAction(Level &L) {
     });
     break;
   case ActionState::SEARCH_FOOD:
+    // TODO check if has food in inventory
+    // consume food in inventory avoid search if possible
     searchObject(L, Tile{{'#'}}, [this](auto) {
       PS.Hunger += 750;
       CurrentActionState = ActionState::IDLE;
