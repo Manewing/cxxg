@@ -22,25 +22,32 @@ set(SOURCE_FILES
   src/LevelGenerator.cpp
   src/Parser.cpp
   src/Renderer.cpp
-  src/main.cpp
 )
 
-add_executable(${TARGET}
+add_library(
+  lib${TARGET} STATIC
   ${HEADER_FILES}
   ${SOURCE_FILES}
 )
 
+add_executable(${TARGET}
+  src/main.cpp
+)
 
-target_include_directories(${TARGET} PUBLIC include)
 
+target_include_directories(lib${TARGET} PUBLIC include)
 
 ## YMIR
 find_library(LIBYMIR NAMES ymir HINTS "${YMIR_INSTALL}/lib")
-target_include_directories(${TARGET} PUBLIC ${YMIR_INSTALL}/include)
+target_include_directories(lib${TARGET} PUBLIC ${YMIR_INSTALL}/include)
 ##
 
-target_link_libraries(${TARGET}
+target_link_libraries(lib${TARGET}
   cxxg ${LIBYMIR}
+)
+
+target_link_libraries(${TARGET}
+  lib${TARGET}
 )
 
 else()
