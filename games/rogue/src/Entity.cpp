@@ -106,4 +106,6 @@ void EnemyEntity::chasePlayer(Level &L) {
   }
 }
 
-PlayerEntity::PlayerEntity(ymir::Point2d<int> Pos) : Entity(Pos, PlayerTile) {}
+PlayerEntity::PlayerEntity(ymir::Point2d<int> Pos) : Entity(Pos, PlayerTile) {
+  Damage = 45;
+}

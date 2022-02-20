@@ -6,7 +6,6 @@ Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
     : L(L), VisibleMap(Size) {
   Offset.X = -(Center.X - Size.W / 2);
   Offset.Y = -(Center.Y - Size.H / 2);
-  std::cout << "Center: " << Center << ", Offset " << Offset << std::endl;
 
   // Render map and copy to visible map
   RenderedLevelMap = L.Map.render();

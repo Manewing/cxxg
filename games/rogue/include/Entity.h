@@ -2,6 +2,7 @@
 #define ROGUE_ENTITY_H
 
 #include "Tile.h"
+#include "Inventory.h"
 #include <ymir/Types.hpp>
 #include <optional>
 #include <functional>
@@ -73,6 +74,7 @@ public:
   };
 
 public:
+  Inventory Inv;
   PlayerEntity(ymir::Point2d<int> Pos = {0, 0});
   std::optional<Interaction> CurrentInteraction;
 };

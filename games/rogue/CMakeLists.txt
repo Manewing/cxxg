@@ -9,20 +9,31 @@ if(EXISTS "${YMIR_INSTALL}/include/ymir")
 set(HEADER_FILES
   include/Entity.h
   include/Game.h
+  include/Inventory.h
+  include/Item.h
+  include/ItemDatabase.h
   include/Level.h
   include/LevelGenerator.h
+  include/NPCEntity.h
   include/Parser.h
   include/Renderer.h
+  include/UIController.h
+  include/UIListSelect.h
 )
 
 set(SOURCE_FILES
   src/Entity.cpp
   src/Game.cpp
+  src/Inventory.cpp
+  src/Item.cpp
+  src/ItemDatabase.cpp
   src/Level.cpp
   src/LevelGenerator.cpp
   src/NPCEntity.cpp
   src/Parser.cpp
   src/Renderer.cpp
+  src/UIController.cpp
+  src/UIListSelect.cpp
 )
 
 add_library(

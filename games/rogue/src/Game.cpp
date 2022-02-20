@@ -17,12 +17,16 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
 }
 
 Game::Game(cxxg::Screen &Scr)
-    : cxxg::Game(Scr), LevelGen(), CurrentLevel(nullptr) {}
+    : cxxg::Game(Scr), LevelGen(), CurrentLevel(nullptr), UICtrl(Scr) {}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   Player = std::make_unique<PlayerEntity>();
 
   switchLevel(0);
+
+  Player->Inv.Items.push_back(ItemDb.createItem(0, 20));
+  Player->Inv.Items.push_back(ItemDb.createItem(1, 15));
+  Player->Inv.Items.push_back(ItemDb.createItem(2, 10));
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
   handleDraw();
@@ -53,6 +57,10 @@ void Game::switchLevel(int Level) {
 }
 
 bool Game::handleInput(int Char) {
+  if (UICtrl.isUIActive()) {
+    UICtrl.handleInput(Char);
+    return true;
+  }
 
   // FIXME play move and attack needs to be handled in update
   switch (Char) {
@@ -77,6 +85,10 @@ bool Game::handleInput(int Char) {
   case 'e':
     tryInteract();
     break;
+  case 'i':
+    // UI interaction do not update level
+    UICtrl.setInventoryUI(Player->Inv);
+    return true;
   default:
     // Not a valid input do not update
     return false;
@@ -84,7 +96,7 @@ bool Game::handleInput(int Char) {
 
   // Update level and handle entity updates
   if (!CurrentLevel->update()) {
-    warn() << "dead";
+    //    warn() << "dead";
   }
   return true;
 }
@@ -96,15 +108,9 @@ void Game::handleDraw() {
   Render.renderShadow(/*Darkness=*/30);
   Render.renderFogOfWar(CurrentLevel->getPlayerSeenMap());
   Render.renderLineOfSight(Player->Pos, /*Range=*/Player->LOSRange);
-  // Render.renderLineOfSight({50, 14}, /*Range=*/5);
 
   // Draw map
   Scr << Render.get();
-  auto ScrSize = Scr.getSize();
-
-  // Draw UI overlay
-  Scr[0][0] << "Rogue v0.0 [FLOOR]: " << (CurrentLevelIdx + 1)
-            << " [HEALTH]: " << Player->Health;
 
   std::string_view InteractStr = "";
   if (Player->CurrentInteraction) {
@@ -112,9 +118,9 @@ void Game::handleDraw() {
   } else if (CurrentLevel->canInteract(Player->Pos)) {
     InteractStr = "[E] Interact";
   }
-  if (!InteractStr.empty()) {
-    Scr[ScrSize.Y - 2][ScrSize.X / 2 - InteractStr.size() / 2] << InteractStr;
-  }
+
+  // Draw UI overlay
+  UICtrl.draw(CurrentLevelIdx, Player->Health, InteractStr);
 
   cxxg::Game::handleDraw();
 }
