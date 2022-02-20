@@ -11,6 +11,7 @@
 #include <ymir/Dungeon/RoomEntityPlacer.hpp>
 #include <ymir/Dungeon/RoomPlacer.hpp>
 #include <ymir/Dungeon/StartEndPlacer.hpp>
+#include <ymir/MapIo.hpp>
 
 template <typename TileType, typename TileCord, typename RandEngType>
 void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
@@ -53,10 +54,35 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
   ymir::Dungeon::Context<Tile, int> Ctx(NewLevel->Map);
 
   Pass.init(Ctx);
-  Pass.run(Ctx);
+  try {
+    Pass.run(Ctx);
+  } catch (const std::exception &E) {
+    auto RenderedLevelMap = NewLevel->Map.render();
+    ymir::Map<cxxg::types::ColoredChar, int> Map(RenderedLevelMap.getSize());
+    Map.forEach([&RenderedLevelMap](auto Pos, auto &Tile) {
+      Tile = RenderedLevelMap.getTile(Pos).T;
+    });
+    std::cout << Map << std::endl;
+    throw E;
+  }
 
   spawnEnemies(*NewLevel);
 
+  return NewLevel;
+}
+
+std::shared_ptr<Level>
+LevelGenerator::loadLevel(const std::filesystem::path &LevelFile,
+                          const std::vector<std::string> &Layers,
+                          const std::map<char, CharInfo>& CharInfoMap) {
+  auto Map = ymir::loadMap(LevelFile);
+  auto NewLevel = std::make_shared<Level>(Layers, Map.getSize());
+  auto &LevelMap = NewLevel->Map;
+
+  Map.forEach([&LevelMap, &CharInfoMap](auto Pos, auto Char) {
+    auto &[T, Layer] = CharInfoMap.at(Char);
+    LevelMap.get(Layer).setTile(Pos, T);
+  });
   return NewLevel;
 }
 
