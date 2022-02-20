@@ -5,8 +5,21 @@
 #include <ymir/Types.hpp>
 #include <optional>
 #include <functional>
+#include <exception>
 
 class Level;
+
+class MovementBlockedException : public std::exception {
+public:
+  MovementBlockedException(ymir::Point2d<int> Pos);
+  const char *what() const noexcept final;
+
+public:
+  const ymir::Point2d<int> Pos;
+
+private:
+  std::string Msg;
+};
 
 class Entity {
 public:
@@ -22,6 +35,7 @@ public:
 
   bool canAttack(ymir::Point2d<int> Pos) const;
   void attackEntity(Entity &Other);
+  void wander(Level &L);
 
   unsigned Damage = 10;
   unsigned Health = 100;
@@ -43,7 +57,6 @@ public:
   void update(Level& L) override;
 
 private:
-  void wander(Level &L);
   bool checkForPlayer(Level &L);
   void chasePlayer(Level &L);
 

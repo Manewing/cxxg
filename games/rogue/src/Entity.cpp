@@ -4,11 +4,22 @@
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
 #include <ymir/Noise.hpp>
+#include <sstream>
 
 #include <ymir/Algorithm/DijkstraIo.hpp>
 
 // FIXME move this, also should this be based on the level seed?
 static std::random_device RandomEngine;
+
+MovementBlockedException::MovementBlockedException(ymir::Point2d<int> Pos) : Pos(Pos) {
+  std::stringstream SS;
+  SS << "Movement blocked at " << Pos;
+  Msg = SS.str();
+}
+
+const char * MovementBlockedException::what() const noexcept {
+  return Msg.c_str();
+}
 
 bool Entity::canAttack(ymir::Point2d<int> Pos) const {
   // FIXME only melee check right now
@@ -25,6 +36,16 @@ void Entity::attackEntity(Entity &Other) {
     NewHealth = 0;
   }
   Other.Health = NewHealth;
+}
+
+void Entity::wander(Level &L) {
+  auto AllNextPos = L.getAllNonBodyBlockedPosNextTo(Pos);
+  auto It =
+      ymir::randomIterator(AllNextPos.begin(), AllNextPos.end(), RandomEngine);
+  if (It == AllNextPos.end()) {
+    throw MovementBlockedException(Pos);
+  }
+  Pos = *It;
 }
 
 void EnemyEntity::update(Level &L) {
@@ -59,15 +80,6 @@ void EnemyEntity::update(Level &L) {
   }
 }
 
-void EnemyEntity::wander(Level &L) {
-  auto AllNextPos = L.getAllNonBodyBlockedPosNextTo(Pos);
-  auto It =
-      ymir::randomIterator(AllNextPos.begin(), AllNextPos.end(), RandomEngine);
-  if (It == AllNextPos.end()) {
-    return;
-  }
-  Pos = *It;
-}
 
 bool EnemyEntity::checkForPlayer(Level &L) {
   auto *Player = L.getPlayer();
