@@ -138,8 +138,16 @@ void HistoryUIController::draw(cxxg::Screen &Scr) const {
   }
 
   // Draw footer
+  const unsigned Start =
+      std::min(Msgs.size(), static_cast<std::size_t>(Offset + 1));
+  const unsigned End =
+      std::min(Msgs.size(), static_cast<std::size_t>(Offset + NumHistoryRows));
+  std::string Footer = std::to_string(Start) + "-" + std::to_string(End);
+
   Scr[PosY + NumHistoryRows + 1][PosX]
       << "+" << std::string(Scr.getSize().X - 2, '-') << "+";
+  const int FtrOffset = (Scr.getSize().X - Footer.size()) / 2 - 1;
+  Scr[PosY + NumHistoryRows + 1][PosX + FtrOffset] << "[" << Footer << "]";
 }
 
 UIController::UIController(cxxg::Screen &Scr) : Scr(Scr) {}
