@@ -8,6 +8,7 @@ if(EXISTS "${YMIR_INSTALL}/include/ymir")
 
 set(HEADER_FILES
   include/Entity.h
+  include/EventHub.h
   include/Game.h
   include/History.h
   include/Inventory.h
