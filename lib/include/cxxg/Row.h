@@ -20,6 +20,9 @@ public:
   /// within the row
   RowAccessor(Row &Rw, int Offset);
 
+  /// Returns the accessed row
+  inline Row &get() { return Rw; }
+
   /// Sets color for the current index/offset
   /// @param[in] Cl - Color to set character to
   RowAccessor &operator=(types::TermColor Cl);

@@ -32,6 +32,7 @@ class Entity;
 class ItemEffect {
 public:
   virtual int apply(Entity &E, int Num) const = 0;
+  virtual ~ItemEffect() = default;
 };
 class HealItemEffect : public ItemEffect {
 public:

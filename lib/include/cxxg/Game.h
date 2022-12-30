@@ -42,8 +42,20 @@ public:
   /// Handles game exit, restores environment to its original state.
   virtual void handleExit();
 
-  /// Creates a warning and returns a writable accessor to it.
+  /// Creates a notification and returns a writable accessor to it.
+  RowAccessor notify();
+
+  /// Creates an info notification and returns a writable accessor to it.
+  /// Format: INFO: <message>
+  RowAccessor info();
+
+  /// Creates a warning notification and returns a writable accessor to it.
+  /// Format: WARNING: <message>
   RowAccessor warn();
+
+  /// Creates a error notification and returns a writable accessor to it.
+  /// Format: ERROR: <message>
+  RowAccessor error();
 
   /// Checks if the screen size is sufficient for the required game size.
   /// @param[in] GameSize - The required game size to check the screen size for
@@ -75,7 +87,7 @@ protected:
 
 private:
   /// Buffer for warnings to display
-  ::std::vector<Row> Warnings;
+  ::std::vector<Row> Notifications;
 };
 
 }; // namespace cxxg

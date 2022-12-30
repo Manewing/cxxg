@@ -9,6 +9,7 @@ if(EXISTS "${YMIR_INSTALL}/include/ymir")
 set(HEADER_FILES
   include/Entity.h
   include/Game.h
+  include/History.h
   include/Inventory.h
   include/Item.h
   include/ItemDatabase.h
@@ -24,6 +25,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
   src/Entity.cpp
   src/Game.cpp
+  src/History.cpp
   src/Inventory.cpp
   src/Item.cpp
   src/ItemDatabase.cpp

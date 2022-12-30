@@ -113,6 +113,7 @@ std::shared_ptr<Level> generateChunk(ymir::Rect2d<int> ChunkRect) {
 
 class GameWorld {
 public:
+  virtual ~GameWorld() = default;
   virtual void initialize(ymir::Point2d<int> InitPos = {0, 0}) = 0;
   virtual bool update(ymir::Point2d<int> Pos = {0, 0}) = 0;
 

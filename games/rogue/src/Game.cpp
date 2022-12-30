@@ -17,7 +17,8 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
 }
 
 Game::Game(cxxg::Screen &Scr)
-    : cxxg::Game(Scr), LevelGen(), CurrentLevel(nullptr), UICtrl(Scr) {}
+    : cxxg::Game(Scr), Hist(*this), LevelGen(), CurrentLevel(nullptr),
+      UICtrl(Scr) {}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   Player = std::make_unique<PlayerEntity>();
@@ -34,12 +35,12 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
 
 void Game::switchLevel(int Level) {
   if (Level < 0) {
-    warn() << "One can never leave...";
+    Hist.warn() << "One can never leave...";
     return;
   }
 
   if (Level >= static_cast<int>(Levels.size())) {
-    assert((Level - 1) < Levels.size());
+    assert((Level - 1) < static_cast<int>(Levels.size()));
     Levels.push_back(LevelGen.generateLevel(Level));
   } else {
     CurrentLevel->setPlayer(nullptr);
@@ -88,6 +89,9 @@ bool Game::handleInput(int Char) {
   case 'i':
     // UI interaction do not update level
     UICtrl.setInventoryUI(Player->Inv);
+    return true;
+  case 'h':
+    UICtrl.setHistoryUI(Hist);
     return true;
   default:
     // Not a valid input do not update
@@ -141,7 +145,7 @@ void Game::movePlayer(ymir::Dir2d Dir) {
   if (!CurrentLevel->isBodyBlocked(NewPos)) {
     Player->Pos = NewPos;
   } else {
-    warn() << "Can't move";
+    Hist.warn() << "Can't move";
   }
 }
 

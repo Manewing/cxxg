@@ -32,14 +32,14 @@ void Game::run(bool Blocking) {
 }
 
 void Game::handleDraw() {
-  for (size_t L = 0; L < Warnings.size(); L++) {
+  for (size_t L = 0; L < Notifications.size(); L++) {
     // get position for warning
-    auto Y = Scr.getSize().Y - Warnings.size() + L;
+    auto Y = Scr.getSize().Y - Notifications.size() + L;
 
     // print warning
-    Scr[Y] = Warnings.at(L);
+    Scr[Y] = Notifications.at(L);
   }
-  Warnings.clear();
+  Notifications.clear();
 
   Scr.update();
   Scr.clear();
@@ -52,9 +52,21 @@ void Game::handleExit() {
   }
 }
 
+RowAccessor Game::notify() {
+  Notifications.push_back(Row(Scr.getSize().X));
+  return Notifications.back()[0];
+}
+
+RowAccessor Game::info() {
+  return (notify() << ::cxxg::types::Color::NONE << "INFO: ");
+}
+
 RowAccessor Game::warn() {
-  Warnings.push_back(Row(Scr.getSize().X));
-  return (Warnings.back()[0] << ::cxxg::types::Color::YELLOW << "WARNING: ");
+  return (notify() << ::cxxg::types::Color::YELLOW << "WARNING: ");
+}
+
+RowAccessor Game::error() {
+  return (notify() << ::cxxg::types::Color::RED << "ERROR: ");
 }
 
 void Game::checkSize(types::Size GameSize) const {
