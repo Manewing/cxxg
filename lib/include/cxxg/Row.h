@@ -26,6 +26,19 @@ public:
   /// Sets color for the current index/offset
   /// @param[in] Cl - Color to set character to
   RowAccessor &operator=(types::TermColor Cl);
+  RowAccessor &operator=(types::NoColor Cl) {
+    *this = types::TermColor(Cl);
+    return *this;
+  }
+  RowAccessor &operator=(types::DefaultColor Cl) {
+    *this = types::TermColor(Cl);
+
+    return *this;
+  }
+  RowAccessor &operator=(types::RgbColor Cl) {
+    *this = types::TermColor(Cl);
+    return *this;
+  }
 
   /// Sets character at the current index/offset
   /// @param[in] C - Character to set
@@ -39,6 +52,18 @@ public:
   /// have the given color
   /// @param[in] Cl - The color to set the output to
   RowAccessor &operator<<(types::TermColor Cl);
+  RowAccessor &operator<<(types::NoColor Cl) {
+    *this << types::TermColor(Cl);
+    return *this;
+  }
+  RowAccessor &operator<<(types::DefaultColor Cl) {
+    *this << types::TermColor(Cl);
+    return *this;
+  }
+  RowAccessor &operator<<(types::RgbColor Cl) {
+    *this << types::TermColor(Cl);
+    return *this;
+  }
 
   /// Outputs the given string to the row, will increase the access offset
   /// by the amount of characters written for the string
