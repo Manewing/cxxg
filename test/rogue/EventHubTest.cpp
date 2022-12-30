@@ -72,6 +72,20 @@ TEST(EventHub, SubscribePublish) {
   EH.publish(DummyEventC("asdf"));
 }
 
+TEST(EventHub, Unsubscribe) {
+  EventHub EH;
+  EventListenerMock Listener;
+  EH.subscribe(Listener, &EventListenerMock::onDummyEventA);
+  EH.subscribe(Listener, &EventListenerMock::onDummyEventB);
+  EH.unsubscribe(Listener);
+
+  EXPECT_CALL(Listener, onDummyEventA(DummyEventA(43))).Times(0);
+  EXPECT_CALL(Listener, onDummyEventB(DummyEventB("asdf"))).Times(0);
+
+  EH.publish(DummyEventA(43));
+  EH.publish(DummyEventB("asdf"));
+}
+
 TEST(EventHub, EventHubConnectorUnconnected) {
   EventHub EH;
   DummyEntity DE;
@@ -97,6 +111,21 @@ TEST(EventHub, EventHubConnectorConnected) {
 
   DE.doSth("asdf");
   DE.publish(DummyEventA(12));
+}
+
+TEST(EventHub, EventHubConnectorUnsubscribe) {
+  EventHub EH;
+
+  DummyEntity DE;
+  DE.setEventHub(&EH);
+  DE.setEventHub(nullptr);
+
+  EventListenerMock Listener;
+  EH.subscribe(Listener, &EventListenerMock::onDummyEventB);
+
+  EXPECT_CALL(Listener, onDummyEventB(DummyEventB("asdf"))).Times(0);
+
+  DE.doSth("asdf");
 }
 
 } // namespace

@@ -22,6 +22,15 @@ const char *MovementBlockedException::what() const noexcept {
   return Msg.c_str();
 }
 
+bool EntityAttackEvent::isPlayerAffected() const {
+  return dynamic_cast<const PlayerEntity *>(&Attacker) ||
+         dynamic_cast<const PlayerEntity *>(&Target);
+}
+
+bool EntityDiedEvent::isPlayer() const {
+  return dynamic_cast<const PlayerEntity *>(&Et);
+}
+
 bool Entity::canAttack(ymir::Point2d<int> Pos) const {
   // FIXME only melee check right now
   //   x
@@ -33,6 +42,7 @@ bool Entity::canAttack(ymir::Point2d<int> Pos) const {
 
 void Entity::attackEntity(Entity &Other) {
   Other.damage(Damage);
+  publish(EntityAttackEvent{{}, *this, Other, Damage});
 }
 
 void Entity::wander(Level &L) {
@@ -51,8 +61,9 @@ void Entity::heal(unsigned Amount) {
 
 void Entity::damage(unsigned Amount) {
   int NewHealth = Health - Amount;
-  if (NewHealth < 0) {
+  if (NewHealth <= 0) {
     NewHealth = 0;
+    publish(EntityDiedEvent{{}, *this});
   }
   Health = NewHealth;
 }
@@ -114,6 +125,7 @@ void EnemyEntity::chasePlayer(Level &L) {
   }
 }
 
-PlayerEntity::PlayerEntity(ymir::Point2d<int> Pos) : Entity(Pos, PlayerTile) {
+PlayerEntity::PlayerEntity(ymir::Point2d<int> Pos)
+    : Entity(Pos, PlayerTile, "Player") {
   Damage = 45;
 }

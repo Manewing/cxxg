@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "Entity.h"
+
 class Game;
 class History;
 
@@ -40,6 +42,19 @@ private:
 private:
   Game &G;
   std::vector<cxxg::Row> Messages;
+};
+
+class EventHistoryWriter : public EventHubConnector {
+public:
+  explicit EventHistoryWriter(History &Hist);
+  void setEventHub(EventHub *Hub) final;
+
+private:
+  void onEntityAttackEvent(const EntityAttackEvent &EAE);
+  void onEntityDiedEvent(const EntityDiedEvent &EDE);
+
+private:
+  History &Hist;
 };
 
 #endif // #ifndef ROGUE_HISTORY_H

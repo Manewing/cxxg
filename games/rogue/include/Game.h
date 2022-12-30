@@ -1,6 +1,7 @@
 #ifndef ROGUE_GAME_H
 #define ROGUE_GAME_H
 
+#include "EventHub.h"
 #include "History.h"
 #include "ItemDatabase.h"
 #include "Level.h"
@@ -28,7 +29,9 @@ public:
   void tryInteract();
 
 public: // FIXME
+  EventHub EvHub;
   History Hist;
+  EventHistoryWriter EHW;
   ItemDatabase ItemDb;
   LevelGenerator LevelGen;
   std::unique_ptr<PlayerEntity> Player;

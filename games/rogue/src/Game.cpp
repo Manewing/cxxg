@@ -17,11 +17,15 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
 }
 
 Game::Game(cxxg::Screen &Scr)
-    : cxxg::Game(Scr), Hist(*this), LevelGen(), CurrentLevel(nullptr),
-      UICtrl(Scr) {}
+    : cxxg::Game(Scr), Hist(*this), EHW(Hist), LevelGen(),
+      CurrentLevel(nullptr), UICtrl(Scr) {
+}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   Player = std::make_unique<PlayerEntity>();
+
+  EHW.setEventHub(&EvHub);
+  Player->setEventHub(&EvHub);
 
   switchLevel(0);
 
@@ -53,6 +57,8 @@ void Game::switchLevel(int Level) {
   } else {
     Player->Pos = CurrentLevel->getPlayerEndPos();
   }
+
+  CurrentLevel->setEventHub(&EvHub);
 
   CurrentLevelIdx = Level;
 }
@@ -100,7 +106,8 @@ bool Game::handleInput(int Char) {
 
   // Update level and handle entity updates
   if (!CurrentLevel->update()) {
-    //    warn() << "dead";
+    // FIXME return false currently indicates player died, refactor for event
+    // of player death
   }
   return true;
 }

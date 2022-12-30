@@ -4,42 +4,54 @@
 #include <functional>
 #include <map>
 #include <typeindex>
-#include <vector>
 
-class Event {};
+struct Event {};
 
 class EventHub {
 public:
   using HandlerType = std::function<void(const Event &)>;
-  using HandlerList = std::vector<HandlerType>;
+  using HandlerMap = std::map<void *, HandlerType>;
 
 public:
   template <class SubscriberType, typename EventType>
   void subscribe(SubscriberType &Subscriber,
                  void (SubscriberType::*CallbackFunc)(const EventType &)) {
-    Handlers[typeid(EventType)].push_back(
+    Subscribers[typeid(EventType)][&Subscriber] =
         [&Subscriber, CallbackFunc](const Event &E) {
           (Subscriber.*CallbackFunc)(static_cast<const EventType &>(E));
-        });
+        };
+  }
+
+  template <class SubscriberType> void unsubscribe(SubscriberType &Subscriber) {
+    for (auto &[EvTypeId, Handlers] : Subscribers) {
+      Handlers.erase(&Subscriber);
+    }
   }
 
   template <typename EventType> void publish(const EventType &E) {
-    auto It = Handlers.find(typeid(EventType));
-    if (It == Handlers.end()) {
+    auto It = Subscribers.find(typeid(EventType));
+    if (It == Subscribers.end()) {
       return;
     }
-    for (auto const &Handler : It->second) {
+    for (auto const &[Inst, Handler] : It->second) {
       Handler(E);
     }
   }
 
 private:
-  std::map<std::type_index, HandlerList> Handlers;
+  std::map<std::type_index, HandlerMap> Subscribers;
 };
 
 class EventHubConnector {
 public:
-  virtual void setEventHub(EventHub *Hub) { this->Hub = Hub; }
+  virtual ~EventHubConnector() = default;
+
+  virtual void setEventHub(EventHub *Hub) {
+    if (this->Hub) {
+      this->Hub->unsubscribe(*this);
+    }
+    this->Hub = Hub;
+  }
 
   template <class SubscriberType, typename EventType>
   void subscribe(SubscriberType &Subscriber,

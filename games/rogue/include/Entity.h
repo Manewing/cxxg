@@ -1,14 +1,16 @@
 #ifndef ROGUE_ENTITY_H
 #define ROGUE_ENTITY_H
 
-#include "Tile.h"
+#include "EventHub.h"
 #include "Inventory.h"
-#include <ymir/Types.hpp>
-#include <optional>
-#include <functional>
+#include "Tile.h"
 #include <exception>
+#include <functional>
+#include <optional>
+#include <ymir/Types.hpp>
 
 class Level;
+class Entity;
 
 class MovementBlockedException : public std::exception {
 public:
@@ -22,15 +24,31 @@ private:
   std::string Msg;
 };
 
-class Entity {
+struct EntityAttackEvent : public Event {
+  Entity &Attacker;
+  Entity &Target;
+  unsigned Damage;
+
+  bool isPlayerAffected() const;
+};
+
+struct EntityDiedEvent : public Event {
+  Entity &Et;
+  bool isPlayer() const;
+};
+
+class Entity : public EventHubConnector {
 public:
   ymir::Point2d<int> Pos;
   Tile T;
 
-  Entity(ymir::Point2d<int> Pos, Tile T) : Pos(Pos), T(T), Inv(*this) {}
+  Entity(ymir::Point2d<int> Pos, Tile T, std::string Name = "TODO_Skeleton")
+      : Pos(Pos), T(T), Inv(*this), Name(Name) {}
   virtual ~Entity() = default;
 
-  virtual void update(Level&) {}
+  inline const std::string &getName() const { return Name; }
+
+  virtual void update(Level &) {}
 
   bool isAlive() const { return Health != 0; }
 
@@ -48,20 +66,19 @@ public:
   unsigned LOSRange = 8;
 
   Inventory Inv;
+
+private:
+  std::string Name;
 };
 
 // FIXME move
 class EnemyEntity : public Entity {
 public:
-  enum class State {
-    Idle,
-    Wander,
-    Chase
-  };
+  enum class State { Idle, Wander, Chase };
 
 public:
   using Entity::Entity;
-  void update(Level& L) override;
+  void update(Level &L) override;
 
 private:
   bool checkForPlayer(Level &L);
@@ -76,7 +93,7 @@ public:
   static constexpr Tile PlayerTile{{'@', cxxg::types::RgbColor{255, 255, 50}}};
   struct Interaction {
     std::string Msg;
-    std::function<void()> Finalize = [](){};
+    std::function<void()> Finalize = []() {};
   };
 
 public:

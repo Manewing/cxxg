@@ -7,6 +7,13 @@ Level::Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size)
   PlayerSeenMap.fill(false);
 }
 
+void Level::setEventHub(EventHub *Hub) {
+  EventHubConnector::setEventHub(Hub);
+  for (auto &E : Entities) {
+    E->setEventHub(Hub);
+  }
+}
+
 bool Level::update() {
   updatePlayerDijkstraMap();
   updatePlayerSeenMap();

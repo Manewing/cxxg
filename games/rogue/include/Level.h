@@ -2,12 +2,13 @@
 #define ROGUE_LEVEL_H
 
 #include "Entity.h"
+#include "EventHub.h"
 #include "Tile.h"
 #include <memory>
 #include <vector>
 #include <ymir/LayeredMap.hpp>
 
-class Level {
+class Level : public EventHubConnector {
 public:
   static constexpr std::size_t LayerGroundIdx = 0;
   static constexpr std::size_t LayerGroundDecoIdx = 1;
@@ -22,6 +23,8 @@ public:
 
 public:
   Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size);
+
+  void setEventHub(EventHub *EH) override;
 
   // TODO check that loaded level is valid
   // bool checkIsValid();
