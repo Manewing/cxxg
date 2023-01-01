@@ -32,11 +32,6 @@ struct EntityAttackEvent : public Event {
   bool isPlayerAffected() const;
 };
 
-struct EntityDiedEvent : public Event {
-  Entity &Et;
-  bool isPlayer() const;
-};
-
 class Entity : public EventHubConnector {
 public:
   ymir::Point2d<int> Pos;
@@ -99,6 +94,23 @@ public:
 public:
   PlayerEntity(ymir::Point2d<int> Pos = {0, 0});
   std::optional<Interaction> CurrentInteraction;
+};
+
+class ChestEntity : public Entity {
+public:
+  ChestEntity(ymir::Point2d<int> Pos, Tile T) : Entity(Pos, T, "Chest") {}
+};
+
+class LevelStartEntity : public Entity {
+public:
+  LevelStartEntity(ymir::Point2d<int> Pos, Tile T)
+      : Entity(Pos, T, "Level Start") {}
+};
+
+class LevelEndEntity : public Entity {
+public:
+  LevelEndEntity(ymir::Point2d<int> Pos, Tile T)
+      : Entity(Pos, T, "Level End") {}
 };
 
 #endif // #ifndef ROGUE_ENTITY_H

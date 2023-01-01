@@ -2,6 +2,7 @@
 #include <cxxg/Screen.h>
 #include <stdexcept>
 
+#include "StackTrace.h"
 #include "Game.h"
 
 int main() {
@@ -14,6 +15,7 @@ int main() {
     GameInstance.run();
   } catch (std::exception const &E) {
     std::cerr << "ERROR: " << E.what() << std::endl;
+    print_stacktrace();
     return 1;
   }
 

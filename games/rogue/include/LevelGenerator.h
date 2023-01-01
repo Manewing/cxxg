@@ -22,8 +22,8 @@ public:
                                    const std::map<char, CharInfo> &CharInfoMap);
 
 protected:
-  void spawnEnemies(Level &L);
-  void spawnEnemy(Level &L, ymir::Point2d<int> Pos, Tile T);
+  void spawnEntities(Level &L);
+  void spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T);
 };
 
 #endif // #ifndef ROGUE_LEVEL_GENERATOR_H

@@ -42,7 +42,7 @@ int main(int Argc, char *Argv[]) {
       {'@', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
 
   const std::vector<std::string> Layers = {
-      "ground", "ground_deco", "walls", "objects", "walls_deco", "enemies",
+      "ground", "ground_deco", "walls", "walls_deco", "entities", "objects",
   };
   const std::map<char, LevelGenerator::CharInfo> CharInfoMap = {
       {GroundTile.kind(), {GroundTile, "ground"}},

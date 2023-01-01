@@ -26,17 +26,18 @@ const Tile GreenGrassTile{
     {' ', cxxg::types::RgbColor{0, 0, 0, true, 110, 160, 60}}};
 const Tile BrownGrassTile{
     {' ', cxxg::types::RgbColor{0, 0, 0, true, 76, 110, 30}}};
-const Tile RockTile{
-    {' ', cxxg::types::RgbColor{0, 0, 0, true, 140, 140, 140}}};
+const Tile RockTile{{' ', cxxg::types::RgbColor{0, 0, 0, true, 140, 140, 140}}};
 
-const Tile WallTile{{'#', cxxg::types::RgbColor{60, 60, 60, true, 45, 45, 45}}};
+// const Tile WallTile{{'#', cxxg::types::RgbColor{60, 60, 60, true, 45, 45,
+// 45}}};
 const Tile WaterTile{
     {'~', cxxg::types::RgbColor{40, 132, 191, true, 30, 110, 150}}};
-const Tile TreeTile{
-    {'A', cxxg::types::RgbColor{10, 50, 15, true, 100, 80, 50}}};
-const Tile BerryBushTile{
-    {'#', cxxg::types::RgbColor{140, 10, 50, true, 10, 50, 15}}};
-const Tile NPCTile{{'@', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
+// const Tile TreeTile{
+//     {'A', cxxg::types::RgbColor{10, 50, 15, true, 100, 80, 50}}};
+// const Tile BerryBushTile{
+//     {'#', cxxg::types::RgbColor{140, 10, 50, true, 10, 50, 15}}};
+// const Tile NPCTile{{'@', cxxg::types::RgbColor{0, 60, 255, true, 100, 80,
+// 50}}};
 
 const Tile ChunkMarker{{'x', cxxg::types::RgbColor{255, 0, 0, true, 0, 0, 0}}};
 
@@ -95,7 +96,8 @@ std::shared_ptr<Level> generateChunk(ymir::Rect2d<int> ChunkRect) {
   const auto Size = ChunkRect.Size;
   auto NewChunk = std::make_shared<Level>(Layers, Size);
 
-//  auto HeightMap = generateSimplexNoiseMap(Size, ChunkRect.Pos, 0, 2048.0f, 6);
+  //  auto HeightMap = generateSimplexNoiseMap(Size, ChunkRect.Pos, 0, 2048.0f,
+  //  6);
   auto HeightMap = generateSimplexNoiseMap(Size, ChunkRect.Pos, 0, 128.0f, 6);
 
   fillGround(*NewChunk, HeightMap);

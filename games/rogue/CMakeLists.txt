@@ -1,12 +1,19 @@
 set(TARGET rogue)
 
-option(YMIR_INSTALL "ymir install location" "")
+add_subdirectory(entt)
+
+set(YMIR_INSTALL "" CACHE STRING "ymir install location")
 message("YMIR_INSTALL: ${YMIR_INSTALL}")
 
 if(EXISTS "${YMIR_INSTALL}/include/ymir")
 
 
 set(HEADER_FILES
+  include/Components/AI.h
+  include/Components/Level.h
+  include/Components/Stats.h
+  include/Components/Transform.h
+  include/Components/Visual.h
   include/Entity.h
   include/EventHub.h
   include/Game.h
@@ -19,6 +26,8 @@ set(HEADER_FILES
   include/NPCEntity.h
   include/Parser.h
   include/Renderer.h
+  include/Systems/DeathSystem.h
+  include/Systems/WanderAISystem.h
   include/UIController.h
   include/UIListSelect.h
 )
@@ -35,6 +44,8 @@ set(SOURCE_FILES
   src/NPCEntity.cpp
   src/Parser.cpp
   src/Renderer.cpp
+  src/Systems/DeathSystem.cpp
+  src/Systems/WanderAISystem.cpp
   src/UIController.cpp
   src/UIListSelect.cpp
 )
@@ -49,7 +60,6 @@ add_executable(${TARGET}
   src/main.cpp
 )
 
-
 target_include_directories(lib${TARGET} PUBLIC include)
 
 ## YMIR
@@ -58,7 +68,7 @@ target_include_directories(lib${TARGET} PUBLIC ${YMIR_INSTALL}/include)
 ##
 
 target_link_libraries(lib${TARGET}
-  cxxg ${LIBYMIR}
+  cxxg ${LIBYMIR} EnTT::EnTT
 )
 
 target_link_libraries(${TARGET}

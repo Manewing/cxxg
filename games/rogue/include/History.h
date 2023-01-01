@@ -10,6 +10,7 @@
 
 class Game;
 class History;
+struct EntityDiedEvent;
 
 class HistoryMessageAssembler {
 public:
@@ -44,6 +45,10 @@ private:
   std::vector<cxxg::Row> Messages;
 };
 
+struct DebugMessageEvent : public Event {
+  std::string Message;
+};
+
 class EventHistoryWriter : public EventHubConnector {
 public:
   explicit EventHistoryWriter(History &Hist);
@@ -52,6 +57,7 @@ public:
 private:
   void onEntityAttackEvent(const EntityAttackEvent &EAE);
   void onEntityDiedEvent(const EntityDiedEvent &EDE);
+  void onDebugMessageEvent(const DebugMessageEvent &DbgEv);
 
 private:
   History &Hist;

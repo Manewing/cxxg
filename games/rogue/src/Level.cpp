@@ -2,13 +2,19 @@
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
 
+#include "Components/Level.h"
+#include "Components/Transform.h"
+
 Level::Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size)
-    : Map(Layers, Size), PlayerDijkstraMap(Size), PlayerSeenMap(Size) {
+    : Map(Layers, Size), AgSys(Reg), WAISys(*this, Reg), DeathSys(Reg),
+      PlayerDijkstraMap(Size), PlayerSeenMap(Size) {
   PlayerSeenMap.fill(false);
 }
 
 void Level::setEventHub(EventHub *Hub) {
   EventHubConnector::setEventHub(Hub);
+  DeathSys.setEventHub(Hub);
+  WAISys.setEventHub(Hub);
   for (auto &E : Entities) {
     E->setEventHub(Hub);
   }
@@ -17,6 +23,10 @@ void Level::setEventHub(EventHub *Hub) {
 bool Level::update() {
   updatePlayerDijkstraMap();
   updatePlayerSeenMap();
+
+  AgSys.update();
+  WAISys.update();
+  DeathSys.update();
 
   auto AllEntities = getEntities();
   std::sort(
@@ -43,25 +53,32 @@ void Level::setPlayer(PlayerEntity *P) { this->Player = P; }
 PlayerEntity *Level::getPlayer() { return Player; }
 
 ymir::Point2d<int> Level::getPlayerStartPos() const {
-  auto AllStartPos = Map.get(LayerObjectsIdx).findTiles(StartTile);
-  for (auto StartPos : AllStartPos) {
-    auto Pos = getNonBodyBlockedPosNextTo(StartPos);
-    if (Pos) {
-      return *Pos;
-    }
+  std::optional<ymir::Point2d<int>> FoundPos;
+  auto View = Reg.view<const PositionComp, LevelStartComp>();
+  View.each([&FoundPos](const auto &Pos) { FoundPos = Pos; });
+  if (!FoundPos) {
+    throw std::runtime_error("Could not find start in level");
   }
-  throw std::runtime_error("Could not find start position for player in level");
+  auto Pos = getNonBodyBlockedPosNextTo(*FoundPos);
+  if (!Pos) {
+    throw std::runtime_error(
+        "Could not find start position for player in level");
+  }
+  return *Pos;
 }
 
 ymir::Point2d<int> Level::getPlayerEndPos() const {
-  auto AllEndPos = Map.get(LayerObjectsIdx).findTiles(EndTile);
-  for (auto EndPos : AllEndPos) {
-    auto Pos = getNonBodyBlockedPosNextTo(EndPos);
-    if (Pos) {
-      return *Pos;
-    }
+  std::optional<ymir::Point2d<int>> FoundPos;
+  auto View = Reg.view<const PositionComp, LevelEndComp>();
+  View.each([&FoundPos](const auto &Pos) { FoundPos = Pos; });
+  if (!FoundPos) {
+    throw std::runtime_error("Could not find end in level");
   }
-  throw std::runtime_error("Could not find end position for player in level");
+  auto Pos = getNonBodyBlockedPosNextTo(*FoundPos);
+  if (!Pos) {
+    throw std::runtime_error("Could not find end position for player in level");
+  }
+  return *Pos;
 }
 
 std::vector<Entity *> Level::getEntities() {
@@ -92,7 +109,8 @@ Entity *Level::getEntityAt(ymir::Point2d<int> Pos) {
 std::vector<ymir::Point2d<int>>
 Level::getAllNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const {
   std::vector<ymir::Point2d<int>> AllUnblockedPos;
-  Map.get(LayerObjectsIdx)
+  // FIXME not actually using the map data here, only the neighbor check func
+  Map.get(LayerWallsIdx)
       .checkNeighbors(
           AtPos,
           [this, &AllUnblockedPos](auto Pos, auto) {
@@ -116,6 +134,8 @@ Level::getNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const {
 
 bool Level::canInteract(ymir::Point2d<int> AtPos) const {
   bool FoundObject = false;
+  (void)AtPos;
+  /*
   Map.get(LayerObjectsIdx)
       .checkNeighbors(
           AtPos,
@@ -127,11 +147,14 @@ bool Level::canInteract(ymir::Point2d<int> AtPos) const {
             return true;
           },
           ymir::FourTileDirections<int>());
+          */
   return FoundObject;
 }
 
 std::vector<Tile> Level::getInteractables(ymir::Point2d<int> AtPos) const {
   std::vector<Tile> Objects;
+  (void)AtPos;
+  /*
   Objects.reserve(4);
   Map.get(LayerObjectsIdx)
       .checkNeighbors(
@@ -143,6 +166,7 @@ std::vector<Tile> Level::getInteractables(ymir::Point2d<int> AtPos) const {
             return true;
           },
           ymir::FourTileDirections<int>());
+  */
   return Objects;
 }
 
@@ -151,8 +175,7 @@ bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
 }
 
 bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
-  bool MapBlocked = Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile ||
-                    Map.get(LayerObjectsIdx).getTile(Pos) != EmptyTile;
+  bool MapBlocked = Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile;
   bool EntityBlocked =
       std::any_of(Entities.begin(), Entities.end(),
                   [Pos](const auto &Entity) { return Entity->Pos == Pos; });

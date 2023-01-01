@@ -1,0 +1,3 @@
+[submodule "games/rogue/entt"]
+	path = games/rogue/entt
+	url = https://github.com/skypjack/entt.git

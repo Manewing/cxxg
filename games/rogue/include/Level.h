@@ -7,14 +7,18 @@
 #include <memory>
 #include <vector>
 #include <ymir/LayeredMap.hpp>
+#include <entt/entt.hpp>
+
+#include "Systems/AgilitySystem.h"
+#include "Systems/DeathSystem.h"
+#include "Systems/WanderAISystem.h"
 
 class Level : public EventHubConnector {
 public:
   static constexpr std::size_t LayerGroundIdx = 0;
   static constexpr std::size_t LayerGroundDecoIdx = 1;
   static constexpr std::size_t LayerWallsIdx = 2;
-  static constexpr std::size_t LayerObjectsIdx = 3;
-  static constexpr std::size_t LayerWallsDecoIdx = 4;
+  static constexpr std::size_t LayerWallsDecoIdx = 3;
 
   static constexpr Tile EmptyTile = Tile{};
   static constexpr Tile WallTile = Tile{{'#'}};
@@ -64,9 +68,16 @@ protected:
 
 public: // FIXME
   ymir::LayeredMap<Tile> Map;
-  PlayerEntity *Player = nullptr;
   std::vector<std::shared_ptr<Entity>> Entities;
 
+  entt::registry Reg;
+
+private:
+  AgilitySystem AgSys;
+  WanderAISystem WAISys;
+  DeathSystem DeathSys;
+
+  PlayerEntity *Player = nullptr;
   ymir::Map<int, int> PlayerDijkstraMap;
   ymir::Map<bool, int> PlayerSeenMap;
 };

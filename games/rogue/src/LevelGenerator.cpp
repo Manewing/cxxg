@@ -13,6 +13,12 @@
 #include <ymir/Dungeon/StartEndPlacer.hpp>
 #include <ymir/MapIo.hpp>
 
+#include "Components/AI.h"
+#include "Components/Level.h"
+#include "Components/Stats.h"
+#include "Components/Transform.h"
+#include "Components/Visual.h"
+
 template <typename TileType, typename TileCord, typename RandEngType>
 void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
   using T = TileType;
@@ -66,7 +72,7 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
     throw E;
   }
 
-  spawnEnemies(*NewLevel);
+  spawnEntities(*NewLevel);
 
   return NewLevel;
 }
@@ -74,7 +80,7 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
 std::shared_ptr<Level>
 LevelGenerator::loadLevel(const std::filesystem::path &LevelFile,
                           const std::vector<std::string> &Layers,
-                          const std::map<char, CharInfo>& CharInfoMap) {
+                          const std::map<char, CharInfo> &CharInfoMap) {
   auto Map = ymir::loadMap(LevelFile);
   auto NewLevel = std::make_shared<Level>(Layers, Map.getSize());
   auto &LevelMap = NewLevel->Map;
@@ -86,15 +92,69 @@ LevelGenerator::loadLevel(const std::filesystem::path &LevelFile,
   return NewLevel;
 }
 
-void LevelGenerator::spawnEnemies(Level &L) {
-  auto &EnemyMap = L.Map.get("enemies");
-  const auto AllEnemyPos = EnemyMap.findTilesNot(Level::EmptyTile);
-  for (const auto &EnemyPos : AllEnemyPos) {
-    spawnEnemy(L, EnemyPos, EnemyMap.getTile(EnemyPos));
+void LevelGenerator::spawnEntities(Level &L) {
+  auto &EntitiesMap = L.Map.get("entities");
+  const auto AllEntitiesPos = EntitiesMap.findTilesNot(Level::EmptyTile);
+  for (const auto &EntityPos : AllEntitiesPos) {
+    spawnEntity(L, EntityPos, EntitiesMap.getTile(EntityPos));
   }
-  EnemyMap.fill(Level::EmptyTile);
+  EntitiesMap.fill(Level::EmptyTile);
 }
 
-void LevelGenerator::spawnEnemy(Level &L, ymir::Point2d<int> Pos, Tile T) {
-  L.Entities.push_back(std::make_shared<EnemyEntity>(Pos, T));
+// FIXME move this
+namespace {
+void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                 const std::string &Name) {
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  Reg.emplace<HealthComp>(Entity);
+  Reg.emplace<WanderAIComp>(Entity);
+  Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, Name);
+  Reg.emplace<LineOfSightComp>(Entity);
+  //  reg.emplace<AttackAI>(Entity);
+  //  reg.emplace<MeleeAttack>(Entity, (Fac == 0 ? 60U : 20U));
+
+  // DEBUG
+  // Reg.emplace<FactionComp>(Entity, FactionKind::Enemy);
+  Reg.emplace<FactionComp>(Entity, T.kind() == 't' ? FactionKind::Nature
+                                                   : FactionKind::Enemy);
+
+  Reg.emplace<AgilityComp>(Entity);
+}
+void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                          bool IsExit) {
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  Reg.emplace<TileComp>(Entity, T);
+  if (IsExit) {
+    Reg.emplace<LevelEndComp>(Entity);
+  } else {
+    Reg.emplace<LevelStartComp>(Entity);
+  }
+}
+} // namespace
+
+void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
+  switch (T.kind()) {
+  case 's':
+    // L.Entities.push_back(std::make_shared<EnemyEntity>(Pos, T));
+    createEnemy(L.Reg, Pos, T, "Skeleton");
+    break;
+  case 't':
+    // L.Entities.push_back(std::make_shared<EnemyEntity>(Pos, T));
+    createEnemy(L.Reg, Pos, T, "Troll");
+    break;
+  case 'H':
+    // L.Entities.push_back(std::make_shared<LevelStartEntity>(Pos, T));
+    createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false);
+    break;
+  case '<':
+    // L.Entities.push_back(std::make_shared<LevelEndEntity>(Pos, T));
+    createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/true);
+    break;
+  case 'C':
+    L.Entities.push_back(std::make_shared<ChestEntity>(Pos, T));
+    break;
+  }
 }

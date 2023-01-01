@@ -2,6 +2,9 @@
 #include "Level.h"
 #include <ymir/Algorithm/LineOfSight.hpp>
 
+#include "Components/Visual.h"
+#include "Components/Transform.h"
+
 Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
     : L(L), VisibleMap(Size) {
   Offset.X = -(Center.X - Size.W / 2);
@@ -74,4 +77,9 @@ void Renderer::renderEntities() {
   for (const auto *Entity : L.getEntities()) {
     RenderedLevelMap.getTile(Entity->Pos) = Entity->T;
   }
+
+  auto View = L.Reg.view<const PositionComp, const TileComp>();
+  View.each([this](const auto &Pos, const auto &T) {
+    RenderedLevelMap.getTile(Pos) = T.T;
+  });
 }

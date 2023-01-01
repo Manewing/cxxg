@@ -27,10 +27,6 @@ bool EntityAttackEvent::isPlayerAffected() const {
          dynamic_cast<const PlayerEntity *>(&Target);
 }
 
-bool EntityDiedEvent::isPlayer() const {
-  return dynamic_cast<const PlayerEntity *>(&Et);
-}
-
 bool Entity::canAttack(ymir::Point2d<int> Pos) const {
   // FIXME only melee check right now
   //   x
@@ -63,7 +59,6 @@ void Entity::damage(unsigned Amount) {
   int NewHealth = Health - Amount;
   if (NewHealth <= 0) {
     NewHealth = 0;
-    publish(EntityDiedEvent{{}, *this});
   }
   Health = NewHealth;
 }
