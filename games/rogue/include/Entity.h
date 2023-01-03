@@ -78,9 +78,6 @@ public:
 private:
   bool checkForPlayer(Level &L);
   void chasePlayer(Level &L);
-
-private:
-  State CurrentState = State::Idle;
 };
 
 class PlayerEntity : public Entity {

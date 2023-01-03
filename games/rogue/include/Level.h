@@ -4,14 +4,13 @@
 #include "Entity.h"
 #include "EventHub.h"
 #include "Tile.h"
+#include <entt/entt.hpp>
 #include <memory>
 #include <vector>
 #include <ymir/LayeredMap.hpp>
-#include <entt/entt.hpp>
 
-#include "Systems/AgilitySystem.h"
-#include "Systems/DeathSystem.h"
-#include "Systems/WanderAISystem.h"
+class System;
+struct PositionComp;
 
 class Level : public EventHubConnector {
 public:
@@ -30,20 +29,16 @@ public:
 
   void setEventHub(EventHub *EH) override;
 
-  // TODO check that loaded level is valid
-  // bool checkIsValid();
-
   // Returns false if game over
   bool update();
 
-  void setPlayer(PlayerEntity *P = nullptr);
-  PlayerEntity *getPlayer();
+  void createPlayer();
+  void movePlayer(Level &From);
+  void removePlayer();
+  const entt::entity &getPlayer() const;
 
   ymir::Point2d<int> getPlayerStartPos() const;
   ymir::Point2d<int> getPlayerEndPos() const;
-
-  std::vector<Entity *> getEntities();
-  Entity *getEntityAt(ymir::Point2d<int> Pos);
 
   std::vector<ymir::Point2d<int>>
   getAllNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const;
@@ -62,9 +57,15 @@ public:
   const ymir::Map<int, int> &getPlayerDijkstraMap() const;
   const ymir::Map<bool, int> &getPlayerSeenMap() const;
 
+  const entt::entity &getEntityAt(ymir::Point2d<int> AtPos) const;
+  void updateEntityPosition(const entt::entity &Entity, PositionComp &PosComp,
+                            ymir::Point2d<int> NextPos);
+
 protected:
   void updatePlayerDijkstraMap();
   void updatePlayerSeenMap();
+
+  void updateEntityPosCache();
 
 public: // FIXME
   ymir::LayeredMap<Tile> Map;
@@ -73,11 +74,11 @@ public: // FIXME
   entt::registry Reg;
 
 private:
-  AgilitySystem AgSys;
-  WanderAISystem WAISys;
-  DeathSystem DeathSys;
+  std::vector<std::shared_ptr<System>> Systems;
 
-  PlayerEntity *Player = nullptr;
+  entt::entity Player = entt::null;
+
+  ymir::Map<entt::entity, int> EntityPosCache;
   ymir::Map<int, int> PlayerDijkstraMap;
   ymir::Map<bool, int> PlayerSeenMap;
 };

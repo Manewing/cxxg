@@ -34,7 +34,6 @@ public: // FIXME
   EventHistoryWriter EHW;
   ItemDatabase ItemDb;
   LevelGenerator LevelGen;
-  std::unique_ptr<PlayerEntity> Player;
   int CurrentLevelIdx = 0;
   std::shared_ptr<Level> CurrentLevel;
   std::vector<std::shared_ptr<Level>> Levels;

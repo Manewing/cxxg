@@ -3,8 +3,6 @@
 
 #include <algorithm>
 
-struct PlayerComp {};
-
 struct HealthComp {
   unsigned Health = 100;
   unsigned MaxHealth = 100;

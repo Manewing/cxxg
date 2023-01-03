@@ -1,4 +1,8 @@
 #include "Game.h"
+#include "Components/Player.h"
+#include "Components/Transform.h"
+#include "Components/Stats.h"
+#include "Components/AI.h"
 #include "Renderer.h"
 #include <cxxg/Row.h>
 #include <cxxg/Screen.h>
@@ -18,20 +22,16 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
 
 Game::Game(cxxg::Screen &Scr)
     : cxxg::Game(Scr), Hist(*this), EHW(Hist), LevelGen(),
-      CurrentLevel(nullptr), UICtrl(Scr) {
-}
+      CurrentLevel(nullptr), UICtrl(Scr) {}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
-  Player = std::make_unique<PlayerEntity>();
-
   EHW.setEventHub(&EvHub);
-  Player->setEventHub(&EvHub);
 
   switchLevel(0);
 
-  Player->Inv.Items.push_back(ItemDb.createItem(0, 20));
-  Player->Inv.Items.push_back(ItemDb.createItem(1, 15));
-  Player->Inv.Items.push_back(ItemDb.createItem(2, 10));
+  // Player->Inv.Items.push_back(ItemDb.createItem(0, 20));
+  // Player->Inv.Items.push_back(ItemDb.createItem(1, 15));
+  // Player->Inv.Items.push_back(ItemDb.createItem(2, 10));
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
   handleDraw();
@@ -46,20 +46,16 @@ void Game::switchLevel(int Level) {
   if (Level >= static_cast<int>(Levels.size())) {
     assert((Level - 1) < static_cast<int>(Levels.size()));
     Levels.push_back(LevelGen.generateLevel(Level));
-  } else {
-    CurrentLevel->setPlayer(nullptr);
+    Levels.back()->setEventHub(&EvHub);
   }
+
+  if (!CurrentLevel) {
+    Levels.at(Level)->createPlayer();
+  } else if (CurrentLevel != Levels.at(Level)) {
+    Levels.at(Level)->movePlayer(*CurrentLevel);
+  }
+
   CurrentLevel = Levels.at(Level);
-
-  CurrentLevel->setPlayer(Player.get());
-  if (CurrentLevelIdx <= Level) {
-    Player->Pos = CurrentLevel->getPlayerStartPos();
-  } else {
-    Player->Pos = CurrentLevel->getPlayerEndPos();
-  }
-
-  CurrentLevel->setEventHub(&EvHub);
-
   CurrentLevelIdx = Level;
 }
 
@@ -94,7 +90,7 @@ bool Game::handleInput(int Char) {
     break;
   case 'i':
     // UI interaction do not update level
-    UICtrl.setInventoryUI(Player->Inv);
+//    UICtrl.setInventoryUI(Player->Inv);
     return true;
   case 'h':
     UICtrl.setHistoryUI(Hist);
@@ -115,48 +111,49 @@ bool Game::handleInput(int Char) {
 void Game::handleDraw() {
   // Render the current map
   const auto RenderSize = ymir::Size2d<int>{80, 24};
-  Renderer Render(RenderSize, *CurrentLevel, Player->Pos);
+  auto Player = CurrentLevel->getPlayer();
+  auto &PC = CurrentLevel->Reg.get<PlayerComp>(Player);
+  auto PlayerPos = CurrentLevel->Reg.get<PositionComp>(Player).Pos;
+  auto LOSRange = CurrentLevel->Reg.get<LineOfSightComp>(Player).LOSRange;
+  auto Health = CurrentLevel->Reg.get<HealthComp>(Player).Health;
+
+  Renderer Render(RenderSize, *CurrentLevel, PlayerPos);
   Render.renderShadow(/*Darkness=*/30);
   Render.renderFogOfWar(CurrentLevel->getPlayerSeenMap());
-  Render.renderLineOfSight(Player->Pos, /*Range=*/Player->LOSRange);
+  Render.renderLineOfSight(PlayerPos, /*Range=*/LOSRange);
 
   // Draw map
   Scr << Render.get();
 
   std::string_view InteractStr = "";
-  if (Player->CurrentInteraction) {
-    InteractStr = Player->CurrentInteraction->Msg;
-  } else if (CurrentLevel->canInteract(Player->Pos)) {
+  if (PC.CurrentInteraction) {
+    InteractStr = PC.CurrentInteraction->Msg;
+  } else if (CurrentLevel->canInteract(PlayerPos)) {
     InteractStr = "[E] Interact";
   }
 
   // Draw UI overlay
-  UICtrl.draw(CurrentLevelIdx, Player->Health, InteractStr);
+  UICtrl.draw(CurrentLevelIdx, Health, InteractStr);
 
   cxxg::Game::handleDraw();
 }
 
 void Game::movePlayer(ymir::Dir2d Dir) {
-  // Abort interaction
-  if (Player->CurrentInteraction) {
-    Player->CurrentInteraction = std::nullopt;
-  }
-  auto NewPos = Player->Pos + Dir;
-
-  if (auto *Entity = CurrentLevel->getEntityAt(NewPos)) {
-    // TODO check if player can attack entity
-    Player->attackEntity(*Entity);
+  if (!CurrentLevel) {
     return;
   }
-
-  if (!CurrentLevel->isBodyBlocked(NewPos)) {
-    Player->Pos = NewPos;
-  } else {
-    Hist.warn() << "Can't move";
+  auto Player = CurrentLevel->getPlayer();
+  if (Player == entt::null) {
+    return;
   }
+  assert(CurrentLevel->Reg.valid(Player));
+  assert(CurrentLevel->Reg.all_of<MovementComp>(Player));
+  CurrentLevel->Reg.get<MovementComp>(Player).Dir = Dir;
 }
 
 void Game::tryInteract() {
+
+  /*
   // Finalize interaction
   if (Player->CurrentInteraction) {
     Player->CurrentInteraction->Finalize();
@@ -184,4 +181,5 @@ void Game::tryInteract() {
     Player->CurrentInteraction = {"[E] Close chest"};
     break;
   }
+  */
 }

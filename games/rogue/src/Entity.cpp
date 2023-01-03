@@ -42,13 +42,7 @@ void Entity::attackEntity(Entity &Other) {
 }
 
 void Entity::wander(Level &L) {
-  auto AllNextPos = L.getAllNonBodyBlockedPosNextTo(Pos);
-  auto It =
-      ymir::randomIterator(AllNextPos.begin(), AllNextPos.end(), RandomEngine);
-  if (It == AllNextPos.end()) {
-    throw MovementBlockedException(Pos);
-  }
-  Pos = *It;
+  (void)L;
 }
 
 void Entity::heal(unsigned Amount) {
@@ -63,61 +57,15 @@ void Entity::damage(unsigned Amount) {
   Health = NewHealth;
 }
 
-void EnemyEntity::update(Level &L) {
-  switch (CurrentState) {
-  case State::Idle:
-    // FIXME switch after random duration
-    CurrentState = State::Wander;
-    if (checkForPlayer(L)) {
-      CurrentState = State::Chase;
-    }
-    break;
-  case State::Wander:
-    wander(L);
-    // FIXME switch after random duration
-    CurrentState = State::Idle;
-    if (checkForPlayer(L)) {
-      CurrentState = State::Chase;
-    }
-    break;
-  case State::Chase:
-    if (!checkForPlayer(L)) {
-      CurrentState = State::Idle;
-      break;
-    }
-    auto *Player = L.getPlayer();
-    if (canAttack(Player->Pos)) {
-      attackEntity(*Player);
-    } else {
-      chasePlayer(L);
-    }
-    break;
-  }
-}
+void EnemyEntity::update(Level &L) { (void)L; }
 
 bool EnemyEntity::checkForPlayer(Level &L) {
-  auto *Player = L.getPlayer();
-  if (!Player) {
-    return false;
-  }
-
-  bool IsInLOS =
-      ymir::Algorithm::isInLOS([&L](auto Pos) { return L.isLOSBlocked(Pos); },
-                               Pos, Player->Pos, LOSRange);
-  if (!IsInLOS) {
-    return false;
-  }
-  return true;
+  (void)L;
+  return false;
 }
 
 void EnemyEntity::chasePlayer(Level &L) {
-  auto PathToPlayer = ymir::Algorithm::getPathFromDijkstraMap(
-      L.getPlayerDijkstraMap(), Pos, ymir::FourTileDirections<int>(), 1);
-  auto TargetPos = PathToPlayer.at(0);
-
-  if (!L.isBodyBlocked(TargetPos)) {
-    Pos = PathToPlayer.at(0);
-  }
+  (void)L;
 }
 
 PlayerEntity::PlayerEntity(ymir::Point2d<int> Pos)

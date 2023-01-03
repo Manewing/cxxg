@@ -46,7 +46,13 @@ private:
 };
 
 struct DebugMessageEvent : public Event {
-  std::string Message;
+  std::stringstream Message;
+
+  template <typename Type>
+  DebugMessageEvent &operator<<(const Type &T) {
+    Message << T;
+    return *this;
+  }
 };
 
 class EventHistoryWriter : public EventHubConnector {

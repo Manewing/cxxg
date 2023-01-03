@@ -3,18 +3,32 @@
 #include <ymir/Algorithm/LineOfSight.hpp>
 
 #include "Components/Level.h"
+#include "Components/Player.h"
 #include "Components/Transform.h"
 
+#include "Systems/AgilitySystem.h"
+#include "Systems/AttackAISystem.h"
+#include "Systems/DeathSystem.h"
+#include "Systems/WanderAISystem.h"
+#include "Systems/PlayerSystem.h"
+
 Level::Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size)
-    : Map(Layers, Size), AgSys(Reg), WAISys(*this, Reg), DeathSys(Reg),
-      PlayerDijkstraMap(Size), PlayerSeenMap(Size) {
+    : Map(Layers, Size), PlayerDijkstraMap(Size), PlayerSeenMap(Size) {
+  Systems = {
+      std::make_shared<AgilitySystem>(Reg),
+      std::make_shared<PlayerSystem>(*this),
+      std::make_shared<WanderAISystem>(*this, Reg),
+      std::make_shared<AttackAISystem>(Reg),
+      std::make_shared<DeathSystem>(Reg),
+  };
   PlayerSeenMap.fill(false);
 }
 
 void Level::setEventHub(EventHub *Hub) {
   EventHubConnector::setEventHub(Hub);
-  DeathSys.setEventHub(Hub);
-  WAISys.setEventHub(Hub);
+  for (auto &Sys : Systems) {
+    Sys->setEventHub(Hub);
+  }
   for (auto &E : Entities) {
     E->setEventHub(Hub);
   }
@@ -23,34 +37,27 @@ void Level::setEventHub(EventHub *Hub) {
 bool Level::update() {
   updatePlayerDijkstraMap();
   updatePlayerSeenMap();
+  updateEntityPosCache();
 
-  AgSys.update();
-  WAISys.update();
-  DeathSys.update();
-
-  auto AllEntities = getEntities();
-  std::sort(
-      AllEntities.begin(), AllEntities.end(),
-      [](const auto &A, const auto &B) { return A->Agility > B->Agility; });
-  for (auto &Entity : AllEntities) {
-    Entity->update(*this);
+  for (auto &Sys : Systems) {
+    Sys->update();
   }
 
-  // Remove dead enemies
-  auto DelIt =
-      std::remove_if(Entities.begin(), Entities.end(),
-                     [](const auto &Entity) { return !Entity->isAlive(); });
-  Entities.erase(DelIt, Entities.end());
-
-  if (Player) {
-    return Player->isAlive();
-  }
   return true;
 }
 
-void Level::setPlayer(PlayerEntity *P) { this->Player = P; }
+void Level::createPlayer() {
+  Player = PlayerComp::createPlayer(Reg, "Player", getPlayerStartPos());
+}
 
-PlayerEntity *Level::getPlayer() { return Player; }
+void Level::movePlayer(Level &From) {
+  Player = PlayerComp::movePlayer(From.Reg, Reg);
+  Reg.get<PositionComp>(Player).Pos = getPlayerStartPos();
+}
+
+void Level::removePlayer() { PlayerComp::removePlayer(Reg); }
+
+const entt::entity &Level::getPlayer() const { return Player; }
 
 ymir::Point2d<int> Level::getPlayerStartPos() const {
   std::optional<ymir::Point2d<int>> FoundPos;
@@ -79,31 +86,6 @@ ymir::Point2d<int> Level::getPlayerEndPos() const {
     throw std::runtime_error("Could not find end position for player in level");
   }
   return *Pos;
-}
-
-std::vector<Entity *> Level::getEntities() {
-  std::vector<Entity *> AllEntities;
-  AllEntities.reserve(Entities.size() + 1);
-  for (auto &Entity : Entities) {
-    AllEntities.push_back(Entity.get());
-  }
-  if (Player) {
-    AllEntities.push_back(Player);
-  }
-  return AllEntities;
-}
-
-Entity *Level::getEntityAt(ymir::Point2d<int> Pos) {
-  if (Player && Player->Pos == Pos) {
-    return Player;
-  }
-  auto It =
-      std::find_if(Entities.begin(), Entities.end(),
-                   [Pos](const auto &Entity) { return Entity->Pos == Pos; });
-  if (It == Entities.end()) {
-    return nullptr;
-  }
-  return It->get();
 }
 
 std::vector<ymir::Point2d<int>>
@@ -176,11 +158,8 @@ bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
 
 bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
   bool MapBlocked = Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile;
-  bool EntityBlocked =
-      std::any_of(Entities.begin(), Entities.end(),
-                  [Pos](const auto &Entity) { return Entity->Pos == Pos; });
-  bool PlayerBlocked = Player && Player->Pos == Pos;
-  return MapBlocked || EntityBlocked || PlayerBlocked;
+  bool EntityBlocked = getEntityAt(Pos) != entt::null;
+  return MapBlocked || EntityBlocked;
 }
 
 ymir::Map<int, int> Level::getDijkstraMap(Tile Target,
@@ -200,14 +179,34 @@ const ymir::Map<bool, int> &Level::getPlayerSeenMap() const {
   return PlayerSeenMap;
 }
 
+const entt::entity &Level::getEntityAt(ymir::Point2d<int> AtPos) const {
+  if (!EntityPosCache.contains(AtPos)) {
+    static const entt::entity EtNull = entt::null;
+    return EtNull;
+  }
+  return EntityPosCache.getTile(AtPos);
+}
+
+void Level::updateEntityPosition(const entt::entity &Entity,
+                                 PositionComp &PosComp,
+                                 const ymir::Point2d<int> NextPos) {
+  if (PosComp.Pos == NextPos) {
+    return;
+  }
+  EntityPosCache.setTile(PosComp, entt::null);
+  EntityPosCache.setTile(NextPos, Entity);
+  PosComp.Pos = NextPos;
+}
+
 void Level::updatePlayerDijkstraMap() {
-  if (!Player) {
+  return;
+  if (Player == entt::null) {
     PlayerDijkstraMap.fill(-1);
     return;
   }
 
   PlayerDijkstraMap = ymir::Algorithm::getDijkstraMap(
-      Map.getSize(), Player->Pos,
+      Map.getSize(), Reg.get<PositionComp>(Player).Pos,
       [this](auto Pos) { return isBodyBlocked(Pos); },
       ymir::FourTileDirections<int>());
 
@@ -221,7 +220,8 @@ void Level::updatePlayerDijkstraMap() {
 }
 
 void Level::updatePlayerSeenMap() {
-  if (!Player) {
+  return;
+  if (Player == entt::null) {
     return;
   }
   ymir::Algorithm::traverseLOS(
@@ -232,5 +232,20 @@ void Level::updatePlayerSeenMap() {
         PlayerSeenMap.getTile(Pos) = true;
         return !isLOSBlocked(Pos);
       },
-      Player->Pos, Player->LOSRange, 0.01);
+      Reg.get<PositionComp>(Player).Pos,
+      Reg.get<LineOfSightComp>(Player).LOSRange, 0.01);
+}
+
+void Level::updateEntityPosCache() {
+  if (EntityPosCache.empty()) {
+    EntityPosCache.resize(Map.getSize());
+  }
+
+  EntityPosCache.fill(entt::null);
+  // FIXME filter by collision?
+  auto View = Reg.view<PositionComp>();
+  for (auto [Entity, Pos] : View.each()) {
+    // FIXME check not overlapping
+    EntityPosCache.setTile(Pos, Entity);
+  }
 }

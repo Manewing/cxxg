@@ -51,5 +51,5 @@ void EventHistoryWriter::onEntityDiedEvent(const EntityDiedEvent &EDE) {
 }
 
 void EventHistoryWriter::onDebugMessageEvent(const DebugMessageEvent &DbgEv) {
-  Hist.info() << cxxg::types::Color::GREEN << "Debug: " << DbgEv.Message;
+  Hist.info() << cxxg::types::Color::GREEN << "Debug: " << DbgEv.Message.str();
 }

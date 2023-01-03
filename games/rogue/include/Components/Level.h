@@ -4,4 +4,4 @@
 struct LevelStartComp {};
 struct LevelEndComp {};
 
-#endif // #ifndef ROGUE_COMPONENTS_AI_H
+#endif // #ifndef ROGUE_COMPONENTS_LEVEL_H

@@ -73,11 +73,6 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
 }
 
 void Renderer::renderEntities() {
-  // FIXME enemies spawn on objects
-  for (const auto *Entity : L.getEntities()) {
-    RenderedLevelMap.getTile(Entity->Pos) = Entity->T;
-  }
-
   auto View = L.Reg.view<const PositionComp, const TileComp>();
   View.each([this](const auto &Pos, const auto &T) {
     RenderedLevelMap.getTile(Pos) = T.T;

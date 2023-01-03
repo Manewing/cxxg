@@ -1,9 +1,9 @@
 #include "Systems/WanderAISystem.h"
+#include "History.h"
 #include "Level.h"
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
 #include <ymir/Noise.hpp>
-#include "History.h"
 
 // FIXME move this, also should this be based on the level seed?
 static std::random_device RandomEngine;
@@ -27,7 +27,8 @@ void WanderAISystem::update() {
         break;
       }
 
-      Pos = wander(Pos);
+      auto NextPos = wander(Pos);
+      L.updateEntityPosition(Entity, Pos, NextPos);
       AI.DistanceWalked += 1;
 
       if (checkForTarget(Entity, Pos)) {
@@ -40,9 +41,11 @@ void WanderAISystem::update() {
       auto Target = checkForTarget(Entity, Pos);
       if (!Target) {
         AI.State = WanderAIState::Idle;
+        break;
       }
       // FIXME check in range
-      Pos = chaseTarget(Pos, *Target);
+      auto NextPos = chaseTarget(Pos, *Target);
+      L.updateEntityPosition(Entity, Pos, NextPos);
       AI.DistanceWalked += 1;
     } break;
 
@@ -53,33 +56,28 @@ void WanderAISystem::update() {
   });
 }
 
-void WanderAISystem::updateEntityPosCache() {
-  EntityPosCache.fill(entt::null);
-  // FIXME only include those with factions for now
-  auto View = Reg.view<PositionComp, FactionComp>();
-  for (auto [Entity, Pos, Fac] : View.each()) {
-    EntityPosCache.setTile(Pos, Entity);
-  }
-}
-
 std::optional<entt::entity>
 WanderAISystem::checkForTarget(const entt::entity &Entity,
                                const ymir::Point2d<int> &AtPos) {
   auto LOSComp = Reg.try_get<LineOfSightComp>(Entity);
-  if (!LOSComp) {
+  auto FacComp = Reg.try_get<FactionComp>(Entity);
+  if (!LOSComp || !FacComp) {
     return std::nullopt;
   }
 
   // FIMXE only finds single target, no ordering of distance
   std::optional<entt::entity> Target;
   ymir::Algorithm::traverseLOS(
-      [this, &Target](auto Pos) {
-        if (auto T = EntityPosCache.getTile(Pos); T != entt::null) {
-          Target = T;
-          // Target blocks LOS
-          return true;
+      [this, &Target, &FacComp](auto Pos) {
+        if (auto T = L.getEntityAt(Pos); T != entt::null) {
+          if (auto TFac = Reg.try_get<FactionComp>(T);
+              TFac && FacComp->Faction != TFac->Faction) {
+            Target = T;
+            // Target blocks LOS
+            return true;
+          }
         }
-        return L.isLOSBlocked(Pos);
+        return !L.isLOSBlocked(Pos);
       },
       AtPos, LOSComp->LOSRange);
 
@@ -103,17 +101,21 @@ ymir::Point2d<int> WanderAISystem::chaseTarget(const ymir::Point2d<int> AtPos,
   const auto &TPos = Reg.get<PositionComp>(Target);
 
   // FIXME avoid recomputing this every time
+  unsigned LOSRange = 8; // FIXME get from LOS Comp
+  ymir::Size2d<int> DMSize(LOSRange * 2 + 1, LOSRange * 2 + 1);
+  ymir::Point2d<int> DMMidPos(LOSRange + 1, LOSRange + 1);
   auto DM = ymir::Algorithm::getDijkstraMap(
-      EntityPosCache.getSize(), TPos.Pos,
-      [this](auto Pos) { return L.isBodyBlocked(Pos); },
+      DMSize, DMMidPos,
+      [this, &TPos, &DMMidPos](auto Pos) {
+        return L.isBodyBlocked(Pos + TPos.Pos - DMMidPos);
+      },
       ymir::FourTileDirections<int>());
 
   auto PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
-      DM, AtPos, ymir::FourTileDirections<int>(), 1);
-  auto TargetPos = PathToTarget.at(0);
+      DM, AtPos - TPos.Pos + DMMidPos, ymir::FourTileDirections<int>(), 1);
+  auto TargetPos = PathToTarget.at(0) + TPos.Pos - DMMidPos;
 
   if (!L.isBodyBlocked(TargetPos)) {
-    publish(DebugMessageEvent{{}, "Entity targeted"});
     return TargetPos;
   }
   return AtPos;

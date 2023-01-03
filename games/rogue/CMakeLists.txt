@@ -10,7 +10,9 @@ if(EXISTS "${YMIR_INSTALL}/include/ymir")
 
 set(HEADER_FILES
   include/Components/AI.h
+  include/Components/Entity.h
   include/Components/Level.h
+  include/Components/Player.h
   include/Components/Stats.h
   include/Components/Transform.h
   include/Components/Visual.h
@@ -26,13 +28,18 @@ set(HEADER_FILES
   include/NPCEntity.h
   include/Parser.h
   include/Renderer.h
+  include/Systems/AttackAISystem.h
   include/Systems/DeathSystem.h
+  include/Systems/PlayerSystem.h
+  include/Systems/System.h
   include/Systems/WanderAISystem.h
   include/UIController.h
   include/UIListSelect.h
 )
 
 set(SOURCE_FILES
+  src/Components/Entity.cpp
+  src/Components/Player.cpp
   src/Entity.cpp
   src/Game.cpp
   src/History.cpp
@@ -44,7 +51,10 @@ set(SOURCE_FILES
   src/NPCEntity.cpp
   src/Parser.cpp
   src/Renderer.cpp
+  src/Systems/AgilitySystem.cpp
+  src/Systems/AttackAISystem.cpp
   src/Systems/DeathSystem.cpp
+  src/Systems/PlayerSystem.cpp
   src/Systems/WanderAISystem.cpp
   src/UIController.cpp
   src/UIListSelect.cpp

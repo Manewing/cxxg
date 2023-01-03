@@ -1,5 +1,6 @@
 #include "Systems/DeathSystem.h"
 #include "Components/Stats.h"
+#include "Components/Player.h"
 #include <entt/entt.hpp>
 
 void DeathSystem::update() {
