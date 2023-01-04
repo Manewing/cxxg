@@ -7,6 +7,8 @@
 #include <string>
 #include <ymir/Types.hpp>
 
+#include "Inventory.h"
+
 class Game;
 
 struct Interaction {
@@ -16,6 +18,10 @@ struct Interaction {
 
 struct InteractableComp {
   Interaction Action;
+};
+
+struct InventoryComp {
+  Inventory Inv;
 };
 
 struct PlayerComp {

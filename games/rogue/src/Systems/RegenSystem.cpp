@@ -15,8 +15,8 @@ void runRegenUpdate(entt::registry &Reg) {
     }
     C.TicksLeft = C.TickPeriod;
 
-    // Update value by with regeneration amount, do not exceed max
-    C.Value = std::min(C.Value + C.RegenAmount, C.MaxValue);
+    // Restore the given amount to regenerate
+    C.restore(C.RegenAmount);
   });
 }
 

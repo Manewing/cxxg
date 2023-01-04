@@ -2,19 +2,23 @@
 #define ROGUE_INVENTORY_H
 
 #include "Item.h"
+#include <entt/entt.hpp>
 #include <vector>
-
-class Entity;
 
 class Inventory {
 public:
-  Inventory(Entity &Parent);
+  const Item &getItem(std::size_t ItemIdx) const { return Items.at(ItemIdx); }
+  const std::vector<Item> &getItems() const { return Items; }
 
-  void consumeItem(std::size_t ItemIdx, int NumItems = 1);
+  void addItem(const Item &It);
+  bool canUseItem(const entt::entity &Entity, entt::registry &Reg,
+                  std::size_t ItemIdx);
+  void useItem(const entt::entity &Entity, entt::registry &Reg,
+               std::size_t ItemIdx, int NumItems = 1);
 
   bool empty() const;
 
-  Entity &Parent;
+private:
   std::vector<Item> Items;
 };
 

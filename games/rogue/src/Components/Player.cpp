@@ -11,7 +11,8 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
                           const PositionComp &PosComp, const HealthComp &HC,
                           const NameComp &NC, const LineOfSightComp LOSC,
                           const AgilityComp &AC, const MeleeAttackComp &MC,
-                          const MovementComp &MVC) {
+                          const MovementComp &MVC,
+                          const InventoryComp &InvComp) {
   static constexpr Tile PlayerTile{{'@', cxxg::types::RgbColor{255, 255, 50}}};
 
   auto Entity = Reg.create();
@@ -29,6 +30,7 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   Reg.emplace<AgilityComp>(Entity, AC);
   Reg.emplace<MeleeAttackComp>(Entity, MC);
   Reg.emplace<MovementComp>(Entity, MVC);
+  Reg.emplace<InventoryComp>(Entity, InvComp);
 
   return Entity;
 }
@@ -40,7 +42,7 @@ entt::entity PlayerComp::createPlayer(entt::registry &Reg,
                                       ymir::Point2d<int> Pos) {
   return ::createPlayer(Reg, PlayerComp{}, PositionComp{Pos}, HealthComp{},
                         NameComp{Name}, LineOfSightComp{}, AgilityComp{},
-                        MeleeAttackComp{}, MovementComp{});
+                        MeleeAttackComp{}, MovementComp{}, InventoryComp{});
 }
 
 entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
@@ -53,7 +55,7 @@ entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
         RegFrom.get<PositionComp>(Entity), RegFrom.get<HealthComp>(Entity),
         RegFrom.get<NameComp>(Entity), RegFrom.get<LineOfSightComp>(Entity),
         RegFrom.get<AgilityComp>(Entity), RegFrom.get<MeleeAttackComp>(Entity),
-        RegFrom.get<MovementComp>(Entity));
+        RegFrom.get<MovementComp>(Entity), RegFrom.get<InventoryComp>(Entity));
   }
   return PlayerEntity;
 }

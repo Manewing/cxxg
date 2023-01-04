@@ -38,7 +38,7 @@ public:
   Tile T;
 
   Entity(ymir::Point2d<int> Pos, Tile T, std::string Name = "TODO_Skeleton")
-      : Pos(Pos), T(T), Inv(*this), Name(Name) {}
+      : Pos(Pos), T(T), Name(Name) {}
   virtual ~Entity() = default;
 
   inline const std::string &getName() const { return Name; }
@@ -59,8 +59,6 @@ public:
   unsigned MaxHealth = 100;
   unsigned Agility = 100;
   unsigned LOSRange = 8;
-
-  Inventory Inv;
 
 private:
   std::string Name;

@@ -2,6 +2,7 @@
 #define ROGUE_UI_CONTROLLER_H
 
 #include "UIListSelect.h"
+#include <entt/entt.hpp>
 #include <memory>
 #include <string_view>
 
@@ -22,7 +23,8 @@ public:
 
 class InventoryUIController : public UIWidget {
 public:
-  InventoryUIController(Inventory &Inv);
+  InventoryUIController(Inventory &Inv, entt::entity Entity,
+                        entt::registry &Reg);
   bool handleInput(int Char) final;
   std::string_view getInteractMsg() const final;
   void draw(cxxg::Screen &Scr) const final;
@@ -32,6 +34,8 @@ protected:
 
 protected:
   Inventory &Inv;
+  entt::entity Entity;
+  entt::registry &Reg;
   UIListSelect ListUI;
 };
 
@@ -56,8 +60,7 @@ public:
   bool isUIActive() const;
   void handleInput(int Char);
 
-  // FIXME use dependency injection
-  void setInventoryUI(Inventory &Inv);
+  void setInventoryUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   void setHistoryUI(History &Hist);
 
   std::unique_ptr<UIWidget> ActiveWidget;

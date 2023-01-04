@@ -1,9 +1,12 @@
 #ifndef ROGUE_ITEM_H
 #define ROGUE_ITEM_H
 
-#include <string>
+#include <entt/entt.hpp>
 #include <memory>
+#include <string>
 #include <vector>
+
+#include "Components/Stats.h"
 
 enum ItemType {
   // Equipment types
@@ -28,35 +31,41 @@ enum ItemType {
   ANY_MASK = 0xffffffff
 };
 
-class Entity;
 class ItemEffect {
 public:
-  virtual int apply(Entity &E, int Num) const = 0;
+  virtual bool canUseOn(const entt::entity &Et, entt::registry &Reg) const = 0;
+  virtual int useOn(const entt::entity &Et, entt::registry &Reg,
+                    int Num) const = 0;
   virtual ~ItemEffect() = default;
 };
 class HealItemEffect : public ItemEffect {
 public:
-  HealItemEffect(unsigned Amount);
-  int apply(Entity &E, int Num) const final;
+  HealItemEffect(StatValue Amount);
+  bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final;
+  int useOn(const entt::entity &Et, entt::registry &Reg, int Num) const final;
 
 private:
-  unsigned Amount;
+  StatValue Amount;
 };
 class DamageItemEffect : public ItemEffect {
 public:
-  DamageItemEffect(unsigned Amount);
-  int apply(Entity &E, int Num) const final;
+  DamageItemEffect(StatValue Amount);
+  bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final;
+  int useOn(const entt::entity &Et, entt::registry &Reg, int Num) const final;
 
 private:
-  unsigned Amount;
+  StatValue Amount;
 };
 
 class ItemPrototype {
 public:
-  ItemPrototype(int ItemId, std::string Name, ItemType Type,
-                int MaxStatckSize,
+  ItemPrototype(int ItemId, std::string Name, ItemType Type, int MaxStatckSize,
                 std::vector<std::shared_ptr<ItemEffect>> Effects);
 
+  bool canUseOn(const entt::entity &Entity, entt::registry &Reg) const;
+  void useOn(const entt::entity &Entity, entt::registry &Reg, int Item) const;
+
+public:
   int ItemId;
   std::string Name;
   ItemType Type;

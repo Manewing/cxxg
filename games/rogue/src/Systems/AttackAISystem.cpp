@@ -27,10 +27,7 @@ void AttackAISystem::update() {
           return;
         }
 
-        int NewHealth = THealth.Value - MA.Damage;
-        if (NewHealth < 0) {
-          NewHealth = 0;
-        }
+        THealth.reduce(MA.Damage);
 
         // publish
         const auto Nm = Reg.try_get<NameComp>(Entity);
@@ -39,8 +36,6 @@ void AttackAISystem::update() {
           publish(DebugMessageEvent() << Nm->Name << " dealt " << MA.Damage
                                       << " melee damage to " << TNm->Name);
         }
-
-        THealth.Value = NewHealth;
       }
     });
   });

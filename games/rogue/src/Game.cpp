@@ -30,9 +30,13 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   switchLevel(0);
   CurrentLevel->update();
 
-  // Player->Inv.Items.push_back(ItemDb.createItem(0, 20));
-  // Player->Inv.Items.push_back(ItemDb.createItem(1, 15));
-  // Player->Inv.Items.push_back(ItemDb.createItem(2, 10));
+  // DEBUG ==>
+  auto Player = CurrentLevel->getPlayer();
+  auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
+  InvComp.Inv.addItem(ItemDb.createItem(0, 20));
+  InvComp.Inv.addItem(ItemDb.createItem(1, 15));
+  InvComp.Inv.addItem(ItemDb.createItem(2, 10));
+  // <== DEBUG
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
   handleDraw();
@@ -89,10 +93,19 @@ bool Game::handleInput(int Char) {
   case 'e':
     tryInteract();
     break;
-  case 'i':
+  case 'i': {
+    if (!CurrentLevel) {
+      return false;
+    }
+    auto Player = CurrentLevel->getPlayer();
+    if (Player == entt::null) {
+      return false;
+    }
+    auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
     // UI interaction do not update level
-    //    UICtrl.setInventoryUI(Player->Inv);
+    UICtrl.setInventoryUI(InvComp.Inv, Player, CurrentLevel->Reg);
     return true;
+  }
   case 'h':
     UICtrl.setHistoryUI(Hist);
     return true;

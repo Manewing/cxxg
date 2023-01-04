@@ -5,8 +5,10 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 
-InventoryUIController::InventoryUIController(Inventory &Inv)
-    : Inv(Inv), ListUI("Inventory", 30, 18) {
+InventoryUIController::InventoryUIController(Inventory &Inv,
+                                             entt::entity Entity,
+                                             entt::registry &Reg)
+    : Inv(Inv), Entity(Entity), Reg(Reg), ListUI("Inventory", 30, 18) {
   updateElements();
 }
 
@@ -21,10 +23,11 @@ bool InventoryUIController::handleInput(int Char) {
   case 'i':
     return false;
   case 'e':
-    if (Inv.empty()) {
+    if (Inv.empty() ||
+        !Inv.canUseItem(Entity, Reg, ListUI.getSelectedElement())) {
       break;
     }
-    Inv.consumeItem(ListUI.getSelectedElement(), 1);
+    Inv.useItem(Entity, Reg, ListUI.getSelectedElement(), 1);
     updateElements();
     break;
   case 'd':
@@ -41,7 +44,7 @@ std::string_view InventoryUIController::getInteractMsg() const {
     return "[Empty]";
   }
   // FIXME item may have multiple options...
-  const auto &SelectedItem = Inv.Items.at(ListUI.getSelectedElement());
+  const auto &SelectedItem = Inv.getItem(ListUI.getSelectedElement());
   if (SelectedItem.getProto().Type & ItemType::EQUIPMENT_MASK) {
     return "[E] Equip";
   }
@@ -58,8 +61,8 @@ void InventoryUIController::draw(cxxg::Screen &Scr) const { ListUI.draw(Scr); }
 
 void InventoryUIController::updateElements() {
   std::vector<std::string> Elements;
-  Elements.reserve(Inv.Items.size());
-  for (const auto &Item : Inv.Items) {
+  Elements.reserve(Inv.getItems().size());
+  for (const auto &Item : Inv.getItems()) {
     std::stringstream SS;
     SS << Item.StackSize << "x " << Item.getProto().Name;
     Elements.push_back(SS.str());
@@ -181,8 +184,9 @@ void UIController::handleInput(int Char) {
   }
 }
 
-void UIController::setInventoryUI(Inventory &Inv) {
-  ActiveWidget.reset(new InventoryUIController(Inv));
+void UIController::setInventoryUI(Inventory &Inv, entt::entity Entity,
+                                  entt::registry &Reg) {
+  ActiveWidget.reset(new InventoryUIController(Inv, Entity, Reg));
 }
 
 void UIController::setHistoryUI(History &Hist) {

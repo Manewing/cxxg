@@ -5,23 +5,21 @@
 
 using StatValue = double;
 
-struct HealthComp {
-  StatValue Value = 100;
-  StatValue MaxValue = 100;
-
-  unsigned TickPeriod = 2;
-  unsigned TicksLeft = 1;
-  StatValue RegenAmount = 0.5;
-};
-
-struct ManaComp {
+struct ValueRegenCompBase {
   StatValue Value = 100;
   StatValue MaxValue = 100;
 
   unsigned TickPeriod = 4;
   unsigned TicksLeft = 1;
   StatValue RegenAmount = 0.1;
+
+  StatValue restore(StatValue Amount);
+  StatValue reduce(StatValue Amount);
 };
+
+struct HealthComp : public ValueRegenCompBase {};
+
+struct ManaComp : public ValueRegenCompBase {};
 
 struct AgilityComp {
   StatValue Agility = 30;

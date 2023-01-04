@@ -41,6 +41,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
   src/Components/Entity.cpp
   src/Components/Player.cpp
+  src/Components/Stats.cpp
   src/Entity.cpp
   src/Game.cpp
   src/History.cpp

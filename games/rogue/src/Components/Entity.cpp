@@ -12,8 +12,8 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                  const std::string &Name) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
-  Reg.emplace<HealthComp>(Entity, T.kind() == 't' ? 30.0 : 10.0,
-                          T.kind() == 't' ? 30.0 : 10.0);
+  Reg.emplace<HealthComp>(Entity, HealthComp{{T.kind() == 't' ? 30.0 : 10.0,
+                                              T.kind() == 't' ? 30.0 : 10.0}});
   Reg.emplace<WanderAIComp>(Entity);
   Reg.emplace<TileComp>(Entity, T);
   Reg.emplace<NameComp>(Entity, Name);
