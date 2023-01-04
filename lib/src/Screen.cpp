@@ -8,6 +8,9 @@ namespace cxxg {
 types::Size Screen::getTerminalSize() {
   winsize Ws;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &Ws);
+  if (!Ws.ws_col || !Ws.ws_row) {
+    return {80, 24};
+  }
   return {Ws.ws_col, Ws.ws_row};
 }
 
