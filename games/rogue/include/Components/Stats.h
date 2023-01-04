@@ -3,15 +3,30 @@
 
 #include <algorithm>
 
+using StatValue = double;
+
 struct HealthComp {
-  unsigned Health = 100;
-  unsigned MaxHealth = 100;
+  StatValue Value = 100;
+  StatValue MaxValue = 100;
+
+  unsigned TickPeriod = 2;
+  unsigned TicksLeft = 1;
+  StatValue RegenAmount = 0.5;
+};
+
+struct ManaComp {
+  StatValue Value = 100;
+  StatValue MaxValue = 100;
+
+  unsigned TickPeriod = 4;
+  unsigned TicksLeft = 1;
+  StatValue RegenAmount = 0.1;
 };
 
 struct AgilityComp {
-  unsigned Agility = 30;
-  unsigned AP = 0;
-  unsigned MaxAP = 20;
+  StatValue Agility = 30;
+  StatValue AP = 0;
+  StatValue MaxAP = 20;
 
   void gainAP(unsigned APAmount) { AP = std::min(MaxAP, AP + APAmount); }
 
@@ -25,8 +40,8 @@ struct AgilityComp {
 };
 
 struct MeleeAttackComp {
-  unsigned Damage = 10;
-  unsigned APCost = 5;
+  StatValue Damage = 10;
+  StatValue APCost = 5;
 };
 
 #endif // #ifndef ROGUE_COMPONENTS_STATS_H

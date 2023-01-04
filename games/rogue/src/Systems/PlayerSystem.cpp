@@ -14,7 +14,7 @@ PlayerSystem::PlayerSystem(Level &L) : System(L.Reg), L(L) {}
 void PlayerSystem::update() {
   auto View =
       Reg.view<PlayerComp, PositionComp, const MeleeAttackComp, MovementComp>();
-  View.each([this](const auto &Entity, auto &PC, auto &PosComp, const auto &MA,
+  View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp, const auto &MA,
                    auto &MC) {
     if (MC.Dir == ymir::Dir2d::NONE) {
       return;
@@ -30,24 +30,25 @@ void PlayerSystem::update() {
       // FIXME create damage system and spawn melee damage entity
       auto &THealth = Reg.get<HealthComp>(Et);
 
-      int NewHealth = THealth.Health - MA.Damage;
+      int NewHealth = THealth.Value - MA.Damage;
       if (NewHealth < 0) {
         NewHealth = 0;
       }
 
       // publish
-      const auto Nm = Reg.try_get<NameComp>(Entity);
+      const auto Nm = Reg.try_get<NameComp>(PlayerEt);
       const auto TNm = Reg.try_get<NameComp>(Et);
       if (Nm && TNm) {
         publish(DebugMessageEvent() << Nm->Name << " dealt " << MA.Damage
                                     << " melee damage to " << TNm->Name);
       }
 
-      THealth.Health = NewHealth;
+      THealth.Value = NewHealth;
+      return;
     }
 
     if (!L.isBodyBlocked(NewPos)) {
-      PosComp.Pos = NewPos;
+      L.updateEntityPosition(PlayerEt, PosComp, NewPos);
     } else {
       publish(DebugMessageEvent() << "Can't move");
     }

@@ -32,7 +32,8 @@ void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
   Pass.registerBuilder<ymir::Dungeon::FilterPlacer<T, U, RE>>();
 }
 
-std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
+std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed,
+                                                     int LevelId) {
   using namespace cxxg::types;
 
   // Load level configuration file
@@ -52,7 +53,7 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
 
   const auto Layers = Cfg.asList<std::string>("layers/");
   const auto Size = Cfg.get<ymir::Size2d<int>>("dungeon/size");
-  auto NewLevel = std::make_shared<Level>(Layers, Size);
+  auto NewLevel = std::make_shared<Level>(LevelId, Layers, Size);
   ymir::Dungeon::Context<Tile, int> Ctx(NewLevel->Map);
 
   Pass.init(Ctx);
@@ -76,9 +77,10 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed) {
 std::shared_ptr<Level>
 LevelGenerator::loadLevel(const std::filesystem::path &LevelFile,
                           const std::vector<std::string> &Layers,
-                          const std::map<char, CharInfo> &CharInfoMap) {
+                          const std::map<char, CharInfo> &CharInfoMap,
+                          int LevelId) {
   auto Map = ymir::loadMap(LevelFile);
-  auto NewLevel = std::make_shared<Level>(Layers, Map.getSize());
+  auto NewLevel = std::make_shared<Level>(LevelId, Layers, Map.getSize());
   auto &LevelMap = NewLevel->Map;
 
   Map.forEach([&LevelMap, &CharInfoMap](auto Pos, auto Char) {
@@ -100,23 +102,25 @@ void LevelGenerator::spawnEntities(Level &L) {
 void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
   switch (T.kind()) {
   case 's':
-    // L.Entities.push_back(std::make_shared<EnemyEntity>(Pos, T));
     createEnemy(L.Reg, Pos, T, "Skeleton");
     break;
   case 't':
-    // L.Entities.push_back(std::make_shared<EnemyEntity>(Pos, T));
     createEnemy(L.Reg, Pos, T, "Troll");
     break;
-  case 'H':
-    // L.Entities.push_back(std::make_shared<LevelStartEntity>(Pos, T));
-    createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false);
-    break;
-  case '<':
-    // L.Entities.push_back(std::make_shared<LevelEndEntity>(Pos, T));
-    createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/true);
-    break;
+  case 'H': {
+    int PrevLevelId = L.getLevelId() - 1;
+    createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/true, PrevLevelId);
+  } break;
+  case '<': {
+    int NextLevelId = L.getLevelId() + 1;
+    createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false, NextLevelId);
+  } break;
   case 'C':
     L.Entities.push_back(std::make_shared<ChestEntity>(Pos, T));
+    break;
+  default:
+    throw std::runtime_error("Invalid entity kind: " +
+                             std::to_string(T.kind()));
     break;
   }
 }

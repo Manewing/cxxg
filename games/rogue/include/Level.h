@@ -25,7 +25,10 @@ public:
   static constexpr Tile EndTile = Tile{{'<'}};
 
 public:
-  Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size);
+  Level(int LevelId, const std::vector<std::string> &Layers,
+        ymir::Size2d<int> Size);
+
+  int getLevelId() const { return LevelId; }
 
   void setEventHub(EventHub *EH) override;
 
@@ -47,7 +50,7 @@ public:
   getNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const;
 
   bool canInteract(ymir::Point2d<int> Pos) const;
-  std::vector<Tile> getInteractables(ymir::Point2d<int> Pos) const;
+  std::vector<entt::entity> getInteractables(ymir::Point2d<int> Pos) const;
 
   bool isLOSBlocked(ymir::Point2d<int> Pos) const;
   bool isBodyBlocked(ymir::Point2d<int> Pos) const;
@@ -74,6 +77,7 @@ public: // FIXME
   entt::registry Reg;
 
 private:
+  int LevelId;
   std::vector<std::shared_ptr<System>> Systems;
 
   entt::entity Player = entt::null;

@@ -10,6 +10,6 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                  const std::string &Name);
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
-                          bool IsExit);
+                          bool IsExit, int LevelId);
 
 #endif // #ifndef ROGUE_COMPONENTS_ENTITY_H

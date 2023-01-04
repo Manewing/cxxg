@@ -92,9 +92,9 @@ struct Chunk {
   // TODO biome
 };
 
-std::shared_ptr<Level> generateChunk(ymir::Rect2d<int> ChunkRect) {
+std::shared_ptr<Level> generateChunk(int LevelId, ymir::Rect2d<int> ChunkRect) {
   const auto Size = ChunkRect.Size;
-  auto NewChunk = std::make_shared<Level>(Layers, Size);
+  auto NewChunk = std::make_shared<Level>(LevelId, Layers, Size);
 
   //  auto HeightMap = generateSimplexNoiseMap(Size, ChunkRect.Pos, 0, 2048.0f,
   //  6);
@@ -160,7 +160,7 @@ public:
     auto It = ChunkMap.lower_bound(ChunkPos);
     if (It == ChunkMap.end() || It->first != ChunkPos) {
       std::cerr << "load chunk: " << ChunkPos << std::endl;
-      auto Chunk = generateChunk({ChunkPos, ChunkSize});
+      auto Chunk = generateChunk(ChunkMap.size(), {ChunkPos, ChunkSize});
       ChunkMap.insert(It, {ChunkPos, Chunk});
     }
   }

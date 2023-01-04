@@ -27,7 +27,7 @@ void AttackAISystem::update() {
           return;
         }
 
-        int NewHealth = THealth.Health - MA.Damage;
+        int NewHealth = THealth.Value - MA.Damage;
         if (NewHealth < 0) {
           NewHealth = 0;
         }
@@ -40,7 +40,7 @@ void AttackAISystem::update() {
                                       << " melee damage to " << TNm->Name);
         }
 
-        THealth.Health = NewHealth;
+        THealth.Value = NewHealth;
       }
     });
   });

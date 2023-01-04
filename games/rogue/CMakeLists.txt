@@ -31,6 +31,7 @@ set(HEADER_FILES
   include/Systems/AttackAISystem.h
   include/Systems/DeathSystem.h
   include/Systems/PlayerSystem.h
+  include/Systems/RegenSystem.h
   include/Systems/System.h
   include/Systems/WanderAISystem.h
   include/UIController.h
@@ -55,6 +56,7 @@ set(SOURCE_FILES
   src/Systems/AttackAISystem.cpp
   src/Systems/DeathSystem.cpp
   src/Systems/PlayerSystem.cpp
+  src/Systems/RegenSystem.cpp
   src/Systems/WanderAISystem.cpp
   src/UIController.cpp
   src/UIListSelect.cpp

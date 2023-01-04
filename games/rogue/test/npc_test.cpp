@@ -51,7 +51,7 @@ int main(int Argc, char *Argv[]) {
       {TreeTile.kind(), {TreeTile, "objects"}},
       {'B', {BerryBushTile, "objects"}},
   };
-  auto Level = LG.loadLevel(Argv[1], Layers, CharInfoMap);
+  auto Level = LG.loadLevel(Argv[1], Layers, CharInfoMap, 0);
   auto NPC = std::make_shared<NPCEntity>(ymir::Point2d<int>{4, 4}, NPCTile);
   Level->Entities.push_back(NPC);
 

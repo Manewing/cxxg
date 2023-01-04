@@ -3,6 +3,7 @@
 
 #include "Systems/System.h"
 
+// FIXME join into RegenSystem?
 class AgilitySystem : public System {
 public:
   using System::System;

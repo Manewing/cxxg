@@ -16,10 +16,11 @@ public:
     std::string Layer;
   };
 
-  std::shared_ptr<Level> generateLevel(unsigned Seed);
+  std::shared_ptr<Level> generateLevel(unsigned Seed, int LevelId);
   std::shared_ptr<Level> loadLevel(const std::filesystem::path &LevelFile,
                                    const std::vector<std::string> &Layers,
-                                   const std::map<char, CharInfo> &CharInfoMap);
+                                   const std::map<char, CharInfo> &CharInfoMap,
+                                   int LevelId);
 
 protected:
   void spawnEntities(Level &L);

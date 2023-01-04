@@ -9,13 +9,17 @@
 #include "Systems/AgilitySystem.h"
 #include "Systems/AttackAISystem.h"
 #include "Systems/DeathSystem.h"
-#include "Systems/WanderAISystem.h"
 #include "Systems/PlayerSystem.h"
+#include "Systems/RegenSystem.h"
+#include "Systems/WanderAISystem.h"
 
-Level::Level(const std::vector<std::string> &Layers, ymir::Size2d<int> Size)
-    : Map(Layers, Size), PlayerDijkstraMap(Size), PlayerSeenMap(Size) {
+Level::Level(int LevelId, const std::vector<std::string> &Layers,
+             ymir::Size2d<int> Size)
+    : Map(Layers, Size), LevelId(LevelId), PlayerDijkstraMap(Size),
+      PlayerSeenMap(Size) {
   Systems = {
       std::make_shared<AgilitySystem>(Reg),
+      std::make_shared<RegenSystem>(Reg),
       std::make_shared<PlayerSystem>(*this),
       std::make_shared<WanderAISystem>(*this, Reg),
       std::make_shared<AttackAISystem>(Reg),
@@ -59,33 +63,32 @@ void Level::removePlayer() { PlayerComp::removePlayer(Reg); }
 
 const entt::entity &Level::getPlayer() const { return Player; }
 
-ymir::Point2d<int> Level::getPlayerStartPos() const {
+namespace {
+
+template <typename LevelComp>
+ymir::Point2d<int> getPlayerStartEndPos(const Level &L) {
   std::optional<ymir::Point2d<int>> FoundPos;
-  auto View = Reg.view<const PositionComp, LevelStartComp>();
-  View.each([&FoundPos](const auto &Pos) { FoundPos = Pos; });
+  auto View = L.Reg.view<const PositionComp, const LevelComp>();
+  View.each([&FoundPos](const auto &Pos, const auto &) { FoundPos = Pos; });
   if (!FoundPos) {
-    throw std::runtime_error("Could not find start in level");
+    throw std::runtime_error("Could not find start/end in level");
   }
-  auto Pos = getNonBodyBlockedPosNextTo(*FoundPos);
+  auto Pos = L.getNonBodyBlockedPosNextTo(*FoundPos);
   if (!Pos) {
     throw std::runtime_error(
-        "Could not find start position for player in level");
+        "Could not find non-blocked start/end position for player in level");
   }
   return *Pos;
 }
 
+} // namespace
+
+ymir::Point2d<int> Level::getPlayerStartPos() const {
+  return getPlayerStartEndPos<LevelStartComp>(*this);
+}
+
 ymir::Point2d<int> Level::getPlayerEndPos() const {
-  std::optional<ymir::Point2d<int>> FoundPos;
-  auto View = Reg.view<const PositionComp, LevelEndComp>();
-  View.each([&FoundPos](const auto &Pos) { FoundPos = Pos; });
-  if (!FoundPos) {
-    throw std::runtime_error("Could not find end in level");
-  }
-  auto Pos = getNonBodyBlockedPosNextTo(*FoundPos);
-  if (!Pos) {
-    throw std::runtime_error("Could not find end position for player in level");
-  }
-  return *Pos;
+  return getPlayerStartEndPos<LevelEndComp>(*this);
 }
 
 std::vector<ymir::Point2d<int>>
@@ -116,40 +119,34 @@ Level::getNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const {
 
 bool Level::canInteract(ymir::Point2d<int> AtPos) const {
   bool FoundObject = false;
-  (void)AtPos;
-  /*
-  Map.get(LayerObjectsIdx)
-      .checkNeighbors(
-          AtPos,
-          [&FoundObject](auto, auto Tile) {
-            if (Tile != EmptyTile) {
-              FoundObject = true;
-              return false;
-            }
-            return true;
-          },
-          ymir::FourTileDirections<int>());
-          */
+  EntityPosCache.checkNeighbors(
+      AtPos,
+      [this, &FoundObject](auto, const auto &Entity) {
+        if (Entity != entt::null && Reg.any_of<InteractableComp>(Entity)) {
+          FoundObject = true;
+          return false;
+        }
+        return true;
+      },
+      ymir::FourTileDirections<int>());
   return FoundObject;
 }
 
-std::vector<Tile> Level::getInteractables(ymir::Point2d<int> AtPos) const {
-  std::vector<Tile> Objects;
-  (void)AtPos;
-  /*
-  Objects.reserve(4);
-  Map.get(LayerObjectsIdx)
-      .checkNeighbors(
-          AtPos,
-          [&Objects](auto, auto Tile) {
-            if (Tile != EmptyTile) {
-              Objects.push_back(Tile);
-            }
-            return true;
-          },
-          ymir::FourTileDirections<int>());
-  */
-  return Objects;
+std::vector<entt::entity>
+Level::getInteractables(ymir::Point2d<int> AtPos) const {
+  std::vector<entt::entity> Entities;
+  Entities.reserve(4);
+  EntityPosCache.checkNeighbors(
+      AtPos,
+      [this, &Entities](auto, const auto &Entity) {
+        if (Entity != entt::null && Reg.any_of<InteractableComp>(Entity)) {
+          Entities.push_back(Entity);
+          return false;
+        }
+        return true;
+      },
+      ymir::FourTileDirections<int>());
+  return Entities;
 }
 
 bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
@@ -199,7 +196,6 @@ void Level::updateEntityPosition(const entt::entity &Entity,
 }
 
 void Level::updatePlayerDijkstraMap() {
-  return;
   if (Player == entt::null) {
     PlayerDijkstraMap.fill(-1);
     return;
@@ -209,18 +205,9 @@ void Level::updatePlayerDijkstraMap() {
       Map.getSize(), Reg.get<PositionComp>(Player).Pos,
       [this](auto Pos) { return isBodyBlocked(Pos); },
       ymir::FourTileDirections<int>());
-
-  // auto MapCopy = L.Map.get(Level::LayerWallsIdx);
-  // ymir::Map<ymir::ColoredUniChar, int> HM(MapCopy.getSize());
-  // HM.forEach([&MapCopy](auto Pos, auto &Tile) {
-  //  Tile = ymir::ColoredUniChar{MapCopy.getTile(Pos).kind()};
-  //});
-  // auto NewHM = ymir::Algorithm::makeHeatMap(HM, DM);
-  // std::cerr << NewHM << std::endl;
 }
 
 void Level::updatePlayerSeenMap() {
-  return;
   if (Player == entt::null) {
     return;
   }

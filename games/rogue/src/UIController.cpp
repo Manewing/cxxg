@@ -166,7 +166,7 @@ void UIController::draw(int LevelIdx, int Health,
   }
 
   if (!InteractStr.empty()) {
-    Scr[ScrSize.Y - 2][ScrSize.X / 2 - InteractStr.size() / 2] << InteractStr;
+    Scr[2][ScrSize.X / 2 - InteractStr.size() / 2] << InteractStr;
   }
 }
 
