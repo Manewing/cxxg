@@ -118,34 +118,28 @@ Level::getNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const {
 }
 
 bool Level::canInteract(ymir::Point2d<int> AtPos) const {
-  bool FoundObject = false;
-  EntityPosCache.checkNeighbors(
-      AtPos,
-      [this, &FoundObject](auto, const auto &Entity) {
-        if (Entity != entt::null && Reg.any_of<InteractableComp>(Entity)) {
-          FoundObject = true;
-          return false;
-        }
-        return true;
-      },
-      ymir::FourTileDirections<int>());
-  return FoundObject;
+  auto View = Reg.view<const PositionComp, const InteractableComp>();
+  for (auto [E, P, I] : View.each()) {
+    if (ymir::FourTileDirections<int>::isNextTo(P, AtPos) || P.Pos == AtPos) {
+      return true;
+    }
+  }
+  return false;
 }
 
 std::vector<entt::entity>
 Level::getInteractables(ymir::Point2d<int> AtPos) const {
   std::vector<entt::entity> Entities;
-  Entities.reserve(4);
-  EntityPosCache.checkNeighbors(
-      AtPos,
-      [this, &Entities](auto, const auto &Entity) {
-        if (Entity != entt::null && Reg.any_of<InteractableComp>(Entity)) {
-          Entities.push_back(Entity);
-          return false;
-        }
-        return true;
-      },
-      ymir::FourTileDirections<int>());
+  Entities.reserve(5);
+
+  auto View = Reg.view<const PositionComp, const InteractableComp>();
+  View.each([AtPos, &Entities](const auto &Entity, const auto &P,
+                               const auto &) {
+    if (ymir::FourTileDirections<int>::isNextTo(P, AtPos) || P.Pos == AtPos) {
+      Entities.push_back(Entity);
+    }
+  });
+
   return Entities;
 }
 
@@ -229,8 +223,7 @@ void Level::updateEntityPosCache() {
   }
 
   EntityPosCache.fill(entt::null);
-  // FIXME filter by collision?
-  auto View = Reg.view<PositionComp>();
+  auto View = Reg.view<PositionComp, CollisionComp>();
   for (auto [Entity, Pos] : View.each()) {
     // FIXME check not overlapping
     EntityPosCache.setTile(Pos, Entity);

@@ -5,14 +5,17 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 
-InventoryUIController::InventoryUIController(Inventory &Inv,
-                                             entt::entity Entity,
-                                             entt::registry &Reg)
-    : Inv(Inv), Entity(Entity), Reg(Reg), ListUI("Inventory", 30, 18) {
+#include "Components/Items.h"
+
+InventoryUIControllerBase::InventoryUIControllerBase(Inventory &Inv,
+                                                     entt::entity Entity,
+                                                     entt::registry &Reg,
+                                                     const std::string &Header)
+    : Inv(Inv), Entity(Entity), Reg(Reg), ListUI(Header, 30, 18) {
   updateElements();
 }
 
-bool InventoryUIController::handleInput(int Char) {
+bool InventoryUIControllerBase::handleInput(int Char) {
   switch (Char) {
   case cxxg::utils::KEY_DOWN:
     ListUI.selectNext();
@@ -22,6 +25,36 @@ bool InventoryUIController::handleInput(int Char) {
     break;
   case 'i':
     return false;
+  default:
+    break;
+  }
+  return true;
+}
+
+void InventoryUIControllerBase::draw(cxxg::Screen &Scr) const {
+  ListUI.draw(Scr);
+}
+
+void InventoryUIControllerBase::updateElements() {
+  std::vector<std::string> Elements;
+  Elements.reserve(Inv.getItems().size());
+  for (const auto &Item : Inv.getItems()) {
+    std::stringstream SS;
+    SS << Item.StackSize << "x " << Item.getProto().Name;
+    Elements.push_back(SS.str());
+  }
+  auto PrevIdx = ListUI.getSelectedElement();
+  ListUI.setElements(Elements);
+  ListUI.selectElement(PrevIdx);
+}
+
+InventoryUIController::InventoryUIController(Inventory &Inv,
+                                             entt::entity Entity,
+                                             entt::registry &Reg)
+    : InventoryUIControllerBase(Inv, Entity, Reg, "Inventory") {}
+
+bool InventoryUIController::handleInput(int Char) {
+  switch (Char) {
   case 'e':
     if (Inv.empty() ||
         !Inv.canUseItem(Entity, Reg, ListUI.getSelectedElement())) {
@@ -34,7 +67,7 @@ bool InventoryUIController::handleInput(int Char) {
     // Inv.dropItem(ListUI.getSelectedElement());
     break;
   default:
-    break;
+    return InventoryUIControllerBase::handleInput(Char);
   }
   return true;
 }
@@ -57,19 +90,31 @@ std::string_view InventoryUIController::getInteractMsg() const {
   return "[D] Drop";
 }
 
-void InventoryUIController::draw(cxxg::Screen &Scr) const { ListUI.draw(Scr); }
+LootUIController::LootUIController(Inventory &Inv, entt::entity Entity,
+                                   entt::registry &Reg)
+    : InventoryUIControllerBase(Inv, Entity, Reg, "Loot") {}
 
-void InventoryUIController::updateElements() {
-  std::vector<std::string> Elements;
-  Elements.reserve(Inv.getItems().size());
-  for (const auto &Item : Inv.getItems()) {
-    std::stringstream SS;
-    SS << Item.StackSize << "x " << Item.getProto().Name;
-    Elements.push_back(SS.str());
+bool LootUIController::handleInput(int Char) {
+  switch (Char) {
+  case 'e': {
+    if (Inv.empty()) {
+      break;
+    }
+    auto &EtInv = Reg.get<InventoryComp>(Entity).Inv;
+    EtInv.addItem(Inv.takeItem(ListUI.getSelectedElement()));
+    updateElements();
+  } break;
+  default:
+    return InventoryUIControllerBase::handleInput(Char);
   }
-  auto PrevIdx = ListUI.getSelectedElement();
-  ListUI.setElements(Elements);
-  ListUI.selectElement(PrevIdx);
+  return true;
+}
+
+std::string_view LootUIController::getInteractMsg() const {
+  if (Inv.empty()) {
+    return "[Empty]";
+  }
+  return "[E] Take";
 }
 
 HistoryUIController::HistoryUIController(const History &Hist,
@@ -187,6 +232,11 @@ void UIController::handleInput(int Char) {
 void UIController::setInventoryUI(Inventory &Inv, entt::entity Entity,
                                   entt::registry &Reg) {
   ActiveWidget.reset(new InventoryUIController(Inv, Entity, Reg));
+}
+
+void UIController::setLootUI(Inventory &Inv, entt::entity Entity,
+                             entt::registry &Reg) {
+  ActiveWidget.reset(new LootUIController(Inv, Entity, Reg));
 }
 
 void UIController::setHistoryUI(History &Hist) {

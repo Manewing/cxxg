@@ -10,6 +10,12 @@ void Inventory::addItem(const Item &It) {
   Items.push_back(It);
 }
 
+Item Inventory::takeItem(std::size_t ItemIdx) {
+  Item It = Items.at(ItemIdx);
+  Items.erase(Items.begin() + ItemIdx);
+  return It;
+}
+
 bool Inventory::canUseItem(const entt::entity &Entity, entt::registry &Reg,
                            std::size_t ItemIdx) {
   return Items.at(ItemIdx).getProto().canUseOn(Entity, Reg);

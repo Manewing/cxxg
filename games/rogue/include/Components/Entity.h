@@ -12,4 +12,8 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                           bool IsExit, int LevelId);
 
+void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T);
+
+void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos);
+
 #endif // #ifndef ROGUE_COMPONENTS_ENTITY_H

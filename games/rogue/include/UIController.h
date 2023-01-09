@@ -21,12 +21,16 @@ public:
   virtual void draw(cxxg::Screen &Scr) const = 0;
 };
 
-class InventoryUIController : public UIWidget {
+class InventoryUIControllerBase : public UIWidget {
 public:
-  InventoryUIController(Inventory &Inv, entt::entity Entity,
-                        entt::registry &Reg);
-  bool handleInput(int Char) final;
-  std::string_view getInteractMsg() const final;
+  /// @brief Creates a new inventory UI controller
+  /// @param Inv The inventory that is acccessed
+  /// @param Entity The entity accessing the inventory
+  /// @param Reg The registry the entity belongs to
+  /// @param Header The header to display for the inventory
+  InventoryUIControllerBase(Inventory &Inv, entt::entity Entity,
+                            entt::registry &Reg, const std::string &Header);
+  bool handleInput(int Char) override;
   void draw(cxxg::Screen &Scr) const final;
 
 protected:
@@ -37,6 +41,21 @@ protected:
   entt::entity Entity;
   entt::registry &Reg;
   UIListSelect ListUI;
+};
+
+class InventoryUIController : public InventoryUIControllerBase {
+public:
+  InventoryUIController(Inventory &Inv, entt::entity Entity,
+                        entt::registry &Reg);
+  bool handleInput(int Char) final;
+  std::string_view getInteractMsg() const final;
+};
+
+class LootUIController : public InventoryUIControllerBase {
+public:
+  LootUIController(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
+  bool handleInput(int Char) final;
+  std::string_view getInteractMsg() const final;
 };
 
 class HistoryUIController : public UIWidget {
@@ -61,6 +80,7 @@ public:
   void handleInput(int Char);
 
   void setInventoryUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
+  void setLootUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   void setHistoryUI(History &Hist);
 
   std::unique_ptr<UIWidget> ActiveWidget;

@@ -62,6 +62,11 @@ public:
   ItemPrototype(int ItemId, std::string Name, ItemType Type, int MaxStatckSize,
                 std::vector<std::shared_ptr<ItemEffect>> Effects);
 
+// add:
+// attack melee
+// attack ranged
+// defnese
+// craft
   bool canUseOn(const entt::entity &Entity, entt::registry &Reg) const;
   void useOn(const entt::entity &Entity, entt::registry &Reg, int Item) const;
 

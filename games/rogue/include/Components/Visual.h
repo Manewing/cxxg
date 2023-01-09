@@ -5,6 +5,7 @@
 
 struct TileComp {
   Tile T;
+  int ZIndex = 0;
 };
 
 struct NameComp {

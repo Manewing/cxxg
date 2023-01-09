@@ -1,4 +1,5 @@
 #include "LevelGenerator.h"
+#include "Context.h"
 #include "Parser.h"
 #include <ymir/Dungeon/BuilderPass.hpp>
 #include <ymir/Dungeon/CaveRoomGenerator.hpp>
@@ -14,6 +15,8 @@
 #include <ymir/MapIo.hpp>
 
 #include "Components/Entity.h"
+
+namespace {
 
 template <typename TileType, typename TileCord, typename RandEngType>
 void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
@@ -31,6 +34,10 @@ void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
   Pass.registerBuilder<ymir::Dungeon::StartEndPlacer<T, U, RE>>();
   Pass.registerBuilder<ymir::Dungeon::FilterPlacer<T, U, RE>>();
 }
+
+} // namespace
+
+LevelGenerator::LevelGenerator(GameContext *Ctx) : Ctx(Ctx) {}
 
 std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed,
                                                      int LevelId) {
@@ -54,6 +61,9 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed,
   const auto Layers = Cfg.asList<std::string>("layers/");
   const auto Size = Cfg.get<ymir::Size2d<int>>("dungeon/size");
   auto NewLevel = std::make_shared<Level>(LevelId, Layers, Size);
+  if (Ctx) {
+    NewLevel->Reg.ctx().emplace<GameContext>(*Ctx);
+  }
   ymir::Dungeon::Context<Tile, int> Ctx(NewLevel->Map);
 
   Pass.init(Ctx);
@@ -116,7 +126,7 @@ void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
     createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false, NextLevelId);
   } break;
   case 'C':
-    L.Entities.push_back(std::make_shared<ChestEntity>(Pos, T));
+    createChestEntity(L.Reg, Pos, T);
     break;
   default:
     throw std::runtime_error("Invalid entity kind: " +

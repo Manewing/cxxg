@@ -1,6 +1,7 @@
 #ifndef ROGUE_GAME_H
 #define ROGUE_GAME_H
 
+#include "Context.h"
 #include "EventHub.h"
 #include "History.h"
 #include "ItemDatabase.h"
@@ -33,6 +34,7 @@ public: // FIXME
   History Hist;
   EventHistoryWriter EHW;
   ItemDatabase ItemDb;
+  GameContext Ctx;
   LevelGenerator LevelGen;
   int CurrentLevelIdx = 0;
   std::shared_ptr<Level> CurrentLevel;

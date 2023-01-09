@@ -11,6 +11,7 @@ public:
   const std::vector<Item> &getItems() const { return Items; }
 
   void addItem(const Item &It);
+  Item takeItem(std::size_t ItemIdx);
   bool canUseItem(const entt::entity &Entity, entt::registry &Reg,
                   std::size_t ItemIdx);
   void useItem(const entt::entity &Entity, entt::registry &Reg,

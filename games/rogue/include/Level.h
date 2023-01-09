@@ -19,10 +19,9 @@ public:
   static constexpr std::size_t LayerWallsIdx = 2;
   static constexpr std::size_t LayerWallsDecoIdx = 3;
 
+  // FIXME move to separate header and use in level gen
   static constexpr Tile EmptyTile = Tile{};
   static constexpr Tile WallTile = Tile{{'#'}};
-  static constexpr Tile StartTile = Tile{{'H'}};
-  static constexpr Tile EndTile = Tile{{'<'}};
 
 public:
   Level(int LevelId, const std::vector<std::string> &Layers,

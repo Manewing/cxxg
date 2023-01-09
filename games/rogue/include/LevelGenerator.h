@@ -9,12 +9,15 @@
 #include <vector>
 #include <ymir/Types.hpp>
 
+struct GameContext;
+
 class LevelGenerator {
 public:
   struct CharInfo {
     Tile T;
     std::string Layer;
   };
+  explicit LevelGenerator(GameContext *Ctx = nullptr);
 
   std::shared_ptr<Level> generateLevel(unsigned Seed, int LevelId);
   std::shared_ptr<Level> loadLevel(const std::filesystem::path &LevelFile,
@@ -25,6 +28,9 @@ public:
 protected:
   void spawnEntities(Level &L);
   void spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T);
+
+protected:
+  GameContext *Ctx = nullptr;
 };
 
 #endif // #ifndef ROGUE_LEVEL_GENERATOR_H

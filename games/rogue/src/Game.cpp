@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "Components/AI.h"
+#include "Components/Items.h"
 #include "Components/Player.h"
 #include "Components/Stats.h"
 #include "Components/Transform.h"
@@ -21,8 +22,8 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
 }
 
 Game::Game(cxxg::Screen &Scr)
-    : cxxg::Game(Scr), Hist(*this), EHW(Hist), LevelGen(),
-      CurrentLevel(nullptr), UICtrl(Scr) {}
+    : cxxg::Game(Scr), Hist(*this), EHW(Hist), ItemDb(), Ctx({*this, ItemDb}),
+      LevelGen(&Ctx), CurrentLevel(nullptr), UICtrl(Scr) {}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.setEventHub(&EvHub);
@@ -70,6 +71,7 @@ bool Game::handleInput(int Char) {
     return true;
   }
 
+  // FIXME add user input to context and process input in player system
   // FIXME play move and attack needs to be handled in update
   switch (Char) {
   case 'a':
@@ -154,6 +156,7 @@ void Game::handleDraw() {
   cxxg::Game::handleDraw();
 }
 
+// FIXME move to player system?
 void Game::movePlayer(ymir::Dir2d Dir) {
   if (!CurrentLevel) {
     return;
@@ -167,6 +170,7 @@ void Game::movePlayer(ymir::Dir2d Dir) {
   CurrentLevel->Reg.get<MovementComp>(Player).Dir = Dir;
 }
 
+// FIXME move to player system?
 void Game::tryInteract() {
   if (!CurrentLevel) {
     return;
@@ -180,7 +184,7 @@ void Game::tryInteract() {
 
   // Finalize interaction
   if (PC.CurrentInteraction) {
-    PC.CurrentInteraction->Execute(*this);
+    PC.CurrentInteraction->Execute(*this, Player, CurrentLevel->Reg);
     PC.CurrentInteraction = std::nullopt;
     return;
   }

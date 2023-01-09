@@ -16,6 +16,7 @@ set(HEADER_FILES
   include/Components/Stats.h
   include/Components/Transform.h
   include/Components/Visual.h
+  include/Context.h
   include/Entity.h
   include/EventHub.h
   include/Game.h

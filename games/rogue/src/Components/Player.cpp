@@ -1,5 +1,6 @@
 #include "Components/Player.h"
 #include "Components/AI.h"
+#include "Components/Items.h"
 #include "Components/Level.h"
 #include "Components/Stats.h"
 #include "Components/Transform.h"
@@ -31,6 +32,7 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   Reg.emplace<MeleeAttackComp>(Entity, MC);
   Reg.emplace<MovementComp>(Entity, MVC);
   Reg.emplace<InventoryComp>(Entity, InvComp);
+  Reg.emplace<CollisionComp>(Entity);
 
   return Entity;
 }

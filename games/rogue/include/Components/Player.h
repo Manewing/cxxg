@@ -7,21 +7,16 @@
 #include <string>
 #include <ymir/Types.hpp>
 
-#include "Inventory.h"
-
 class Game;
 
 struct Interaction {
   std::string Msg;
-  std::function<void(Game &)> Execute = [](auto &) {};
+  std::function<void(Game &, entt::entity, entt::registry &)> Execute =
+      [](auto &, auto, auto &) {};
 };
 
 struct InteractableComp {
   Interaction Action;
-};
-
-struct InventoryComp {
-  Inventory Inv;
 };
 
 struct PlayerComp {

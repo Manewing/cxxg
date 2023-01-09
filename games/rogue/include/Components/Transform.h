@@ -19,4 +19,6 @@ struct MovementComp {
   operator const ymir::Dir2d &() const { return Dir; }
 };
 
+struct CollisionComp {};
+
 #endif // #ifndef ROGUE_COMPONENTS_TRANSFORM_H

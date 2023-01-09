@@ -73,6 +73,10 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
 }
 
 void Renderer::renderEntities() {
+  L.Reg.sort<TileComp>([](const auto &Lhs, const auto &Rhs) {
+    return Lhs.ZIndex < Rhs.ZIndex;
+  });
+  L.Reg.sort<PositionComp, TileComp>();
   auto View = L.Reg.view<const PositionComp, const TileComp>();
   View.each([this](const auto &Pos, const auto &T) {
     RenderedLevelMap.getTile(Pos) = T.T;
