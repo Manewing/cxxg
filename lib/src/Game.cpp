@@ -58,15 +58,15 @@ RowAccessor Game::notify() {
 }
 
 RowAccessor Game::info() {
-  return (notify() << ::cxxg::types::Color::NONE << "INFO: ");
+  return std::move(notify() << ::cxxg::types::Color::NONE << "INFO: ");
 }
 
 RowAccessor Game::warn() {
-  return (notify() << ::cxxg::types::Color::YELLOW << "WARNING: ");
+  return std::move(notify() << ::cxxg::types::Color::YELLOW << "WARNING: ");
 }
 
 RowAccessor Game::error() {
-  return (notify() << ::cxxg::types::Color::RED << "ERROR: ");
+  return std::move(notify() << ::cxxg::types::Color::RED << "ERROR: ");
 }
 
 void Game::checkSize(types::Size GameSize) const {

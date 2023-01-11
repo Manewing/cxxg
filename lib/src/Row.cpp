@@ -8,6 +8,14 @@ namespace cxxg {
 RowAccessor::RowAccessor(Row &Rw, int Offset)
     : Rw(Rw), Offset(Offset), CurrentColor(types::Color::NONE) {}
 
+RowAccessor::RowAccessor(RowAccessor &&RA)
+    : Rw(RA.Rw), Offset(RA.Offset), CurrentColor(RA.CurrentColor),
+      SS(std::move(RA.SS)) {
+  RA.Valid = false;
+}
+
+RowAccessor::~RowAccessor() { flushBuffer(); }
+
 RowAccessor &RowAccessor::operator=(types::TermColor Cl) {
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.ColorInfo.size()) || Offset < 0) {
@@ -33,21 +41,25 @@ RowAccessor &RowAccessor::operator=(types::ColoredChar C) {
 }
 
 RowAccessor &RowAccessor::operator<<(types::TermColor Cl) {
+  flushBuffer();
   CurrentColor = Cl;
   return *this;
 }
 
-RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
-  std::string_view StrView = Str;
-  *this << StrView;
-  return *this;
+void RowAccessor::flushBuffer() {
+  if (!Valid) {
+    return;
+  }
+  output(SS.str());
+  SS.str("");
+  SS.clear();
 }
 
-RowAccessor &RowAccessor::operator<<(::std::string_view const &Str) {
+void RowAccessor::output(::std::string const &Str) {
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.Buffer.size()) ||
       Offset + Str.size() <= 0) {
-    return *this;
+    return;
   }
 
   // get row buffer and color info
@@ -57,6 +69,7 @@ RowAccessor &RowAccessor::operator<<(::std::string_view const &Str) {
   // keep track of how much we moved offset
   size_t Count;
 
+  // FIXME four cases?? 4. is before start and after end
   // We have got three cases
   if (Offset < 0) {
     // First case: Writing before row with part of string overlapping into
@@ -83,7 +96,7 @@ RowAccessor &RowAccessor::operator<<(::std::string_view const &Str) {
   // update offset of accessor by the amount of characters we already wrote
   Offset += Count;
 
-  return *this;
+  return;
 }
 
 Row::Row(size_t Size) {

@@ -10,7 +10,9 @@ namespace cxxg {
 
 namespace types {
 
-template <class... Ts> struct Overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts> struct Overloaded : Ts... {
+  using Ts::operator()...;
+};
 template <class... Ts> Overloaded(Ts...) -> Overloaded<Ts...>;
 
 /// Position in rows and columns

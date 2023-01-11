@@ -19,6 +19,8 @@ public:
   /// Constructs a new row accessor from the given row and the offset
   /// within the row
   RowAccessor(Row &Rw, int Offset);
+  RowAccessor(RowAccessor &&);
+  ~RowAccessor();
 
   /// Returns the accessed row
   inline Row &get() { return Rw; }
@@ -65,24 +67,23 @@ public:
     return *this;
   }
 
-  /// Outputs the given string to the row, will increase the access offset
-  /// by the amount of characters written for the string
-  /// @param[in] Str - The string to output
-  RowAccessor &operator<<(::std::string const &Str);
-
-  /// Outputs the given string to the row, will increase the access offset
-  /// by the amount of characters written for the string
-  /// @param[in] Str - The string to output
-  RowAccessor &operator<<(::std::string_view const &Str);
-
   /// Outputs the given type to the row, first the the type will be converted
   /// to string via a string stream, the resulting string will the be output
   /// @param[in] T - The variable with type 'T' to output
   template <typename Type> RowAccessor &operator<<(Type const &T) {
-    ::std::stringstream SS;
     SS << T;
-    return operator<<(SS.str());
+    return *this;
   }
+
+  /// @brief Flushes the current character buffer to the row, note that
+  /// colors are written without buffering
+  void flushBuffer();
+
+protected:
+  /// Outputs the given string to the row, will increase the access offset
+  /// by the amount of characters written for the string
+  /// @param[in] Str - The string to output
+  void output(::std::string const &Str);
 
 private:
   /// The row to access
@@ -93,6 +94,12 @@ private:
 
   /// The current color for output
   types::TermColor CurrentColor;
+
+  // Buffer string stream
+  std::stringstream SS;
+
+  // If the accessor is still valid
+  bool Valid = true;
 };
 
 /// Class for representing a row in the screen (terminal), provides
