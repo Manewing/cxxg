@@ -198,7 +198,7 @@ void MasterMind::handleDraw() {
   // highlight input position, TODO cleanup
   int InputStartX = 1 + Offset.X + InputPosition * 4;
   int InputEndX = 4 + Offset.X + InputPosition * 4;
-  ::cxxg::types::RgbColor const HlCl{255, 255, 255, false};
+  ::cxxg::types::RgbColor const HlCl{255, 255, 255, true, 140, 140, 140};
   Scr[InputOffset.Y][InputStartX - 1] = ::cxxg::types::Color::NONE;
   Scr[InputOffset.Y].setColor(InputStartX, InputEndX, HlCl);
   Scr[InputOffset.Y][InputEndX] = ::cxxg::types::Color::NONE;
