@@ -5,12 +5,28 @@
 namespace cxxg {
 namespace types {
 
+std::ostream &operator<<(std::ostream &Out, const FontStyle &FS) {
+  if (FS.Italic) {
+    Out << "\033[3m";
+  }
+  if (FS.Bold) {
+    Out << "\033[1m";
+  }
+  if (FS.Underline) {
+    Out << "\033[4m";
+  }
+  if (FS.Strikethrough) {
+    Out << "\033[9m";
+  }
+  return Out;
+}
+
 std::ostream &operator<<(std::ostream &Out, const NoColor & /*NC*/) {
   return Out;
 }
 
-std::ostream &operator<<(std::ostream &Out, const DefaultColor & /*DC*/) {
-  Out << "\033[0m";
+std::ostream &operator<<(std::ostream &Out, const DefaultColor &DC) {
+  Out << "\033[0m" << DC.FS;
   return Out;
 }
 
@@ -26,15 +42,15 @@ RgbColor RgbColor::getHeatMapColor(float Min, float Max, float Value) {
 
 std::ostream &operator<<(std::ostream &Out, const RgbColor &Color) {
   // FIXME check if we have a tty, disable if we don't have a terminal
+  Out << "\033[0m";
   if (Color.HasBackground) {
     Out << "\033[48;2;" << static_cast<int>(Color.BgR) << ";"
         << static_cast<int>(Color.BgG) << ";" << static_cast<int>(Color.BgB)
         << "m";
-  } else {
-    Out << DefaultColor{}; // clear everything, include background
   }
   Out << "\033[38;2;" << static_cast<int>(Color.R) << ";"
       << static_cast<int>(Color.G) << ";" << static_cast<int>(Color.B) << "m";
+  Out << Color.FS;
   return Out;
 }
 

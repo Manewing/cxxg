@@ -15,6 +15,10 @@ template <class... Ts> struct Overloaded : Ts... {
 };
 template <class... Ts> Overloaded(Ts...) -> Overloaded<Ts...>;
 
+template <typename T, typename... Ts>
+using EnableIfOfType = std::enable_if<
+    std::disjunction<std::is_same<T, Ts>...>::value>;
+
 /// Position in rows and columns
 struct Position {
   /// X-Position (Column)
@@ -81,6 +85,21 @@ inline Size operator+(Size const A, Size const B) {
   return {A.X + B.X, A.Y + B.Y};
 }
 
+struct FontStyle {
+  unsigned Italic : 1;
+  unsigned Bold : 1;
+  unsigned Underline : 1;
+  unsigned Strikethrough : 1;
+};
+inline bool operator==(const FontStyle &Lhs, const FontStyle &Rhs) noexcept {
+  return std::tie(Lhs.Italic, Lhs.Bold, Lhs.Underline, Lhs.Strikethrough) ==
+         std::tie(Rhs.Italic, Rhs.Bold, Rhs.Underline, Rhs.Strikethrough);
+}
+inline bool operator!=(const FontStyle &Lhs, const FontStyle &Rhs) noexcept {
+  return !(Lhs == Rhs);
+}
+std::ostream &operator<<(std::ostream &Out, const FontStyle &FS);
+
 struct NoColor {};
 inline bool operator==(const NoColor &, const NoColor &) noexcept {
   return true;
@@ -90,12 +109,40 @@ inline bool operator!=(const NoColor &, const NoColor &) noexcept {
 }
 std::ostream &operator<<(std::ostream &Out, const NoColor &NC);
 
-struct DefaultColor {};
-inline bool operator==(const DefaultColor &, const DefaultColor &) noexcept {
-  return true;
+struct DefaultColor {
+  FontStyle FS{};
+
+  constexpr auto italic() const {
+    auto Copy = *this;
+    Copy.FS.Italic = 1;
+    return Copy;
+  }
+
+  constexpr auto bold() const {
+    auto Copy = *this;
+    Copy.FS.Bold = 1;
+    return Copy;
+  }
+
+  constexpr auto underline() const {
+    auto Copy = *this;
+    Copy.FS.Underline = 1;
+    return Copy;
+  }
+
+  constexpr auto striketrhough() const {
+    auto Copy = *this;
+    Copy.FS.Strikethrough = 1;
+    return Copy;
+  }
+};
+inline bool operator==(const DefaultColor &Lhs,
+                       const DefaultColor &Rhs) noexcept {
+  return Lhs.FS == Rhs.FS;
 }
-inline bool operator!=(const DefaultColor &, const DefaultColor &) noexcept {
-  return false;
+inline bool operator!=(const DefaultColor &Lhs,
+                       const DefaultColor &Rhs) noexcept {
+  return !(Lhs.FS == Rhs.FS);
 }
 std::ostream &operator<<(std::ostream &Out, const DefaultColor &DC);
 
@@ -109,11 +156,37 @@ struct RgbColor {
   uint8_t BgR = 0;
   uint8_t BgG = 0;
   uint8_t BgB = 0;
+  FontStyle FS{};
+
+  constexpr auto italic() const {
+    auto Copy = *this;
+    Copy.FS.Italic = 1;
+    return Copy;
+  }
+
+  constexpr auto bold() const {
+    auto Copy = *this;
+    Copy.FS.Bold = 1;
+    return Copy;
+  }
+
+  constexpr auto underline() const {
+    auto Copy = *this;
+    Copy.FS.Underline = 1;
+    return Copy;
+  }
+
+  constexpr auto striketrhough() const {
+    auto Copy = *this;
+    Copy.FS.Strikethrough = 1;
+    return Copy;
+  }
 };
 inline bool operator==(const RgbColor &Lhs, const RgbColor &Rhs) noexcept {
   return std::tie(Lhs.R, Lhs.G, Lhs.B, Lhs.HasBackground, Lhs.BgR, Lhs.BgG,
-                  Lhs.BgB) == std::tie(Rhs.R, Rhs.G, Rhs.B, Rhs.HasBackground,
-                                       Rhs.BgR, Rhs.BgG, Rhs.BgB);
+                  Lhs.BgB, Lhs.FS) == std::tie(Rhs.R, Rhs.G, Rhs.B,
+                                               Rhs.HasBackground, Rhs.BgR,
+                                               Rhs.BgG, Rhs.BgB, Rhs.FS);
 }
 inline bool operator!=(const RgbColor &Lhs, const RgbColor &Rhs) noexcept {
   return !(Lhs == Rhs);
@@ -121,15 +194,34 @@ inline bool operator!=(const RgbColor &Lhs, const RgbColor &Rhs) noexcept {
 std::ostream &operator<<(std::ostream &Out, const RgbColor &Color);
 
 using TermColor = std::variant<NoColor, DefaultColor, RgbColor>;
+template <typename T>
+using IsTermColor = EnableIfOfType<T, NoColor, DefaultColor, RgbColor>;
 std::ostream &operator<<(std::ostream &Out, const TermColor &TC);
 
+template <typename T, typename IsTermColor<T>::type* = nullptr>
+inline bool operator==(const TermColor &Lhs, const T &Rhs) noexcept {
+  return std::holds_alternative<T>(Lhs) && std::get<T>(Lhs) == Rhs;
+}
+template <typename T, typename IsTermColor<T>::type* = nullptr>
+inline bool operator==(const T &Lhs, const TermColor &Rhs) noexcept {
+  return (Rhs == Lhs);
+}
+template <typename T, typename IsTermColor<T>::type* = nullptr>
+inline bool operator!=(const TermColor &Lhs, const T &Rhs) noexcept {
+  return !(Lhs == Rhs);
+}
+template <typename T, typename IsTermColor<T>::type* = nullptr>
+inline bool operator!=(const T &Lhs, const TermColor &Rhs) noexcept {
+  return (Rhs != Lhs);
+}
+
 namespace Color {
-static constexpr TermColor NONE = DefaultColor{};
-static constexpr TermColor RED = RgbColor{255, 25, 25};
-static constexpr TermColor GREEN = RgbColor{25, 255, 25};
-static constexpr TermColor YELLOW = RgbColor{255, 255, 25};
-static constexpr TermColor BLUE = RgbColor{80, 80, 255};
-static constexpr TermColor GREY = RgbColor{100, 100, 100};
+static constexpr auto NONE = DefaultColor{};
+static constexpr auto RED = RgbColor{255, 25, 25};
+static constexpr auto GREEN = RgbColor{25, 255, 25};
+static constexpr auto YELLOW = RgbColor{255, 255, 25};
+static constexpr auto BLUE = RgbColor{80, 80, 255};
+static constexpr auto GREY = RgbColor{100, 100, 100};
 }; // namespace Color
 
 struct ColoredChar {

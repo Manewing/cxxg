@@ -56,6 +56,10 @@ void RowAccessor::flushBuffer() {
 }
 
 void RowAccessor::output(::std::string const &Str) {
+  if (Str.empty()) {
+    return;
+  }
+
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.Buffer.size()) ||
       Offset + Str.size() <= 0) {
