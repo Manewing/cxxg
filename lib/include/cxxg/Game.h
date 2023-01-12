@@ -29,7 +29,7 @@ public:
 
   /// Game loop, while flag 'GameRunning' is true calls 'handleInput'
   /// and 'handleDraw' continously.
-  void run(bool Blocking = true);
+  virtual void run(bool Blocking = true);
 
   /// Callback for handling new character input, called from game loop.
   /// @param[in] Char - The new character input

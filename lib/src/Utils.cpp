@@ -30,7 +30,7 @@ bool setStdinBlocking(bool Enabled) {
   }
 }
 
-int getCharNonBlock() {
+int readChar() {
   unsigned char Char;
   if (read(STDIN_FILENO, &Char, sizeof(Char)) < 0) {
     return EOF;
@@ -38,35 +38,87 @@ int getCharNonBlock() {
   return Char;
 }
 
-// FIXME this aligns non-blocking with blocking getchar, but parsing
-// escape sequences
 // up - "\033[A"
 // down - "\033[B"
 // left - "\033[D"
 // right - "\033[C"
-int getCharNonBlockHandleEscape() {
-  int Char = getCharNonBlock();
-  if (Char != KEY_ESC) {
-    return Char;
+int decodeEscape(int CharA, int CharB) {
+  if (CharA != static_cast<int>('[')) {
+    return KEY_ESC;
   }
-  Char = getCharNonBlock();
-  if (Char != static_cast<int>('[')) {
-    return KEY_INVALID;
-  }
-  Char = getCharNonBlock();
-  switch (Char) {
-  case KEY_UP:
-  case KEY_DOWN:
-  case KEY_LEFT:
-  case KEY_RIGHT:
-    return Char;
+  switch (CharB) {
+  case 'A':
+    return KEY_UP;
+  case 'B':
+    return KEY_DOWN;
+  case 'D':
+    return KEY_LEFT;
+  case 'C':
+    return KEY_RIGHT;
   default:
-    break;
+    return CharB;
   }
   return KEY_INVALID;
 }
 
+int getCharNonBlockHandleEscape() {
+  int Char = readChar();
+  if (Char != KEY_ESC) {
+    return Char;
+  }
+  int CharA = readChar();
+  int CharB = readChar();
+  return decodeEscape(CharA, CharB);
+}
+
+int getCharBlockHandleEscape() {
+  int Char = readChar();
+  if (Char != KEY_ESC) {
+    return Char;
+  }
+  setStdinBlocking(false);
+  int CharA = readChar();
+  int CharB = readChar();
+  setStdinBlocking(true);
+  return decodeEscape(CharA, CharB);
+}
+
 } // namespace
+
+std::string getCharTxt(int Char) {
+  if (32 <= Char && Char < 127) {
+    std::string Str = "' '";
+    Str[1] = Char;
+    return Str;
+  }
+  switch (Char) {
+  case KEY_NULL:
+    return "KEY_NUL";
+  case KEY_INVALID:
+    return "KEY_INVALID";
+  case KEY_TAB:
+    return "KEY_TAB";
+  case KEY_ENTER:
+    return "KEY_ENTER";
+  case KEY_ESC:
+    return "KEY_ESC";
+  case KEY_SPACE:
+    return "KEY_SPACE";
+  case KEY_UP:
+    return "KEY_UP";
+  case KEY_DOWN:
+    return "KEY_DOWN";
+  case KEY_LEFT:
+    return "KEY_LEFT";
+  case KEY_RIGHT:
+    return "KEY_RIGHT";
+  case KEY_DEL:
+    return "KEY_DEL";
+  default:
+    break;
+  }
+  return "???";
+}
 
 void registerSigintHandler(::std::function<void()> const &Handler) {
   SigintHandler = Handler;
@@ -75,7 +127,7 @@ void registerSigintHandler(::std::function<void()> const &Handler) {
 
 int getChar(bool Blocking) {
   if (Blocking) {
-    return getchar();
+    return getCharBlockHandleEscape();
   }
   setStdinBlocking(false);
   int Char = getCharNonBlockHandleEscape();
@@ -85,7 +137,8 @@ int getChar(bool Blocking) {
 }
 
 void clearStdin() {
-  while(getchar() != EOF) {}
+  while (getchar() != EOF) {
+  }
 }
 
 bool hasBufferedInput() {

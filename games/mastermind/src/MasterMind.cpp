@@ -38,13 +38,13 @@ void MasterMind::initialize(bool BufferedInput, unsigned TickDelayUs) {
 
 bool MasterMind::handleInput(int Char) {
   switch (Char) {
-  case 68: // left
+  case cxxg::utils::KEY_LEFT:
     handleLeft();
     break;
-  case 67: // right
+  case cxxg::utils::KEY_RIGHT:
     handleRight();
     break;
-  case '\n':
+  case cxxg::utils::KEY_ENTER:
     handleReturn();
     break;
   case 'q':

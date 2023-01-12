@@ -1,11 +1,11 @@
 #ifndef CXXG_UTILS_HH
 #define CXXG_UTILS_HH
 
+#include <ctime>
 #include <functional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <ctime>
 
 #define THROW_CXXG_ERROR(msg)                                                  \
   {                                                                            \
@@ -18,13 +18,22 @@ namespace cxxg {
 
 namespace utils {
 
-constexpr char KEY_INVALID = -1;
-constexpr char KEY_ESC = 27;
-constexpr char KEY_SPACE = 32;
-constexpr char KEY_UP = 65;
-constexpr char KEY_DOWN = 66;
-constexpr char KEY_RIGHT = 67;
-constexpr char KEY_LEFT = 68;
+constexpr int KEY_INVALID = -1;
+constexpr int KEY_NULL = 0;
+constexpr int KEY_TAB = 9;
+constexpr int KEY_ENTER = 10;
+constexpr int KEY_ESC = 27;
+constexpr int KEY_SPACE = 32;
+constexpr int KEY_DEL = 127;
+constexpr int KEY_UP = 1001;
+constexpr int KEY_DOWN = 1002;
+constexpr int KEY_RIGHT = 1003;
+constexpr int KEY_LEFT = 1004;
+
+/// @brief Returns a string representation of the given character, in alignment
+/// with the constants listed above
+/// @param Char The character to get the text for
+std::string getCharTxt(int Char);
 
 /// Helper function for registering a handler (e.g. a lambda) for
 /// a SIGINT signal (after Ctrl+C). Note that only one handler can
