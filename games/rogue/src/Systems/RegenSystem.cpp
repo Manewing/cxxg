@@ -2,6 +2,9 @@
 #include "Components/Stats.h"
 #include <entt/entt.hpp>
 
+static constexpr float HealthPerVit = 9.1f;
+static constexpr float ManaPerInt = 9.1f;
+
 namespace {
 
 template <typename Component>
@@ -23,6 +26,11 @@ void runRegenUpdate(entt::registry &Reg) {
 } // namespace
 
 void RegenSystem::update() {
+  auto StatsView = Reg.view<const StatsComp, HealthComp, ManaComp>();
+  StatsView.each([](const auto &St, auto &Health, auto &Mana) {
+    Health.MaxValue = St.Vit * HealthPerVit;
+    Mana.MaxValue = St.Int * ManaPerInt;
+  });
   runRegenUpdate<HealthComp>(Reg);
   runRegenUpdate<ManaComp>(Reg);
 }

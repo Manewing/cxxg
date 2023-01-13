@@ -205,8 +205,10 @@ void UIController::draw(int LevelIdx, int Health,
   auto ScrSize = Scr.getSize();
 
   // Draw UI overlay
-  Scr[0][0] << "Rogue v0.0 [FLOOR]: " << (LevelIdx + 1)
-            << " [HEALTH]: " << Health;
+  Scr[0][0] << cxxg::types::Color::NONE.underline() << "Rogue v0.0 [FLOOR]: "
+            << (LevelIdx + 1)
+            << " [HEALTH]: "
+            << Health;
 
   if (ActiveWidget) {
     ActiveWidget->draw(Scr);

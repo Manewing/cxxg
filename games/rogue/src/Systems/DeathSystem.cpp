@@ -1,9 +1,9 @@
 #include "Systems/DeathSystem.h"
+#include "Components/Entity.h"
+#include "Components/Items.h"
 #include "Components/Player.h"
 #include "Components/Stats.h"
 #include "Components/Transform.h"
-#include "Components/Entity.h"
-#include "Components/Items.h"
 #include <entt/entt.hpp>
 
 void DeathSystem::update() {

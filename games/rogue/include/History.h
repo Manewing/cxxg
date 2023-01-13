@@ -15,6 +15,7 @@ struct EntityDiedEvent;
 class HistoryMessageAssembler {
 public:
   HistoryMessageAssembler(History &Hist, cxxg::RowAccessor Row);
+  HistoryMessageAssembler(HistoryMessageAssembler &&);
   ~HistoryMessageAssembler();
 
   template <typename Type> HistoryMessageAssembler &operator<<(const Type &T) {
@@ -48,8 +49,7 @@ private:
 struct DebugMessageEvent : public Event {
   std::stringstream Message;
 
-  template <typename Type>
-  DebugMessageEvent &operator<<(const Type &T) {
+  template <typename Type> DebugMessageEvent &operator<<(const Type &T) {
     Message << T;
     return *this;
   }

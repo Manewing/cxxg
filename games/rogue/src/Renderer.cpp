@@ -2,8 +2,8 @@
 #include "Level.h"
 #include <ymir/Algorithm/LineOfSight.hpp>
 
-#include "Components/Visual.h"
 #include "Components/Transform.h"
+#include "Components/Visual.h"
 
 Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
     : L(L), VisibleMap(Size) {
@@ -73,9 +73,8 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
 }
 
 void Renderer::renderEntities() {
-  L.Reg.sort<TileComp>([](const auto &Lhs, const auto &Rhs) {
-    return Lhs.ZIndex < Rhs.ZIndex;
-  });
+  L.Reg.sort<TileComp>(
+      [](const auto &Lhs, const auto &Rhs) { return Lhs.ZIndex < Rhs.ZIndex; });
   L.Reg.sort<PositionComp, TileComp>();
   auto View = L.Reg.view<const PositionComp, const TileComp>();
   View.each([this](const auto &Pos, const auto &T) {

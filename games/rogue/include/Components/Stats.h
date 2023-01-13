@@ -3,7 +3,15 @@
 
 #include <algorithm>
 
+using StatPoint = int;
 using StatValue = double;
+
+struct StatsComp {
+  StatPoint Int = 11;
+  StatPoint Str = 11;
+  StatPoint Dex = 11;
+  StatPoint Vit = 11;
+};
 
 struct ValueRegenCompBase {
   StatValue Value = 100;

@@ -3,10 +3,14 @@
 #include "Systems/DeathSystem.h"
 
 HistoryMessageAssembler::HistoryMessageAssembler(History &Hist,
-                                                 cxxg::RowAccessor Row)
-    : Hist(Hist), Row(Row) {}
+                                                 cxxg::RowAccessor Rw)
+    : Hist(Hist), Row(std::move(Rw)) {}
+
+HistoryMessageAssembler::HistoryMessageAssembler(HistoryMessageAssembler &&HMA)
+    : Hist(HMA.Hist), Row(std::move(HMA.Row)) {}
 
 HistoryMessageAssembler::~HistoryMessageAssembler() {
+  Row.flushBuffer();
   Hist.addMessage(Row.get());
 }
 
