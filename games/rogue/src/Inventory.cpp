@@ -1,4 +1,6 @@
-#include "Inventory.h"
+#include <rogue/Inventory.h>
+
+namespace rogue {
 
 void Inventory::addItem(const Item &It) {
   for (auto &InvIt : Items) {
@@ -38,3 +40,5 @@ void Inventory::useItem(const entt::entity &Entity, entt::registry &Reg,
 }
 
 bool Inventory::empty() const { return Items.empty(); }
+
+}

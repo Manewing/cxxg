@@ -1,10 +1,10 @@
-#include "EventHub.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <rogue/EventHub.h>
 
 namespace {
 
-class DummyEventA : public Event {
+class DummyEventA : public rogue::Event {
 public:
   explicit DummyEventA(int Value) : Value(Value) {}
   int Value = 42;
@@ -15,7 +15,7 @@ inline bool operator==(const DummyEventA &Lhs,
   return Lhs.Value == Rhs.Value;
 }
 
-class DummyEventB : public Event {
+class DummyEventB : public rogue::Event {
 public:
   explicit DummyEventB(std::string Msg) : Msg(Msg) {}
   std::string Msg;
@@ -26,7 +26,7 @@ inline bool operator==(const DummyEventB &Lhs,
   return Lhs.Msg == Rhs.Msg;
 }
 
-class DummyEventC : public Event {
+class DummyEventC : public rogue::Event {
 public:
   explicit DummyEventC(std::string Msg) : Msg(Msg) {}
   std::string Msg;
@@ -44,9 +44,9 @@ public:
   MOCK_METHOD(void, onDummyEventB, (const DummyEventB &B), (final));
 };
 
-class DummyEntity : public EventHubConnector {
+class DummyEntity : public rogue::EventHubConnector {
 public:
-  void setEventHub(EventHub *Hub) {
+  void setEventHub(rogue::EventHub *Hub) {
     EventHubConnector::setEventHub(Hub);
     subscribe(*this, &DummyEntity::onDummyEventA);
   }
@@ -59,7 +59,7 @@ public:
 };
 
 TEST(EventHub, SubscribePublish) {
-  EventHub EH;
+  rogue::EventHub EH;
   EventListenerMock Listener;
   EH.subscribe(Listener, &EventListenerMock::onDummyEventA);
   EH.subscribe(Listener, &EventListenerMock::onDummyEventB);
@@ -73,7 +73,7 @@ TEST(EventHub, SubscribePublish) {
 }
 
 TEST(EventHub, Unsubscribe) {
-  EventHub EH;
+  rogue::EventHub EH;
   EventListenerMock Listener;
   EH.subscribe(Listener, &EventListenerMock::onDummyEventA);
   EH.subscribe(Listener, &EventListenerMock::onDummyEventB);
@@ -87,7 +87,7 @@ TEST(EventHub, Unsubscribe) {
 }
 
 TEST(EventHub, EventHubConnectorUnconnected) {
-  EventHub EH;
+  rogue::EventHub EH;
   DummyEntity DE;
   EventListenerMock Listener;
   EH.subscribe(Listener, &EventListenerMock::onDummyEventB);
@@ -98,7 +98,7 @@ TEST(EventHub, EventHubConnectorUnconnected) {
 }
 
 TEST(EventHub, EventHubConnectorConnected) {
-  EventHub EH;
+  rogue::EventHub EH;
 
   DummyEntity DE;
   DE.setEventHub(&EH);
@@ -114,7 +114,7 @@ TEST(EventHub, EventHubConnectorConnected) {
 }
 
 TEST(EventHub, EventHubConnectorUnsubscribe) {
-  EventHub EH;
+  rogue::EventHub EH;
 
   DummyEntity DE;
   DE.setEventHub(&EH);

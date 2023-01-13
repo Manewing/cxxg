@@ -1,17 +1,17 @@
-#include "Level.h"
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
+#include <rogue/Level.h>
+#include <rogue/Components/Level.h>
+#include <rogue/Components/Player.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Systems/AgilitySystem.h>
+#include <rogue/Systems/AttackAISystem.h>
+#include <rogue/Systems/DeathSystem.h>
+#include <rogue/Systems/PlayerSystem.h>
+#include <rogue/Systems/RegenSystem.h>
+#include <rogue/Systems/WanderAISystem.h>
 
-#include "Components/Level.h"
-#include "Components/Player.h"
-#include "Components/Transform.h"
-
-#include "Systems/AgilitySystem.h"
-#include "Systems/AttackAISystem.h"
-#include "Systems/DeathSystem.h"
-#include "Systems/PlayerSystem.h"
-#include "Systems/RegenSystem.h"
-#include "Systems/WanderAISystem.h"
+namespace rogue {
 
 Level::Level(int LevelId, const std::vector<std::string> &Layers,
              ymir::Size2d<int> Size)
@@ -228,4 +228,6 @@ void Level::updateEntityPosCache() {
     // FIXME check not overlapping
     EntityPosCache.setTile(Pos, Entity);
   }
+}
+
 }

@@ -1,4 +1,6 @@
-#include "Components/Stats.h"
+#include <rogue/Components/Stats.h>
+
+namespace rogue {
 
 StatValue ValueRegenCompBase::restore(StatValue Amount) {
   Value = std::min(Value + Amount, MaxValue);
@@ -8,4 +10,6 @@ StatValue ValueRegenCompBase::restore(StatValue Amount) {
 StatValue ValueRegenCompBase::reduce(StatValue Amount) {
   Value = std::max(Value - Amount, 0.0);
   return Value;
+}
+
 }

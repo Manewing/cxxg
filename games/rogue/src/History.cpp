@@ -1,6 +1,8 @@
-#include "History.h"
-#include "Game.h"
-#include "Systems/DeathSystem.h"
+#include <rogue/History.h>
+#include <rogue/Game.h>
+#include <rogue/Systems/DeathSystem.h>
+
+namespace rogue {
 
 HistoryMessageAssembler::HistoryMessageAssembler(History &Hist,
                                                  cxxg::RowAccessor Rw)
@@ -56,4 +58,6 @@ void EventHistoryWriter::onEntityDiedEvent(const EntityDiedEvent &EDE) {
 
 void EventHistoryWriter::onDebugMessageEvent(const DebugMessageEvent &DbgEv) {
   Hist.info() << cxxg::types::Color::GREEN << "Debug: " << DbgEv.Message.str();
+}
+
 }

@@ -1,4 +1,6 @@
-#include "ItemDatabase.h"
+#include <rogue/ItemDatabase.h>
+
+namespace rogue {
 
 static void fillItemDatabase(ItemDatabase &DB) {
   const int MaxStackSize = 99;
@@ -32,4 +34,6 @@ void ItemDatabase::addItemProto(int ItemId, const ItemPrototype &ItemProto) {
 Item ItemDatabase::createItem(int ItemId, int StackSize) const {
   const auto &Proto = ItemProtos.at(ItemId);
   return Item(Proto, StackSize);
+}
+
 }

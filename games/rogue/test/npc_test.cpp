@@ -1,11 +1,13 @@
-#include "LevelGenerator.h"
-#include "NPCEntity.h"
-#include "Renderer.h"
+#include <rogue/LevelGenerator.h>
+#include <rogue/NPCEntity.h>
+#include <rogue/Renderer.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 #include <memory>
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
+
+using namespace rogue;
 
 template <typename T, typename U>
 cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {

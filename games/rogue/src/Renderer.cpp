@@ -1,9 +1,10 @@
-#include "Renderer.h"
-#include "Level.h"
+#include <rogue/Renderer.h>
+#include <rogue/Level.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
 #include <ymir/Algorithm/LineOfSight.hpp>
 
-#include "Components/Transform.h"
-#include "Components/Visual.h"
+namespace rogue {
 
 Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
     : L(L), VisibleMap(Size) {
@@ -80,4 +81,6 @@ void Renderer::renderEntities() {
   View.each([this](const auto &Pos, const auto &T) {
     RenderedLevelMap.getTile(Pos) = T.T;
   });
+}
+
 }

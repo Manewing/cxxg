@@ -1,15 +1,17 @@
-#include "Game.h"
-#include "Components/AI.h"
-#include "Components/Items.h"
-#include "Components/Player.h"
-#include "Components/Stats.h"
-#include "Components/Transform.h"
-#include "Renderer.h"
+#include <rogue/Game.h>
+#include <rogue/Components/AI.h>
+#include <rogue/Components/Items.h>
+#include <rogue/Components/Player.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Renderer.h>
 #include <cxxg/Row.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Types.h>
 #include <cxxg/Utils.h>
 #include <memory>
+
+namespace rogue {
 
 template <typename T, typename U>
 cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
@@ -199,4 +201,6 @@ void Game::tryInteract() {
   auto &Interactable =
       CurrentLevel->Reg.get<InteractableComp>(InteractableEntity);
   PC.CurrentInteraction = Interactable.Action;
+}
+
 }

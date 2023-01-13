@@ -1,6 +1,6 @@
-#include "LevelGenerator.h"
-#include "NPCEntity.h"
-#include "Renderer.h"
+#include <rogue/LevelGenerator.h>
+#include <rogue/NPCEntity.h>
+#include <rogue/Renderer.h>
 #include <cxxg/Game.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
@@ -9,6 +9,8 @@
 #include <ymir/Map.hpp>
 
 #include "perlin_noise.h"
+
+using namespace rogue;
 
 template <typename T, typename U>
 cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {

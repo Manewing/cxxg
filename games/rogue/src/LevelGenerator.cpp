@@ -1,6 +1,7 @@
-#include "LevelGenerator.h"
-#include "Context.h"
-#include "Parser.h"
+#include <rogue/Components/Entity.h>
+#include <rogue/Context.h>
+#include <rogue/LevelGenerator.h>
+#include <rogue/Parser.h>
 #include <ymir/Dungeon/BuilderPass.hpp>
 #include <ymir/Dungeon/CaveRoomGenerator.hpp>
 #include <ymir/Dungeon/CelAltMapFiller.hpp>
@@ -14,7 +15,7 @@
 #include <ymir/Dungeon/StartEndPlacer.hpp>
 #include <ymir/MapIo.hpp>
 
-#include "Components/Entity.h"
+namespace rogue {
 
 namespace {
 
@@ -134,3 +135,5 @@ void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
     break;
   }
 }
+
+} // namespace rogue

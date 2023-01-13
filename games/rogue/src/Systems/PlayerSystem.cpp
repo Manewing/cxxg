@@ -1,13 +1,15 @@
-#include "Systems/PlayerSystem.h"
-#include "Components/AI.h"
-#include "Components/Player.h"
-#include "Components/Stats.h"
-#include "Components/Transform.h"
-#include "Components/Visual.h"
-#include "Level.h"
+#include <rogue/Systems/PlayerSystem.h>
+#include <rogue/Components/AI.h>
+#include <rogue/Components/Player.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
+#include <rogue/Level.h>
 #include <entt/entt.hpp>
 
-#include "History.h"
+#include <rogue/History.h>
+
+namespace rogue {
 
 PlayerSystem::PlayerSystem(Level &L) : System(L.Reg), L(L) {}
 
@@ -48,4 +50,6 @@ void PlayerSystem::update() {
       publish(DebugMessageEvent() << "Can't move");
     }
   });
+}
+
 }

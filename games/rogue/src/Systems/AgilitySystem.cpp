@@ -1,9 +1,11 @@
-#include "Systems/AgilitySystem.h"
-#include "Components/Stats.h"
+#include <rogue/Systems/AgilitySystem.h>
+#include <rogue/Components/Stats.h>
 #include <entt/entt.hpp>
 
 static constexpr float AgilityPerDex = 2.73f;
 static constexpr float APPerAgilityPoint = 0.12f;
+
+namespace rogue {
 
 void AgilitySystem::update() {
   auto StatsView = Reg.view<const StatsComp, AgilityComp>();
@@ -14,4 +16,6 @@ void AgilitySystem::update() {
   View.each([](auto &Ag) {
     Ag.gainAP(static_cast<unsigned>(APPerAgilityPoint * Ag.Agility));
   });
+}
+
 }

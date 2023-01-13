@@ -1,12 +1,14 @@
-#include "Systems/WanderAISystem.h"
-#include "History.h"
-#include "Level.h"
+#include <rogue/Systems/WanderAISystem.h>
+#include <rogue/History.h>
+#include <rogue/Level.h>
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
 #include <ymir/Noise.hpp>
 
 // FIXME move this, also should this be based on the level seed?
 static std::random_device RandomEngine;
+
+namespace rogue {
 
 void WanderAISystem::update() {
   auto View = Reg.view<PositionComp, WanderAIComp, AgilityComp>();
@@ -124,4 +126,6 @@ ymir::Point2d<int> WanderAISystem::chaseTarget(const ymir::Point2d<int> AtPos,
     return TargetPos;
   }
   return AtPos;
+}
+
 }

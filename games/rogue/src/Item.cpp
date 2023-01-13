@@ -1,6 +1,7 @@
-#include "Item.h"
+#include <rogue/Components/Stats.h>
+#include <rogue/Item.h>
 
-#include "Components/Stats.h"
+namespace rogue {
 
 HealItemEffect::HealItemEffect(StatValue Amount) : Amount(Amount) {}
 
@@ -58,3 +59,5 @@ Item::Item(const ItemPrototype &Proto, int StackSize)
     : StackSize(StackSize), Proto(&Proto) {}
 
 const ItemPrototype &Item::getProto() const { return *Proto; }
+
+} // namespace rogue

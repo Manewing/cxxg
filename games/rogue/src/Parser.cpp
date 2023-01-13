@@ -1,8 +1,10 @@
-#include "Parser.h"
-#include "Level.h"
+#include <rogue/Parser.h>
+#include <rogue/Level.h>
 #include <cxxg/Types.h>
 #include <ymir/Config/Parser.hpp>
 #include <ymir/Config/Types.hpp>
+
+namespace rogue {
 
 cxxg::types::ColoredChar parseColoredChar(const std::string &Value) {
   static const std::regex Regex("\\{('..?'), (\"#[0-9a-fA-F]+\")\\}");
@@ -34,4 +36,6 @@ ymir::Config::AnyDict loadConfigurationFile(const std::filesystem::path &File) {
   registerParserTypes(CfgParser);
   CfgParser.parse(File);
   return CfgParser.getCfg();
+}
+
 }

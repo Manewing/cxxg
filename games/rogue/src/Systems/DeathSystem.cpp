@@ -1,10 +1,12 @@
-#include "Systems/DeathSystem.h"
-#include "Components/Entity.h"
-#include "Components/Items.h"
-#include "Components/Player.h"
-#include "Components/Stats.h"
-#include "Components/Transform.h"
+#include <rogue/Systems/DeathSystem.h>
+#include <rogue/Components/Entity.h>
+#include <rogue/Components/Items.h>
+#include <rogue/Components/Player.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
 #include <entt/entt.hpp>
+
+namespace rogue {
 
 void DeathSystem::update() {
   auto View = Reg.view<const HealthComp, const PositionComp>();
@@ -31,4 +33,6 @@ void DeathSystem::update() {
       Reg.destroy(Entity);
     }
   });
+}
+
 }

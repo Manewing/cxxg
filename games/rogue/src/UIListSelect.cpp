@@ -1,5 +1,7 @@
-#include "UIListSelect.h"
+#include <rogue/UIListSelect.h>
 #include <cxxg/Screen.h>
+
+namespace rogue {
 
 UIListSelect::UIListSelect(std::string Hdr, unsigned Width, unsigned MaxRows)
     : Header(std::move(Hdr)), Width(Width), MaxRows(MaxRows) {}
@@ -78,4 +80,6 @@ void UIListSelect::drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
   }
   (void)Width;
   Scr[Pos.Y][Pos.X + 2] << Element;
+}
+
 }

@@ -1,11 +1,12 @@
-#include "UIController.h"
-#include "History.h"
-#include "Inventory.h"
-#include "UIListSelect.h"
+#include <rogue/UIController.h>
+#include <rogue/History.h>
+#include <rogue/Inventory.h>
+#include <rogue/UIListSelect.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <rogue/Components/Items.h>
 
-#include "Components/Items.h"
+namespace rogue {
 
 InventoryUIControllerBase::InventoryUIControllerBase(Inventory &Inv,
                                                      entt::entity Entity,
@@ -243,4 +244,6 @@ void UIController::setLootUI(Inventory &Inv, entt::entity Entity,
 
 void UIController::setHistoryUI(History &Hist) {
   ActiveWidget.reset(new HistoryUIController(Hist));
+}
+
 }

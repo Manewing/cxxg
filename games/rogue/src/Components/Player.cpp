@@ -1,11 +1,12 @@
-#include "Components/Player.h"
-#include "Components/AI.h"
-#include "Components/Items.h"
-#include "Components/Level.h"
-#include "Components/Stats.h"
-#include "Components/Transform.h"
-#include "Components/Visual.h"
+#include <rogue/Components/AI.h>
+#include <rogue/Components/Items.h>
+#include <rogue/Components/Level.h>
+#include <rogue/Components/Player.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
 
+namespace rogue {
 namespace {
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
@@ -42,9 +43,10 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
 entt::entity PlayerComp::createPlayer(entt::registry &Reg,
                                       const std::string &Name,
                                       ymir::Point2d<int> Pos) {
-  return ::createPlayer(Reg, PlayerComp{}, PositionComp{Pos}, HealthComp{},
-                        NameComp{Name}, LineOfSightComp{}, AgilityComp{},
-                        MeleeAttackComp{}, MovementComp{}, InventoryComp{});
+  return ::rogue::createPlayer(Reg, PlayerComp{}, PositionComp{Pos},
+                               HealthComp{}, NameComp{Name}, LineOfSightComp{},
+                               AgilityComp{}, MeleeAttackComp{}, MovementComp{},
+                               InventoryComp{});
 }
 
 entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
@@ -52,7 +54,7 @@ entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
   entt::entity PlayerEntity = entt::null;
   auto View = RegFrom.view<PlayerComp>();
   for (auto Entity : View) {
-    PlayerEntity = ::createPlayer(
+    PlayerEntity = ::rogue::createPlayer(
         RegTo, RegFrom.get<PlayerComp>(Entity),
         RegFrom.get<PositionComp>(Entity), RegFrom.get<HealthComp>(Entity),
         RegFrom.get<NameComp>(Entity), RegFrom.get<LineOfSightComp>(Entity),
@@ -77,3 +79,5 @@ void PlayerComp::removePlayer(entt::registry &Reg) {
     Reg.destroy(Entity);
   }
 }
+
+} // namespace rogue

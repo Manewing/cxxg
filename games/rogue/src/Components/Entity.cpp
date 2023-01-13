@@ -1,14 +1,15 @@
-#include "Components/Entity.h"
-#include "Components/AI.h"
-#include "Components/Items.h"
-#include "Components/Level.h"
-#include "Components/Player.h"
-#include "Components/Stats.h"
-#include "Components/Transform.h"
-#include "Components/Visual.h"
+#include <rogue/Components/AI.h>
+#include <rogue/Components/Entity.h>
+#include <rogue/Components/Items.h>
+#include <rogue/Components/Level.h>
+#include <rogue/Components/Player.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
+#include <rogue/Context.h>
+#include <rogue/Game.h>
 
-#include "Context.h"
-#include "Game.h"
+namespace rogue {
 
 void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                  const std::string &Name) {
@@ -94,3 +95,5 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos) {
                             G.UICtrl.setLootUI(Inv, Et, Reg);
                           }});
 }
+
+} // namespace rogue

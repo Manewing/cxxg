@@ -1,14 +1,13 @@
 #include <cxxg/Utils.h>
 #include <cxxg/Screen.h>
 #include <stdexcept>
-
-#include "Game.h"
+#include <rogue/Game.h>
 
 int main() {
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
-  Game GameInstance(Scr);
+  rogue::Game GameInstance(Scr);
   try {
     GameInstance.initialize();
     GameInstance.run();

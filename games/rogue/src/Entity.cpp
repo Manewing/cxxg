@@ -1,5 +1,5 @@
-#include "Entity.h"
-#include "Level.h"
+#include <rogue/Entity.h>
+#include <rogue/Level.h>
 #include <random>
 #include <sstream>
 #include <ymir/Algorithm/Dijkstra.hpp>
@@ -7,6 +7,8 @@
 #include <ymir/Noise.hpp>
 
 #include <ymir/Algorithm/DijkstraIo.hpp>
+
+namespace rogue {
 
 // FIXME move this, also should this be based on the level seed?
 static std::random_device RandomEngine;
@@ -71,4 +73,6 @@ void EnemyEntity::chasePlayer(Level &L) {
 PlayerEntity::PlayerEntity(ymir::Point2d<int> Pos)
     : Entity(Pos, PlayerTile, "Player") {
   Damage = 45;
+}
+
 }

@@ -7,34 +7,34 @@ if(EXISTS "${YMIR_INSTALL}/include/ymir")
 
 
 set(HEADER_FILES
-  include/Components/AI.h
-  include/Components/Entity.h
-  include/Components/Level.h
-  include/Components/Player.h
-  include/Components/Stats.h
-  include/Components/Transform.h
-  include/Components/Visual.h
-  include/Context.h
-  include/Entity.h
-  include/EventHub.h
-  include/Game.h
-  include/History.h
-  include/Inventory.h
-  include/Item.h
-  include/ItemDatabase.h
-  include/Level.h
-  include/LevelGenerator.h
-  include/NPCEntity.h
-  include/Parser.h
-  include/Renderer.h
-  include/Systems/AttackAISystem.h
-  include/Systems/DeathSystem.h
-  include/Systems/PlayerSystem.h
-  include/Systems/RegenSystem.h
-  include/Systems/System.h
-  include/Systems/WanderAISystem.h
-  include/UIController.h
-  include/UIListSelect.h
+  include/rogue/Components/AI.h
+  include/rogue/Components/Entity.h
+  include/rogue/Components/Level.h
+  include/rogue/Components/Player.h
+  include/rogue/Components/Stats.h
+  include/rogue/Components/Transform.h
+  include/rogue/Components/Visual.h
+  include/rogue/Context.h
+  include/rogue/Entity.h
+  include/rogue/EventHub.h
+  include/rogue/Game.h
+  include/rogue/History.h
+  include/rogue/Inventory.h
+  include/rogue/Item.h
+  include/rogue/ItemDatabase.h
+  include/rogue/Level.h
+  include/rogue/LevelGenerator.h
+  include/rogue/NPCEntity.h
+  include/rogue/Parser.h
+  include/rogue/Renderer.h
+  include/rogue/Systems/AttackAISystem.h
+  include/rogue/Systems/DeathSystem.h
+  include/rogue/Systems/PlayerSystem.h
+  include/rogue/Systems/RegenSystem.h
+  include/rogue/Systems/System.h
+  include/rogue/Systems/WanderAISystem.h
+  include/rogue/UIController.h
+  include/rogue/UIListSelect.h
 )
 
 set(SOURCE_FILES

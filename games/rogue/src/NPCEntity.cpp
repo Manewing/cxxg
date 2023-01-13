@@ -1,6 +1,8 @@
-#include "NPCEntity.h"
-#include "Level.h"
+#include <rogue/NPCEntity.h>
+#include <rogue/Level.h>
 #include <ymir/Algorithm/Dijkstra.hpp>
+
+namespace rogue {
 
 std::ostream &operator<<(std::ostream &Out, const PhysState &PS) {
   Out << "PhysState{Thirst=" << PS.Thirst << ", Hunger=" << PS.Hunger
@@ -183,4 +185,6 @@ void NPCEntity::searchObject(
   } else {
     // FIXME should never be reached
   }
+}
+
 }

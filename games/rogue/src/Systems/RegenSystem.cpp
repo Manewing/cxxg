@@ -1,5 +1,5 @@
-#include "Systems/RegenSystem.h"
-#include "Components/Stats.h"
+#include <rogue/Systems/RegenSystem.h>
+#include <rogue/Components/Stats.h>
 #include <entt/entt.hpp>
 
 static constexpr float HealthPerVit = 9.1f;
@@ -25,6 +25,8 @@ void runRegenUpdate(entt::registry &Reg) {
 
 } // namespace
 
+namespace rogue {
+
 void RegenSystem::update() {
   auto StatsView = Reg.view<const StatsComp, HealthComp, ManaComp>();
   StatsView.each([](const auto &St, auto &Health, auto &Mana) {
@@ -33,4 +35,6 @@ void RegenSystem::update() {
   });
   runRegenUpdate<HealthComp>(Reg);
   runRegenUpdate<ManaComp>(Reg);
+}
+
 }

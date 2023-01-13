@@ -1,10 +1,12 @@
-#include "Systems/AttackAISystem.h"
-#include "Components/AI.h"
-#include "Components/Stats.h"
-#include "Components/Transform.h"
-#include "Components/Visual.h"
+#include <rogue/Systems/AttackAISystem.h>
+#include <rogue/Components/AI.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
 
-#include "History.h"
+#include <rogue/History.h>
+
+namespace rogue {
 
 void AttackAISystem::update() {
   auto View = Reg.view<const PositionComp, AttackAIComp, const MeleeAttackComp,
@@ -39,4 +41,6 @@ void AttackAISystem::update() {
       }
     });
   });
+}
+
 }
