@@ -22,9 +22,9 @@ add_test(unittest_${ARGS_NAME} ${TARGET})
 
 target_link_libraries(${TARGET}
   cxxg
-  ${GTEST_LIBRARIES}
-  ${GTEST_MAIN_LIBRARY}
-  ${GMOCK_LIBRARIES}
+  gtest
+  gtest_main
+  gmock
   ${ARGS_LIBRARIES}
   pthread
 )

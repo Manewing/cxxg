@@ -1,7 +1,5 @@
 set(TARGET rogue)
 
-add_subdirectory(entt)
-
 set(YMIR_INSTALL "" CACHE STRING "ymir install location")
 message("YMIR_INSTALL: ${YMIR_INSTALL}")
 

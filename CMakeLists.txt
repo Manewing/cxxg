@@ -15,6 +15,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(games)
 add_subdirectory(lib)
+add_subdirectory(third-party)
 
 option(BUILD_TESTS "If to build unit tests (need google-test)" OFF)
 if (BUILD_TESTS)

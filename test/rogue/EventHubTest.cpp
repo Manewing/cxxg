@@ -40,8 +40,8 @@ public:
 
 class EventListenerMock : public EventListener {
 public:
-  MOCK_METHOD1(onDummyEventA, void(const DummyEventA &A));
-  MOCK_METHOD1(onDummyEventB, void(const DummyEventB &B));
+  MOCK_METHOD(void, onDummyEventA, (const DummyEventA &A), (final));
+  MOCK_METHOD(void, onDummyEventB, (const DummyEventB &B), (final));
 };
 
 class DummyEntity : public EventHubConnector {
