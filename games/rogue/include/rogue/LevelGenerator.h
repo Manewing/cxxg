@@ -1,11 +1,11 @@
 #ifndef ROGUE_LEVEL_GENERATOR_H
 #define ROGUE_LEVEL_GENERATOR_H
 
-#include <rogue/Level.h>
-#include <rogue/Tile.h>
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <rogue/Level.h>
+#include <rogue/Tile.h>
 #include <vector>
 #include <ymir/Types.hpp>
 
@@ -37,6 +37,6 @@ protected:
   GameContext *Ctx = nullptr;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_LEVEL_GENERATOR_H

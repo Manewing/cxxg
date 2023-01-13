@@ -10,14 +10,12 @@ namespace cxxg {
 
 namespace types {
 
-template <class... Ts> struct Overloaded : Ts... {
-  using Ts::operator()...;
-};
+template <class... Ts> struct Overloaded : Ts... { using Ts::operator()...; };
 template <class... Ts> Overloaded(Ts...) -> Overloaded<Ts...>;
 
 template <typename T, typename... Ts>
-using EnableIfOfType = std::enable_if<
-    std::disjunction<std::is_same<T, Ts>...>::value>;
+using EnableIfOfType =
+    std::enable_if<std::disjunction<std::is_same<T, Ts>...>::value>;
 
 /// Position in rows and columns
 struct Position {
@@ -198,19 +196,19 @@ template <typename T>
 using IsTermColor = EnableIfOfType<T, NoColor, DefaultColor, RgbColor>;
 std::ostream &operator<<(std::ostream &Out, const TermColor &TC);
 
-template <typename T, typename IsTermColor<T>::type* = nullptr>
+template <typename T, typename IsTermColor<T>::type * = nullptr>
 inline bool operator==(const TermColor &Lhs, const T &Rhs) noexcept {
   return std::holds_alternative<T>(Lhs) && std::get<T>(Lhs) == Rhs;
 }
-template <typename T, typename IsTermColor<T>::type* = nullptr>
+template <typename T, typename IsTermColor<T>::type * = nullptr>
 inline bool operator==(const T &Lhs, const TermColor &Rhs) noexcept {
   return (Rhs == Lhs);
 }
-template <typename T, typename IsTermColor<T>::type* = nullptr>
+template <typename T, typename IsTermColor<T>::type * = nullptr>
 inline bool operator!=(const TermColor &Lhs, const T &Rhs) noexcept {
   return !(Lhs == Rhs);
 }
-template <typename T, typename IsTermColor<T>::type* = nullptr>
+template <typename T, typename IsTermColor<T>::type * = nullptr>
 inline bool operator!=(const T &Lhs, const TermColor &Rhs) noexcept {
   return (Rhs != Lhs);
 }

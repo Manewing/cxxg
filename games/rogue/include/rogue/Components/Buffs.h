@@ -23,6 +23,6 @@ struct HealthRegenBuffComp {
   StatValue RegenAmount = 0.1;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_BUFFS_H

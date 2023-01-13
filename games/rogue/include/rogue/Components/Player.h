@@ -7,7 +7,6 @@
 #include <string>
 #include <ymir/Types.hpp>
 
-
 namespace rogue {
 class Game;
 }
@@ -39,6 +38,6 @@ public:
   std::optional<Interaction> CurrentInteraction;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_PLAYER_H

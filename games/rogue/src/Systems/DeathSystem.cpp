@@ -1,10 +1,10 @@
-#include <rogue/Systems/DeathSystem.h>
+#include <entt/entt.hpp>
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
-#include <entt/entt.hpp>
+#include <rogue/Systems/DeathSystem.h>
 
 namespace rogue {
 
@@ -35,4 +35,4 @@ void DeathSystem::update() {
   });
 }
 
-}
+} // namespace rogue

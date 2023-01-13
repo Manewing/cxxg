@@ -41,4 +41,4 @@ void Inventory::useItem(const entt::entity &Entity, entt::registry &Reg,
 
 bool Inventory::empty() const { return Items.empty(); }
 
-}
+} // namespace rogue

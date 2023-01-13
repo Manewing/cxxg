@@ -14,6 +14,6 @@ struct NameComp {
   std::string Name;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_VISUAL_H

@@ -1,5 +1,5 @@
-#include <rogue/NPCEntity.h>
 #include <rogue/Level.h>
+#include <rogue/NPCEntity.h>
 #include <ymir/Algorithm/Dijkstra.hpp>
 
 namespace rogue {
@@ -187,4 +187,4 @@ void NPCEntity::searchObject(
   }
 }
 
-}
+} // namespace rogue

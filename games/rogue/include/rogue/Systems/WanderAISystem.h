@@ -2,12 +2,12 @@
 #define ROGUE_SYSTEMS_WANDER_AI_SYSTEM_H
 
 #include <entt/entt.hpp>
-#include <ymir/Types.hpp>
 #include <rogue/Components/AI.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/EventHub.h>
 #include <rogue/Systems/System.h>
+#include <ymir/Types.hpp>
 
 namespace rogue {
 class Level;
@@ -35,6 +35,6 @@ private:
   Level &L;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_SYSTEMS_AGILITY_SYSTEM_H

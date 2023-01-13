@@ -1,6 +1,8 @@
 #ifndef ROGUE_GAME_H
 #define ROGUE_GAME_H
 
+#include <cxxg/Game.h>
+#include <memory>
 #include <rogue/Context.h>
 #include <rogue/EventHub.h>
 #include <rogue/History.h>
@@ -8,8 +10,6 @@
 #include <rogue/Level.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/UIController.h>
-#include <cxxg/Game.h>
-#include <memory>
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
 #include <ymir/Types.hpp>
@@ -45,6 +45,6 @@ public: // FIXME
   UIController UICtrl;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_GAME_H

@@ -101,6 +101,6 @@ protected:
   const ItemPrototype *Proto = nullptr;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_ITEM_H

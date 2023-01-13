@@ -1,8 +1,8 @@
 #ifndef ROGUE_RENDERER_H
 #define ROGUE_RENDERER_H
 
-#include <rogue/Tile.h>
 #include <cxxg/Types.h>
+#include <rogue/Tile.h>
 #include <ymir/Map.hpp>
 #include <ymir/Types.hpp>
 

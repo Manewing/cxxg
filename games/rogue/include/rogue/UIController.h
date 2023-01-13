@@ -13,8 +13,7 @@ class Screen;
 namespace rogue {
 class History;
 class Inventory;
-}
-
+} // namespace rogue
 
 namespace rogue {
 
@@ -92,6 +91,6 @@ public:
   cxxg::Screen &Scr;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_UI_CONTROLLER_H

@@ -1,10 +1,10 @@
-#include <rogue/UIController.h>
-#include <rogue/History.h>
-#include <rogue/Inventory.h>
-#include <rogue/UIListSelect.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 #include <rogue/Components/Items.h>
+#include <rogue/History.h>
+#include <rogue/Inventory.h>
+#include <rogue/UIController.h>
+#include <rogue/UIListSelect.h>
 
 namespace rogue {
 
@@ -206,10 +206,9 @@ void UIController::draw(int LevelIdx, int Health,
   auto ScrSize = Scr.getSize();
 
   // Draw UI overlay
-  Scr[0][0] << cxxg::types::Color::NONE.underline() << "Rogue v0.0 [FLOOR]: "
-            << (LevelIdx + 1)
-            << " [HEALTH]: "
-            << Health;
+  Scr[0][0] << cxxg::types::Color::NONE.underline()
+            << "Rogue v0.0 [FLOOR]: " << (LevelIdx + 1)
+            << " [HEALTH]: " << Health;
 
   if (ActiveWidget) {
     ActiveWidget->draw(Scr);
@@ -246,4 +245,4 @@ void UIController::setHistoryUI(History &Hist) {
   ActiveWidget.reset(new HistoryUIController(Hist));
 }
 
-}
+} // namespace rogue

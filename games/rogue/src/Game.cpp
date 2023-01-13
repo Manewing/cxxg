@@ -1,15 +1,15 @@
-#include <rogue/Game.h>
-#include <rogue/Components/AI.h>
-#include <rogue/Components/Items.h>
-#include <rogue/Components/Player.h>
-#include <rogue/Components/Stats.h>
-#include <rogue/Components/Transform.h>
-#include <rogue/Renderer.h>
 #include <cxxg/Row.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Types.h>
 #include <cxxg/Utils.h>
 #include <memory>
+#include <rogue/Components/AI.h>
+#include <rogue/Components/Items.h>
+#include <rogue/Components/Player.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Game.h>
+#include <rogue/Renderer.h>
 
 namespace rogue {
 
@@ -203,4 +203,4 @@ void Game::tryInteract() {
   PC.CurrentInteraction = Interactable.Action;
 }
 
-}
+} // namespace rogue

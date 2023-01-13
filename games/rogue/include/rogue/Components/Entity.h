@@ -1,8 +1,8 @@
 #ifndef ROGUE_COMPONENTS_ENTITY_H
 #define ROGUE_COMPONENTS_ENTITY_H
 
-#include <rogue/Tile.h>
 #include <entt/entt.hpp>
+#include <rogue/Tile.h>
 #include <string>
 #include <ymir/Types.hpp>
 
@@ -18,6 +18,6 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T);
 
 void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos);
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_ENTITY_H

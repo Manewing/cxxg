@@ -1,18 +1,18 @@
 #ifndef ROGUE_ENTITY_H
 #define ROGUE_ENTITY_H
 
-#include <rogue/EventHub.h>
-#include <rogue/Inventory.h>
-#include <rogue/Tile.h>
 #include <exception>
 #include <functional>
 #include <optional>
+#include <rogue/EventHub.h>
+#include <rogue/Inventory.h>
+#include <rogue/Tile.h>
 #include <ymir/Types.hpp>
 
 namespace rogue {
 class Level;
 class Entity;
-}
+} // namespace rogue
 
 namespace rogue {
 
@@ -112,6 +112,6 @@ public:
       : Entity(Pos, T, "Level End") {}
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_ENTITY_H

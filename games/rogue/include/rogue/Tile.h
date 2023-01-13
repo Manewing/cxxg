@@ -25,6 +25,6 @@ inline std::ostream &operator<<(std::ostream &Out, Tile &T) {
   return Out;
 }
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_LEVEL_H

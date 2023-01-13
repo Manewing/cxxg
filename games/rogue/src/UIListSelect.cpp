@@ -1,5 +1,5 @@
-#include <rogue/UIListSelect.h>
 #include <cxxg/Screen.h>
+#include <rogue/UIListSelect.h>
 
 namespace rogue {
 
@@ -18,9 +18,7 @@ void UIListSelect::selectElement(std::size_t ElemIdx) {
   }
 }
 
-std::size_t UIListSelect::getSelectedElement() const {
-  return SelectedElemIdx;
-}
+std::size_t UIListSelect::getSelectedElement() const { return SelectedElemIdx; }
 
 void UIListSelect::selectNext() { selectElement(SelectedElemIdx + 1); }
 
@@ -82,4 +80,4 @@ void UIListSelect::drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
   Scr[Pos.Y][Pos.X + 2] << Element;
 }
 
-}
+} // namespace rogue

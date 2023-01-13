@@ -19,7 +19,7 @@ static void fillItemDatabase(ItemDatabase &DB) {
 
   };
 
-  for (const auto &Proto: ItemProtos) {
+  for (const auto &Proto : ItemProtos) {
     DB.addItemProto(Proto.ItemId, Proto);
   }
 }
@@ -36,4 +36,4 @@ Item ItemDatabase::createItem(int ItemId, int StackSize) const {
   return Item(Proto, StackSize);
 }
 
-}
+} // namespace rogue

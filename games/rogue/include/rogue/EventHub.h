@@ -75,6 +75,6 @@ private:
   EventHub *Hub = nullptr;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_EVENT_HUB_H

@@ -1,9 +1,9 @@
 #ifndef TETRIS_H
 #define TETRIS_H
 
-#include <random>
 #include <cxxg/Game.h>
 #include <cxxg/Types.h>
+#include <random>
 
 #include <Field.h>
 #include <Tetromino.h>

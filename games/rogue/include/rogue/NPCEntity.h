@@ -57,6 +57,6 @@ public:
   ActionState CurrentActionState = ActionState::IDLE;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_NPC_ENTITY_H

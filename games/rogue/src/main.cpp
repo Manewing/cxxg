@@ -1,7 +1,7 @@
-#include <cxxg/Utils.h>
 #include <cxxg/Screen.h>
-#include <stdexcept>
+#include <cxxg/Utils.h>
 #include <rogue/Game.h>
+#include <stdexcept>
 
 int main() {
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());

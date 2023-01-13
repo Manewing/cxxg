@@ -1,6 +1,6 @@
-#include <rogue/Parser.h>
-#include <rogue/Level.h>
 #include <cxxg/Types.h>
+#include <rogue/Level.h>
+#include <rogue/Parser.h>
 #include <ymir/Config/Parser.hpp>
 #include <ymir/Config/Types.hpp>
 
@@ -24,7 +24,6 @@ Tile parseTile(const std::string &Value) {
   return Tile{ColoredChar};
 }
 
-
 void registerParserTypes(ymir::Config::Parser &P) {
   P.registerType("CC", parseColoredChar);
   P.registerType("Tile", parseTile);
@@ -38,4 +37,4 @@ ymir::Config::AnyDict loadConfigurationFile(const std::filesystem::path &File) {
   return CfgParser.getCfg();
 }
 
-}
+} // namespace rogue

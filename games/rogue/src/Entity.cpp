@@ -1,6 +1,6 @@
+#include <random>
 #include <rogue/Entity.h>
 #include <rogue/Level.h>
-#include <random>
 #include <sstream>
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
@@ -43,9 +43,7 @@ void Entity::attackEntity(Entity &Other) {
   publish(EntityAttackEvent{{}, *this, Other, Damage});
 }
 
-void Entity::wander(Level &L) {
-  (void)L;
-}
+void Entity::wander(Level &L) { (void)L; }
 
 void Entity::heal(unsigned Amount) {
   Health = std::min(Health + Amount, MaxHealth);
@@ -66,13 +64,11 @@ bool EnemyEntity::checkForPlayer(Level &L) {
   return false;
 }
 
-void EnemyEntity::chasePlayer(Level &L) {
-  (void)L;
-}
+void EnemyEntity::chasePlayer(Level &L) { (void)L; }
 
 PlayerEntity::PlayerEntity(ymir::Point2d<int> Pos)
     : Entity(Pos, PlayerTile, "Player") {
   Damage = 45;
 }
 
-}
+} // namespace rogue

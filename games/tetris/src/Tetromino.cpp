@@ -53,15 +53,7 @@ static std::vector<std::string> T = {
     "....",
 };
 
-static constexpr std::array Shapes = {
-    &LL,
-    &RL,
-    &Square,
-    &Line,
-    &ZR,
-    &ZL,
-    &T
-};
+static constexpr std::array Shapes = {&LL, &RL, &Square, &Line, &ZR, &ZL, &T};
 
 }; // namespace Shape
 

@@ -11,6 +11,6 @@ struct LevelEndComp {
   int NextLevelId = -1;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_LEVEL_H

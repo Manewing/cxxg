@@ -23,6 +23,6 @@ struct MovementComp {
 
 struct CollisionComp {};
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_TRANSFORM_H

@@ -52,6 +52,6 @@ struct MeleeAttackComp {
   StatValue APCost = 5;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_STATS_H

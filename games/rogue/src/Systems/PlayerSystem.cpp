@@ -1,11 +1,11 @@
-#include <rogue/Systems/PlayerSystem.h>
+#include <entt/entt.hpp>
 #include <rogue/Components/AI.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/Level.h>
-#include <entt/entt.hpp>
+#include <rogue/Systems/PlayerSystem.h>
 
 #include <rogue/History.h>
 
@@ -16,8 +16,8 @@ PlayerSystem::PlayerSystem(Level &L) : System(L.Reg), L(L) {}
 void PlayerSystem::update() {
   auto View =
       Reg.view<PlayerComp, PositionComp, const MeleeAttackComp, MovementComp>();
-  View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp, const auto &MA,
-                   auto &MC) {
+  View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp,
+                   const auto &MA, auto &MC) {
     if (MC.Dir == ymir::Dir2d::NONE) {
       return;
     }
@@ -52,4 +52,4 @@ void PlayerSystem::update() {
   });
 }
 
-}
+} // namespace rogue

@@ -1,5 +1,5 @@
-#include <rogue/History.h>
 #include <rogue/Game.h>
+#include <rogue/History.h>
 #include <rogue/Systems/DeathSystem.h>
 
 namespace rogue {
@@ -60,4 +60,4 @@ void EventHistoryWriter::onDebugMessageEvent(const DebugMessageEvent &DbgEv) {
   Hist.info() << cxxg::types::Color::GREEN << "Debug: " << DbgEv.Message.str();
 }
 
-}
+} // namespace rogue

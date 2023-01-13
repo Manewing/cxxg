@@ -1,6 +1,6 @@
-#include <rogue/Systems/WanderAISystem.h>
 #include <rogue/History.h>
 #include <rogue/Level.h>
+#include <rogue/Systems/WanderAISystem.h>
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
 #include <ymir/Noise.hpp>
@@ -116,8 +116,8 @@ ymir::Point2d<int> WanderAISystem::chaseTarget(const ymir::Point2d<int> AtPos,
   auto PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
       DM, AtPos - TPos.Pos + DMMidPos, ymir::FourTileDirections<int>(), 1);
   if (PathToTarget.empty()) {
-    publish(DebugMessageEvent() << "can't find path from " << AtPos << " to "
-                                << TPos.Pos);
+    publish(DebugMessageEvent()
+            << "can't find path from " << AtPos << " to " << TPos.Pos);
     return AtPos;
   }
   auto TargetPos = PathToTarget.at(0) + TPos.Pos - DMMidPos;
@@ -128,4 +128,4 @@ ymir::Point2d<int> WanderAISystem::chaseTarget(const ymir::Point2d<int> AtPos,
   return AtPos;
 }
 
-}
+} // namespace rogue

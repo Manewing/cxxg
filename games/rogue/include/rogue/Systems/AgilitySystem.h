@@ -12,6 +12,6 @@ public:
   void update() override;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_SYSTEMS_AGILITY_SYSTEM_H

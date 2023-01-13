@@ -18,6 +18,6 @@ protected:
   entt::registry &Reg;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_SYSTEMS_SYSTEM_H

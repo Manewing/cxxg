@@ -41,6 +41,6 @@ public:
   std::vector<std::string> Elements;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_UI_LIST_SELECT_H

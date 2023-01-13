@@ -1,9 +1,9 @@
-#include <rogue/LevelGenerator.h>
-#include <rogue/NPCEntity.h>
-#include <rogue/Renderer.h>
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 #include <memory>
+#include <rogue/LevelGenerator.h>
+#include <rogue/NPCEntity.h>
+#include <rogue/Renderer.h>
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
 

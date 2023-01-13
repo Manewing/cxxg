@@ -1,8 +1,8 @@
-#include <rogue/Systems/AttackAISystem.h>
 #include <rogue/Components/AI.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Systems/AttackAISystem.h>
 
 #include <rogue/History.h>
 
@@ -43,4 +43,4 @@ void AttackAISystem::update() {
   });
 }
 
-}
+} // namespace rogue

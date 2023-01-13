@@ -12,4 +12,4 @@ StatValue ValueRegenCompBase::reduce(StatValue Amount) {
   return Value;
 }
 
-}
+} // namespace rogue

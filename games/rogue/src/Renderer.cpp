@@ -1,7 +1,7 @@
-#include <rogue/Renderer.h>
-#include <rogue/Level.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Level.h>
+#include <rogue/Renderer.h>
 #include <ymir/Algorithm/LineOfSight.hpp>
 
 namespace rogue {
@@ -83,4 +83,4 @@ void Renderer::renderEntities() {
   });
 }
 
-}
+} // namespace rogue

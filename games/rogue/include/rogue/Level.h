@@ -1,18 +1,18 @@
 #ifndef ROGUE_LEVEL_H
 #define ROGUE_LEVEL_H
 
+#include <entt/entt.hpp>
+#include <memory>
 #include <rogue/Entity.h>
 #include <rogue/EventHub.h>
 #include <rogue/Tile.h>
-#include <entt/entt.hpp>
-#include <memory>
 #include <vector>
 #include <ymir/LayeredMap.hpp>
 
 namespace rogue {
 class System;
 struct PositionComp;
-}
+} // namespace rogue
 
 namespace rogue {
 
@@ -90,6 +90,6 @@ private:
   ymir::Map<bool, int> PlayerSeenMap;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_LEVEL_H

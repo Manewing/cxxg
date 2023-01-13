@@ -1,9 +1,9 @@
 #ifndef MASTERMIND_H
 #define MASTERMIND_H
 
+#include <ctime>
 #include <cxxg/Game.h>
 #include <map>
-#include <ctime>
 
 class MasterMind : public ::cxxg::Game {
 public:

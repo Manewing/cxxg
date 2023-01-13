@@ -1,8 +1,8 @@
 #ifndef ROGUE_INVENTORY_H
 #define ROGUE_INVENTORY_H
 
-#include <rogue/Item.h>
 #include <entt/entt.hpp>
+#include <rogue/Item.h>
 #include <vector>
 
 namespace rogue {
@@ -25,6 +25,6 @@ private:
   std::vector<Item> Items;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_INVENTORY_H

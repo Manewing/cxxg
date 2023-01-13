@@ -1,8 +1,8 @@
 #ifndef ROGUE_ITEM_DATABASE_H
 #define ROGUE_ITEM_DATABASE_H
 
-#include <rogue/Item.h>
 #include <map>
+#include <rogue/Item.h>
 
 namespace rogue {
 
@@ -17,6 +17,6 @@ public:
   std::map<int, ItemPrototype> ItemProtos;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_ITEM_DATABASE_H

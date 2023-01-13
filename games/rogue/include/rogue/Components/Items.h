@@ -17,6 +17,6 @@ struct DropComp {
   Inventory Inv;
 };
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_ITEMS_H

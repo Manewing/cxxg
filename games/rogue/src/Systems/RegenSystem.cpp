@@ -1,14 +1,13 @@
-#include <rogue/Systems/RegenSystem.h>
-#include <rogue/Components/Stats.h>
 #include <entt/entt.hpp>
+#include <rogue/Components/Stats.h>
+#include <rogue/Systems/RegenSystem.h>
 
 static constexpr float HealthPerVit = 9.1f;
 static constexpr float ManaPerInt = 9.1f;
 
 namespace {
 
-template <typename Component>
-void runRegenUpdate(entt::registry &Reg) {
+template <typename Component> void runRegenUpdate(entt::registry &Reg) {
   auto View = Reg.view<Component>();
   View.each([](auto &C) {
     // Check there are ticks left until the next update, pre-decrement so
@@ -37,4 +36,4 @@ void RegenSystem::update() {
   runRegenUpdate<ManaComp>(Reg);
 }
 
-}
+} // namespace rogue
