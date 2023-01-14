@@ -4,16 +4,18 @@
 #include <cxxg/Types.h>
 #include <string>
 #include <vector>
-
-namespace cxxg {
-class Screen;
-}
+#include <rogue/UI/Widget.h>
 
 namespace rogue::ui {
 
-class ListSelect {
+class ListSelect : public BaseRect {
 public:
-  ListSelect(std::string Header, unsigned Width, unsigned MaxRows);
+  static void drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
+                               cxxg::types::Position Pos, unsigned Width,
+                               bool IsSelected);
+
+public:
+  using BaseRect::BaseRect;
 
   void setElements(const std::vector<std::string> &Elements);
   void selectElement(std::size_t ElemIdx);
@@ -21,22 +23,11 @@ public:
   void selectNext();
   void selectPrev();
 
-  void draw(cxxg::Screen &Scr) const;
+  bool handleInput(int Char) override;
+  std::string_view getInteractMsg() const override;
+  void draw(cxxg::Screen &Scr) const override;
 
-  static void drawFrameHeader(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                              std::string_view Header, unsigned Width);
-  static void drawFrameHLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                             unsigned Width);
-  static void drawFrameVLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                             unsigned Width);
-  static void drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
-                               cxxg::types::Position Pos, unsigned Width,
-                               bool IsSelected);
-
-  std::string Header;
-  unsigned Width;
-  unsigned MaxRows;
-
+private:
   std::size_t SelectedElemIdx = 0;
   std::vector<std::string> Elements;
 };

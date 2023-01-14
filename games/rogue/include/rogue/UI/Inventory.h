@@ -1,14 +1,17 @@
 #ifndef ROGUE_UI_INVENTORY_H
 #define ROGUE_UI_INVENTORY_H
 
-#include <rogue/UI/Widget.h>
-#include <rogue/UI/ListSelect.h>
 #include <entt/entt.hpp>
+#include <rogue/UI/Widget.h>
 #include <string_view>
 
 namespace rogue {
 class Inventory;
 } // namespace rogue
+
+namespace rogue::ui {
+class ListSelect;
+}
 
 namespace rogue::ui {
 
@@ -31,13 +34,13 @@ protected:
   Inventory &Inv;
   entt::entity Entity;
   entt::registry &Reg;
-  ListSelect List;
+  std::shared_ptr<ListSelect> List;
+  std::shared_ptr<Widget> Widget;
 };
 
 class InventoryController : public InventoryControllerBase {
 public:
-  InventoryController(Inventory &Inv, entt::entity Entity,
-                        entt::registry &Reg);
+  InventoryController(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   bool handleInput(int Char) final;
   std::string_view getInteractMsg() const final;
 };

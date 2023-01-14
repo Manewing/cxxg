@@ -1,7 +1,9 @@
 #include <cxxg/Utils.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Inventory.h>
+#include <rogue/UI/Frame.h>
 #include <rogue/UI/Inventory.h>
+#include <rogue/UI/ListSelect.h>
 
 namespace rogue::ui {
 
@@ -9,27 +11,27 @@ InventoryControllerBase::InventoryControllerBase(Inventory &Inv,
                                                  entt::entity Entity,
                                                  entt::registry &Reg,
                                                  const std::string &Header)
-    : Inv(Inv), Entity(Entity), Reg(Reg), List(Header, 30, 18) {
+    : Inv(Inv), Entity(Entity), Reg(Reg) {
+  cxxg::types::Position Pos{2, 2};
+  cxxg::types::Size Size{30, 18};
+  List = std::make_shared<ListSelect>(Pos, Size);
+  Widget = std::make_shared<Frame>(List, Pos, Size, Header);
   updateElements();
 }
 
 bool InventoryControllerBase::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_DOWN:
-    List.selectNext();
-    break;
-  case cxxg::utils::KEY_UP:
-    List.selectPrev();
-    break;
   case 'i':
     return false;
   default:
-    break;
+    return List->handleInput(Char);
   }
   return true;
 }
 
-void InventoryControllerBase::draw(cxxg::Screen &Scr) const { List.draw(Scr); }
+void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
+  Widget->draw(Scr);
+}
 
 void InventoryControllerBase::updateElements() {
   std::vector<std::string> Elements;
@@ -39,9 +41,9 @@ void InventoryControllerBase::updateElements() {
     SS << Item.StackSize << "x " << Item.getName();
     Elements.push_back(SS.str());
   }
-  auto PrevIdx = List.getSelectedElement();
-  List.setElements(Elements);
-  List.selectElement(PrevIdx);
+  auto PrevIdx = List->getSelectedElement();
+  List->setElements(Elements);
+  List->selectElement(PrevIdx);
 }
 
 InventoryController::InventoryController(Inventory &Inv, entt::entity Entity,
@@ -50,15 +52,15 @@ InventoryController::InventoryController(Inventory &Inv, entt::entity Entity,
 
 bool InventoryController::handleInput(int Char) {
   if (Inv.empty()) {
-    return true;
+    return InventoryControllerBase::handleInput(Char);
   }
 
   switch (Char) {
   case 'u':
-    if (Inv.canUseItem(Entity, Reg, List.getSelectedElement())) {
+    if (Inv.canUseItem(Entity, Reg, List->getSelectedElement())) {
       break;
     }
-    Inv.useItem(Entity, Reg, List.getSelectedElement(), 1);
+    Inv.useItem(Entity, Reg, List->getSelectedElement(), 1);
     updateElements();
     break;
   case 'd':
@@ -75,7 +77,7 @@ std::string_view InventoryController::getInteractMsg() const {
     return "[Empty]";
   }
   // FIXME item may have multiple options...
-  const auto &SelectedItem = Inv.getItem(List.getSelectedElement());
+  const auto &SelectedItem = Inv.getItem(List->getSelectedElement());
   if ((SelectedItem.getType() & ItemType::EquipmentMask) != ItemType::None) {
     return "[E] Equip";
   }
@@ -99,7 +101,7 @@ bool LootController::handleInput(int Char) {
       break;
     }
     auto &EtInv = Reg.get<InventoryComp>(Entity).Inv;
-    EtInv.addItem(Inv.takeItem(List.getSelectedElement()));
+    EtInv.addItem(Inv.takeItem(List->getSelectedElement()));
     updateElements();
   } break;
   default:

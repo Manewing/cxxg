@@ -1,6 +1,7 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 #include <rogue/History.h>
+#include <rogue/UI/Frame.h>
 #include <rogue/UI/History.h>
 
 namespace rogue::ui {
@@ -44,9 +45,7 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
   std::string_view Header = "History";
 
   // Draw header
-  const int HdrOffset = (Scr.getSize().X - Header.size()) / 2 - 1;
-  Scr[PosY][PosX] << "+" << std::string(Scr.getSize().X - 2, '-') << "+";
-  Scr[PosY][PosX + HdrOffset] << "[" << Header << "]";
+  Frame::drawFrameHeader(Scr, {PosX, PosY}, Header, Scr.getSize().X);
 
   const auto &Msgs = Hist.getMessages();
   for (unsigned int Idx = 0; Idx < NumHistoryRows; Idx++) {
@@ -80,10 +79,8 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
       std::min(Msgs.size(), static_cast<std::size_t>(Offset + NumHistoryRows));
   std::string Footer = std::to_string(Start) + "-" + std::to_string(End);
 
-  Scr[PosY + NumHistoryRows + 1][PosX]
-      << "+" << std::string(Scr.getSize().X - 2, '-') << "+";
-  const int FtrOffset = (Scr.getSize().X - Footer.size()) / 2 - 1;
-  Scr[PosY + NumHistoryRows + 1][PosX + FtrOffset] << "[" << Footer << "]";
+  Frame::drawFrameHeader(Scr, {PosX, PosY + NumHistoryRows + 1}, Footer,
+                         Scr.getSize().X);
 }
 
 } // namespace rogue::ui

@@ -1,10 +1,8 @@
 #include <cxxg/Screen.h>
+#include <cxxg/Utils.h>
 #include <rogue/UI/ListSelect.h>
 
 namespace rogue::ui {
-
-ListSelect::ListSelect(std::string Hdr, unsigned Width, unsigned MaxRows)
-    : Header(std::move(Hdr)), Width(Width), MaxRows(MaxRows) {}
 
 void ListSelect::setElements(const std::vector<std::string> &Elements) {
   this->Elements = Elements;
@@ -30,44 +28,33 @@ void ListSelect::selectPrev() {
   selectElement(SelectedElemIdx - 1);
 }
 
-void ListSelect::draw(cxxg::Screen &Scr) const {
-  const int PosX = 2, PosY = 2;
+bool ListSelect::handleInput(int Char) {
+  switch (Char) {
+  case cxxg::utils::KEY_DOWN:
+    selectNext();
+    break;
+  case cxxg::utils::KEY_UP:
+    selectPrev();
+    break;
+  default:
+    break;
+  }
+  return true;
+}
 
-  // Draw frame
-  if (Header.empty()) {
-    drawFrameHLine(Scr, {PosX, PosY}, Width);
-  } else {
-    drawFrameHeader(Scr, {PosX, PosY}, Header, Width);
-  }
-  for (unsigned Row = 0; Row < MaxRows; Row++) {
-    drawFrameVLine(Scr, {PosX, PosY + static_cast<int>(Row) + 1}, Width);
-  }
-  drawFrameHLine(Scr, {PosX, PosY + static_cast<int>(MaxRows) + 1}, Width);
+std::string_view ListSelect::getInteractMsg() const { return ""; }
+
+void ListSelect::draw(cxxg::Screen &Scr) const {
+  // Fill rect
+  BaseRect::draw(Scr);
 
   // Draw elements
-  for (unsigned ElemIdx = 0; ElemIdx < MaxRows && ElemIdx < Elements.size();
+  for (unsigned ElemIdx = 0; ElemIdx < Size.Y && ElemIdx < Elements.size();
        ElemIdx++) {
     const auto &Element = Elements.at(ElemIdx);
-    drawFrameElement(Scr, Element, {PosX, PosY + static_cast<int>(ElemIdx) + 1},
-                     Width, ElemIdx == SelectedElemIdx);
+    drawFrameElement(Scr, Element, {Pos.X, Pos.Y + static_cast<int>(ElemIdx) + 1},
+                     Size.X, ElemIdx == SelectedElemIdx);
   }
-}
-
-void ListSelect::drawFrameHeader(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                                 std::string_view Header, unsigned Width) {
-  drawFrameHLine(Scr, Pos, Width);
-  unsigned HdrOffset = (Width - Header.size()) / 2 - 1;
-  Scr[Pos.Y][Pos.X + HdrOffset] << "[" << Header << "]";
-}
-
-void ListSelect::drawFrameHLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                                unsigned Width) {
-  Scr[Pos.Y][Pos.X] << "+" << std::string(Width - 2, '-') << "+";
-}
-
-void ListSelect::drawFrameVLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                                unsigned Width) {
-  Scr[Pos.Y][Pos.X] << "|" << std::string(Width - 2, ' ') << "|";
 }
 
 void ListSelect::drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
@@ -80,4 +67,4 @@ void ListSelect::drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
   Scr[Pos.Y][Pos.X + 2] << Element;
 }
 
-} // namespace rogue
+} // namespace rogue::ui
