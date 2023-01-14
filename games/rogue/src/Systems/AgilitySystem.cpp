@@ -9,8 +9,9 @@ namespace rogue {
 
 void AgilitySystem::update() {
   auto StatsView = Reg.view<const StatsComp, AgilityComp>();
-  StatsView.each(
-      [](const auto &St, auto &Ag) { Ag.Agility = AgilityPerDex * St.Dex; });
+  StatsView.each([](const auto &St, auto &Ag) {
+    Ag.Agility = AgilityPerDex * St.effective().Dex;
+  });
   auto View = Reg.view<AgilityComp>();
   View.each([](auto &Ag) {
     Ag.gainAP(static_cast<unsigned>(APPerAgilityPoint * Ag.Agility));

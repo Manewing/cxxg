@@ -7,6 +7,7 @@
 #include <rogue/Systems/DeathSystem.h>
 #include <rogue/Systems/PlayerSystem.h>
 #include <rogue/Systems/RegenSystem.h>
+#include <rogue/Systems/StatsSystem.h>
 #include <rogue/Systems/WanderAISystem.h>
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
@@ -18,6 +19,7 @@ Level::Level(int LevelId, const std::vector<std::string> &Layers,
     : Map(Layers, Size), LevelId(LevelId), PlayerDijkstraMap(Size),
       PlayerSeenMap(Size) {
   Systems = {
+      std::make_shared<StatsSystem>(Reg),
       std::make_shared<AgilitySystem>(Reg),
       std::make_shared<RegenSystem>(Reg),
       std::make_shared<PlayerSystem>(*this),

@@ -1,18 +1,29 @@
+#include <rogue/Components/Buffs.h>
 #include <rogue/ItemDatabase.h>
 
 namespace rogue {
+
+template <typename BuffType, typename... RequiredComps>
+static std::shared_ptr<ApplyBuffEffect<BuffType, RequiredComps...>>
+makeApplyBuffEffect(const BuffType &Buff) {
+  return std::make_shared<ApplyBuffEffect<BuffType, RequiredComps...>>(Buff);
+}
 
 static void fillItemDatabase(ItemDatabase &DB) {
   const int MaxStackSize = 99;
 
   auto HealEffectx10 = std::make_shared<HealItemEffect>(10);
+  auto HealthRegenBuffEffect =
+      makeApplyBuffEffect<HealthRegenBuffComp, HealthComp>({});
   auto DamageEffectx10 = std::make_shared<DamageItemEffect>(10);
+  auto PoisonDebuffEffect =
+      makeApplyBuffEffect<PoisonDebuffComp, HealthComp>({});
 
   std::vector<ItemPrototype> ItemProtos = {
       ItemPrototype(0, "Berry", ItemType::CONSUMABLE, MaxStackSize,
-                    {HealEffectx10}),
+                    {HealEffectx10, HealthRegenBuffEffect}),
       ItemPrototype(1, "Poison Berry", ItemType::CONSUMABLE, MaxStackSize,
-                    {DamageEffectx10}),
+                    {DamageEffectx10, PoisonDebuffEffect}),
       ItemPrototype(2, "Wood", ItemType::CRAFTING, MaxStackSize, {}),
 
       ItemPrototype(3, "Stone", ItemType::CRAFTING, MaxStackSize, {}),

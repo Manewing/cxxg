@@ -57,6 +57,7 @@ public:
 private:
   StatValue Amount;
 };
+
 class DamageItemEffect : public ItemEffect {
 public:
   DamageItemEffect(StatValue Amount);
@@ -65,6 +66,31 @@ public:
 
 private:
   StatValue Amount;
+};
+
+template <typename BuffType, typename... RequiredComps>
+class ApplyBuffEffect : public ItemEffect {
+public:
+  explicit ApplyBuffEffect(const BuffType &Buff) : Buff(Buff) {}
+
+  bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final {
+    return Reg.all_of<RequiredComps...>(Et);
+  }
+
+  int useOn(const entt::entity &Et, entt::registry &Reg, int Num) const final {
+    // FIXME use Num to control number of stacks applied of buff
+    (void)Num;
+    auto ExistingBuff = Reg.try_get<BuffType>(Et);
+    if (ExistingBuff) {
+      ExistingBuff->add(Buff);
+      return Num;
+    }
+    Reg.emplace<BuffType>(Et);
+    return Num;
+  }
+
+private:
+  BuffType Buff;
 };
 
 class ItemPrototype {

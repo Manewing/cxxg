@@ -31,6 +31,7 @@ set(HEADER_FILES
   include/rogue/Systems/DeathSystem.h
   include/rogue/Systems/PlayerSystem.h
   include/rogue/Systems/RegenSystem.h
+  include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
   include/rogue/UIController.h
@@ -38,6 +39,7 @@ set(HEADER_FILES
 )
 
 set(SOURCE_FILES
+  src/Components/Buffs.cpp
   src/Components/Entity.cpp
   src/Components/Player.cpp
   src/Components/Stats.cpp
@@ -57,6 +59,7 @@ set(SOURCE_FILES
   src/Systems/DeathSystem.cpp
   src/Systems/PlayerSystem.cpp
   src/Systems/RegenSystem.cpp
+  src/Systems/StatsSystem.cpp
   src/Systems/WanderAISystem.cpp
   src/UIController.cpp
   src/UIListSelect.cpp

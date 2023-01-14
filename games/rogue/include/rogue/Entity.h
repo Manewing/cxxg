@@ -82,36 +82,6 @@ private:
   void chasePlayer(Level &L);
 };
 
-class PlayerEntity : public Entity {
-public:
-  static constexpr Tile PlayerTile{{'@', cxxg::types::RgbColor{255, 255, 50}}};
-  struct Interaction {
-    std::string Msg;
-    std::function<void()> Finalize = []() {};
-  };
-
-public:
-  PlayerEntity(ymir::Point2d<int> Pos = {0, 0});
-  std::optional<Interaction> CurrentInteraction;
-};
-
-class ChestEntity : public Entity {
-public:
-  ChestEntity(ymir::Point2d<int> Pos, Tile T) : Entity(Pos, T, "Chest") {}
-};
-
-class LevelStartEntity : public Entity {
-public:
-  LevelStartEntity(ymir::Point2d<int> Pos, Tile T)
-      : Entity(Pos, T, "Level Start") {}
-};
-
-class LevelEndEntity : public Entity {
-public:
-  LevelEndEntity(ymir::Point2d<int> Pos, Tile T)
-      : Entity(Pos, T, "Level End") {}
-};
-
 } // namespace rogue
 
 #endif // #ifndef ROGUE_ENTITY_H
