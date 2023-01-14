@@ -46,8 +46,8 @@ runRegenBuffUpdate(System &Sys, entt::registry &Reg) {
   View.each([&Sys, &Reg](auto Entity, auto &B, auto &C) {
     // Post decrement to match count
     if (B.TicksLeft-- == 0) {
-      Reg.erase<Buff>(Entity);
       Sys.publish(DebugMessageEvent() << B.getName() << " expired");
+      Reg.erase<Buff>(Entity);
       return;
     }
     // Restore the given amount to regenerate
@@ -63,8 +63,8 @@ runReductionBuffUpdate(System &Sys, entt::registry &Reg) {
   View.each([&Sys, &Reg](auto Entity, auto &B, auto &C) {
     // Post decrement to match count
     if (B.TicksLeft-- == 0) {
-      Reg.erase<Buff>(Entity);
       Sys.publish(DebugMessageEvent() << B.getName() << " expired");
+      Reg.erase<Buff>(Entity);
       return;
     }
     // Reduce the given amount
