@@ -1,5 +1,6 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <iomanip>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/History.h>
 #include <rogue/UI/Inventory.h>
@@ -8,21 +9,47 @@ namespace rogue::ui {
 
 Controller::Controller(cxxg::Screen &Scr) : Scr(Scr) {}
 
-void Controller::draw(int LevelIdx, int Health, std::string_view InteractStr) {
-  auto ScrSize = Scr.getSize();
+namespace {
 
-  // Draw UI overlay
-  Scr[0][0] << cxxg::types::Color::NONE.underline()
-            << "Rogue v0.0 [FLOOR]: " << (LevelIdx + 1)
-            << " [HEALTH]: " << Health;
+cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
+  int Percent = (Health * 100) / MaxHealth;
+  if (Percent >= 66) {
+    return {135, 250, 10};
+  }
+  if (Percent >= 33) {
+    return {225, 140, 10};
+  }
+  return {245, 30, 30};
+}
+
+} // namespace
+
+void Controller::draw(int LevelIdx, int Health, int MaxHealth,
+                      std::string_view InteractStr) {
+  // Define colors
+  const auto NoColor = cxxg::types::Color::NONE;
+  const auto NoInterColor = cxxg::types::Color::GREY;
+  const auto HasInterColor = cxxg::types::RgbColor{80, 200, 145};
+  const auto HealthColor = getHealthColor(Health, MaxHealth);
 
   if (ActiveWidget) {
-    ActiveWidget->draw(Scr);
     InteractStr = ActiveWidget->getInteractMsg();
   }
 
-  if (!InteractStr.empty()) {
-    Scr[2][ScrSize.X / 2 - InteractStr.size() / 2] << InteractStr;
+  auto InterColor = HasInterColor;
+  auto InterStr = InteractStr;
+  if (InterStr.empty()) {
+    InterStr = "Nothing";
+    InterColor = NoInterColor;
+  }
+
+  Scr[0][0] << NoColor.underline() << "Rogue v0.0 [FLOOR]:" << NoColor << " "
+            << std::setw(3) << (LevelIdx + 1) << " " << NoColor.underline()
+            << "[HEALTH]:" << HealthColor << std::setw(4) << Health << NoColor
+            << " | " << InterColor.underline() << InterStr;
+
+  if (ActiveWidget) {
+    ActiveWidget->draw(Scr);
   }
 }
 

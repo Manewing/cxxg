@@ -135,7 +135,7 @@ void Game::handleDraw() {
   auto &PC = CurrentLevel->Reg.get<PlayerComp>(Player);
   auto PlayerPos = CurrentLevel->Reg.get<PositionComp>(Player).Pos;
   auto LOSRange = CurrentLevel->Reg.get<LineOfSightComp>(Player).LOSRange;
-  auto Health = CurrentLevel->Reg.get<HealthComp>(Player).Value;
+  auto Health = CurrentLevel->Reg.get<HealthComp>(Player);
 
   Renderer Render(RenderSize, *CurrentLevel, PlayerPos);
   Render.renderShadow(/*Darkness=*/30);
@@ -153,7 +153,7 @@ void Game::handleDraw() {
   }
 
   // Draw UI overlay
-  UICtrl.draw(CurrentLevelIdx, Health, InteractStr);
+  UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, InteractStr);
 
   cxxg::Game::handleDraw();
 }

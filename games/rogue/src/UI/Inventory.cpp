@@ -4,6 +4,7 @@
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/ListSelect.h>
+#include <iomanip>
 
 namespace rogue::ui {
 
@@ -38,7 +39,7 @@ void InventoryControllerBase::updateElements() {
   Elements.reserve(Inv.getItems().size());
   for (const auto &Item : Inv.getItems()) {
     std::stringstream SS;
-    SS << Item.StackSize << "x " << Item.getName();
+    SS << std::setw(3) << Item.StackSize << "x " << Item.getName();
     Elements.push_back(SS.str());
   }
   auto PrevIdx = List->getSelectedElement();
