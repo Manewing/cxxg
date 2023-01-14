@@ -5,6 +5,10 @@
 
 namespace rogue {
 
+struct EquipementComp {
+  Equipment Equip;
+};
+
 struct InventoryComp {
   Inventory Inv;
 };

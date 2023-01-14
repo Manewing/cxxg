@@ -20,13 +20,13 @@ static void fillItemDatabase(ItemDatabase &DB) {
       makeApplyBuffEffect<PoisonDebuffComp, HealthComp>({});
 
   std::vector<ItemPrototype> ItemProtos = {
-      ItemPrototype(0, "Berry", ItemType::CONSUMABLE, MaxStackSize,
+      ItemPrototype(0, "Berry", ItemType::Consumable, MaxStackSize,
                     {HealEffectx10, HealthRegenBuffEffect}),
-      ItemPrototype(1, "Poison Berry", ItemType::CONSUMABLE, MaxStackSize,
+      ItemPrototype(1, "Poison Berry", ItemType::Consumable, MaxStackSize,
                     {DamageEffectx10, PoisonDebuffEffect}),
-      ItemPrototype(2, "Wood", ItemType::CRAFTING, MaxStackSize, {}),
+      ItemPrototype(2, "Wood", ItemType::Crafting, MaxStackSize, {}),
 
-      ItemPrototype(3, "Stone", ItemType::CRAFTING, MaxStackSize, {}),
+      ItemPrototype(3, "Stone", ItemType::Crafting, MaxStackSize, {}),
 
   };
 

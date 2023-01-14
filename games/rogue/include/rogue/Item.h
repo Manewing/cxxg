@@ -3,34 +3,62 @@
 
 #include <entt/entt.hpp>
 #include <memory>
+#include <optional>
+#include <rogue/Components/Stats.h>
 #include <string>
 #include <vector>
-
-#include <rogue/Components/Stats.h>
+#include <ymir/Enum.hpp>
 
 namespace rogue {
 
-enum ItemType {
+enum class ItemType {
+  None = 0x0,
+
   // Equipment types
-  RING = 0x1,
-  AMULET = 0x2,
-  HELMET = 0x4,
-  CHEST_PLATE = 0x8,
-  PANTS = 0x10,
-  BOOTS = 0x20,
-  WEAPON = 0x40,
-  SHIELD = 0x80,
-  EQUIPMENT_MASK = 0xff,
+  Ring = 0x1,
+  Amulet = 0x2,
+  Helmet = 0x4,
+  ChestPlate = 0x8,
+  Pants = 0x10,
+  Boots = 0x20,
+  Weapon = 0x40,
+  Shield = 0x80,
+  EquipmentMask = 0xff,
 
-  // General item types
-  GENERIC = 0x100,
-  CONSUMABLE = 0x200,
-  QUEST = 0x400,
-  CRAFTING = 0x800,
-  GENERAL_MASK = 0xf00,
+  // general item types
+  Generic = 0x100,
+  Consumable = 0x200,
+  Quest = 0x400,
+  Crafting = 0x800,
+  GeneralMask = 0xf00,
 
-  // Mask for all items
-  ANY_MASK = 0xffffffff
+  // mask for all items
+  AnyMask = 0xfffffff
+};
+
+}
+
+YMIR_BITFIELD_ENUM(rogue::ItemType);
+
+namespace rogue {
+
+class UseInterface {
+public:
+  virtual bool canUseOn(const entt::entity &Entity,
+                        entt::registry &Reg) const = 0;
+  virtual void useOn(const entt::entity &Entity, entt::registry &Reg) const = 0;
+};
+
+class EquipInterface {
+public:
+  virtual bool canEquipOn(const entt::entity &Entity,
+                          entt::registry &Reg) const = 0;
+  virtual void equipOn(const entt::entity &Entity,
+                       entt::registry &Reg) const = 0;
+  virtual bool canUnequipFrom(const entt::entity &Entity,
+                              entt::registry &Reg) const = 0;
+  virtual void unequipFrom(const entt::entity &Entity,
+                           entt::registry &Reg) const = 0;
 };
 
 // Add durability to items:
@@ -41,18 +69,36 @@ enum ItemType {
 // Durability can be restored to MaxDurability by repairing
 // MaxDurability can only be restored with rare special items
 
-class ItemEffect {
+class ItemEffect : public UseInterface, public EquipInterface {
 public:
-  virtual bool canUseOn(const entt::entity &Et, entt::registry &Reg) const = 0;
-  virtual int useOn(const entt::entity &Et, entt::registry &Reg,
-                    int Num) const = 0;
   virtual ~ItemEffect() = default;
+
+  bool canUseOn(const entt::entity &, entt::registry &) const override {
+    return false;
+  }
+
+  void useOn(const entt::entity &, entt::registry &) const override {}
+
+  bool canEquipOn(const entt::entity &, entt::registry &) const override {
+    // Generally handled by Item slot, only to veto by effect
+    return true;
+  }
+
+  void equipOn(const entt::entity &, entt::registry &) const override {}
+
+  bool canUnequipFrom(const entt::entity &, entt::registry &) const override {
+    // Generally handled by Item slot, only to veto by effect
+    return true;
+  }
+
+  void unequipFrom(const entt::entity &, entt::registry &) const override {}
 };
+
 class HealItemEffect : public ItemEffect {
 public:
   HealItemEffect(StatValue Amount);
   bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final;
-  int useOn(const entt::entity &Et, entt::registry &Reg, int Num) const final;
+  void useOn(const entt::entity &Et, entt::registry &Reg) const final;
 
 private:
   StatValue Amount;
@@ -62,7 +108,7 @@ class DamageItemEffect : public ItemEffect {
 public:
   DamageItemEffect(StatValue Amount);
   bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final;
-  int useOn(const entt::entity &Et, entt::registry &Reg, int Num) const final;
+  void useOn(const entt::entity &Et, entt::registry &Reg) const final;
 
 private:
   StatValue Amount;
@@ -77,23 +123,19 @@ public:
     return Reg.all_of<RequiredComps...>(Et);
   }
 
-  int useOn(const entt::entity &Et, entt::registry &Reg, int Num) const final {
-    // FIXME use Num to control number of stacks applied of buff
-    (void)Num;
+  void useOn(const entt::entity &Et, entt::registry &Reg) const final {
     auto ExistingBuff = Reg.try_get<BuffType>(Et);
     if (ExistingBuff) {
       ExistingBuff->add(Buff);
-      return Num;
     }
     Reg.emplace<BuffType>(Et);
-    return Num;
   }
 
 private:
   BuffType Buff;
 };
 
-class ItemPrototype {
+class ItemPrototype : public UseInterface, public EquipInterface {
 public:
   ItemPrototype(int ItemId, std::string Name, ItemType Type, int MaxStatckSize,
                 std::vector<std::shared_ptr<ItemEffect>> Effects);
@@ -103,28 +145,72 @@ public:
   // attack ranged
   // defnese
   // craft
-  bool canUseOn(const entt::entity &Entity, entt::registry &Reg) const;
-  void useOn(const entt::entity &Entity, entt::registry &Reg, int Item) const;
+  bool canUseOn(const entt::entity &Entity, entt::registry &Reg) const final;
+  void useOn(const entt::entity &Entity, entt::registry &Reg) const final;
+
+  bool canEquipOn(const entt::entity &Entity, entt::registry &Reg) const final;
+  void equipOn(const entt::entity &Entity, entt::registry &Reg) const final;
+
+  bool canUnequipFrom(const entt::entity &Entity,
+                      entt::registry &Reg) const final;
+  void unequipFrom(const entt::entity &Entity, entt::registry &Reg) const final;
 
 public:
   int ItemId;
   std::string Name;
   ItemType Type;
   int MaxStatckSize = 1;
+
   std::vector<std::shared_ptr<ItemEffect>> Effects;
 };
 
-class Item {
+class Item : public UseInterface, public EquipInterface {
 public:
-  Item(const ItemPrototype &Proto, int StackSize = 1);
+  Item(const ItemPrototype &Proto, int StackSize = 1,
+       const std::shared_ptr<ItemPrototype> &Specialization = nullptr);
 
-  const ItemPrototype &getProto() const;
+  std::string getName() const;
+
+  ItemType getType() const;
+
+  /// Returns true if other Item has same prototype and specialization
+  bool isSameKind(const Item &Other) const;
+
+  bool canUseOn(const entt::entity &Entity, entt::registry &Reg) const final;
+  void useOn(const entt::entity &Entity, entt::registry &Reg) const final;
+
+  bool canEquipOn(const entt::entity &Entity, entt::registry &Reg) const final;
+  void equipOn(const entt::entity &Entity, entt::registry &Reg) const final;
+
+  bool canUnequipFrom(const entt::entity &Entity,
+                      entt::registry &Reg) const final;
+  void unequipFrom(const entt::entity &Entity, entt::registry &Reg) const final;
 
 public:
   int StackSize = 1;
 
-protected:
+private:
+  const ItemPrototype &getProto() const;
+
+private:
   const ItemPrototype *Proto = nullptr;
+  std::shared_ptr<const ItemPrototype> Specialization = nullptr;
+};
+
+class Equipment {
+public:
+  std::optional<Item> Ring;
+  std::optional<Item> Amulet;
+  std::optional<Item> Helmet;
+  std::optional<Item> ChestPlat;
+  std::optional<Item> Pants;
+  std::optional<Item> Boots;
+  std::optional<Item> Weapon;
+  std::optional<Item> OffHand;
+
+  bool canEquip(ItemType Type) const;
+  bool equip(const Item &Item);
+  Item unequip(ItemType Type);
 };
 
 } // namespace rogue

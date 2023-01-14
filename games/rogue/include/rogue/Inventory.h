@@ -14,10 +14,21 @@ public:
 
   void addItem(const Item &It);
   Item takeItem(std::size_t ItemIdx);
+
   bool canUseItem(const entt::entity &Entity, entt::registry &Reg,
                   std::size_t ItemIdx);
   void useItem(const entt::entity &Entity, entt::registry &Reg,
                std::size_t ItemIdx, int NumItems = 1);
+
+  bool canEquipItemOn(const entt::entity &Entity, entt::registry &Reg,
+                      std::size_t ItemIdx);
+  void equipItemOn(const entt::entity &Entity, entt::registry &Reg,
+                     std::size_t ItemIdx);
+
+  bool canUnequipItemFrom(const entt::entity &Entity, entt::registry &Reg,
+                        std::size_t ItemIdx);
+  void unequipItemFrom(const entt::entity &Entity, entt::registry &Reg,
+                       std::size_t ItemIdx);
 
   bool empty() const;
 

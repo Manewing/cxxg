@@ -41,7 +41,7 @@ void InventoryUIControllerBase::updateElements() {
   Elements.reserve(Inv.getItems().size());
   for (const auto &Item : Inv.getItems()) {
     std::stringstream SS;
-    SS << Item.StackSize << "x " << Item.getProto().Name;
+    SS << Item.StackSize << "x " << Item.getName();
     Elements.push_back(SS.str());
   }
   auto PrevIdx = ListUI.getSelectedElement();
@@ -55,10 +55,13 @@ InventoryUIController::InventoryUIController(Inventory &Inv,
     : InventoryUIControllerBase(Inv, Entity, Reg, "Inventory") {}
 
 bool InventoryUIController::handleInput(int Char) {
+  if (Inv.empty()) {
+    return true;
+  }
+
   switch (Char) {
-  case 'e':
-    if (Inv.empty() ||
-        !Inv.canUseItem(Entity, Reg, ListUI.getSelectedElement())) {
+  case 'u':
+    if (Inv.canUseItem(Entity, Reg, ListUI.getSelectedElement())) {
       break;
     }
     Inv.useItem(Entity, Reg, ListUI.getSelectedElement(), 1);
@@ -79,14 +82,14 @@ std::string_view InventoryUIController::getInteractMsg() const {
   }
   // FIXME item may have multiple options...
   const auto &SelectedItem = Inv.getItem(ListUI.getSelectedElement());
-  if (SelectedItem.getProto().Type & ItemType::EQUIPMENT_MASK) {
+  if ((SelectedItem.getType() & ItemType::EquipmentMask) != ItemType::None) {
     return "[E] Equip";
   }
-  if (SelectedItem.getProto().Type & ItemType::CRAFTING) {
+  if ((SelectedItem.getType() & ItemType::Crafting) != ItemType::None) {
     return "[C] Craft";
   }
-  if (SelectedItem.getProto().Type & ItemType::CONSUMABLE) {
-    return "[E] Consume";
+  if ((SelectedItem.getType() & ItemType::Consumable) != ItemType::None) {
+    return "[U] Use";
   }
   return "[D] Drop";
 }
