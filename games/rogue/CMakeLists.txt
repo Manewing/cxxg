@@ -34,8 +34,10 @@ set(HEADER_FILES
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
-  include/rogue/UIController.h
-  include/rogue/UIListSelect.h
+  include/rogue/UI/Controller.h
+  include/rogue/UI/History.h
+  include/rogue/UI/Inventory.h
+  include/rogue/UI/ListSelect.h
 )
 
 set(SOURCE_FILES
@@ -61,8 +63,10 @@ set(SOURCE_FILES
   src/Systems/RegenSystem.cpp
   src/Systems/StatsSystem.cpp
   src/Systems/WanderAISystem.cpp
-  src/UIController.cpp
-  src/UIListSelect.cpp
+  src/UI/Controller.cpp
+  src/UI/History.cpp
+  src/UI/Inventory.cpp
+  src/UI/ListSelect.cpp
 )
 
 add_library(

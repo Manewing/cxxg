@@ -9,11 +9,11 @@ namespace cxxg {
 class Screen;
 }
 
-namespace rogue {
+namespace rogue::ui {
 
-class UIListSelect {
+class ListSelect {
 public:
-  UIListSelect(std::string Header, unsigned Width, unsigned MaxRows);
+  ListSelect(std::string Header, unsigned Width, unsigned MaxRows);
 
   void setElements(const std::vector<std::string> &Elements);
   void selectElement(std::size_t ElemIdx);
@@ -41,6 +41,6 @@ public:
   std::vector<std::string> Elements;
 };
 
-} // namespace rogue
+} // namespace rogue::ui
 
 #endif // #ifndef ROGUE_UI_LIST_SELECT_H

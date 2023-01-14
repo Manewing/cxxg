@@ -1,28 +1,28 @@
 #include <cxxg/Screen.h>
-#include <rogue/UIListSelect.h>
+#include <rogue/UI/ListSelect.h>
 
-namespace rogue {
+namespace rogue::ui {
 
-UIListSelect::UIListSelect(std::string Hdr, unsigned Width, unsigned MaxRows)
+ListSelect::ListSelect(std::string Hdr, unsigned Width, unsigned MaxRows)
     : Header(std::move(Hdr)), Width(Width), MaxRows(MaxRows) {}
 
-void UIListSelect::setElements(const std::vector<std::string> &Elements) {
+void ListSelect::setElements(const std::vector<std::string> &Elements) {
   this->Elements = Elements;
   SelectedElemIdx = 0;
 }
 
-void UIListSelect::selectElement(std::size_t ElemIdx) {
+void ListSelect::selectElement(std::size_t ElemIdx) {
   SelectedElemIdx = ElemIdx;
   if (SelectedElemIdx >= Elements.size()) {
     SelectedElemIdx = 0;
   }
 }
 
-std::size_t UIListSelect::getSelectedElement() const { return SelectedElemIdx; }
+std::size_t ListSelect::getSelectedElement() const { return SelectedElemIdx; }
 
-void UIListSelect::selectNext() { selectElement(SelectedElemIdx + 1); }
+void ListSelect::selectNext() { selectElement(SelectedElemIdx + 1); }
 
-void UIListSelect::selectPrev() {
+void ListSelect::selectPrev() {
   if (SelectedElemIdx == 0) {
     selectElement(Elements.size() - 1);
     return;
@@ -30,7 +30,7 @@ void UIListSelect::selectPrev() {
   selectElement(SelectedElemIdx - 1);
 }
 
-void UIListSelect::draw(cxxg::Screen &Scr) const {
+void ListSelect::draw(cxxg::Screen &Scr) const {
   const int PosX = 2, PosY = 2;
 
   // Draw frame
@@ -53,26 +53,26 @@ void UIListSelect::draw(cxxg::Screen &Scr) const {
   }
 }
 
-void UIListSelect::drawFrameHeader(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                                   std::string_view Header, unsigned Width) {
+void ListSelect::drawFrameHeader(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                                 std::string_view Header, unsigned Width) {
   drawFrameHLine(Scr, Pos, Width);
   unsigned HdrOffset = (Width - Header.size()) / 2 - 1;
   Scr[Pos.Y][Pos.X + HdrOffset] << "[" << Header << "]";
 }
 
-void UIListSelect::drawFrameHLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                                  unsigned Width) {
+void ListSelect::drawFrameHLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                                unsigned Width) {
   Scr[Pos.Y][Pos.X] << "+" << std::string(Width - 2, '-') << "+";
 }
 
-void UIListSelect::drawFrameVLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
-                                  unsigned Width) {
+void ListSelect::drawFrameVLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                                unsigned Width) {
   Scr[Pos.Y][Pos.X] << "|" << std::string(Width - 2, ' ') << "|";
 }
 
-void UIListSelect::drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
-                                    cxxg::types::Position Pos, unsigned Width,
-                                    bool IsSelected) {
+void ListSelect::drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
+                                  cxxg::types::Position Pos, unsigned Width,
+                                  bool IsSelected) {
   if (IsSelected) {
     Scr[Pos.Y][Pos.X + 1] << ">";
   }

@@ -9,7 +9,7 @@
 #include <rogue/ItemDatabase.h>
 #include <rogue/Level.h>
 #include <rogue/LevelGenerator.h>
-#include <rogue/UIController.h>
+#include <rogue/UI/Controller.h>
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
 #include <ymir/Types.hpp>
@@ -42,7 +42,7 @@ public: // FIXME
   std::shared_ptr<Level> CurrentLevel;
   std::vector<std::shared_ptr<Level>> Levels;
 
-  UIController UICtrl;
+  ui::Controller UICtrl;
 };
 
 } // namespace rogue
