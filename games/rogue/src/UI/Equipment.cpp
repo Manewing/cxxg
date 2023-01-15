@@ -10,7 +10,7 @@ namespace rogue::ui {
 namespace {
 
 const char *getItemTypeLabel(ItemType It) {
-  switch (It) {
+  switch (It & ItemType::EquipmentMask) {
   case ItemType::Amulet:
     return "Amulet";
   case ItemType::ChestPlate:
@@ -65,11 +65,12 @@ bool EquipmentController::handleInput(int Char) {
     }
     auto SelIdx = ItSel->getSelectedIdx();
     auto *ES = Equip.all().at(SelIdx);
-    if (!ES->It || !ES->It->canUnequipFrom(Entity, Reg)) {
+    if (!ES->It ||
+        !ES->It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
       // FIXME message
       break;
     }
-    ES->It->unequipFrom(Entity, Reg);
+    ES->It->removeFrom(Entity, Reg, CapabilityFlags::UnequipFrom);
     InvComp->Inv.addItem(Equip.unequip(ES->BaseTypeFilter));
     updateSelectValues();
   } break;

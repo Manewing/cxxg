@@ -68,20 +68,22 @@ bool InventoryController::handleInput(int Char) {
       // FIXME message
       break;
     }
-    if (!It.canEquipOn(Entity, Reg)) {
+    if (!It.canApplyTo(Entity, Reg, CapabilityFlags::EquipOn)) {
       // FIXME message
       break;
     }
-    It.equipOn(Entity, Reg);
-    Equip->Equip.equip(Inv.takeItem(List->getSelectedElement())),
+    It.applyTo(Entity, Reg, CapabilityFlags::EquipOn);
+    Equip->Equip.equip(Inv.takeItem(List->getSelectedElement(), /*Count=*/1));
     updateElements();
   } break;
   case 'u':
-    if (Inv.canUseItem(Entity, Reg, List->getSelectedElement())) {
+    if (!Inv.getItem(List->getSelectedElement())
+            .canApplyTo(Entity, Reg, CapabilityFlags::UseOn)) {
       // FIXME message
       break;
     }
-    Inv.useItem(Entity, Reg, List->getSelectedElement(), 1);
+    Inv.takeItem(List->getSelectedElement(), /*Count=*/1)
+        .applyTo(Entity, Reg, CapabilityFlags::UseOn);
     updateElements();
     break;
   case 'd':

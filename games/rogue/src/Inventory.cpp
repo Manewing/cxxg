@@ -21,48 +21,14 @@ Item Inventory::takeItem(std::size_t ItemIdx) {
   return It;
 }
 
-bool Inventory::canUseItem(const entt::entity &Entity, entt::registry &Reg,
-                           std::size_t ItemIdx) {
-  return Items.at(ItemIdx).canUseOn(Entity, Reg);
-}
-
-void Inventory::useItem(const entt::entity &Entity, entt::registry &Reg,
-                        std::size_t ItemIdx, int NumItems) {
-  auto &Itm = Items.at(ItemIdx);
-  if (NumItems > Itm.StackSize) {
-    return;
+Item Inventory::takeItem(std::size_t ItemIdx, unsigned Count) {
+  Item &It = Items.at(ItemIdx);
+  if (It.StackSize > static_cast<int>(Count)) {
+    It.StackSize -= Count;
+    return It;
   }
-  Itm.StackSize -= NumItems;
-
-  for (int Cnt = 0; Cnt < NumItems; Cnt++) {
-    Itm.useOn(Entity, Reg);
-  }
-
-  if (Itm.StackSize == 0) {
-    Items.erase(Items.begin() + ItemIdx);
-    return;
-  }
-}
-
-bool Inventory::canEquipItemOn(const entt::entity &Entity, entt::registry &Reg,
-                               std::size_t ItemIdx) {
-  return Items.at(ItemIdx).canEquipOn(Entity, Reg);
-}
-
-void Inventory::equipItemOn(const entt::entity &Entity, entt::registry &Reg,
-                            std::size_t ItemIdx) {
-  Items.at(ItemIdx).equipOn(Entity, Reg);
-}
-
-bool Inventory::canUnequipItemFrom(const entt::entity &Entity,
-                                   entt::registry &Reg, std::size_t ItemIdx) {
-  return Items.at(ItemIdx).canUnequipFrom(Entity, Reg);
-}
-
-void Inventory::unequipItemFrom(const entt::entity &Entity, entt::registry &Reg,
-                                std::size_t ItemIdx) {
-
-  Items.at(ItemIdx).unequipFrom(Entity, Reg);
+  // Count exceeds stack size, just return everything
+  return takeItem(ItemIdx);
 }
 
 bool Inventory::empty() const { return Items.empty(); }

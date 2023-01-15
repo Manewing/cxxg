@@ -9,11 +9,12 @@ namespace rogue {
 struct AdditiveBuff {
   unsigned SourceCount = 1;
   void add();
-  bool remove();
+  bool remove(const AdditiveBuff &Other);
 };
 
 struct TimedBuff {
   unsigned TicksLeft = 10;
+  bool remove(const TimedBuff&) { return false; }
 };
 
 struct RegenerationBuff : public TimedBuff {

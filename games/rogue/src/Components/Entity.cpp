@@ -58,6 +58,7 @@ void generateRandomLoot(Inventory &Inv, ItemDatabase &ItemDb) {
   Inv.addItem(ItemDb.createItem(0, 20));
   Inv.addItem(ItemDb.createItem(1, 15));
   Inv.addItem(ItemDb.createItem(2, 10));
+  Inv.addItem(ItemDb.createItem(3, 2));
   Inv.addItem(ItemDb.createItem(4, 1));
   // <== DEBUG
 }

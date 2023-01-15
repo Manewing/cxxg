@@ -4,15 +4,9 @@
 namespace rogue {
 
 template <typename BuffType, typename... RequiredComps>
-static std::shared_ptr<UseItemBuffEffect<BuffType, RequiredComps...>>
-makeUseItemBuffEffect(const BuffType &Buff) {
-  return std::make_shared<UseItemBuffEffect<BuffType, RequiredComps...>>(Buff);
-}
-
-template <typename BuffType, typename... RequiredComps>
-static std::shared_ptr<EquipItemBuffEffect<BuffType, RequiredComps...>>
-makeEquipItemBuffEffect(const BuffType &Buff) {
-  return std::make_shared<EquipItemBuffEffect<BuffType, RequiredComps...>>(
+static std::shared_ptr<ApplyBuffItemEffect<BuffType, RequiredComps...>>
+makeApplyBuffItemEffect(const BuffType &Buff) {
+  return std::make_shared<ApplyBuffItemEffect<BuffType, RequiredComps...>>(
       Buff);
 }
 
@@ -21,22 +15,41 @@ static void fillItemDatabase(ItemDatabase &DB) {
 
   auto HealEffectx10 = std::make_shared<HealItemEffect>(10);
   auto HealthRegenBuffEffect =
-      makeUseItemBuffEffect<HealthRegenBuffComp, HealthComp>({});
+      makeApplyBuffItemEffect<HealthRegenBuffComp, HealthComp>({});
   auto DamageEffectx10 = std::make_shared<DamageItemEffect>(10);
   auto PoisonDebuffEffect =
-      makeUseItemBuffEffect<PoisonDebuffComp, HealthComp>({});
-  auto StatBuffEffect = makeEquipItemBuffEffect<StatsBuffComp, StatsComp>(
-      StatsBuffComp{1, StatPoints{1, 1, 1, 10}});
+      makeApplyBuffItemEffect<PoisonDebuffComp, HealthComp>({});
+  auto BleeedingDebuffEffect =
+      makeApplyBuffItemEffect<BleedingDebuffComp, HealthComp>({});
+  auto StatBuffEffect = makeApplyBuffItemEffect<StatsBuffComp, StatsComp>(
+      StatsBuffComp{{1U}, StatPoints{1, 1, 1, 10}});
+
+  // FIXME there needs to be a damage buff
+  auto StatBuffEffectStr1 = makeApplyBuffItemEffect<StatsBuffComp, StatsComp>(
+      StatsBuffComp{{1U}, StatPoints{0, 1, 0, 0}});
 
   std::vector<ItemPrototype> ItemProtos = {
       ItemPrototype(0, "Berry", ItemType::Consumable, MaxStackSize,
-                    {HealEffectx10, HealthRegenBuffEffect}),
+                    {{CapabilityFlags::UseOn, HealEffectx10},
+                     {CapabilityFlags::UseOn, HealthRegenBuffEffect}}),
+
       ItemPrototype(1, "Poison Berry", ItemType::Consumable, MaxStackSize,
-                    {DamageEffectx10, PoisonDebuffEffect}),
+                    {{CapabilityFlags::UseOn, DamageEffectx10},
+                     {CapabilityFlags::UseOn, PoisonDebuffEffect}}),
+
       ItemPrototype(2, "Wood", ItemType::Crafting, MaxStackSize, {}),
 
-      ItemPrototype(3, "Stone", ItemType::Crafting, MaxStackSize, {}),
-      ItemPrototype(4, "Sword", ItemType::Weapon, 1, {StatBuffEffect})};
+      ItemPrototype(3, "Stone",
+                    ItemType::Weapon | ItemType::Consumable |
+                        ItemType::Crafting,
+                    MaxStackSize,
+                    {{CapabilityFlags::Equipment, StatBuffEffectStr1},
+                     {CapabilityFlags::UseOn, BleeedingDebuffEffect},
+                     {CapabilityFlags::UseOn, DamageEffectx10}}),
+
+      ItemPrototype(4, "Sword", ItemType::Weapon, 1,
+                    {{CapabilityFlags::Equipment, StatBuffEffect},
+                     {CapabilityFlags::Equipment, PoisonDebuffEffect}})};
 
   for (const auto &Proto : ItemProtos) {
     DB.addItemProto(Proto.ItemId, Proto);

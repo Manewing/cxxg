@@ -37,30 +37,22 @@ enum class ItemType {
   AnyMask = 0xfffffff
 };
 
-}
+enum class CapabilityFlags {
+  None = 0x0,
+  UseOn = 0x1,
+  EquipOn = 0x2,
+  UnequipFrom = 0x4,
+
+  // Mask all equipment
+  Equipment = 0x6,
+};
+
+} // namespace rogue
 
 YMIR_BITFIELD_ENUM(rogue::ItemType);
+YMIR_BITFIELD_ENUM(rogue::CapabilityFlags);
 
 namespace rogue {
-
-class UseInterface {
-public:
-  virtual bool canUseOn(const entt::entity &Entity,
-                        entt::registry &Reg) const = 0;
-  virtual void useOn(const entt::entity &Entity, entt::registry &Reg) const = 0;
-};
-
-class EquipInterface {
-public:
-  virtual bool canEquipOn(const entt::entity &Entity,
-                          entt::registry &Reg) const = 0;
-  virtual void equipOn(const entt::entity &Entity,
-                       entt::registry &Reg) const = 0;
-  virtual bool canUnequipFrom(const entt::entity &Entity,
-                              entt::registry &Reg) const = 0;
-  virtual void unequipFrom(const entt::entity &Entity,
-                           entt::registry &Reg) const = 0;
-};
 
 // Add durability to items:
 //  Durability
@@ -70,36 +62,28 @@ public:
 // Durability can be restored to MaxDurability by repairing
 // MaxDurability can only be restored with rare special items
 
-class ItemEffect : public UseInterface, public EquipInterface {
+class ItemEffect {
 public:
   virtual ~ItemEffect() = default;
 
-  bool canUseOn(const entt::entity &, entt::registry &) const override {
-    return false;
-  }
-
-  void useOn(const entt::entity &, entt::registry &) const override {}
-
-  bool canEquipOn(const entt::entity &, entt::registry &) const override {
-    // Generally handled by Item slot, only to veto by effect
+  virtual bool canApplyTo(const entt::entity &, entt::registry &) const {
     return true;
   }
 
-  void equipOn(const entt::entity &, entt::registry &) const override {}
+  virtual void applyTo(const entt::entity &, entt::registry &) const {}
 
-  bool canUnequipFrom(const entt::entity &, entt::registry &) const override {
-    // Generally handled by Item slot, only to veto by effect
+  virtual bool canRemoveFrom(const entt::entity &, entt::registry &) const {
     return true;
   }
 
-  void unequipFrom(const entt::entity &, entt::registry &) const override {}
+  virtual void removeFrom(const entt::entity &, entt::registry &) const {}
 };
 
 class HealItemEffect : public ItemEffect {
 public:
   HealItemEffect(StatValue Amount);
-  bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final;
-  void useOn(const entt::entity &Et, entt::registry &Reg) const final;
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
 
 private:
   StatValue Amount;
@@ -108,23 +92,23 @@ private:
 class DamageItemEffect : public ItemEffect {
 public:
   DamageItemEffect(StatValue Amount);
-  bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final;
-  void useOn(const entt::entity &Et, entt::registry &Reg) const final;
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
 
 private:
   StatValue Amount;
 };
 
 template <typename BuffType, typename... RequiredComps>
-class UseItemBuffEffect : public ItemEffect {
+class ApplyBuffItemEffect : public ItemEffect {
 public:
-  explicit UseItemBuffEffect(const BuffType &Buff) : Buff(Buff) {}
+  explicit ApplyBuffItemEffect(const BuffType &Buff) : Buff(Buff) {}
 
-  bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final {
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
     return Reg.all_of<RequiredComps...>(Et);
   }
 
-  void useOn(const entt::entity &Et, entt::registry &Reg) const final {
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
     auto ExistingBuff = Reg.try_get<BuffType>(Et);
     if (ExistingBuff) {
       ExistingBuff->add(Buff);
@@ -133,33 +117,11 @@ public:
     }
   }
 
-private:
-  BuffType Buff;
-};
-
-template <typename BuffType, typename... RequiredComps>
-class EquipItemBuffEffect : public ItemEffect {
-public:
-  explicit EquipItemBuffEffect(const BuffType &Buff) : Buff(Buff) {}
-
-  bool canEquipOn(const entt::entity &Et, entt::registry &Reg) const final {
+  bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) const final {
     return Reg.all_of<RequiredComps...>(Et);
   }
 
-  void equipOn(const entt::entity &Et, entt::registry &Reg) const final {
-    auto ExistingBuff = Reg.try_get<BuffType>(Et);
-    if (ExistingBuff) {
-      ExistingBuff->add(Buff);
-    } else {
-      Reg.emplace<BuffType>(Et, Buff);
-    }
-  }
-
-  bool canUnequipFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    return Reg.all_of<RequiredComps...>(Et);
-  }
-
-  void unequipFrom(const entt::entity &Et, entt::registry &Reg) const final {
+  void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {
     auto ExistingBuff = Reg.try_get<BuffType>(Et);
     if (ExistingBuff) {
       if (ExistingBuff->remove(Buff)) {
@@ -172,25 +134,34 @@ private:
   BuffType Buff;
 };
 
-class ItemPrototype : public UseInterface, public EquipInterface {
+class ItemPrototype {
+public:
+  struct EffectInfo {
+    CapabilityFlags Flags;
+    std::shared_ptr<ItemEffect> Effect;
+  };
+
+public:
+  static bool canApply(ItemType Type, CapabilityFlags Flags);
+
 public:
   ItemPrototype(int ItemId, std::string Name, ItemType Type, int MaxStatckSize,
-                std::vector<std::shared_ptr<ItemEffect>> Effects);
+                std::vector<EffectInfo> Effects);
 
-  // add:
+  // TODO add:
   // attack melee
   // attack ranged
-  // defnese
+  // defense
   // craft
-  bool canUseOn(const entt::entity &Entity, entt::registry &Reg) const final;
-  void useOn(const entt::entity &Entity, entt::registry &Reg) const final;
 
-  bool canEquipOn(const entt::entity &Entity, entt::registry &Reg) const final;
-  void equipOn(const entt::entity &Entity, entt::registry &Reg) const final;
-
-  bool canUnequipFrom(const entt::entity &Entity,
-                      entt::registry &Reg) const final;
-  void unequipFrom(const entt::entity &Entity, entt::registry &Reg) const final;
+  bool canApplyTo(const entt::entity &Entity, entt::registry &Reg,
+                  CapabilityFlags Flags) const;
+  void applyTo(const entt::entity &Entity, entt::registry &Reg,
+               CapabilityFlags Flags) const;
+  bool canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
+                     CapabilityFlags Flags) const;
+  void removeFrom(const entt::entity &Entity, entt::registry &Reg,
+                  CapabilityFlags Flags) const;
 
 public:
   int ItemId;
@@ -198,10 +169,10 @@ public:
   ItemType Type = ItemType::None;
   int MaxStatckSize = 1;
 
-  std::vector<std::shared_ptr<ItemEffect>> Effects;
+  std::vector<EffectInfo> Effects;
 };
 
-class Item : public UseInterface, public EquipInterface {
+class Item {
 public:
   Item(const ItemPrototype &Proto, int StackSize = 1,
        const std::shared_ptr<ItemPrototype> &Specialization = nullptr);
@@ -214,15 +185,14 @@ public:
   /// Returns true if other Item has same prototype and specialization
   bool isSameKind(const Item &Other) const;
 
-  bool canUseOn(const entt::entity &Entity, entt::registry &Reg) const final;
-  void useOn(const entt::entity &Entity, entt::registry &Reg) const final;
-
-  bool canEquipOn(const entt::entity &Entity, entt::registry &Reg) const final;
-  void equipOn(const entt::entity &Entity, entt::registry &Reg) const final;
-
-  bool canUnequipFrom(const entt::entity &Entity,
-                      entt::registry &Reg) const final;
-  void unequipFrom(const entt::entity &Entity, entt::registry &Reg) const final;
+  bool canApplyTo(const entt::entity &Entity, entt::registry &Reg,
+                  CapabilityFlags Flags) const;
+  void applyTo(const entt::entity &Entity, entt::registry &Reg,
+               CapabilityFlags Flags) const;
+  bool canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
+                     CapabilityFlags Flags) const;
+  void removeFrom(const entt::entity &Entity, entt::registry &Reg,
+                  CapabilityFlags Flags) const;
 
 public:
   int StackSize = 1;

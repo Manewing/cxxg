@@ -4,7 +4,7 @@ namespace rogue {
 
 void AdditiveBuff::add() { SourceCount++; }
 
-bool AdditiveBuff::remove() { return --SourceCount == 0; }
+bool AdditiveBuff::remove(const AdditiveBuff &) { return --SourceCount == 0; }
 
 void RegenerationBuff::add(const RegenerationBuff &Other) {
   if (Other.total() > total()) {
@@ -33,7 +33,7 @@ void StatsBuffComp::add(const StatsBuffComp &Other) {
 
 bool StatsBuffComp::remove(const StatsBuffComp &Other) {
   Bonus += Other.Bonus;
-  return AdditiveBuff::remove();
+  return AdditiveBuff::remove(Other);
 }
 
 void StatsTimedBuffComp::add(const StatsTimedBuffComp &Other) {

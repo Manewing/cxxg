@@ -5,88 +5,94 @@ namespace rogue {
 
 HealItemEffect::HealItemEffect(StatValue Amount) : Amount(Amount) {}
 
-bool HealItemEffect::canUseOn(const entt::entity &Et,
-                              entt::registry &Reg) const {
+bool HealItemEffect::canApplyTo(const entt::entity &Et,
+                                entt::registry &Reg) const {
   return Reg.any_of<HealthComp>(Et);
 }
 
-void HealItemEffect::useOn(const entt::entity &Et, entt::registry &Reg) const {
+void HealItemEffect::applyTo(const entt::entity &Et,
+                             entt::registry &Reg) const {
   assert(canUseOn(Et, Reg));
   Reg.get<HealthComp>(Et).restore(Amount);
 }
 
 DamageItemEffect::DamageItemEffect(StatValue Amount) : Amount(Amount) {}
 
-bool DamageItemEffect::canUseOn(const entt::entity &Et,
-                                entt::registry &Reg) const {
+bool DamageItemEffect::canApplyTo(const entt::entity &Et,
+                                  entt::registry &Reg) const {
   return Reg.any_of<HealthComp>(Et);
 }
 
-void DamageItemEffect::useOn(const entt::entity &Et,
-                             entt::registry &Reg) const {
+void DamageItemEffect::applyTo(const entt::entity &Et,
+                               entt::registry &Reg) const {
   Reg.get<HealthComp>(Et).reduce(Amount);
 }
 
+bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
+  return
+      // Equipment
+      ((Flags & CapabilityFlags::Equipment) != CapabilityFlags::None &&
+       (Type & ItemType::EquipmentMask) != ItemType::None) ||
+      // Consumable
+      ((Flags & CapabilityFlags::UseOn) != CapabilityFlags::None &&
+       (Type & ItemType::Consumable) != ItemType::None);
+}
+
 ItemPrototype::ItemPrototype(int ItemId, std::string N, ItemType Type,
-                             int MaxStatckSize,
-                             std::vector<std::shared_ptr<ItemEffect>> Eff)
+                             int MaxStatckSize, std::vector<EffectInfo> Eff)
     : ItemId(ItemId), Name(std::move(N)), Type(Type),
       MaxStatckSize(MaxStatckSize), Effects(std::move(Eff)) {}
 
-bool ItemPrototype::canUseOn(const entt::entity &Entity,
-                             entt::registry &Reg) const {
-  if (Effects.empty()) {
+bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
+                               CapabilityFlags Flags) const {
+  if (!canApply(Type, Flags)) {
     return false;
   }
-  bool CanUse = true;
-  for (const auto &Effect : Effects) {
-    CanUse = CanUse && Effect->canUseOn(Entity, Reg);
+  bool CanApply = true;
+  for (const auto &Info : Effects) {
+    if ((Info.Flags & Flags) != CapabilityFlags::None) {
+      CanApply = CanApply && Info.Effect->canApplyTo(Entity, Reg);
+    }
   }
-  return CanUse;
+  return CanApply;
 }
 
-void ItemPrototype::useOn(const entt::entity &Entity,
-                          entt::registry &Reg) const {
-  for (const auto &Effect : Effects) {
-    Effect->useOn(Entity, Reg);
+void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
+                            CapabilityFlags Flags) const {
+  if (!canApply(Type, Flags)) {
+    return;
+  }
+  for (const auto &Info : Effects) {
+    if ((Info.Flags & Flags) != CapabilityFlags::None) {
+      Info.Effect->applyTo(Entity, Reg);
+    }
   }
 }
 
-bool ItemPrototype::canEquipOn(const entt::entity &Entity,
-                               entt::registry &Reg) const {
-  if (Effects.empty()) {
+bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
+                                  entt::registry &Reg,
+                                  CapabilityFlags Flags) const {
+  if (!canApply(Type, Flags)) {
     return false;
   }
-  bool CanEquip = true;
-  for (const auto &Effect : Effects) {
-    CanEquip = CanEquip && Effect->canEquipOn(Entity, Reg);
+  bool CanRemove = true;
+  for (const auto &Info : Effects) {
+    if ((Info.Flags & Flags) != CapabilityFlags::None) {
+      CanRemove = CanRemove && Info.Effect->canRemoveFrom(Entity, Reg);
+    }
   }
-  return CanEquip;
+  return CanRemove;
 }
 
-void ItemPrototype::equipOn(const entt::entity &Entity,
-                            entt::registry &Reg) const {
-  for (const auto &Effect : Effects) {
-    Effect->equipOn(Entity, Reg);
+void ItemPrototype::removeFrom(const entt::entity &Entity, entt::registry &Reg,
+                               CapabilityFlags Flags) const {
+  if (!canApply(Type, Flags)) {
+    return;
   }
-}
-
-bool ItemPrototype::canUnequipFrom(const entt::entity &Entity,
-                                   entt::registry &Reg) const {
-  if (Effects.empty()) {
-    return false;
-  }
-  bool CanUnequip = true;
-  for (const auto &Effect : Effects) {
-    CanUnequip = CanUnequip && Effect->canUnequipFrom(Entity, Reg);
-  }
-  return CanUnequip;
-}
-
-void ItemPrototype::unequipFrom(const entt::entity &Entity,
-                                entt::registry &Reg) const {
-  for (const auto &Effect : Effects) {
-    Effect->unequipFrom(Entity, Reg);
+  for (const auto &Info : Effects) {
+    if ((Info.Flags & Flags) != CapabilityFlags::None) {
+      Info.Effect->removeFrom(Entity, Reg);
+    }
   }
 }
 
@@ -110,43 +116,34 @@ bool Item::isSameKind(const Item &Other) const {
   return Proto == Other.Proto && Specialization == Other.Specialization;
 }
 
-bool Item::canUseOn(const entt::entity &Entity, entt::registry &Reg) const {
-  bool SpecCanUseOn = Specialization && Specialization->canUseOn(Entity, Reg);
-  return getProto().canUseOn(Entity, Reg) && SpecCanUseOn;
+bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
+                      CapabilityFlags Flags) const {
+  bool SpecCanUseOn =
+      !Specialization || Specialization->canApplyTo(Entity, Reg, Flags);
+  return getProto().canApplyTo(Entity, Reg, Flags) && SpecCanUseOn;
 }
 
-void Item::useOn(const entt::entity &Entity, entt::registry &Reg) const {
+void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
+                   CapabilityFlags Flags) const {
   if (Specialization) {
-    Specialization->useOn(Entity, Reg);
+    Specialization->applyTo(Entity, Reg, Flags);
   }
-  getProto().useOn(Entity, Reg);
+  getProto().applyTo(Entity, Reg, Flags);
 }
 
-bool Item::canEquipOn(const entt::entity &Entity, entt::registry &Reg) const {
-  bool SpecCanEquipOn =
-      !Specialization || Specialization->canEquipOn(Entity, Reg);
-  return getProto().canEquipOn(Entity, Reg) && SpecCanEquipOn;
-}
-
-void Item::equipOn(const entt::entity &Entity, entt::registry &Reg) const {
-  if (Specialization) {
-    Specialization->equipOn(Entity, Reg);
-  }
-  getProto().equipOn(Entity, Reg);
-}
-
-bool Item::canUnequipFrom(const entt::entity &Entity,
-                          entt::registry &Reg) const {
+bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
+                         CapabilityFlags Flags) const {
   bool SpecCanUnequipFrom =
-      !Specialization || Specialization->canUnequipFrom(Entity, Reg);
-  return getProto().canUnequipFrom(Entity, Reg) && SpecCanUnequipFrom;
+      !Specialization || Specialization->canRemoveFrom(Entity, Reg, Flags);
+  return getProto().canRemoveFrom(Entity, Reg, Flags) && SpecCanUnequipFrom;
 }
 
-void Item::unequipFrom(const entt::entity &Entity, entt::registry &Reg) const {
+void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,
+                      CapabilityFlags Flags) const {
   if (Specialization) {
-    Specialization->unequipFrom(Entity, Reg);
+    Specialization->removeFrom(Entity, Reg, Flags);
   }
-  getProto().unequipFrom(Entity, Reg);
+  getProto().removeFrom(Entity, Reg, Flags);
 }
 
 const ItemPrototype &Item::getProto() const { return *Proto; }
@@ -157,7 +154,7 @@ EquipmentSlot &Equipment::getSlot(ItemType It) {
 }
 
 const EquipmentSlot &Equipment::getSlot(ItemType It) const {
-  switch (It) {
+  switch (It & ItemType::EquipmentMask) {
   case ItemType::Ring:
     return Ring;
   case ItemType::Amulet:
@@ -178,7 +175,7 @@ const EquipmentSlot &Equipment::getSlot(ItemType It) const {
     break;
   }
   assert(false);
-  return Ring;
+  return OffHand;
 }
 
 bool Equipment::canEquip(ItemType Type) const {
