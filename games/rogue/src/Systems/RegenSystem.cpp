@@ -6,9 +6,6 @@
 // FIXME for debug message
 #include <rogue/History.h>
 
-static constexpr float HealthPerVit = 9.1f;
-static constexpr float ManaPerInt = 9.1f;
-
 namespace rogue {
 
 namespace {
@@ -75,16 +72,6 @@ runReductionBuffUpdate(System &Sys, entt::registry &Reg) {
 } // namespace
 
 void RegenSystem::update() {
-  // If the entity has stats they override the maximum values defined
-  Reg.view<const StatsComp, HealthComp>().each(
-      [](const auto &St, auto &Health) {
-        Health.MaxValue = St.effective().Vit * HealthPerVit;
-      });
-  Reg.view<const StatsComp, ManaComp>().each(
-      [](const auto &St, auto &Mana) {
-        Mana.MaxValue = St.effective().Int * ManaPerInt;
-      });
-
   // Run regeneration
   runRegenUpdate<HealthComp>(Reg);
   runRegenUpdate<ManaComp>(Reg);
