@@ -39,7 +39,7 @@ EquipmentController::EquipmentController(Equipment &Equip, entt::entity Entity,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
     : BaseRect(Pos, {50, 10}), Equip(Equip), Entity(Entity), Reg(Reg) {
-  ItSel = std::make_shared<ItemSelect>();
+  ItSel = std::make_shared<ItemSelect>(Pos);
   Dec = std::make_shared<Frame>(ItSel, Pos, Size, "Equipment");
 
   int Count = 0;

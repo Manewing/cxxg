@@ -23,7 +23,6 @@ public:
   void draw(cxxg::Screen &Scr) const override;
 
 protected:
-  cxxg::types::Position Pos;
   cxxg::types::Size Size;
   std::string Header;
 };

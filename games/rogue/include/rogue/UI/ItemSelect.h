@@ -34,6 +34,8 @@ private:
 
 class ItemSelect : public Widget {
 public:
+  using Widget::Widget;
+
   void addSelect(std::shared_ptr<LabeledSelect> Select);
 
   void selectNext();
@@ -43,6 +45,7 @@ public:
   LabeledSelect &getSelected();
   LabeledSelect &getSelect(std::size_t Idx);
 
+  void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
   std::string_view getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;

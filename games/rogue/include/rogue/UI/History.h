@@ -12,7 +12,8 @@ namespace rogue::ui {
 
 class HistoryController : public Widget {
 public:
-  HistoryController(const History &Hist, unsigned NumHistoryRows = 18);
+  HistoryController(cxxg::types::Position Pos, const History &Hist,
+                    unsigned NumHistoryRows = 18);
   bool handleInput(int Char) final;
   std::string_view getInteractMsg() const final;
   void draw(cxxg::Screen &Scr) const final;

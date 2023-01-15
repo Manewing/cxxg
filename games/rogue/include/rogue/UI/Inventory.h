@@ -35,7 +35,7 @@ protected:
   entt::entity Entity;
   entt::registry &Reg;
   std::shared_ptr<ListSelect> List;
-  std::shared_ptr<Widget> Widget;
+  std::shared_ptr<Widget> Decorated;
 };
 
 class InventoryController : public InventoryControllerBase {

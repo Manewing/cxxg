@@ -23,7 +23,7 @@ void Frame::drawFrameVLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
 
 Frame::Frame(std::shared_ptr<Widget> Comp, cxxg::types::Position Pos,
              cxxg::types::Size Size, std::string Header)
-    : Decorator(std::move(Comp)), Pos(Pos), Size(Size),
+    : Decorator(Pos, std::move(Comp)), Size(Size),
       Header(std::move(Header)) {}
 
 void Frame::draw(cxxg::Screen &Scr) const {

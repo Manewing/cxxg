@@ -47,6 +47,7 @@ void LabeledSelect::draw(cxxg::Screen &Scr) const {
 }
 
 void ItemSelect::addSelect(std::shared_ptr<LabeledSelect> Select) {
+  Select->setPos(Select->getPos() + Pos);
   Selects.emplace_back(std::move(Select));
   selectNext();
 }
@@ -81,6 +82,13 @@ LabeledSelect &ItemSelect::getSelected() { return *Selects.at(SelectedIdx); }
 
 LabeledSelect &ItemSelect::getSelect(std::size_t Idx) {
   return *Selects.at(Idx);
+}
+
+void ItemSelect::setPos(cxxg::types::Position P) {
+  for (auto &Select : Selects) {
+    Select->setPos(Select->getPos() - Pos + P);
+  }
+  Pos = P;
 }
 
 bool ItemSelect::handleInput(int Char) {

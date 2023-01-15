@@ -2,7 +2,13 @@
 
 namespace rogue::ui {
 
-Decorator::Decorator(std::shared_ptr<Widget> Comp) : Comp(std::move(Comp)) {}
+Decorator::Decorator(cxxg::types::Position Pos, std::shared_ptr<Widget> Comp)
+    : Widget(Pos), Comp(std::move(Comp)) {}
+
+void Decorator::setPos(cxxg::types::Position P) {
+  Pos = P;
+  Comp->setPos(P);
+}
 
 bool Decorator::handleInput(int Char) { return Comp->handleInput(Char); }
 

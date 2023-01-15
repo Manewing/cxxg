@@ -4,7 +4,7 @@
 namespace rogue::ui {
 
 BaseRect::BaseRect(cxxg::types::Position Pos, cxxg::types::Size Size)
-    : Pos(Pos), Size(Size) {}
+    : Widget(Pos), Size(Size) {}
 
 void BaseRect::draw(cxxg::Screen &Scr) const {
   auto FillStr = std::string(Size.X, ' ');

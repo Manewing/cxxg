@@ -12,11 +12,10 @@ InventoryControllerBase::InventoryControllerBase(Inventory &Inv,
                                                  entt::entity Entity,
                                                  entt::registry &Reg,
                                                  const std::string &Header)
-    : Inv(Inv), Entity(Entity), Reg(Reg) {
-  cxxg::types::Position Pos{2, 2};
+    : Widget({2, 2}), Inv(Inv), Entity(Entity), Reg(Reg) {
   cxxg::types::Size Size{30, 18};
   List = std::make_shared<ListSelect>(Pos, Size);
-  Widget = std::make_shared<Frame>(List, Pos, Size, Header);
+  Decorated = std::make_shared<Frame>(List, Pos, Size, Header);
   updateElements();
 }
 
@@ -31,7 +30,7 @@ bool InventoryControllerBase::handleInput(int Char) {
 }
 
 void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
-  Widget->draw(Scr);
+  Decorated->draw(Scr);
 }
 
 void InventoryControllerBase::updateElements() {

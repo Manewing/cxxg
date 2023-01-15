@@ -6,9 +6,10 @@
 
 namespace rogue::ui {
 
-HistoryController::HistoryController(const History &Hist,
+HistoryController::HistoryController(cxxg::types::Position Pos,
+                                     const History &Hist,
                                      unsigned NumHistoryRows)
-    : Hist(Hist), NumHistoryRows(NumHistoryRows) {
+    : Widget(Pos), Hist(Hist), NumHistoryRows(NumHistoryRows) {
   auto NumMsgs = Hist.getMessages().size();
   if (NumMsgs > NumHistoryRows) {
     Offset = Hist.getMessages().size() - NumHistoryRows;
@@ -40,32 +41,31 @@ std::string_view HistoryController::getInteractMsg() const {
 }
 
 void HistoryController::draw(cxxg::Screen &Scr) const {
-  const int PosX = 0, PosY = 2;
-  const unsigned NumHistoryRows = 18;
+  const int NumHistoryRows = 18;
   std::string_view Header = "History";
 
   // Draw header
-  Frame::drawFrameHeader(Scr, {PosX, PosY}, Header, Scr.getSize().X);
+  Frame::drawFrameHeader(Scr, {Pos.X, Pos.Y}, Header, Scr.getSize().X);
 
   const auto &Msgs = Hist.getMessages();
   for (unsigned int Idx = 0; Idx < NumHistoryRows; Idx++) {
-    const int LinePos = PosY + Idx + 1;
+    const int LinePos = Pos.Y + Idx + 1;
     const unsigned MsgPos = Idx + Offset;
 
     if (MsgPos >= Msgs.size()) {
-      Scr[LinePos][PosX] << std::string(Scr.getSize().X, ' ');
+      Scr[LinePos][Pos.X] << std::string(Scr.getSize().X, ' ');
       continue;
     }
 
     if (Idx == 0 && Offset != 0) {
-      Scr[LinePos][PosX] << std::string(Scr.getSize().X, ' ');
-      Scr[LinePos][PosX + Scr.getSize().X / 2] = '^';
+      Scr[LinePos][Pos.X] << std::string(Scr.getSize().X, ' ');
+      Scr[LinePos][Pos.X + Scr.getSize().X / 2] = '^';
       continue;
     }
 
     if (Idx == NumHistoryRows - 1 && MsgPos < Msgs.size() - 1) {
-      Scr[LinePos][PosX] << std::string(Scr.getSize().X, ' ');
-      Scr[LinePos][PosX + Scr.getSize().X / 2] = 'v';
+      Scr[LinePos][Pos.X] << std::string(Scr.getSize().X, ' ');
+      Scr[LinePos][Pos.X + Scr.getSize().X / 2] = 'v';
       continue;
     }
 
@@ -79,7 +79,7 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
       std::min(Msgs.size(), static_cast<std::size_t>(Offset + NumHistoryRows));
   std::string Footer = std::to_string(Start) + "-" + std::to_string(End);
 
-  Frame::drawFrameHeader(Scr, {PosX, PosY + NumHistoryRows + 1}, Footer,
+  Frame::drawFrameHeader(Scr, {Pos.X, Pos.Y + NumHistoryRows + 1}, Footer,
                          Scr.getSize().X);
 }
 

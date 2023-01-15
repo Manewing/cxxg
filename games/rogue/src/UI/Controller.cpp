@@ -81,7 +81,7 @@ void Controller::setLootUI(Inventory &Inv, entt::entity Entity,
 }
 
 void Controller::setHistoryUI(History &Hist) {
-  ActiveWidget.reset(new HistoryController(Hist));
+  ActiveWidget.reset(new HistoryController({0, 2}, Hist));
 }
 
 } // namespace rogue::ui
