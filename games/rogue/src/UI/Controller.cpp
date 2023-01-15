@@ -2,6 +2,7 @@
 #include <cxxg/Utils.h>
 #include <iomanip>
 #include <rogue/UI/Controller.h>
+#include <rogue/UI/Equipment.h>
 #include <rogue/UI/History.h>
 #include <rogue/UI/Inventory.h>
 
@@ -62,6 +63,11 @@ void Controller::handleInput(int Char) {
   if (!ActiveWidget->handleInput(Char)) {
     ActiveWidget = nullptr;
   }
+}
+
+void Controller::setEquipmentUI(Equipment &Equip, entt::entity Entity,
+                                entt::registry &Reg) {
+  ActiveWidget.reset(new EquipmentController(Equip, Entity, Reg, {2, 2}));
 }
 
 void Controller::setInventoryUI(Inventory &Inv, entt::entity Entity,

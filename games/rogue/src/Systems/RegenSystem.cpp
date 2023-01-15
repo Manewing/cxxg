@@ -76,18 +76,21 @@ runReductionBuffUpdate(System &Sys, entt::registry &Reg) {
 
 void RegenSystem::update() {
   // If the entity has stats they override the maximum values defined
-  auto StatsView = Reg.view<const StatsComp, HealthComp, ManaComp>();
-  StatsView.each([](const auto &St, auto &Health, auto &Mana) {
-    Health.MaxValue = St.effective().Vit * HealthPerVit;
-    Mana.MaxValue = St.effective().Int * ManaPerInt;
-  });
+  Reg.view<const StatsComp, HealthComp>().each(
+      [](const auto &St, auto &Health) {
+        Health.MaxValue = St.effective().Vit * HealthPerVit;
+      });
+  Reg.view<const StatsComp, ManaComp>().each(
+      [](const auto &St, auto &Mana) {
+        Mana.MaxValue = St.effective().Int * ManaPerInt;
+      });
 
   // Run regeneration
   runRegenUpdate<HealthComp>(Reg);
   runRegenUpdate<ManaComp>(Reg);
 
   // Process buffs
-  runRegenBuffUpdate<HealthComp, HealthRegenBuffComp>(*this,Reg);
+  runRegenBuffUpdate<HealthComp, HealthRegenBuffComp>(*this, Reg);
   runRegenBuffUpdate<ManaComp, ManaRegenBuffComp>(*this, Reg);
   runReductionBuffUpdate<HealthComp, PoisonDebuffComp>(*this, Reg);
   runReductionBuffUpdate<HealthComp, BleedingDebuffComp>(*this, Reg);

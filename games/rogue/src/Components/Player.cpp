@@ -10,11 +10,12 @@ namespace rogue {
 namespace {
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
-                          const PositionComp &PosComp, const HealthComp &HC,
-                          const NameComp &NC, const LineOfSightComp LOSC,
-                          const AgilityComp &AC, const MeleeAttackComp &MC,
-                          const MovementComp &MVC,
-                          const InventoryComp &InvComp) {
+                          const PositionComp &PosComp, const StatsComp &Stats,
+                          const HealthComp &HC, const NameComp &NC,
+                          const LineOfSightComp LOSC, const AgilityComp &AC,
+                          const MeleeAttackComp &MC, const MovementComp &MVC,
+                          const InventoryComp &InvComp,
+                          const EquipmentComp &EquipComp) {
   static constexpr Tile PlayerTile{{'@', cxxg::types::RgbColor{255, 255, 50}}};
 
   auto Entity = Reg.create();
@@ -26,6 +27,7 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   // Copy values
   Reg.emplace<PlayerComp>(Entity, PC);
   Reg.emplace<PositionComp>(Entity, PosComp);
+  Reg.emplace<StatsComp>(Entity, Stats);
   Reg.emplace<HealthComp>(Entity, HC);
   Reg.emplace<NameComp>(Entity, NC);
   Reg.emplace<LineOfSightComp>(Entity, LOSC);
@@ -33,6 +35,7 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   Reg.emplace<MeleeAttackComp>(Entity, MC);
   Reg.emplace<MovementComp>(Entity, MVC);
   Reg.emplace<InventoryComp>(Entity, InvComp);
+  Reg.emplace<EquipmentComp>(Entity, EquipComp);
   Reg.emplace<CollisionComp>(Entity);
 
   return Entity;
@@ -43,10 +46,10 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
 entt::entity PlayerComp::createPlayer(entt::registry &Reg,
                                       const std::string &Name,
                                       ymir::Point2d<int> Pos) {
-  return ::rogue::createPlayer(Reg, PlayerComp{}, PositionComp{Pos},
-                               HealthComp{}, NameComp{Name}, LineOfSightComp{},
-                               AgilityComp{}, MeleeAttackComp{}, MovementComp{},
-                               InventoryComp{});
+  return ::rogue::createPlayer(
+      Reg, PlayerComp{}, PositionComp{Pos}, StatsComp{}, HealthComp{},
+      NameComp{Name}, LineOfSightComp{}, AgilityComp{}, MeleeAttackComp{},
+      MovementComp{}, InventoryComp{}, EquipmentComp{});
 }
 
 entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
@@ -56,10 +59,11 @@ entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
   for (auto Entity : View) {
     PlayerEntity = ::rogue::createPlayer(
         RegTo, RegFrom.get<PlayerComp>(Entity),
-        RegFrom.get<PositionComp>(Entity), RegFrom.get<HealthComp>(Entity),
-        RegFrom.get<NameComp>(Entity), RegFrom.get<LineOfSightComp>(Entity),
-        RegFrom.get<AgilityComp>(Entity), RegFrom.get<MeleeAttackComp>(Entity),
-        RegFrom.get<MovementComp>(Entity), RegFrom.get<InventoryComp>(Entity));
+        RegFrom.get<PositionComp>(Entity), RegFrom.get<StatsComp>(Entity),
+        RegFrom.get<HealthComp>(Entity), RegFrom.get<NameComp>(Entity),
+        RegFrom.get<LineOfSightComp>(Entity), RegFrom.get<AgilityComp>(Entity),
+        RegFrom.get<MeleeAttackComp>(Entity), RegFrom.get<MovementComp>(Entity),
+        RegFrom.get<InventoryComp>(Entity), RegFrom.get<EquipmentComp>(Entity));
   }
   return PlayerEntity;
 }

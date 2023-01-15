@@ -8,33 +8,33 @@ namespace rogue {
 using StatPoint = int;
 using StatValue = double;
 
-struct StatValues {
+struct StatPoints {
   StatPoint Int = 11;
   StatPoint Str = 11;
   StatPoint Dex = 11;
   StatPoint Vit = 11;
 
-  StatValues &operator+=(const StatValues &Other) {
+  StatPoints &operator+=(const StatPoints &Other) {
     *this = {Int + Other.Int, Str + Other.Str, Dex + Other.Dex,
              Vit + Other.Vit};
     return *this;
   }
 };
 
-inline StatValues operator+(const StatValues &Lhs,
-                            const StatValues &Rhs) noexcept {
+inline StatPoints operator+(const StatPoints &Lhs,
+                            const StatPoints &Rhs) noexcept {
   auto Copy = Lhs;
   Copy += Rhs;
   return Copy;
 }
 
 struct StatsComp {
-  StatValues Base;
-  StatValues Bonus;
+  StatPoints Base;
+  StatPoints Bonus;
 
   inline void reset() { Bonus = {0, 0, 0, 0}; }
-  inline void add(StatValues Bonus) { this->Bonus += Bonus; }
-  inline StatValues effective() const { return Base + Bonus; }
+  inline void add(StatPoints Bonus) { this->Bonus += Bonus; }
+  inline StatPoints effective() const { return Base + Bonus; }
 };
 
 struct ValueRegenCompBase {

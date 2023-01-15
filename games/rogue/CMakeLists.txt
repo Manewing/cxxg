@@ -36,9 +36,11 @@ set(HEADER_FILES
   include/rogue/Systems/WanderAISystem.h
   include/rogue/UI/Controller.h
   include/rogue/UI/Decorator.h
+  include/rogue/UI/Equipment.h
   include/rogue/UI/Frame.h
   include/rogue/UI/History.h
   include/rogue/UI/Inventory.h
+  include/rogue/UI/ItemSelect.h
   include/rogue/UI/ListSelect.h
   include/rogue/UI/Widget.h
 )
@@ -68,9 +70,11 @@ set(SOURCE_FILES
   src/Systems/WanderAISystem.cpp
   src/UI/Controller.cpp
   src/UI/Decorator.cpp
+  src/UI/Equipment.cpp
   src/UI/Frame.cpp
   src/UI/History.cpp
   src/UI/Inventory.cpp
+  src/UI/ItemSelect.cpp
   src/UI/ListSelect.cpp
   src/UI/Widget.cpp
 )

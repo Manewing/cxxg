@@ -1,10 +1,10 @@
 #include <cxxg/Utils.h>
+#include <iomanip>
 #include <rogue/Components/Items.h>
 #include <rogue/Inventory.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/ListSelect.h>
-#include <iomanip>
 
 namespace rogue::ui {
 
@@ -57,8 +57,28 @@ bool InventoryController::handleInput(int Char) {
   }
 
   switch (Char) {
+  case 'e': {
+    auto Equip = Reg.try_get<EquipmentComp>(Entity);
+    if (!Equip) {
+      // FIXME message
+      break;
+    }
+    const auto &It = Inv.getItem(List->getSelectedElement());
+    if (!Equip->Equip.canEquip(It.getType())) {
+      // FIXME message
+      break;
+    }
+    if (!It.canEquipOn(Entity, Reg)) {
+      // FIXME message
+      break;
+    }
+    It.equipOn(Entity, Reg);
+    Equip->Equip.equip(Inv.takeItem(List->getSelectedElement())),
+    updateElements();
+  } break;
   case 'u':
     if (Inv.canUseItem(Entity, Reg, List->getSelectedElement())) {
+      // FIXME message
       break;
     }
     Inv.useItem(Entity, Reg, List->getSelectedElement(), 1);
@@ -75,7 +95,7 @@ bool InventoryController::handleInput(int Char) {
 
 std::string_view InventoryController::getInteractMsg() const {
   if (Inv.empty()) {
-    return "[Empty]";
+    return "";
   }
   // FIXME item may have multiple options...
   const auto &SelectedItem = Inv.getItem(List->getSelectedElement());
@@ -113,7 +133,7 @@ bool LootController::handleInput(int Char) {
 
 std::string_view LootController::getInteractMsg() const {
   if (Inv.empty()) {
-    return "[Empty]";
+    return "";
   }
   return "[E] Take";
 }

@@ -97,6 +97,9 @@ bool Game::handleInput(int Char) {
   case 'e':
     tryInteract();
     break;
+  case 'c':
+    // TODO help show controls
+    return false;
   case 'i': {
     if (!CurrentLevel) {
       return false;
@@ -108,6 +111,19 @@ bool Game::handleInput(int Char) {
     auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
     // UI interaction do not update level
     UICtrl.setInventoryUI(InvComp.Inv, Player, CurrentLevel->Reg);
+    return true;
+  }
+  case 'o': {
+    if (!CurrentLevel) {
+      return false;
+    }
+    auto Player = CurrentLevel->getPlayer();
+    if (Player == entt::null) {
+      return false;
+    }
+    auto &EquipComp = CurrentLevel->Reg.get<EquipmentComp>(Player);
+    // UI interaction do not update level
+    UICtrl.setEquipmentUI(EquipComp.Equip, Player, CurrentLevel->Reg);
     return true;
   }
   case 'h':

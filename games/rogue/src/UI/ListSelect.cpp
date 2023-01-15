@@ -30,6 +30,8 @@ void ListSelect::selectPrev() {
 
 bool ListSelect::handleInput(int Char) {
   switch (Char) {
+  case cxxg::utils::KEY_ESC:
+    return false;
   case cxxg::utils::KEY_DOWN:
     selectNext();
     break;
@@ -52,8 +54,9 @@ void ListSelect::draw(cxxg::Screen &Scr) const {
   for (unsigned ElemIdx = 0; ElemIdx < Size.Y && ElemIdx < Elements.size();
        ElemIdx++) {
     const auto &Element = Elements.at(ElemIdx);
-    drawFrameElement(Scr, Element, {Pos.X, Pos.Y + static_cast<int>(ElemIdx) + 1},
-                     Size.X, ElemIdx == SelectedElemIdx);
+    drawFrameElement(Scr, Element,
+                     {Pos.X, Pos.Y + static_cast<int>(ElemIdx) + 1}, Size.X,
+                     ElemIdx == SelectedElemIdx);
   }
 }
 

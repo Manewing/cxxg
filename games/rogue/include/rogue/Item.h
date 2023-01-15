@@ -1,6 +1,7 @@
 #ifndef ROGUE_ITEM_H
 #define ROGUE_ITEM_H
 
+#include <array>
 #include <entt/entt.hpp>
 #include <memory>
 #include <optional>
@@ -22,7 +23,7 @@ enum class ItemType {
   Pants = 0x10,
   Boots = 0x20,
   Weapon = 0x40,
-  Shield = 0x80,
+  OffHand = 0x80,
   EquipmentMask = 0xff,
 
   // general item types
@@ -115,9 +116,9 @@ private:
 };
 
 template <typename BuffType, typename... RequiredComps>
-class ApplyBuffEffect : public ItemEffect {
+class UseItemBuffEffect : public ItemEffect {
 public:
-  explicit ApplyBuffEffect(const BuffType &Buff) : Buff(Buff) {}
+  explicit UseItemBuffEffect(const BuffType &Buff) : Buff(Buff) {}
 
   bool canUseOn(const entt::entity &Et, entt::registry &Reg) const final {
     return Reg.all_of<RequiredComps...>(Et);
@@ -127,8 +128,44 @@ public:
     auto ExistingBuff = Reg.try_get<BuffType>(Et);
     if (ExistingBuff) {
       ExistingBuff->add(Buff);
+    } else {
+      Reg.emplace<BuffType>(Et, Buff);
     }
-    Reg.emplace<BuffType>(Et);
+  }
+
+private:
+  BuffType Buff;
+};
+
+template <typename BuffType, typename... RequiredComps>
+class EquipItemBuffEffect : public ItemEffect {
+public:
+  explicit EquipItemBuffEffect(const BuffType &Buff) : Buff(Buff) {}
+
+  bool canEquipOn(const entt::entity &Et, entt::registry &Reg) const final {
+    return Reg.all_of<RequiredComps...>(Et);
+  }
+
+  void equipOn(const entt::entity &Et, entt::registry &Reg) const final {
+    auto ExistingBuff = Reg.try_get<BuffType>(Et);
+    if (ExistingBuff) {
+      ExistingBuff->add(Buff);
+    } else {
+      Reg.emplace<BuffType>(Et, Buff);
+    }
+  }
+
+  bool canUnequipFrom(const entt::entity &Et, entt::registry &Reg) const final {
+    return Reg.all_of<RequiredComps...>(Et);
+  }
+
+  void unequipFrom(const entt::entity &Et, entt::registry &Reg) const final {
+    auto ExistingBuff = Reg.try_get<BuffType>(Et);
+    if (ExistingBuff) {
+      if (ExistingBuff->remove(Buff)) {
+        Reg.erase<BuffType>(Et);
+      }
+    }
   }
 
 private:
@@ -158,7 +195,7 @@ public:
 public:
   int ItemId;
   std::string Name;
-  ItemType Type;
+  ItemType Type = ItemType::None;
   int MaxStatckSize = 1;
 
   std::vector<std::shared_ptr<ItemEffect>> Effects;
@@ -198,19 +235,33 @@ private:
   std::shared_ptr<const ItemPrototype> Specialization = nullptr;
 };
 
+struct EquipmentSlot {
+  const ItemType BaseTypeFilter = ItemType::None;
+  std::optional<Item> It = std::nullopt;
+  ItemType TypeFilter = ItemType::None;
+};
+
 class Equipment {
 public:
-  std::optional<Item> Ring;
-  std::optional<Item> Amulet;
-  std::optional<Item> Helmet;
-  std::optional<Item> ChestPlat;
-  std::optional<Item> Pants;
-  std::optional<Item> Boots;
-  std::optional<Item> Weapon;
-  std::optional<Item> OffHand;
+  EquipmentSlot Ring = {ItemType::Ring};
+  EquipmentSlot Amulet = {ItemType::Amulet};
+  EquipmentSlot Helmet = {ItemType::Helmet};
+  EquipmentSlot ChestPlate = {ItemType::ChestPlate};
+  EquipmentSlot Pants = {ItemType::Pants};
+  EquipmentSlot Boots = {ItemType::Boots};
+  EquipmentSlot Weapon = {ItemType::Weapon};
+  EquipmentSlot OffHand = {ItemType::OffHand};
+
+  inline std::array<EquipmentSlot *, 8> all() {
+    return {&Ring,  &Amulet, &Helmet, &ChestPlate,
+            &Pants, &Boots,  &Weapon, &OffHand};
+  }
+
+  EquipmentSlot &getSlot(ItemType It);
+  const EquipmentSlot &getSlot(ItemType It) const;
 
   bool canEquip(ItemType Type) const;
-  bool equip(const Item &Item);
+  void equip(Item Item);
   Item unequip(ItemType Type);
 };
 

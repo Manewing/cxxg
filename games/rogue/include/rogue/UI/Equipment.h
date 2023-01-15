@@ -2,30 +2,36 @@
 #define ROGUE_UI_EQUIPMENT_H
 
 #include <entt/entt.hpp>
-#include <rogue/UI/ListSelect.h>
+#include <optional>
+#include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/Widget.h>
 #include <string_view>
 
 namespace rogue {
-class Inventory;
+class Equipment;
+class EquipmentSlot;
 } // namespace rogue
 
 namespace rogue::ui {
 
-class EquipmentController : public Widget {
+class EquipmentController : public BaseRect {
 public:
-  EquipmentController(entt::entity Entity, entt::registry &Reg);
-  bool handleInput(int Char) override;
+  EquipmentController(Equipment &Equip, entt::entity Entity,
+                      entt::registry &Reg, cxxg::types::Position Pos);
+  bool handleInput(int Char) final;
+  std::string_view getInteractMsg() const final;
   void draw(cxxg::Screen &Scr) const final;
 
 protected:
-  void updateElements();
+  void addSelect(const EquipmentSlot &ES, cxxg::types::Position Pos);
+  void updateSelectValues();
 
 protected:
-  Inventory &Inv;
+  Equipment &Equip;
   entt::entity Entity;
   entt::registry &Reg;
-  ListSelect List;
+  std::shared_ptr<ItemSelect> ItSel;
+  std::shared_ptr<Widget> Dec;
 };
 
 } // namespace rogue::ui

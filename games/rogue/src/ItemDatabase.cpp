@@ -4,9 +4,16 @@
 namespace rogue {
 
 template <typename BuffType, typename... RequiredComps>
-static std::shared_ptr<ApplyBuffEffect<BuffType, RequiredComps...>>
-makeApplyBuffEffect(const BuffType &Buff) {
-  return std::make_shared<ApplyBuffEffect<BuffType, RequiredComps...>>(Buff);
+static std::shared_ptr<UseItemBuffEffect<BuffType, RequiredComps...>>
+makeUseItemBuffEffect(const BuffType &Buff) {
+  return std::make_shared<UseItemBuffEffect<BuffType, RequiredComps...>>(Buff);
+}
+
+template <typename BuffType, typename... RequiredComps>
+static std::shared_ptr<EquipItemBuffEffect<BuffType, RequiredComps...>>
+makeEquipItemBuffEffect(const BuffType &Buff) {
+  return std::make_shared<EquipItemBuffEffect<BuffType, RequiredComps...>>(
+      Buff);
 }
 
 static void fillItemDatabase(ItemDatabase &DB) {
@@ -14,10 +21,12 @@ static void fillItemDatabase(ItemDatabase &DB) {
 
   auto HealEffectx10 = std::make_shared<HealItemEffect>(10);
   auto HealthRegenBuffEffect =
-      makeApplyBuffEffect<HealthRegenBuffComp, HealthComp>({});
+      makeUseItemBuffEffect<HealthRegenBuffComp, HealthComp>({});
   auto DamageEffectx10 = std::make_shared<DamageItemEffect>(10);
   auto PoisonDebuffEffect =
-      makeApplyBuffEffect<PoisonDebuffComp, HealthComp>({});
+      makeUseItemBuffEffect<PoisonDebuffComp, HealthComp>({});
+  auto StatBuffEffect = makeEquipItemBuffEffect<StatsBuffComp, StatsComp>(
+      StatsBuffComp{1, StatPoints{1, 1, 1, 10}});
 
   std::vector<ItemPrototype> ItemProtos = {
       ItemPrototype(0, "Berry", ItemType::Consumable, MaxStackSize,
@@ -27,8 +36,7 @@ static void fillItemDatabase(ItemDatabase &DB) {
       ItemPrototype(2, "Wood", ItemType::Crafting, MaxStackSize, {}),
 
       ItemPrototype(3, "Stone", ItemType::Crafting, MaxStackSize, {}),
-
-  };
+      ItemPrototype(4, "Sword", ItemType::Weapon, 1, {StatBuffEffect})};
 
   for (const auto &Proto : ItemProtos) {
     DB.addItemProto(Proto.ItemId, Proto);

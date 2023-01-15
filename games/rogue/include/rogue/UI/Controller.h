@@ -13,6 +13,7 @@ class Screen;
 namespace rogue {
 class History;
 class Inventory;
+class Equipment;
 } // namespace rogue
 
 namespace rogue::ui {
@@ -26,6 +27,8 @@ public:
   bool isUIActive() const;
   void handleInput(int Char);
 
+  void setEquipmentUI(Equipment &Equip, entt::entity Entity,
+                      entt::registry &Reg);
   void setInventoryUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   void setLootUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   void setHistoryUI(History &Hist);

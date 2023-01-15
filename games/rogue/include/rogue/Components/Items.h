@@ -5,7 +5,7 @@
 
 namespace rogue {
 
-struct EquipementComp {
+struct EquipmentComp {
   Equipment Equip;
 };
 

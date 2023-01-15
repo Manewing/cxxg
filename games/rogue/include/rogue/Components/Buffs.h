@@ -41,7 +41,7 @@ public:
   bool remove(const StatsBuffComp &Other);
 
 public:
-  StatValues Bonus;
+  StatPoints Bonus;
 };
 
 struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {

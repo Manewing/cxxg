@@ -66,7 +66,6 @@ bool ItemPrototype::canEquipOn(const entt::entity &Entity,
 
 void ItemPrototype::equipOn(const entt::entity &Entity,
                             entt::registry &Reg) const {
-
   for (const auto &Effect : Effects) {
     Effect->equipOn(Entity, Reg);
   }
@@ -125,7 +124,7 @@ void Item::useOn(const entt::entity &Entity, entt::registry &Reg) const {
 
 bool Item::canEquipOn(const entt::entity &Entity, entt::registry &Reg) const {
   bool SpecCanEquipOn =
-      Specialization && Specialization->canEquipOn(Entity, Reg);
+      !Specialization || Specialization->canEquipOn(Entity, Reg);
   return getProto().canEquipOn(Entity, Reg) && SpecCanEquipOn;
 }
 
@@ -139,7 +138,7 @@ void Item::equipOn(const entt::entity &Entity, entt::registry &Reg) const {
 bool Item::canUnequipFrom(const entt::entity &Entity,
                           entt::registry &Reg) const {
   bool SpecCanUnequipFrom =
-      Specialization && Specialization->canUnequipFrom(Entity, Reg);
+      !Specialization || Specialization->canUnequipFrom(Entity, Reg);
   return getProto().canUnequipFrom(Entity, Reg) && SpecCanUnequipFrom;
 }
 
@@ -151,5 +150,55 @@ void Item::unequipFrom(const entt::entity &Entity, entt::registry &Reg) const {
 }
 
 const ItemPrototype &Item::getProto() const { return *Proto; }
+
+EquipmentSlot &Equipment::getSlot(ItemType It) {
+  return const_cast<EquipmentSlot &>(
+      static_cast<const Equipment *>(this)->getSlot(It));
+}
+
+const EquipmentSlot &Equipment::getSlot(ItemType It) const {
+  switch (It) {
+  case ItemType::Ring:
+    return Ring;
+  case ItemType::Amulet:
+    return Amulet;
+  case ItemType::Helmet:
+    return Helmet;
+  case ItemType::ChestPlate:
+    return ChestPlate;
+  case ItemType::Pants:
+    return Pants;
+  case ItemType::Boots:
+    return Boots;
+  case ItemType::Weapon:
+    return Weapon;
+  case ItemType::OffHand:
+    return OffHand;
+  default:
+    break;
+  }
+  assert(false);
+  return Ring;
+}
+
+bool Equipment::canEquip(ItemType Type) const {
+  if ((Type & ItemType::EquipmentMask) == ItemType::None) {
+    return false;
+  }
+  return getSlot(Type).It == std::nullopt;
+}
+
+void Equipment::equip(Item Item) {
+  auto Type = Item.getType();
+  auto &ES = getSlot(Type);
+  ES.It = std::move(Item);
+}
+
+Item Equipment::unequip(ItemType Type) {
+  auto &ES = getSlot(Type);
+  Item It = std::move(*ES.It);
+  ES.It = std::nullopt;
+  return It;
+}
 
 } // namespace rogue
