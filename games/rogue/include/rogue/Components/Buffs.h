@@ -14,7 +14,7 @@ struct AdditiveBuff {
 
 struct TimedBuff {
   unsigned TicksLeft = 10;
-  bool remove(const TimedBuff&) { return false; }
+  bool remove(const TimedBuff &) { return false; }
 };
 
 struct RegenerationBuff : public TimedBuff {

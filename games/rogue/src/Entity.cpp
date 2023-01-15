@@ -16,9 +16,7 @@ const char *MovementBlockedException::what() const noexcept {
   return Msg.c_str();
 }
 
-bool EntityAttackEvent::isPlayerAffected() const {
-  return false;
-}
+bool EntityAttackEvent::isPlayerAffected() const { return false; }
 
 bool Entity::canAttack(ymir::Point2d<int> Pos) const {
   // FIXME only melee check right now

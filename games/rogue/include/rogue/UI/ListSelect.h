@@ -2,9 +2,9 @@
 #define ROGUE_UI_LIST_SELECT_H
 
 #include <cxxg/Types.h>
+#include <rogue/UI/Widget.h>
 #include <string>
 #include <vector>
-#include <rogue/UI/Widget.h>
 
 namespace rogue::ui {
 

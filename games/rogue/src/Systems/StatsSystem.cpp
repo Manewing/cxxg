@@ -40,10 +40,9 @@ void applyStatEffects(entt::registry &Reg) {
 
   // Mana
   // If the entity has stats they override the maximum values defined
-  Reg.view<const StatsComp, ManaComp>().each(
-      [](const auto &St, auto &Mana) {
-        Mana.MaxValue = St.effective().Int * ManaPerInt;
-      });
+  Reg.view<const StatsComp, ManaComp>().each([](const auto &St, auto &Mana) {
+    Mana.MaxValue = St.effective().Int * ManaPerInt;
+  });
 
   // Agility is determined by Dex
   Reg.view<const StatsComp, AgilityComp>().each([](const auto &St, auto &Ag) {
@@ -51,7 +50,7 @@ void applyStatEffects(entt::registry &Reg) {
   });
 }
 
-}
+} // namespace
 
 void StatsSystem::update() {
   updateStats(Reg);

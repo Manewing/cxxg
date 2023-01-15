@@ -1,5 +1,5 @@
-#include <rogue/UI/Frame.h>
 #include <cxxg/Screen.h>
+#include <rogue/UI/Frame.h>
 
 namespace rogue::ui {
 
@@ -23,8 +23,7 @@ void Frame::drawFrameVLine(cxxg::Screen &Scr, cxxg::types::Position Pos,
 
 Frame::Frame(std::shared_ptr<Widget> Comp, cxxg::types::Position Pos,
              cxxg::types::Size Size, std::string Header)
-    : Decorator(Pos, std::move(Comp)), Size(Size),
-      Header(std::move(Header)) {}
+    : Decorator(Pos, std::move(Comp)), Size(Size), Header(std::move(Header)) {}
 
 void Frame::draw(cxxg::Screen &Scr) const {
   Decorator::draw(Scr);

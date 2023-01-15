@@ -77,7 +77,7 @@ bool InventoryController::handleInput(int Char) {
   } break;
   case 'u':
     if (!Inv.getItem(List->getSelectedElement())
-            .canApplyTo(Entity, Reg, CapabilityFlags::UseOn)) {
+             .canApplyTo(Entity, Reg, CapabilityFlags::UseOn)) {
       // FIXME message
       break;
     }
