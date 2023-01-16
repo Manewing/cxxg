@@ -45,6 +45,9 @@ private:
 
 class ItemSelect : public Widget {
 public:
+  using OnSelectCallback = std::function<void(Select &)>;
+
+public:
   using Widget::Widget;
 
   void addSelect(std::shared_ptr<Select> Select);
@@ -62,6 +65,8 @@ public:
   Select &getSelected();
   Select &getSelect(std::size_t Idx);
 
+  void registerOnSelectCallback(OnSelectCallback OnSelectCb);
+
   void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
   std::string_view getInteractMsg() const override;
@@ -70,6 +75,7 @@ public:
 protected:
   std::size_t SelectedIdx = 0;
   std::vector<std::shared_ptr<Select>> Selects;
+  OnSelectCallback OnSelectCb;
 };
 
 } // namespace rogue::ui

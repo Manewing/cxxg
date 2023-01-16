@@ -12,7 +12,6 @@ bool HealItemEffect::canApplyTo(const entt::entity &Et,
 
 void HealItemEffect::applyTo(const entt::entity &Et,
                              entt::registry &Reg) const {
-  assert(canUseOn(Et, Reg));
   Reg.get<HealthComp>(Et).restore(Amount);
 }
 

@@ -9,7 +9,7 @@
 
 namespace rogue {
 class Equipment;
-class EquipmentSlot;
+struct EquipmentSlot;
 } // namespace rogue
 
 namespace rogue::ui {

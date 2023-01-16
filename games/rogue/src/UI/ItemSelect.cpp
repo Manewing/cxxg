@@ -93,6 +93,10 @@ Select &ItemSelect::getSelected() { return *Selects.at(SelectedIdx); }
 
 Select &ItemSelect::getSelect(std::size_t Idx) { return *Selects.at(Idx); }
 
+void ItemSelect::registerOnSelectCallback(OnSelectCallback OnSelectCb) {
+  this->OnSelectCb = std::move(OnSelectCb);
+}
+
 void ItemSelect::setPos(cxxg::types::Position P) {
   for (auto &S : Selects) {
     S->setPos(S->getPos() - Pos + P);
@@ -109,6 +113,12 @@ bool ItemSelect::handleInput(int Char) {
     break;
   case cxxg::utils::KEY_DOWN:
     selectNext();
+    break;
+  case cxxg::utils::KEY_ENTER:
+    if (Selects.empty()) {
+      break;
+    }
+    OnSelectCb(getSelected());
     break;
   default:
     break;
