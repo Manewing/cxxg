@@ -9,12 +9,11 @@
 
 namespace rogue::ui {
 
-class LabeledSelect : public BaseRect {
+class Select : public BaseRect {
 public:
-  LabeledSelect(std::string Label, std::string Value, cxxg::types::Position Pos,
+  Select(std::string Value, cxxg::types::Position Pos,
                 unsigned Width);
 
-  const std::string &getLabel() const;
   void setValue(std::string NewValue);
   const std::string &getValue() const;
 
@@ -26,24 +25,42 @@ public:
   std::string_view getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
-private:
+protected:
   bool IsSelected = false;
-  std::string Label;
   std::string Value;
+};
+
+class LabeledSelect : public Select {
+public:
+  LabeledSelect(std::string Label, std::string Value, cxxg::types::Position Pos,
+                unsigned Width);
+
+  const std::string &getLabel() const;
+  std::string_view getInteractMsg() const override;
+  void draw(cxxg::Screen &Scr) const override;
+
+private:
+  std::string Label;
 };
 
 class ItemSelect : public Widget {
 public:
   using Widget::Widget;
 
-  void addSelect(std::shared_ptr<LabeledSelect> Select);
+  void addSelect(std::shared_ptr<Select> Select);
 
+  template <typename T, typename ... Args>
+  void addSelect(Args && ...Arg) {
+    addSelect(std::make_shared<T>(Arg...));
+  }
+
+  void select(std::size_t Idx);
   void selectNext();
   void selectPrev();
 
   std::size_t getSelectedIdx() const;
-  LabeledSelect &getSelected();
-  LabeledSelect &getSelect(std::size_t Idx);
+  Select &getSelected();
+  Select &getSelect(std::size_t Idx);
 
   void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
@@ -52,7 +69,7 @@ public:
 
 protected:
   std::size_t SelectedIdx = 0;
-  std::vector<std::shared_ptr<LabeledSelect>> Selects;
+  std::vector<std::shared_ptr<Select>> Selects;
 };
 
 } // namespace rogue::ui

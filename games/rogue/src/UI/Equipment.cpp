@@ -103,8 +103,8 @@ std::string getSelectValue(const EquipmentSlot &ES) {
 
 void EquipmentController::addSelect(const EquipmentSlot &ES,
                                     cxxg::types::Position Pos) {
-  ItSel->addSelect(std::make_shared<LabeledSelect>(
-      getItemTypeLabel(ES.BaseTypeFilter), getSelectValue(ES), Pos, 25));
+  ItSel->addSelect<LabeledSelect>(getItemTypeLabel(ES.BaseTypeFilter),
+                                  getSelectValue(ES), Pos, 25);
 }
 
 void EquipmentController::updateSelectValues() {

@@ -11,6 +11,8 @@ class Decorator : public Widget {
 public:
   Decorator(cxxg::types::Position Pos, std::shared_ptr<Widget> Comp);
 
+  const std::shared_ptr<Widget> &getComp() const { return Comp; }
+
   void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
   std::string_view getInteractMsg() const override;

@@ -10,29 +10,40 @@ static constexpr cxxg::types::RgbColor HighlightColor{255, 255, 255, true,
 static constexpr auto NoColor = cxxg::types::Color::NONE;
 } // namespace
 
-LabeledSelect::LabeledSelect(std::string Label, std::string Value,
-                             cxxg::types::Position Pos, unsigned Width)
-    : BaseRect(Pos, {Width, 1}), Label(std::move(Label)),
-      Value(std::move(Value)) {}
+Select::Select(std::string Value, cxxg::types::Position Pos, unsigned Width)
+    : BaseRect(Pos, {Width, 1}), Value(std::move(Value)) {}
 
-const std::string &LabeledSelect::getLabel() const { return Label; }
+void Select::setValue(std::string NewValue) { Value = std::move(NewValue); }
 
-void LabeledSelect::setValue(std::string NewValue) {
-  Value = std::move(NewValue);
-}
+const std::string &Select::getValue() const { return Value; }
 
-const std::string &LabeledSelect::getValue() const { return Value; }
+void Select::unselect() { IsSelected = false; }
 
-void LabeledSelect::unselect() { IsSelected = false; }
+void Select::select() { IsSelected = true; }
 
-void LabeledSelect::select() { IsSelected = true; }
+bool Select::isSlected() const { return IsSelected; }
 
-bool LabeledSelect::isSlected() const { return IsSelected; }
-
-bool LabeledSelect::handleInput(int Char) {
+bool Select::handleInput(int Char) {
   (void)Char;
   return false;
 }
+
+std::string_view Select::getInteractMsg() const { return ""; }
+
+void Select::draw(cxxg::Screen &Scr) const {
+  BaseRect::draw(Scr);
+  if (IsSelected) {
+    Scr[Pos.Y][Pos.X] << HighlightColor << Value;
+  } else {
+    Scr[Pos.Y][Pos.X] << Value;
+  }
+}
+
+LabeledSelect::LabeledSelect(std::string Label, std::string Value,
+                             cxxg::types::Position Pos, unsigned Width)
+    : Select(std::move(Value), Pos, Width), Label(std::move(Label)) {}
+
+const std::string &LabeledSelect::getLabel() const { return Label; }
 
 std::string_view LabeledSelect::getInteractMsg() const { return ""; }
 
@@ -46,47 +57,45 @@ void LabeledSelect::draw(cxxg::Screen &Scr) const {
   }
 }
 
-void ItemSelect::addSelect(std::shared_ptr<LabeledSelect> Select) {
-  Select->setPos(Select->getPos() + Pos);
-  Selects.emplace_back(std::move(Select));
+void ItemSelect::addSelect(std::shared_ptr<Select> S) {
+  S->setPos(S->getPos() + Pos);
+  Selects.emplace_back(std::move(S));
   selectNext();
 }
 
-void ItemSelect::selectNext() {
+void ItemSelect::select(std::size_t Idx) {
   if (!Selects.empty()) {
     Selects.at(SelectedIdx)->unselect();
-  }
-  if (++SelectedIdx >= Selects.size()) {
-    SelectedIdx = 0;
-  }
-  if (!Selects.empty()) {
+    SelectedIdx = Idx;
     Selects.at(SelectedIdx)->select();
   }
 }
 
+void ItemSelect::selectNext() {
+  auto NewIdx = SelectedIdx + 1;
+  if (NewIdx >= Selects.size()) {
+    NewIdx = 0;
+  }
+  select(NewIdx);
+}
+
 void ItemSelect::selectPrev() {
-  if (!Selects.empty()) {
-    Selects.at(SelectedIdx)->unselect();
+  auto NewIdx = SelectedIdx - 1;
+  if (SelectedIdx == 0) {
+    NewIdx = Selects.size() - 1;
   }
-  if (SelectedIdx-- == 0) {
-    SelectedIdx = Selects.size() - 1;
-  }
-  if (!Selects.empty()) {
-    Selects.at(SelectedIdx)->select();
-  }
+  select(NewIdx);
 }
 
 std::size_t ItemSelect::getSelectedIdx() const { return SelectedIdx; }
 
-LabeledSelect &ItemSelect::getSelected() { return *Selects.at(SelectedIdx); }
+Select &ItemSelect::getSelected() { return *Selects.at(SelectedIdx); }
 
-LabeledSelect &ItemSelect::getSelect(std::size_t Idx) {
-  return *Selects.at(Idx);
-}
+Select &ItemSelect::getSelect(std::size_t Idx) { return *Selects.at(Idx); }
 
 void ItemSelect::setPos(cxxg::types::Position P) {
-  for (auto &Select : Selects) {
-    Select->setPos(Select->getPos() - Pos + P);
+  for (auto &S : Selects) {
+    S->setPos(S->getPos() - Pos + P);
   }
   Pos = P;
 }
@@ -110,8 +119,8 @@ bool ItemSelect::handleInput(int Char) {
 std::string_view ItemSelect::getInteractMsg() const { return "[^v] Nav."; }
 
 void ItemSelect::draw(cxxg::Screen &Scr) const {
-  for (const auto &Select : Selects) {
-    Select->draw(Scr);
+  for (const auto &S : Selects) {
+    S->draw(Scr);
   }
 }
 

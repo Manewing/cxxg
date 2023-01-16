@@ -61,8 +61,8 @@ void RowAccessor::output(::std::string const &Str) {
   }
 
   // check if the access is out of range, if so ignore it
-  if (Offset >= static_cast<int>(Rw.Buffer.size()) ||
-      Offset + Str.size() <= 0) {
+  if (Rw.Buffer.size() == 0 || Offset >= static_cast<int>(Rw.Buffer.size()) ||
+      Offset + static_cast<int>(Str.size()) <= 0) {
     return;
   }
 
