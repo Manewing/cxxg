@@ -91,7 +91,15 @@ std::size_t ItemSelect::getSelectedIdx() const { return SelectedIdx; }
 
 Select &ItemSelect::getSelected() { return *Selects.at(SelectedIdx); }
 
+const Select &ItemSelect::getSelected() const {
+  return *Selects.at(SelectedIdx);
+}
+
 Select &ItemSelect::getSelect(std::size_t Idx) { return *Selects.at(Idx); }
+
+const Select &ItemSelect::getSelect(std::size_t Idx) const {
+  return *Selects.at(Idx);
+}
 
 void ItemSelect::registerOnSelectCallback(OnSelectCallback OnSelectCb) {
   this->OnSelectCb = std::move(OnSelectCb);
@@ -115,10 +123,7 @@ bool ItemSelect::handleInput(int Char) {
     selectNext();
     break;
   case cxxg::utils::KEY_ENTER:
-    if (Selects.empty()) {
-      break;
-    }
-    OnSelectCb(getSelected());
+    handleSelect();
     break;
   default:
     break;
@@ -131,6 +136,15 @@ std::string_view ItemSelect::getInteractMsg() const { return "[^v] Nav."; }
 void ItemSelect::draw(cxxg::Screen &Scr) const {
   for (const auto &S : Selects) {
     S->draw(Scr);
+  }
+}
+
+void ItemSelect::handleSelect() const {
+  if (Selects.empty()) {
+    return;
+  }
+  if (OnSelectCb) {
+    OnSelectCb(getSelected());
   }
 }
 

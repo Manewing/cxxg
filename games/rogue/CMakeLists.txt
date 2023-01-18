@@ -42,7 +42,11 @@ set(HEADER_FILES
   include/rogue/UI/Inventory.h
   include/rogue/UI/ItemSelect.h
   include/rogue/UI/ListSelect.h
+  include/rogue/UI/SelectBox.h
+  include/rogue/UI/TextBox.h
   include/rogue/UI/Widget.h
+  include/rogue/UI/WindowContainer.h
+  include/rogue/UI/WordWrap.h
 )
 
 set(SOURCE_FILES
@@ -76,7 +80,11 @@ set(SOURCE_FILES
   src/UI/Inventory.cpp
   src/UI/ItemSelect.cpp
   src/UI/ListSelect.cpp
+  src/UI/SelectBox.cpp
+  src/UI/TextBox.cpp
   src/UI/Widget.cpp
+  src/UI/WindowContainer.cpp
+  src/UI/WordWrap.cpp
 )
 
 add_library(

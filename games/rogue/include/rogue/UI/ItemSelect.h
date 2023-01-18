@@ -11,8 +11,7 @@ namespace rogue::ui {
 
 class Select : public BaseRect {
 public:
-  Select(std::string Value, cxxg::types::Position Pos,
-                unsigned Width);
+  Select(std::string Value, cxxg::types::Position Pos, unsigned Width);
 
   void setValue(std::string NewValue);
   const std::string &getValue() const;
@@ -45,15 +44,14 @@ private:
 
 class ItemSelect : public Widget {
 public:
-  using OnSelectCallback = std::function<void(Select &)>;
+  using OnSelectCallback = std::function<void(const Select &)>;
 
 public:
   using Widget::Widget;
 
   void addSelect(std::shared_ptr<Select> Select);
 
-  template <typename T, typename ... Args>
-  void addSelect(Args && ...Arg) {
+  template <typename T, typename... Args> void addSelect(Args &&...Arg) {
     addSelect(std::make_shared<T>(Arg...));
   }
 
@@ -63,7 +61,9 @@ public:
 
   std::size_t getSelectedIdx() const;
   Select &getSelected();
+  const Select &getSelected() const;
   Select &getSelect(std::size_t Idx);
+  const Select &getSelect(std::size_t Idx) const;
 
   void registerOnSelectCallback(OnSelectCallback OnSelectCb);
 
@@ -71,6 +71,8 @@ public:
   bool handleInput(int Char) override;
   std::string_view getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
+
+  void handleSelect() const;
 
 protected:
   std::size_t SelectedIdx = 0;

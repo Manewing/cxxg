@@ -6,278 +6,25 @@
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/ListSelect.h>
+#include <rogue/UI/WindowContainer.h>
+#include <rogue/UI/TextBox.h>
+#include <rogue/UI/SelectBox.h>
 
 using namespace rogue::ui;
 using Size = cxxg::types::Size;
 using Position = cxxg::types::Position;
 
-class ExitHandlerProvider {
-public:
-  using ExitHandlerCallback = std::function<void()>;
-
-public:
-  virtual ~ExitHandlerProvider() = default;
-
-  void registerExitHandler(ExitHandlerCallback EMC) {
-    this->EMC = std::move(EMC);
-  }
-
-protected:
-  void handleExit() { EMC(); }
-
-private:
-  ExitHandlerCallback EMC;
-};
-
-// PreventCloseDecorator
-// PreventResizeDecorator
-
-class MoveDecorator : public Decorator, public ExitHandlerProvider {
-public:
-  static constexpr auto IconColor = cxxg::types::RgbColor{135, 250, 10};
-
-public:
-  explicit MoveDecorator(const std::shared_ptr<Widget> &Comp)
-      : Decorator(Comp->getPos(), Comp) {}
-
-  bool handleInput(int Char) final {
-    switch (Char) {
-    case cxxg::utils::KEY_ESC:
-      handleExit();
-      break;
-    case cxxg::utils::KEY_LEFT:
-      setPos(Pos + Position{-1, 0});
-      break;
-    case cxxg::utils::KEY_RIGHT:
-      setPos(Pos + Position{1, 0});
-      break;
-    case cxxg::utils::KEY_UP:
-      setPos(Pos + Position{0, -1});
-      break;
-    case cxxg::utils::KEY_DOWN:
-      setPos(Pos + Position{0, 1});
-      break;
-    default:
-      break;
-    }
-    return true;
-  }
-
-  void draw(cxxg::Screen &Scr) const final {
-    Decorator::draw(Scr);
-    Scr[Pos.Y][Pos.X] << IconColor << "X";
-  }
-
-  void setComp(std::shared_ptr<Widget> Comp) { this->Comp = std::move(Comp); }
-};
-
-class WindowContainer : public Widget {
-public:
-  static constexpr int KEY_MOVE = 'm';
-  static constexpr int KEY_NEXT_WINDOW = 'C';
-  static constexpr int KEY_PREV_WINDOW = 'V';
-  static constexpr int KEY_AUTO_LAYOUT = 'X';
-
-  static constexpr auto ActiveColor = cxxg::types::RgbColor{90, 130, 175};
-
-public:
-  WindowContainer() : Widget({0, 0}) {}
-
-  bool handleInput(int Char) override {
-    switch (Char) {
-    case KEY_MOVE:
-      switchMoveActiveWindow(!MoveDeco);
-      break;
-    case KEY_NEXT_WINDOW: {
-      bool WasMoving = exitMoveActiveWindow();
-      selectNextWindow();
-      switchMoveActiveWindow(WasMoving);
-    } break;
-    case KEY_PREV_WINDOW: {
-      bool WasMoving = exitMoveActiveWindow();
-      selectPrevWindow();
-      switchMoveActiveWindow(WasMoving);
-    } break;
-    case KEY_AUTO_LAYOUT:
-      autoLayoutWindows({0, 0}, {80, 24});
-      break;
-    default:
-      break;
-    }
-
-    if (hasActiveWindow()) {
-      if (!getActiveWindow().handleInput(Char)) {
-        return closeActiveWindow();
-      }
-    }
-    return false;
-  }
-  std::string_view getInteractMsg() const override {
-    if (hasActiveWindow()) {
-      return getActiveWindow().getInteractMsg();
-    }
-    return "";
-  }
-
-  void draw(cxxg::Screen &Scr) const override {
-    for (const auto &Window : Windows) {
-      if (Window.get() != &getActiveWindow()) {
-        Window->draw(Scr);
-      }
-    }
-    if (hasActiveWindow()) {
-      const auto &Wdw = getActiveWindow();
-      Wdw.draw(Scr);
-      //
-      //    ,_
-      //    |[List] [Item] [Tooltip]
-      //
-      //    ,_
-      //    |+--------
-      //     |
-      Scr[Wdw.getPos() - Position{1, 1}] = '_';
-      Scr[Wdw.getPos() - Position{1, 1}] = ActiveColor;
-      Scr[Wdw.getPos() - Position{0, 1}] = ',';
-      Scr[Wdw.getPos() - Position{0, 1}] = ActiveColor;
-      Scr[Wdw.getPos() - Position{1, 0}] = '|';
-      Scr[Wdw.getPos() - Position{1, 0}] = ActiveColor;
-    }
-  }
-
-  bool hasActiveWindow() const { return !Windows.empty(); }
-
-  Widget &getActiveWindow() { return *Windows.at(FocusIdx); }
-
-  const Widget &getActiveWindow() const { return *Windows.at(FocusIdx); }
-
-  std::shared_ptr<Widget> &getActiveWindowPtr() { return Windows.at(FocusIdx); }
-
-  /// @brief Closes the active window if there is one
-  /// @return True if there is still is a window left, otherwise false
-  bool closeActiveWindow() {
-    if (Windows.empty()) {
-      return false;
-    }
-    Windows.erase(Windows.begin() + FocusIdx);
-    FocusIdx = 0;
-    return !Windows.empty();
-  }
-
-  void addWindow(std::shared_ptr<Widget> Window) {
-    Windows.emplace_back(std::move(Window));
-    FocusIdx = Windows.size() - 1;
-  }
-
-  void selectWindow(std::size_t Idx) {
-    FocusIdx = Idx;
-    if (FocusIdx >= Windows.size()) {
-      FocusIdx = 0;
-    }
-  }
-
-  void selectNextWindow() { selectWindow(FocusIdx + 1); }
-
-  void selectPrevWindow() {
-    if (FocusIdx == 0) {
-      selectWindow(Windows.size() - 1);
-      return;
-    }
-    selectWindow(FocusIdx - 1);
-  }
-
-  void autoLayoutWindows(cxxg::types::Position StartPos,
-                         cxxg::types::Size Size) {
-    struct WindowInfo {
-      cxxg::types::Position Pos{};
-      cxxg::types::Size Size{};
-      unsigned long Area = 0;
-      Widget *Wdw = nullptr;
-    };
-    if (Windows.empty()) {
-      return;
-    }
-    std::vector<WindowInfo> WdwInfos;
-    WdwInfos.reserve(Windows.size());
-
-    for (auto &Wdw : Windows) {
-      auto *W = Wdw.get();
-      while (auto *Next = dynamic_cast<Decorator *>(W)) {
-        W = Next->getComp().get();
-      }
-      if (auto *BrWdw = dynamic_cast<BaseRect *>(W)) {
-        auto Size = BrWdw->getSize();
-        WdwInfos.push_back(WindowInfo{BrWdw->getPos(), BrWdw->getSize(),
-                                      Size.X * Size.Y, Wdw.get()});
-      }
-    }
-    std::sort(WdwInfos.begin(), WdwInfos.end(),
-              [](const auto &A, const auto &B) { return A.Area > B.Area; });
-
-    auto PlacePos = StartPos;
-    //    auto *LastWdwInfo = &WdwInfos.at(0);
-    unsigned Height = WdwInfos.at(0).Size.Y;
-    for (auto &WdwInfo : WdwInfos) {
-
-      if (PlacePos.X + WdwInfo.Size.X > Size.X) {
-        if (PlacePos.Y + WdwInfo.Size.Y > Size.Y) {
-          // abort, can't handle
-          return;
-        }
-        // FIXME adding the current height does not make sense
-        PlacePos = {0, PlacePos.Y + static_cast<int>(Height)};
-        Height = WdwInfo.Size.Y;
-      }
-
-      WdwInfo.Wdw->setPos(PlacePos);
-
-      PlacePos.X += static_cast<int>(WdwInfo.Size.X + 1);
-    }
-  }
-
-protected:
-  bool exitMoveActiveWindow() {
-    if (!MoveDeco) {
-      return false;
-    }
-    getActiveWindowPtr() = MoveDeco->getComp();
-    MoveDeco.reset();
-    return true;
-  }
-
-  bool enterMoveActiveWindow() {
-    if (!hasActiveWindow()) {
-      return false;
-    }
-    MoveDeco.reset(new MoveDecorator(getActiveWindowPtr()));
-    getActiveWindowPtr() = MoveDeco;
-    MoveDeco->registerExitHandler([this]() { exitMoveActiveWindow(); });
-    return true;
-  }
-
-  void switchMoveActiveWindow(bool IsMoving) {
-    if (!IsMoving) {
-      exitMoveActiveWindow();
-      return;
-    }
-    enterMoveActiveWindow();
-  }
-
-private:
-  std::size_t FocusIdx = 0;
-  std::shared_ptr<MoveDecorator> MoveDeco = nullptr;
-  std::vector<std::shared_ptr<Widget>> Windows;
-};
-
 class UITest : public cxxg::Game {
 public:
-  explicit UITest(cxxg::Screen &Scr) : cxxg::Game(Scr) {
+  explicit UITest(cxxg::Screen &Scr) : cxxg::Game(Scr), WdwContainer({0, 0}) {
     auto UISelect = std::make_shared<ItemSelect>(Position{0, 0});
     UISelect->addSelect<Select>("[List]", Position{0, 0}, 6);
     UISelect->addSelect<Select>("[Item]", Position{7, 0}, 6);
-    UISelect->addSelect<Select>("[Tooltip]", Position{14, 0}, 9);
+    UISelect->addSelect<Select>("[SelBox]", Position{14, 0}, 8);
+    UISelect->addSelect<Select>("[Tooltip]", Position{23, 0}, 9);
     UISelect->select(0);
     UISelect->registerOnSelectCallback(
-        [this](Select &Selected) { switchUI(Selected.getValue()); });
+        [this](const Select &Selected) { switchUI(Selected.getValue()); });
     WdwContainer.addWindow(UISelect);
   }
 
@@ -294,6 +41,11 @@ public:
   }
 
   void handleDraw() final {
+    const auto Size = Scr.getSize();
+    for (std::size_t Idx = 0; Idx < Size.Y; Idx++) {
+      Scr[Idx][0] << cxxg::types::RgbColor{20, 20, 20}
+                  << std::string(Size.X, '#');
+    }
     WdwContainer.draw(Scr);
     cxxg::Game::handleDraw();
   }
@@ -302,20 +54,56 @@ private:
   void switchUI(const std::string &UIName) {
     if (UIName == "[List]") {
       WdwContainer.addWindow(createListUI());
+    } else if (UIName == "[SelBox]") {
+      WdwContainer.addWindow(createSelectBox());
     } else if (UIName == "[Item]") {
       //      ActiveWidget = createItemUI();
     } else if (UIName == "[Tooltip]") {
-      //      ActiveWidget = createTooltipUI();
+      WdwContainer.addWindow(createTooltipUI());
     }
   }
 
-  static std::shared_ptr<Widget> createListUI() {
-    Position P{2 + rand() % 4, 2 + rand() % 4};
+  std::shared_ptr<Widget> createListUI() {
+    Position P{2 + rand() % 10, 2 + rand() % 10};
     Size S{static_cast<std::size_t>(18 + rand() % 8),
            static_cast<std::size_t>(5 + rand() % 5)};
     auto LS = std::make_shared<ListSelect>(P, S);
     LS->setElements({"1. Item", "2. Item", "3. Item"});
     return std::make_shared<Frame>(LS, P, S, "List");
+  }
+
+  std::shared_ptr<Widget> createSelectBox() {
+    Position P{2 + rand() % 10, 2 + rand() % 10};
+    std::vector<SelectBox::Option> Options = {
+        {'u', "Use"}, {'e', "Equip"}, {'c', "Craft"}};
+    auto SB = std::make_shared<SelectBox>(P, Options);
+    SB->registerOnSelectCallback([this](const auto &S) {
+      WdwContainer.addWindow(
+          createTextBox("You selected the option " + S.getValue()));
+    });
+    return SB;
+  }
+
+  std::shared_ptr<Widget> createTextBox(const std::string &Text) {
+    Position P{2 + rand() % 10, 2 + rand() % 10};
+    Size S{static_cast<std::size_t>(38 + rand() % 8),
+           static_cast<std::size_t>(5 + rand() % 5)};
+    auto TB = std::make_shared<TextBox>(P, S, Text);
+    return std::make_shared<Frame>(TB, P, S, "Text");
+  }
+
+  std::shared_ptr<Widget> createTooltipUI() {
+    std::string Text =
+        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam "
+        "nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam "
+        "erat, sed diam voluptua. At vero eos et accusam et justo duo dolores "
+        "et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est "
+        "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur "
+        "sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et "
+        "dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam "
+        "et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea "
+        "takimata sanctus est Lorem ipsum dolor sit amet.";
+    return createTextBox(Text);
   }
 
 private:
