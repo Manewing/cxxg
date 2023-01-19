@@ -36,8 +36,8 @@ void SelectBox::registerOnSelectCallback(
 }
 
 void SelectBox::setPos(cxxg::types::Position P) {
+  BaseRect::setPos(P);
   Decorated->setPos(P);
-  Pos = P;
 }
 
 bool SelectBox::handleInput(int Char) {

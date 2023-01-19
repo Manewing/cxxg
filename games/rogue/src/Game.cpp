@@ -68,38 +68,7 @@ void Game::switchLevel(int Level) {
 }
 
 bool Game::handleInput(int Char) {
-  if (UICtrl.isUIActive()) {
-    UICtrl.handleInput(Char);
-    return true;
-  }
-
-  // FIXME add user input to context and process input in player system
-  // FIXME play move and attack needs to be handled in update
   switch (Char) {
-  case 'a':
-  case cxxg::utils::KEY_LEFT:
-    movePlayer(ymir::Dir2d::LEFT);
-    break;
-  case 'd':
-  case cxxg::utils::KEY_RIGHT:
-    movePlayer(ymir::Dir2d::RIGHT);
-    break;
-  case 's':
-  case cxxg::utils::KEY_DOWN:
-    movePlayer(ymir::Dir2d::DOWN);
-    break;
-  case 'w':
-  case cxxg::utils::KEY_UP:
-    movePlayer(ymir::Dir2d::UP);
-    break;
-  case cxxg::utils::KEY_SPACE:
-    break;
-  case 'e':
-    tryInteract();
-    break;
-  case 'c':
-    // TODO help show controls
-    return false;
   case 'i': {
     if (!CurrentLevel) {
       return false;
@@ -129,6 +98,41 @@ bool Game::handleInput(int Char) {
   case 'h':
     UICtrl.setHistoryUI(Hist);
     return true;
+  case 'c':
+    // TODO help show controls
+    return false;
+  default:
+    break;
+  }
+  if (UICtrl.isUIActive()) {
+    UICtrl.handleInput(Char);
+    return true;
+  }
+
+  // FIXME add user input to context and process input in player system
+  // FIXME play move and attack needs to be handled in update
+  switch (Char) {
+  case 'a':
+  case cxxg::utils::KEY_LEFT:
+    movePlayer(ymir::Dir2d::LEFT);
+    break;
+  case 'd':
+  case cxxg::utils::KEY_RIGHT:
+    movePlayer(ymir::Dir2d::RIGHT);
+    break;
+  case 's':
+  case cxxg::utils::KEY_DOWN:
+    movePlayer(ymir::Dir2d::DOWN);
+    break;
+  case 'w':
+  case cxxg::utils::KEY_UP:
+    movePlayer(ymir::Dir2d::UP);
+    break;
+  case cxxg::utils::KEY_SPACE:
+    break;
+  case 'e':
+    tryInteract();
+    break;
   default:
     // Not a valid input do not update
     return false;
@@ -172,10 +176,11 @@ void Game::handleDraw() {
   UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, InteractStr);
 
   /// DEBUG==>
-  const auto &SC = CurrentLevel->Reg.get<StatsComp>(Player);
-  Scr[1][0] << "Int: " << SC.effective().Int << ", Str: " << SC.effective().Str
-            << ", Dex: " << SC.effective().Dex
-            << ", Vit: " << SC.effective().Vit;
+  // const auto &SC = CurrentLevel->Reg.get<StatsComp>(Player);
+  // Scr[1][0] << "Int: " << SC.effective().Int << ", Str: " <<
+  // SC.effective().Str
+  //           << ", Dex: " << SC.effective().Dex
+  //           << ", Vit: " << SC.effective().Vit;
   /// <== DEBUG
 
   cxxg::Game::handleDraw();

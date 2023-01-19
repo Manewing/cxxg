@@ -12,11 +12,15 @@ InventoryControllerBase::InventoryControllerBase(Inventory &Inv,
                                                  entt::entity Entity,
                                                  entt::registry &Reg,
                                                  const std::string &Header)
-    : Widget({2, 2}), Inv(Inv), Entity(Entity), Reg(Reg) {
-  cxxg::types::Size Size{30, 18};
+    : BaseRect({2, 2}, {30, 18}), Inv(Inv), Entity(Entity), Reg(Reg) {
   List = std::make_shared<ListSelect>(Pos, Size);
   Decorated = std::make_shared<Frame>(List, Pos, Size, Header);
   updateElements();
+}
+
+void InventoryControllerBase::setPos(cxxg::types::Position P) {
+  BaseRect::setPos(P);
+  Decorated->setPos(Pos);
 }
 
 bool InventoryControllerBase::handleInput(int Char) {
@@ -30,6 +34,7 @@ bool InventoryControllerBase::handleInput(int Char) {
 }
 
 void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
+  BaseRect::draw(Scr);
   Decorated->draw(Scr);
 }
 
@@ -129,7 +134,7 @@ bool LootController::handleInput(int Char) {
   default:
     return InventoryControllerBase::handleInput(Char);
   }
-  return true;
+  return !Inv.empty();
 }
 
 std::string_view LootController::getInteractMsg() const {

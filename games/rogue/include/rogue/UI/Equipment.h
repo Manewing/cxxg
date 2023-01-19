@@ -18,6 +18,7 @@ class EquipmentController : public BaseRect {
 public:
   EquipmentController(Equipment &Equip, entt::entity Entity,
                       entt::registry &Reg, cxxg::types::Position Pos);
+  void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) final;
   std::string_view getInteractMsg() const final;
   void draw(cxxg::Screen &Scr) const final;

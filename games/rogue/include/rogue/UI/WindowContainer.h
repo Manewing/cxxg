@@ -18,7 +18,7 @@ public:
   static constexpr auto ActiveColor = cxxg::types::RgbColor{90, 130, 175};
 
 public:
-  using Widget::Widget;
+  WindowContainer(cxxg::types::Position Pos, cxxg::types::Size Size);
 
   bool handleInput(int Char) override;
   std::string_view getInteractMsg() const override;
@@ -42,6 +42,7 @@ public:
   void selectNextWindow();
   void selectPrevWindow();
 
+  void autoLayoutWindows();
   void autoLayoutWindows(cxxg::types::Position StartPos,
                          cxxg::types::Size Size);
 
@@ -51,6 +52,7 @@ protected:
   void switchMoveActiveWindow(bool IsMoving);
 
 private:
+  cxxg::types::Size Size;
   std::size_t FocusIdx = 0;
   std::shared_ptr<MoveDecorator> MoveDeco = nullptr;
   std::vector<std::shared_ptr<Widget>> Windows;

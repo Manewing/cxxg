@@ -15,7 +15,7 @@ class ListSelect;
 
 namespace rogue::ui {
 
-class InventoryControllerBase : public Widget {
+class InventoryControllerBase : public BaseRect {
 public:
   /// @brief Creates a new inventory UI controller
   /// @param Inv The inventory that is acccessed
@@ -24,6 +24,7 @@ public:
   /// @param Header The header to display for the inventory
   InventoryControllerBase(Inventory &Inv, entt::entity Entity,
                           entt::registry &Reg, const std::string &Header);
+  void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
   void draw(cxxg::Screen &Scr) const final;
 

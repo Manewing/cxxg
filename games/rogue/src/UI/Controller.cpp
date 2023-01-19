@@ -8,8 +8,6 @@
 
 namespace rogue::ui {
 
-Controller::Controller(cxxg::Screen &Scr) : Scr(Scr) {}
-
 namespace {
 
 cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
@@ -23,7 +21,15 @@ cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
   return {245, 30, 30};
 }
 
+cxxg::types::Size getWindowContainerSize(cxxg::Screen &Scr) {
+  auto S = Scr.getSize();
+  return {S.X - 1, S.Y - 2};
+}
+
 } // namespace
+
+Controller::Controller(cxxg::Screen &Scr)
+    : Scr(Scr), WdwContainer({1, 2}, getWindowContainerSize(Scr)) {}
 
 void Controller::draw(int LevelIdx, int Health, int MaxHealth,
                       std::string_view InteractStr) {
@@ -33,8 +39,8 @@ void Controller::draw(int LevelIdx, int Health, int MaxHealth,
   const auto HasInterColor = cxxg::types::RgbColor{80, 200, 145};
   const auto HealthColor = getHealthColor(Health, MaxHealth);
 
-  if (ActiveWidget) {
-    InteractStr = ActiveWidget->getInteractMsg();
+  if (WdwContainer.hasActiveWindow()) {
+    InteractStr = WdwContainer.getActiveWindow().getInteractMsg();
   }
 
   auto InterColor = HasInterColor;
@@ -49,39 +55,42 @@ void Controller::draw(int LevelIdx, int Health, int MaxHealth,
             << "[HEALTH]:" << HealthColor << std::setw(4) << Health << NoColor
             << " | " << InterColor.underline() << InterStr;
 
-  if (ActiveWidget) {
-    ActiveWidget->draw(Scr);
-  }
+  WdwContainer.draw(Scr);
 }
 
-bool Controller::isUIActive() const { return ActiveWidget != nullptr; }
+bool Controller::isUIActive() const { return WdwContainer.hasActiveWindow(); }
 
 void Controller::handleInput(int Char) {
-  if (!ActiveWidget) {
+  if (!WdwContainer.hasActiveWindow()) {
     return;
   }
-  if (!ActiveWidget->handleInput(Char)) {
-    ActiveWidget = nullptr;
-  }
+  WdwContainer.handleInput(Char);
 }
 
 void Controller::setEquipmentUI(Equipment &Equip, entt::entity Entity,
                                 entt::registry &Reg) {
-  ActiveWidget.reset(new EquipmentController(Equip, Entity, Reg, {2, 2}));
+  WdwContainer.addWindow(std::make_shared<EquipmentController>(
+      Equip, Entity, Reg, cxxg::types::Position{2, 2}));
+  WdwContainer.autoLayoutWindows();
 }
 
 void Controller::setInventoryUI(Inventory &Inv, entt::entity Entity,
                                 entt::registry &Reg) {
-  ActiveWidget.reset(new InventoryController(Inv, Entity, Reg));
+  WdwContainer.addWindow(
+      std::make_shared<InventoryController>(Inv, Entity, Reg));
+  WdwContainer.autoLayoutWindows();
 }
 
 void Controller::setLootUI(Inventory &Inv, entt::entity Entity,
                            entt::registry &Reg) {
-  ActiveWidget.reset(new LootController(Inv, Entity, Reg));
+  WdwContainer.addWindow(std::make_shared<LootController>(Inv, Entity, Reg));
+  WdwContainer.autoLayoutWindows();
 }
 
 void Controller::setHistoryUI(History &Hist) {
-  ActiveWidget.reset(new HistoryController({0, 2}, Hist));
+  WdwContainer.addWindow(
+      std::make_shared<HistoryController>(cxxg::types::Position{0, 2}, Hist));
+  WdwContainer.autoLayoutWindows();
 }
 
 } // namespace rogue::ui

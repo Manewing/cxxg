@@ -6,9 +6,9 @@
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/ListSelect.h>
-#include <rogue/UI/WindowContainer.h>
-#include <rogue/UI/TextBox.h>
 #include <rogue/UI/SelectBox.h>
+#include <rogue/UI/TextBox.h>
+#include <rogue/UI/WindowContainer.h>
 
 using namespace rogue::ui;
 using Size = cxxg::types::Size;
@@ -16,7 +16,8 @@ using Position = cxxg::types::Position;
 
 class UITest : public cxxg::Game {
 public:
-  explicit UITest(cxxg::Screen &Scr) : cxxg::Game(Scr), WdwContainer({0, 0}) {
+  explicit UITest(cxxg::Screen &Scr)
+      : cxxg::Game(Scr), WdwContainer({0, 0}, Scr.getSize()) {
     auto UISelect = std::make_shared<ItemSelect>(Position{0, 0});
     UISelect->addSelect<Select>("[List]", Position{0, 0}, 6);
     UISelect->addSelect<Select>("[Item]", Position{7, 0}, 6);

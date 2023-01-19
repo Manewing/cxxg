@@ -3,6 +3,10 @@
 
 namespace rogue::ui {
 
+WindowContainer::WindowContainer(cxxg::types::Position Pos,
+                                 cxxg::types::Size Size)
+    : Widget(Pos), Size(Size) {}
+
 bool WindowContainer::handleInput(int Char) {
   switch (Char) {
   case KEY_MOVE:
@@ -19,7 +23,7 @@ bool WindowContainer::handleInput(int Char) {
     switchMoveActiveWindow(WasMoving);
   } break;
   case KEY_AUTO_LAYOUT:
-    autoLayoutWindows({0, 0}, {80, 24});
+    autoLayoutWindows();
     break;
   default:
     break;
@@ -107,6 +111,8 @@ void WindowContainer::selectPrevWindow() {
   selectWindow(FocusIdx - 1);
 }
 
+void WindowContainer::autoLayoutWindows() { autoLayoutWindows(Pos, Size); }
+
 void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
                                         cxxg::types::Size Size) {
   struct WindowInfo {
@@ -132,6 +138,10 @@ void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
                                     Size.X * Size.Y, Wdw.get()});
     }
   }
+  if (WdwInfos.empty()) {
+    return;
+  }
+
   std::sort(WdwInfos.begin(), WdwInfos.end(),
             [](const auto &A, const auto &B) { return A.Area > B.Area; });
 

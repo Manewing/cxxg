@@ -38,17 +38,19 @@ const char *getItemTypeLabel(ItemType It) {
 EquipmentController::EquipmentController(Equipment &Equip, entt::entity Entity,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
-    : BaseRect(Pos, {50, 10}), Equip(Equip), Entity(Entity), Reg(Reg) {
+    : BaseRect(Pos, {40, 11}), Equip(Equip), Entity(Entity), Reg(Reg) {
   ItSel = std::make_shared<ItemSelect>(Pos);
   Dec = std::make_shared<Frame>(ItSel, Pos, Size, "Equipment");
 
   int Count = 0;
   for (const auto *ES : Equip.all()) {
-    auto PosX = 1 + Pos.X + (Count / 4) * int(Size.X / 2);
-    auto PosY = 1 + Pos.Y + Count % 4;
-    Count++;
-    addSelect(*ES, {PosX, PosY});
+    addSelect(*ES, {Pos.X + 1, Pos.Y + Count++});
   }
+}
+
+void EquipmentController::setPos(cxxg::types::Position Pos) {
+  BaseRect::setPos(Pos);
+  Dec->setPos(Pos);
 }
 
 bool EquipmentController::handleInput(int Char) {

@@ -28,6 +28,7 @@ bool HistoryController::handleInput(int Char) {
       Offset--;
     }
     break;
+  case cxxg::utils::KEY_ESC:
   case 'h':
     return false;
   default:
