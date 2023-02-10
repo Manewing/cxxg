@@ -26,7 +26,7 @@ public:
       Rotation::Left,
   };
 
-  static const std::vector<cxxg::types::Color> Colors;
+  static const std::vector<cxxg::types::TermColor> Colors;
 
   class Iterator {
     friend bool operator==(const Iterator &Lhs, const Iterator &Rhs) noexcept;
@@ -80,7 +80,7 @@ public:
   static const unsigned NumShapes;
 
 public:
-  explicit Tetromino(cxxg::types::Color Color,
+  explicit Tetromino(cxxg::types::TermColor Color,
                      std::vector<std::string> const &Shape);
   virtual ~Tetromino() = default;
 
@@ -95,7 +95,7 @@ public:
 
   void rotate(int Times);
 
-  cxxg::types::Color getColor() const;
+  cxxg::types::TermColor getColor() const;
 
   void setRotation(Rotation Rot);
   Rotation getRotation() const;
@@ -115,13 +115,13 @@ public:
   const std::vector<std::string> &getShape() const;
 
 public:
-  static Tetromino create(cxxg::types::Color Color, unsigned ShapeIdx);
+  static Tetromino create(cxxg::types::TermColor Color, unsigned ShapeIdx);
 
   static cxxg::types::Position rotate(cxxg::types::Position Pos, Rotation Rot);
 
 protected:
   /// Color of the tetromino
-  cxxg::types::Color Color = cxxg::types::Color::NONE;
+  cxxg::types::TermColor Color = cxxg::types::Color::NONE;
 
   /// Rotation of the tetromino in degrees
   Rotation Rot = Rotation::Up;

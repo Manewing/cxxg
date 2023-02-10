@@ -1,9 +1,9 @@
 #ifndef MASTERMIND_H
 #define MASTERMIND_H
 
+#include <ctime>
 #include <cxxg/Game.h>
 #include <map>
-#include <ctime>
 
 class MasterMind : public ::cxxg::Game {
 public:
@@ -19,7 +19,7 @@ public:
     std::time_t TimeStamp;
   };
 
-  static ::std::map<char, ::cxxg::types::Color> Colors;
+  static ::std::map<char, ::cxxg::types::TermColor> Colors;
 
   static ::std::string formatMinutesSeconds(std::time_t TimeStamp);
 
@@ -28,7 +28,7 @@ public:
   virtual ~MasterMind();
 
   void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0) final;
-  void handleInput(int Char) final;
+  bool handleInput(int Char) final;
   void handleReturn();
   void handleLeft();
   void handleRight();

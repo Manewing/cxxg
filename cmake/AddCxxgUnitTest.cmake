@@ -2,7 +2,7 @@ function(add_cxxg_unittest)
 
 set(options "")
 set(oneValueArgs NAME RENAME)
-set(multiValueArgs SOURCES INCLUDES)
+set(multiValueArgs SOURCES INCLUDES LIBRARIES)
 
 cmake_parse_arguments(
   ARGS
@@ -22,8 +22,10 @@ add_test(unittest_${ARGS_NAME} ${TARGET})
 
 target_link_libraries(${TARGET}
   cxxg
-  ${GTEST_LIBRARIES}
-  ${GTEST_MAIN_LIBRARY}
+  gtest
+  gtest_main
+  gmock
+  ${ARGS_LIBRARIES}
   pthread
 )
 

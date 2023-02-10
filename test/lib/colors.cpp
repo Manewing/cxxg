@@ -9,7 +9,7 @@ TEST(cxxg, Colors) {
 
   // for generating references
   ::std::stringstream Ref;
-  ::std::vector<::cxxg::types::Color> ColorRef;
+  ::std::vector<::cxxg::types::TermColor> ColorRef;
   ColorRef.resize(10, ::cxxg::types::Color::NONE);
 
   // check that init worked correctly
@@ -42,7 +42,8 @@ TEST(cxxg, Colors) {
   Row[1] = ::cxxg::types::Color::GREEN;
   Row[2] = ::cxxg::types::Color::BLUE;
   Row.dump(SS);
-  Ref << "\033[31mt\033[32me\033[34ms\033[31mt\033[0m      \033[0m";
+  Ref << "\x1B[0m\x1B[38;2;255;25;25mt\x1B[0m\x1B[38;2;25;255;25me\x1B[0m\x1B["
+         "38;2;80;80;255ms\x1B[0m\x1B[38;2;255;25;25mt\x1B[0m      \x1B[0m";
   EXPECT_EQ(SS.str(), Ref.str()) << "RowColoredOutput";
 }
 

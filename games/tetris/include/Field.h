@@ -12,8 +12,8 @@ class Screen;
 }
 
 struct Block {
-    char Char = ' ';
-    cxxg::types::Color Color = cxxg::types::Color::NONE;
+  char Char = ' ';
+  cxxg::types::TermColor Color = cxxg::types::Color::NONE;
 };
 
 class Field {
@@ -21,30 +21,28 @@ public:
   using BlockMatrix = std::vector<std::vector<Block>>;
 
 public:
-    Field() = delete;
-    Field(unsigned Width, unsigned Heigh);
+  Field() = delete;
+  Field(unsigned Width, unsigned Heigh);
 
-    void draw(cxxg::Screen &Scr, cxxg::types::Position Pos = {0, 0});
+  void draw(cxxg::Screen &Scr, cxxg::types::Position Pos = {0, 0});
 
-    bool inBounds(cxxg::types::Position Pos) const;
-    bool inBounds(Tetromino T) const;
-    bool collides(Tetromino T) const;
-    bool place(Tetromino T);
+  bool inBounds(cxxg::types::Position Pos) const;
+  bool inBounds(Tetromino T) const;
+  bool collides(Tetromino T) const;
+  bool place(Tetromino T);
 
-    unsigned getNumLines() const;
-    bool isLineFull(unsigned Y) const;
-    std::vector<unsigned> getFullLines() const;
+  unsigned getNumLines() const;
+  bool isLineFull(unsigned Y) const;
+  std::vector<unsigned> getFullLines() const;
 
-    void removeFullLines();
+  void removeFullLines();
 
-    void animateRainbowLine(unsigned Y, unsigned AnimTick);
+  void animateRainbowLine(unsigned Y, unsigned AnimTick);
 
 private:
-    unsigned Width = 0;
-    unsigned Height = 0;
-    BlockMatrix Blocks;
+  unsigned Width = 0;
+  unsigned Height = 0;
+  BlockMatrix Blocks;
 };
-
-
 
 #endif // #ifndef FIELD_H

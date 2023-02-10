@@ -9,22 +9,17 @@ List of games:
 - Tetris
 
 # Build
-In order to build `cxxg` you need `cmake (version >= 3.5)` and optionally if you want to build the unit-tests `google-test (version >= 1.8)`. 
+In order to build `cxxg` you need `cmake (version >= 3.5)`.
 
-1. Install `cmake`:
+1. Initialize submodules
+    ```
+    git submodule update --init --recursive
+    ```
+
+2. Install `cmake`:
     ```
     sudo apt install cmake # Ubuntu
     brew install cmake # Mac OS (brew)
-    ```
-2. (Optional) Install `google-test`:
-    ```
-    wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
-    tar -xzf release-1.8.0.tar.gz && cd googletest-release-1.8.0
-    mkdir build && cd build
-    cmake .. -DCMAKE_INSTALL_PREFIX=install -DCMAKE_CXX_STANDARD=11
-    make && make install
-    export GTEST_ROOT=`pwd`/install
-    export GMOCK_ROOT=$GTEST_ROOT
     ```
 
 3. Configure and build `cxxg`, default `BUILD_TESTS=OFF`:
@@ -34,7 +29,7 @@ In order to build `cxxg` you need `cmake (version >= 3.5)` and optionally if you
     cmake ../ -DBUILD_TESTS=[ON/OFF]
     make
     ```
-    
+
 # Screenshots
 ## 2048
 ![Screenshot 2048](doc/screenshots/2048.png)

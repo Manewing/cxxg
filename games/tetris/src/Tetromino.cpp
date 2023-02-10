@@ -53,26 +53,18 @@ static std::vector<std::string> T = {
     "....",
 };
 
-static constexpr std::array Shapes = {
-    &LL,
-    &RL,
-    &Square,
-    &Line,
-    &ZR,
-    &ZL,
-    &T
-};
+static constexpr std::array Shapes = {&LL, &RL, &Square, &Line, &ZR, &ZL, &T};
 
 }; // namespace Shape
 
-const std::vector<cxxg::types::Color> Tetromino::Colors = {
+const std::vector<cxxg::types::TermColor> Tetromino::Colors = {
     cxxg::types::Color::RED,
     cxxg::types::Color::BLUE,
     cxxg::types::Color::YELLOW,
     cxxg::types::Color::GREEN,
 };
 
-Tetromino::Tetromino(cxxg::types::Color Color,
+Tetromino::Tetromino(cxxg::types::TermColor Color,
                      const std::vector<std::string> &Shp)
     : Color(Color), Shape(&Shp) {
   // TODO check size
@@ -97,7 +89,7 @@ void Tetromino::rotate(int Times) {
   this->Rot = Rotations.at(Index);
 }
 
-cxxg::types::Color Tetromino::getColor() const { return Color; }
+cxxg::types::TermColor Tetromino::getColor() const { return Color; }
 
 void Tetromino::setRotation(Rotation Rot) { this->Rot = Rot; }
 
@@ -109,7 +101,7 @@ cxxg::types::Position Tetromino::getPosition() const { return Pos; }
 
 const std::vector<std::string> &Tetromino::getShape() const { return *Shape; }
 
-Tetromino Tetromino::create(cxxg::types::Color Color, unsigned ShapeIdx) {
+Tetromino Tetromino::create(cxxg::types::TermColor Color, unsigned ShapeIdx) {
   return Tetromino(Color, *Shape::Shapes.at(ShapeIdx));
 }
 

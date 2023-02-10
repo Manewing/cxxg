@@ -1,3 +1,4 @@
+#include "cxxg/Types.h"
 #include <cxxg/Row.h>
 
 #include <stdexcept>
@@ -7,7 +8,15 @@ namespace cxxg {
 RowAccessor::RowAccessor(Row &Rw, int Offset)
     : Rw(Rw), Offset(Offset), CurrentColor(types::Color::NONE) {}
 
-RowAccessor &RowAccessor::operator=(types::Color Cl) {
+RowAccessor::RowAccessor(RowAccessor &&RA)
+    : Rw(RA.Rw), Offset(RA.Offset), CurrentColor(RA.CurrentColor),
+      SS(std::move(RA.SS)) {
+  RA.Valid = false;
+}
+
+RowAccessor::~RowAccessor() { flushBuffer(); }
+
+RowAccessor &RowAccessor::operator=(types::TermColor Cl) {
   // check if the access is out of range, if so ignore it
   if (Offset >= static_cast<int>(Rw.ColorInfo.size()) || Offset < 0) {
     return *this;
@@ -25,16 +34,36 @@ RowAccessor &RowAccessor::operator=(char C) {
   return *this;
 }
 
-RowAccessor &RowAccessor::operator<<(types::Color Cl) {
+RowAccessor &RowAccessor::operator=(types::ColoredChar C) {
+  *this = C.Color;
+  *this = C.Char;
+  return *this;
+}
+
+RowAccessor &RowAccessor::operator<<(types::TermColor Cl) {
+  flushBuffer();
   CurrentColor = Cl;
   return *this;
 }
 
-RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
+void RowAccessor::flushBuffer() {
+  if (!Valid) {
+    return;
+  }
+  output(SS.str());
+  SS.str("");
+  SS.clear();
+}
+
+void RowAccessor::output(::std::string const &Str) {
+  if (Str.empty()) {
+    return;
+  }
+
   // check if the access is out of range, if so ignore it
-  if (Offset >= static_cast<int>(Rw.Buffer.size()) ||
-      Offset + Str.size() <= 0) {
-    return *this;
+  if (Rw.Buffer.size() == 0 || Offset >= static_cast<int>(Rw.Buffer.size()) ||
+      Offset + static_cast<int>(Str.size()) <= 0) {
+    return;
   }
 
   // get row buffer and color info
@@ -44,6 +73,7 @@ RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
   // keep track of how much we moved offset
   size_t Count;
 
+  // FIXME four cases?? 4. is before start and after end
   // We have got three cases
   if (Offset < 0) {
     // First case: Writing before row with part of string overlapping into
@@ -70,7 +100,7 @@ RowAccessor &RowAccessor::operator<<(::std::string const &Str) {
   // update offset of accessor by the amount of characters we already wrote
   Offset += Count;
 
-  return *this;
+  return;
 }
 
 Row::Row(size_t Size) {
@@ -88,13 +118,13 @@ void Row::clear() {
 
 ::std::string const &Row::getBuffer() const { return Buffer; }
 
-::std::vector<types::Color> const &Row::getColorInfo() const {
+::std::vector<types::TermColor> const &Row::getColorInfo() const {
   return ColorInfo;
 }
 
 RowAccessor Row::operator[](int X) { return RowAccessor(*this, X); }
 
-void Row::setColor(int StartX, int EndX, types::Color Cl) {
+void Row::setColor(int StartX, int EndX, types::TermColor Cl) {
   int Start = ::std::max(StartX, 0);
   int End = ::std::max(0, ::std::min(EndX, static_cast<int>(ColorInfo.size())));
 
@@ -104,7 +134,7 @@ void Row::setColor(int StartX, int EndX, types::Color Cl) {
 }
 
 ::std::ostream &Row::dump(::std::ostream &Out) const {
-  types::Color LastColor = types::Color::NONE;
+  types::TermColor LastColor = types::Color::NONE;
 
   for (size_t L = 0; L < Buffer.size(); L++) {
     if (LastColor != ColorInfo.at(L)) {

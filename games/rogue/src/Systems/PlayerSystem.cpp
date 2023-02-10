@@ -1,0 +1,55 @@
+#include <entt/entt.hpp>
+#include <rogue/Components/AI.h>
+#include <rogue/Components/Player.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
+#include <rogue/Level.h>
+#include <rogue/Systems/PlayerSystem.h>
+
+#include <rogue/History.h>
+
+namespace rogue {
+
+PlayerSystem::PlayerSystem(Level &L) : System(L.Reg), L(L) {}
+
+void PlayerSystem::update() {
+  auto View =
+      Reg.view<PlayerComp, PositionComp, const MeleeAttackComp, MovementComp>();
+  View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp,
+                   const auto &MA, auto &MC) {
+    if (MC.Dir == ymir::Dir2d::NONE) {
+      return;
+    }
+    PC.CurrentInteraction = std::nullopt;
+
+    auto NewPos = PosComp.Pos + MC.Dir;
+    MC.Dir = ymir::Dir2d::NONE;
+
+    if (auto Et = L.getEntityAt(NewPos);
+        Et != entt::null && Reg.all_of<HealthComp, FactionComp>(Et)) {
+
+      // FIXME create damage system and spawn melee damage entity
+      auto &THealth = Reg.get<HealthComp>(Et);
+
+      THealth.reduce(MA.Damage);
+
+      // publish
+      const auto Nm = Reg.try_get<NameComp>(PlayerEt);
+      const auto TNm = Reg.try_get<NameComp>(Et);
+      if (Nm && TNm) {
+        publish(DebugMessageEvent() << Nm->Name << " dealt " << MA.Damage
+                                    << " melee damage to " << TNm->Name);
+      }
+      return;
+    }
+
+    if (!L.isBodyBlocked(NewPos)) {
+      L.updateEntityPosition(PlayerEt, PosComp, NewPos);
+    } else {
+      publish(DebugMessageEvent() << "Can't move");
+    }
+  });
+}
+
+} // namespace rogue

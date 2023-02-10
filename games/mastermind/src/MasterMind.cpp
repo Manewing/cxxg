@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <stdexcept>
 
-::std::map<char, ::cxxg::types::Color> MasterMind::Colors = {
+::std::map<char, ::cxxg::types::TermColor> MasterMind::Colors = {
     {' ', ::cxxg::types::Color::NONE},   {'a', ::cxxg::types::Color::RED},
     {'b', ::cxxg::types::Color::GREEN},  {'c', ::cxxg::types::Color::BLUE},
     {'d', ::cxxg::types::Color::YELLOW}, {'e', ::cxxg::types::Color::RED},
@@ -36,27 +36,35 @@ void MasterMind::initialize(bool BufferedInput, unsigned TickDelayUs) {
   handleDraw();
 }
 
-void MasterMind::handleInput(int Char) {
+bool MasterMind::handleInput(int Char) {
   switch (Char) {
-  case 68: // left
+  case cxxg::utils::KEY_LEFT:
     handleLeft();
     break;
-  case 67: // right
+  case cxxg::utils::KEY_RIGHT:
     handleRight();
     break;
-  case '\n':
+  case cxxg::utils::KEY_ENTER:
     handleReturn();
     break;
   case 'q':
     handleGameOver();
     break;
-  default:
-    if ('a' <= Char && Char <= 'h') {
-      CurrentGuess.at(InputPosition) = Char;
-      handleRight();
-    }
+  case 'a':
+  case 'b':
+  case 'c':
+  case 'd':
+  case 'e':
+  case 'f':
+  case 'g':
+  case 'h':
+    CurrentGuess.at(InputPosition) = Char;
+    handleRight();
     break;
+  default:
+    return false;
   }
+  return true;
 }
 
 void MasterMind::handleReturn() {
@@ -114,7 +122,7 @@ void MasterMind::handleDraw() {
   // draw the board outline
   int Y = Offset.Y;
 
-  ::cxxg::types::Color CodeColor = ::cxxg::types::Color::NONE;
+  ::cxxg::types::TermColor CodeColor = ::cxxg::types::Color::NONE;
   if (State == GameOver) {
     CodeColor = ::cxxg::types::Color::RED;
   } else if (State == Victory) {
@@ -190,7 +198,7 @@ void MasterMind::handleDraw() {
   // highlight input position, TODO cleanup
   int InputStartX = 1 + Offset.X + InputPosition * 4;
   int InputEndX = 4 + Offset.X + InputPosition * 4;
-  ::cxxg::types::Color const HlCl{7};
+  ::cxxg::types::RgbColor const HlCl{255, 255, 255, true, 140, 140, 140};
   Scr[InputOffset.Y][InputStartX - 1] = ::cxxg::types::Color::NONE;
   Scr[InputOffset.Y].setColor(InputStartX, InputEndX, HlCl);
   Scr[InputOffset.Y][InputEndX] = ::cxxg::types::Color::NONE;

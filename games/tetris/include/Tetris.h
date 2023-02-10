@@ -1,9 +1,9 @@
 #ifndef TETRIS_H
 #define TETRIS_H
 
-#include <random>
 #include <cxxg/Game.h>
 #include <cxxg/Types.h>
+#include <random>
 
 #include <Field.h>
 #include <Tetromino.h>
@@ -13,7 +13,7 @@ public:
   Tetris(cxxg::Screen &Scr);
   virtual ~Tetris();
 
-  void handleInput(int Char) final;
+  bool handleInput(int Char) final;
 
   void handleDraw() final;
   void drawLogo(cxxg::types::Position Offset);

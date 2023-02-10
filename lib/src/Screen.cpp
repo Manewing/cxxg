@@ -8,6 +8,9 @@ namespace cxxg {
 types::Size Screen::getTerminalSize() {
   winsize Ws;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &Ws);
+  if (!Ws.ws_col || !Ws.ws_row) {
+    return {80, 24};
+  }
   return {Ws.ws_col, Ws.ws_row};
 }
 
@@ -36,7 +39,7 @@ Row const &Screen::operator[](int Y) const {
 }
 
 void Screen::setColor(types::Position Top, types::Position Bottom,
-                      types::Color Cl) {
+                      types::TermColor Cl) {
   for (int Y = Top.Y; Y <= Bottom.Y; Y++) {
     operator[](Y).setColor(Top.X, Bottom.X, Cl);
   }

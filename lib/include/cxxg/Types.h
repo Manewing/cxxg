@@ -3,10 +3,19 @@
 
 #include <iosfwd>
 #include <string>
+#include <tuple>
+#include <variant>
 
 namespace cxxg {
 
 namespace types {
+
+template <class... Ts> struct Overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts> Overloaded(Ts...) -> Overloaded<Ts...>;
+
+template <typename T, typename... Ts>
+using EnableIfOfType =
+    std::enable_if<std::disjunction<std::is_same<T, Ts>...>::value>;
 
 /// Position in rows and columns
 struct Position {
@@ -74,33 +83,168 @@ inline Size operator+(Size const A, Size const B) {
   return {A.X + B.X, A.Y + B.Y};
 }
 
-/// Typesafe struct for holding color information
-struct Color {
-  static Color NONE;
-  static Color RED;
-  static Color GREEN;
-  static Color YELLOW;
-  static Color BLUE;
-  static Color GREY;
-
-  /// The color code for terminal, output as "\033$Value[0m"
-  int Value;
+struct FontStyle {
+  unsigned Italic : 1;
+  unsigned Bold : 1;
+  unsigned Underline : 1;
+  unsigned Strikethrough : 1;
 };
+inline bool operator==(const FontStyle &Lhs, const FontStyle &Rhs) noexcept {
+  return std::tie(Lhs.Italic, Lhs.Bold, Lhs.Underline, Lhs.Strikethrough) ==
+         std::tie(Rhs.Italic, Rhs.Bold, Rhs.Underline, Rhs.Strikethrough);
+}
+inline bool operator!=(const FontStyle &Lhs, const FontStyle &Rhs) noexcept {
+  return !(Lhs == Rhs);
+}
+std::ostream &operator<<(std::ostream &Out, const FontStyle &FS);
 
-/// Compares if the given two colors are equal, based on the color value.
-inline bool operator==(Color const A, Color const B) {
-  return A.Value == B.Value;
+struct NoColor {};
+inline bool operator==(const NoColor &, const NoColor &) noexcept {
+  return true;
+}
+inline bool operator!=(const NoColor &, const NoColor &) noexcept {
+  return false;
+}
+std::ostream &operator<<(std::ostream &Out, const NoColor &NC);
+
+struct DefaultColor {
+  FontStyle FS{};
+
+  constexpr auto italic() const {
+    auto Copy = *this;
+    Copy.FS.Italic = 1;
+    return Copy;
+  }
+
+  constexpr auto bold() const {
+    auto Copy = *this;
+    Copy.FS.Bold = 1;
+    return Copy;
+  }
+
+  constexpr auto underline() const {
+    auto Copy = *this;
+    Copy.FS.Underline = 1;
+    return Copy;
+  }
+
+  constexpr auto striketrhough() const {
+    auto Copy = *this;
+    Copy.FS.Strikethrough = 1;
+    return Copy;
+  }
+};
+inline bool operator==(const DefaultColor &Lhs,
+                       const DefaultColor &Rhs) noexcept {
+  return Lhs.FS == Rhs.FS;
+}
+inline bool operator!=(const DefaultColor &Lhs,
+                       const DefaultColor &Rhs) noexcept {
+  return !(Lhs.FS == Rhs.FS);
+}
+std::ostream &operator<<(std::ostream &Out, const DefaultColor &DC);
+
+struct RgbColor {
+  static RgbColor getHeatMapColor(float Min, float Max, float Value);
+
+  uint8_t R = 0;
+  uint8_t G = 0;
+  uint8_t B = 0;
+  bool HasBackground = false;
+  uint8_t BgR = 0;
+  uint8_t BgG = 0;
+  uint8_t BgB = 0;
+  FontStyle FS{};
+
+  constexpr auto italic() const {
+    auto Copy = *this;
+    Copy.FS.Italic = 1;
+    return Copy;
+  }
+
+  constexpr auto bold() const {
+    auto Copy = *this;
+    Copy.FS.Bold = 1;
+    return Copy;
+  }
+
+  constexpr auto underline() const {
+    auto Copy = *this;
+    Copy.FS.Underline = 1;
+    return Copy;
+  }
+
+  constexpr auto striketrhough() const {
+    auto Copy = *this;
+    Copy.FS.Strikethrough = 1;
+    return Copy;
+  }
+};
+inline bool operator==(const RgbColor &Lhs, const RgbColor &Rhs) noexcept {
+  return std::tie(Lhs.R, Lhs.G, Lhs.B, Lhs.HasBackground, Lhs.BgR, Lhs.BgG,
+                  Lhs.BgB, Lhs.FS) == std::tie(Rhs.R, Rhs.G, Rhs.B,
+                                               Rhs.HasBackground, Rhs.BgR,
+                                               Rhs.BgG, Rhs.BgB, Rhs.FS);
+}
+inline bool operator!=(const RgbColor &Lhs, const RgbColor &Rhs) noexcept {
+  return !(Lhs == Rhs);
+}
+std::ostream &operator<<(std::ostream &Out, const RgbColor &Color);
+
+using TermColor = std::variant<NoColor, DefaultColor, RgbColor>;
+template <typename T>
+using IsTermColor = EnableIfOfType<T, NoColor, DefaultColor, RgbColor>;
+std::ostream &operator<<(std::ostream &Out, const TermColor &TC);
+
+template <typename T, typename IsTermColor<T>::type * = nullptr>
+inline bool operator==(const TermColor &Lhs, const T &Rhs) noexcept {
+  return std::holds_alternative<T>(Lhs) && std::get<T>(Lhs) == Rhs;
+}
+template <typename T, typename IsTermColor<T>::type * = nullptr>
+inline bool operator==(const T &Lhs, const TermColor &Rhs) noexcept {
+  return (Rhs == Lhs);
+}
+template <typename T, typename IsTermColor<T>::type * = nullptr>
+inline bool operator!=(const TermColor &Lhs, const T &Rhs) noexcept {
+  return !(Lhs == Rhs);
+}
+template <typename T, typename IsTermColor<T>::type * = nullptr>
+inline bool operator!=(const T &Lhs, const TermColor &Rhs) noexcept {
+  return (Rhs != Lhs);
 }
 
-/// Compares if the given two colors are un-equal, based on the color value.
-inline bool operator!=(Color const A, Color const B) {
-  return A.Value != B.Value;
+namespace Color {
+static constexpr auto NONE = DefaultColor{};
+static constexpr auto RED = RgbColor{255, 25, 25};
+static constexpr auto GREEN = RgbColor{25, 255, 25};
+static constexpr auto YELLOW = RgbColor{255, 255, 25};
+static constexpr auto BLUE = RgbColor{80, 80, 255};
+static constexpr auto GREY = RgbColor{100, 100, 100};
+}; // namespace Color
+
+struct ColoredChar {
+  char Char = 0;
+  TermColor Color = NoColor{};
+
+  constexpr ColoredChar() = default;
+  constexpr ColoredChar(char Char) : Char(Char) {}
+  constexpr ColoredChar(char Char, TermColor Color)
+      : Char(Char), Color(Color) {}
+  ColoredChar &operator=(char Char);
+  ColoredChar &operator=(const TermColor &Color);
+};
+inline bool operator==(const ColoredChar &Lhs,
+                       const ColoredChar &Rhs) noexcept {
+  return Lhs.Char == Rhs.Char && Lhs.Color == Rhs.Color;
 }
+inline bool operator!=(const ColoredChar &Lhs,
+                       const ColoredChar &Rhs) noexcept {
+  return !(Lhs == Rhs);
+}
+std::ostream &operator<<(std::ostream &Out, const ColoredChar &Char);
 
 }; // namespace types
 
 }; // namespace cxxg
-
-::std::ostream &operator<<(::std::ostream &Out, ::cxxg::types::Color const Cl);
 
 #endif // #ifndef CXXG_TYPES_H

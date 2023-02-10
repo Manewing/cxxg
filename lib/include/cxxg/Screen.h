@@ -54,7 +54,8 @@ public:
   /// @param[in] Top    - Top corner of the rectangle
   /// @param[in] Bottom - Bottom corner of the rectangle
   /// @param[in] Cl     - Color to set
-  void setColor(types::Position Top, types::Position Bottom, types::Color Cl);
+  void setColor(types::Position Top, types::Position Bottom,
+                types::TermColor Cl);
 
   /// Updates the screen by writing buffer to output stream
   void update() const;
