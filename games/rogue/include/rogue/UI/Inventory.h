@@ -29,7 +29,7 @@ public:
   void draw(cxxg::Screen &Scr) const final;
 
 protected:
-  void updateElements();
+  void updateElements() const;
 
 protected:
   Inventory &Inv;

@@ -15,6 +15,10 @@
 #include <ymir/Types.hpp>
 
 namespace rogue {
+struct Interaction;
+}
+
+namespace rogue {
 
 class Game : public cxxg::Game {
 public:
@@ -27,6 +31,9 @@ public:
 
   bool handleInput(int Char) final;
 
+  /// Update level and handle entity updates
+  bool handleUpdates(bool IsTick);
+
   void handleDraw() final;
 
   void movePlayer(ymir::Dir2d Dir);
@@ -38,10 +45,7 @@ private:
   entt::entity getPlayerOrNull() const;
   entt::entity getPlayer() const;
 
-  /// Update level and handle entity updates
-  bool handleUpdates(bool IsTick);
-
-  void updateCurrentInteraction();
+  Interaction *getAvailableInteraction();
 
 public: // FIXME
   EventHub EvHub;

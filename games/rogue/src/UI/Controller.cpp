@@ -69,27 +69,41 @@ void Controller::handleInput(int Char) {
 
 void Controller::setEquipmentUI(Equipment &Equip, entt::entity Entity,
                                 entt::registry &Reg) {
-  WdwContainer.addWindow(std::make_shared<EquipmentController>(
-      Equip, Entity, Reg, cxxg::types::Position{2, 2}));
+  WdwContainer.addWindow<EquipmentController>(Equip, Entity, Reg,
+                                              cxxg::types::Position{2, 2});
   WdwContainer.autoLayoutWindows();
+}
+
+bool Controller::hasEquipmentUI() const {
+  return WdwContainer.hasWindowOfType<EquipmentController>();
+}
+
+void Controller::closeEquipmentUI() {
+  WdwContainer.closeWindow(WdwContainer.getWindowOfType<EquipmentController>());
 }
 
 void Controller::setInventoryUI(Inventory &Inv, entt::entity Entity,
                                 entt::registry &Reg) {
-  WdwContainer.addWindow(
-      std::make_shared<InventoryController>(Inv, Entity, Reg));
+  WdwContainer.addWindow<InventoryController>(Inv, Entity, Reg);
   WdwContainer.autoLayoutWindows();
+}
+
+bool Controller::hasInventoryUI() const {
+  return WdwContainer.hasWindowOfType<InventoryController>();
+}
+
+void Controller::closeInventoryUI() {
+  WdwContainer.closeWindow(WdwContainer.getWindowOfType<InventoryController>());
 }
 
 void Controller::setLootUI(Inventory &Inv, entt::entity Entity,
                            entt::registry &Reg) {
-  WdwContainer.addWindow(std::make_shared<LootController>(Inv, Entity, Reg));
+  WdwContainer.addWindow<LootController>(Inv, Entity, Reg);
   WdwContainer.autoLayoutWindows();
 }
 
 void Controller::setHistoryUI(History &Hist) {
-  WdwContainer.addWindow(
-      std::make_shared<HistoryController>(cxxg::types::Position{0, 2}, Hist));
+  WdwContainer.addWindow<HistoryController>(cxxg::types::Position{0, 2}, Hist);
   WdwContainer.autoLayoutWindows();
 }
 

@@ -34,11 +34,12 @@ bool InventoryControllerBase::handleInput(int Char) {
 }
 
 void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
+  updateElements();
   BaseRect::draw(Scr);
   Decorated->draw(Scr);
 }
 
-void InventoryControllerBase::updateElements() {
+void InventoryControllerBase::updateElements() const {
   std::vector<std::string> Elements;
   Elements.reserve(Inv.getItems().size());
   for (const auto &Item : Inv.getItems()) {

@@ -88,6 +88,7 @@ std::string_view EquipmentController::getInteractMsg() const {
 }
 
 void EquipmentController::draw(cxxg::Screen &Scr) const {
+  updateSelectValues();
   BaseRect::draw(Scr);
   Dec->draw(Scr);
 }
@@ -109,7 +110,7 @@ void EquipmentController::addSelect(const EquipmentSlot &ES,
                                   getSelectValue(ES), Pos, 25);
 }
 
-void EquipmentController::updateSelectValues() {
+void EquipmentController::updateSelectValues() const {
   std::size_t Count = 0;
   for (const auto *ES : Equip.all()) {
     ItSel->getSelect(Count++).setValue(getSelectValue(*ES));

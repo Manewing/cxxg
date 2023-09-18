@@ -25,7 +25,6 @@ struct InteractableComp {
 
 struct PlayerComp {
 public:
-public:
   static entt::entity createPlayer(entt::registry &Reg, const std::string &Name,
                                    ymir::Point2d<int> Pos = {});
   static entt::entity copyPlayer(entt::registry &RegFrom,

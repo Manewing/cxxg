@@ -26,6 +26,19 @@ public:
 
   bool hasActiveWindow() const;
 
+  template <typename T> Widget *getWindowOfType() const {
+    for (const auto &Wdw : Windows) {
+      if (dynamic_cast<T *>(Wdw.get())) {
+        return Wdw.get();
+      }
+    }
+    return nullptr;
+  }
+
+  template <typename T> bool hasWindowOfType() const {
+    return getWindowOfType<T>() != nullptr;
+  }
+
   Widget &getActiveWindow();
 
   const Widget &getActiveWindow() const;
@@ -34,9 +47,15 @@ public:
 
   /// @brief Closes the active window if there is one
   /// @return True if there is still is a window left, otherwise false
+  bool closeWindow(std::size_t Idx);
+  bool closeWindow(Widget *Wdw);
   bool closeActiveWindow();
 
   void addWindow(std::shared_ptr<Widget> Window);
+
+  template <typename T, typename... Args> void addWindow(Args &&...Arg) {
+    addWindow(std::make_shared<T>(Arg...));
+  }
 
   void selectWindow(std::size_t Idx);
   void selectNextWindow();

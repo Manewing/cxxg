@@ -25,7 +25,7 @@ public:
 
 protected:
   void addSelect(const EquipmentSlot &ES, cxxg::types::Position Pos);
-  void updateSelectValues();
+  void updateSelectValues() const;
 
 protected:
   Equipment &Equip;

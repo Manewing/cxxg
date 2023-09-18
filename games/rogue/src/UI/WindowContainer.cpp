@@ -80,13 +80,27 @@ std::shared_ptr<Widget> &WindowContainer::getActiveWindowPtr() {
   return Windows.at(FocusIdx);
 }
 
-bool WindowContainer::closeActiveWindow() {
+bool WindowContainer::closeWindow(std::size_t Idx) {
   if (Windows.empty()) {
     return false;
   }
-  Windows.erase(Windows.begin() + FocusIdx);
+  Windows.erase(Windows.begin() + Idx);
   FocusIdx = 0;
   return !Windows.empty();
+}
+
+bool WindowContainer::closeWindow(Widget *Wdw) {
+  for (std::size_t Idx = 0; Idx < Windows.size(); ++Idx) {
+    if (Windows.at(Idx).get() == Wdw) {
+      return closeWindow(Idx);
+    }
+  }
+  return false;
+}
+
+
+bool WindowContainer::closeActiveWindow() {
+  return closeWindow(FocusIdx);
 }
 
 void WindowContainer::addWindow(std::shared_ptr<Widget> Window) {

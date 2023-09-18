@@ -79,6 +79,10 @@ bool Game::handleInput(int Char) {
     if (Player == entt::null) {
       return false;
     }
+    if (UICtrl.hasInventoryUI()) {
+      UICtrl.closeInventoryUI();
+      return true;
+    }
     auto &InvComp = getLvlReg().get<InventoryComp>(Player);
     // UI interaction do not update level
     UICtrl.setInventoryUI(InvComp.Inv, Player, CurrentLevel->Reg);
@@ -88,6 +92,10 @@ bool Game::handleInput(int Char) {
     auto Player = getPlayerOrNull();
     if (Player == entt::null) {
       return false;
+    }
+    if (UICtrl.hasEquipmentUI()) {
+      UICtrl.closeEquipmentUI();
+      return true;
     }
     auto &EquipComp = getLvlReg().get<EquipmentComp>(Player);
     // UI interaction do not update level
@@ -107,9 +115,7 @@ bool Game::handleInput(int Char) {
   // Handle UI input
   if (UICtrl.isUIActive()) {
     UICtrl.handleInput(Char);
-    if (!UICtrl.isUIActive()) {
-      handleUpdates(/*IsTick=*/false);
-    }
+    handleUpdates(/*IsTick=*/false);
     return true;
   }
 
@@ -148,16 +154,27 @@ bool Game::handleInput(int Char) {
   return true;
 }
 
+bool Game::handleUpdates(bool IsTick) {
+  if (IsTick) {
+    GameTicks++;
+  }
+  if (!CurrentLevel->update(IsTick)) {
+    // FIXME return false currently indicates player died, refactor for event
+    // of player death
+    return false;
+  }
+  return true;
+}
+
 void Game::handleDraw() {
   // Render the current map
   const auto RenderSize = ymir::Size2d<int>{80, 24};
 
   // FIXME need to check that player is still alive!
-  auto Player = CurrentLevel->getPlayer();
-  auto &PC = CurrentLevel->Reg.get<PlayerComp>(Player);
-  auto PlayerPos = CurrentLevel->Reg.get<PositionComp>(Player).Pos;
-  auto LOSRange = CurrentLevel->Reg.get<LineOfSightComp>(Player).LOSRange;
-  auto Health = CurrentLevel->Reg.get<HealthComp>(Player);
+  auto Player = getPlayer();
+  auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
+  auto LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
+  auto Health = getLvlReg().get<HealthComp>(Player);
 
   Renderer Render(RenderSize, *CurrentLevel, PlayerPos);
   Render.renderShadow(/*Darkness=*/30);
@@ -168,8 +185,8 @@ void Game::handleDraw() {
   Scr << Render.get();
 
   std::string_view InteractStr = "";
-  if (PC.CurrentInteraction) {
-    InteractStr = "[E] " + PC.CurrentInteraction->Msg;
+  if (auto *Interact = getAvailableInteraction()) {
+    InteractStr = "[E] " + Interact->Msg;
   }
 
   // Draw UI overlay
@@ -202,15 +219,12 @@ void Game::movePlayer(ymir::Dir2d Dir) {
 
 // FIXME move to player system?
 void Game::tryInteract() {
-  auto Player = getPlayer();
-  auto &PC = getLvlReg().get<PlayerComp>(Player);
-  if (!PC.CurrentInteraction) {
-    return;
+  if (auto *Interact = getAvailableInteraction()) {
+    auto Player = getPlayer();
+    auto &PC = getLvlReg().get<PlayerComp>(Player);
+    Interact->Execute(*this, Player, getLvlReg());
+    PC.CurrentInteraction = *Interact;
   }
-
-  // Finalize interaction
-  PC.CurrentInteraction->Execute(*this, Player, CurrentLevel->Reg);
-  PC.CurrentInteraction = std::nullopt;
 }
 
 entt::registry &Game::getLvlReg() {
@@ -231,34 +245,20 @@ entt::entity Game::getPlayer() const {
   return Player;
 }
 
-bool Game::handleUpdates(bool IsTick) {
-  if (IsTick) {
-    GameTicks++;
-  }
-  if (!CurrentLevel->update(IsTick)) {
-    // FIXME return false currently indicates player died, refactor for event
-    // of player death
-    return false;
-  }
-  updateCurrentInteraction();
-  return true;
-}
-
-void Game::updateCurrentInteraction() {
+Interaction *Game::getAvailableInteraction() {
   auto Player = getPlayer();
-  auto &PC = getLvlReg().get<PlayerComp>(Player);
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
 
   auto InteractableEntities = CurrentLevel->getInteractables(PlayerPos);
   if (InteractableEntities.empty()) {
-    return;
+    return nullptr;
   }
 
   // TODO allow cycling through available objects
   auto &InteractableEntity = InteractableEntities.at(0);
   auto &Interactable =
       CurrentLevel->Reg.get<InteractableComp>(InteractableEntity);
-  PC.CurrentInteraction = Interactable.Action;
+  return &Interactable.Action;
 }
 
 } // namespace rogue

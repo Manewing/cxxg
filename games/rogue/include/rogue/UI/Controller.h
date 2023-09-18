@@ -29,7 +29,13 @@ public:
 
   void setEquipmentUI(Equipment &Equip, entt::entity Entity,
                       entt::registry &Reg);
+  bool hasEquipmentUI() const;
+  void closeEquipmentUI();
+
   void setInventoryUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
+  bool hasInventoryUI() const;
+  void closeInventoryUI();
+
   void setLootUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   void setHistoryUI(History &Hist);
 
