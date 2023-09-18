@@ -177,11 +177,11 @@ const EquipmentSlot &Equipment::getSlot(ItemType It) const {
   return OffHand;
 }
 
-bool Equipment::canEquip(ItemType Type) const {
+bool Equipment::isEquipped(ItemType Type) const {
   if ((Type & ItemType::EquipmentMask) == ItemType::None) {
     return false;
   }
-  return getSlot(Type).It == std::nullopt;
+  return getSlot(Type).It != std::nullopt;
 }
 
 void Equipment::equip(Item Item) {

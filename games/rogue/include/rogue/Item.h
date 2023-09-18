@@ -230,6 +230,7 @@ public:
   EquipmentSlot &getSlot(ItemType It);
   const EquipmentSlot &getSlot(ItemType It) const;
 
+  bool isEquipped(ItemType Type) const;
   bool canEquip(ItemType Type) const;
   void equip(Item Item);
   Item unequip(ItemType Type);

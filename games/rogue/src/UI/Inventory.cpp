@@ -69,10 +69,13 @@ bool InventoryController::handleInput(int Char) {
       break;
     }
     const auto &It = Inv.getItem(List->getSelectedElement());
-    if (!Equip->Equip.canEquip(It.getType())) {
+
+    if (Equip->Equip.isEquipped(It.getType())) {
+      auto EquippedIt = Equip->Equip.unequip(It.getType());
+      Inv.addItem(EquippedIt);
       // FIXME message
-      break;
     }
+
     if (!It.canApplyTo(Entity, Reg, CapabilityFlags::EquipOn)) {
       // FIXME message
       break;
