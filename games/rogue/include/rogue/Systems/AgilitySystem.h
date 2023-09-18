@@ -9,6 +9,7 @@ namespace rogue {
 class AgilitySystem : public System {
 public:
   using System::System;
+  bool needsTick() const final { return true; }
   void update() override;
 };
 

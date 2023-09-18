@@ -26,10 +26,22 @@ public:
   void switchLevel(int Level);
 
   bool handleInput(int Char) final;
+
   void handleDraw() final;
 
   void movePlayer(ymir::Dir2d Dir);
   void tryInteract();
+
+private:
+  entt::registry &getLvlReg();
+
+  entt::entity getPlayerOrNull() const;
+  entt::entity getPlayer() const;
+
+  /// Update level and handle entity updates
+  bool handleUpdates(bool IsTick);
+
+  void updateCurrentInteraction();
 
 public: // FIXME
   EventHub EvHub;
@@ -43,6 +55,8 @@ public: // FIXME
   std::vector<std::shared_ptr<Level>> Levels;
 
   ui::Controller UICtrl;
+
+  long unsigned GameTicks = 0;
 };
 
 } // namespace rogue

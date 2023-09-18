@@ -31,7 +31,6 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.setEventHub(&EvHub);
 
   switchLevel(0);
-  CurrentLevel->update();
 
   // DEBUG ==>
   auto Player = CurrentLevel->getPlayer();
@@ -42,6 +41,10 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   // <== DEBUG
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
+
+  // We could update the level here, but we want to draw the initial state.
+  handleUpdates(/*IsTick=*/false);
+
   handleDraw();
 }
 
@@ -68,29 +71,25 @@ void Game::switchLevel(int Level) {
 }
 
 bool Game::handleInput(int Char) {
+
+  // Override keys
   switch (Char) {
   case 'i': {
-    if (!CurrentLevel) {
-      return false;
-    }
-    auto Player = CurrentLevel->getPlayer();
+    auto Player = getPlayerOrNull();
     if (Player == entt::null) {
       return false;
     }
-    auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
+    auto &InvComp = getLvlReg().get<InventoryComp>(Player);
     // UI interaction do not update level
     UICtrl.setInventoryUI(InvComp.Inv, Player, CurrentLevel->Reg);
     return true;
   }
   case 'o': {
-    if (!CurrentLevel) {
-      return false;
-    }
-    auto Player = CurrentLevel->getPlayer();
+    auto Player = getPlayerOrNull();
     if (Player == entt::null) {
       return false;
     }
-    auto &EquipComp = CurrentLevel->Reg.get<EquipmentComp>(Player);
+    auto &EquipComp = getLvlReg().get<EquipmentComp>(Player);
     // UI interaction do not update level
     UICtrl.setEquipmentUI(EquipComp.Equip, Player, CurrentLevel->Reg);
     return true;
@@ -104,8 +103,13 @@ bool Game::handleInput(int Char) {
   default:
     break;
   }
+
+  // Handle UI input
   if (UICtrl.isUIActive()) {
     UICtrl.handleInput(Char);
+    if (!UICtrl.isUIActive()) {
+      handleUpdates(/*IsTick=*/false);
+    }
     return true;
   }
 
@@ -132,17 +136,15 @@ bool Game::handleInput(int Char) {
     break;
   case 'e':
     tryInteract();
-    break;
+    // Does not count as a tick
+    return true;
   default:
     // Not a valid input do not update
     return false;
   }
 
-  // Update level and handle entity updates
-  if (!CurrentLevel->update()) {
-    // FIXME return false currently indicates player died, refactor for event
-    // of player death
-  }
+  handleUpdates(/*IsTick=*/true);
+
   return true;
 }
 
@@ -168,8 +170,6 @@ void Game::handleDraw() {
   std::string_view InteractStr = "";
   if (PC.CurrentInteraction) {
     InteractStr = "[E] " + PC.CurrentInteraction->Msg;
-  } else if (CurrentLevel->canInteract(PlayerPos)) {
-    InteractStr = "[E] Interact";
   }
 
   // Draw UI overlay
@@ -202,22 +202,52 @@ void Game::movePlayer(ymir::Dir2d Dir) {
 
 // FIXME move to player system?
 void Game::tryInteract() {
-  if (!CurrentLevel) {
+  auto Player = getPlayer();
+  auto &PC = getLvlReg().get<PlayerComp>(Player);
+  if (!PC.CurrentInteraction) {
     return;
   }
-  auto Player = CurrentLevel->getPlayer();
-  if (Player == entt::null) {
-    return;
-  }
-  auto &PC = CurrentLevel->Reg.get<PlayerComp>(Player);
-  auto PlayerPos = CurrentLevel->Reg.get<PositionComp>(Player).Pos;
 
   // Finalize interaction
-  if (PC.CurrentInteraction) {
-    PC.CurrentInteraction->Execute(*this, Player, CurrentLevel->Reg);
-    PC.CurrentInteraction = std::nullopt;
-    return;
+  PC.CurrentInteraction->Execute(*this, Player, CurrentLevel->Reg);
+  PC.CurrentInteraction = std::nullopt;
+}
+
+entt::registry &Game::getLvlReg() {
+  assert(CurrentLevel); // FIXME this should be an exception
+  return CurrentLevel->Reg;
+}
+
+entt::entity Game::getPlayerOrNull() const {
+  if (!CurrentLevel) {
+    return entt::null;
   }
+  return CurrentLevel->getPlayer();
+}
+
+entt::entity Game::getPlayer() const {
+  auto Player = getPlayerOrNull();
+  assert(Player != entt::null); // FIXME this should be an exception
+  return Player;
+}
+
+bool Game::handleUpdates(bool IsTick) {
+  if (IsTick) {
+    GameTicks++;
+  }
+  if (!CurrentLevel->update(IsTick)) {
+    // FIXME return false currently indicates player died, refactor for event
+    // of player death
+    return false;
+  }
+  updateCurrentInteraction();
+  return true;
+}
+
+void Game::updateCurrentInteraction() {
+  auto Player = getPlayer();
+  auto &PC = getLvlReg().get<PlayerComp>(Player);
+  auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
 
   auto InteractableEntities = CurrentLevel->getInteractables(PlayerPos);
   if (InteractableEntities.empty()) {

@@ -40,12 +40,15 @@ void Level::setEventHub(EventHub *Hub) {
   }
 }
 
-bool Level::update() {
+bool Level::update(bool IsTick) {
   updatePlayerDijkstraMap();
   updatePlayerSeenMap();
   updateEntityPosCache();
 
   for (auto &Sys : Systems) {
+    if (!IsTick && Sys->needsTick()) {
+      continue;
+    }
     Sys->update();
   }
 

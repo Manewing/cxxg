@@ -71,7 +71,7 @@ int main(int Argc, char *Argv[]) {
 
     Scr.update();
     Scr.clear();
-    Level->update();
+    Level->update(true);
     cxxg::utils::sleep(200000);
   }
 

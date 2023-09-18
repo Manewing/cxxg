@@ -4,6 +4,7 @@
 #include <cxxg/Types.h>
 #include <memory>
 #include <rogue/UI/Widget.h>
+#include <functional>
 
 namespace rogue::ui {
 

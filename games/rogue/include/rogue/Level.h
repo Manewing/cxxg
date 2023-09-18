@@ -36,7 +36,7 @@ public:
   void setEventHub(EventHub *EH) override;
 
   // Returns false if game over
-  bool update();
+  bool update(bool IsTick);
 
   void createPlayer();
   void movePlayer(Level &From);

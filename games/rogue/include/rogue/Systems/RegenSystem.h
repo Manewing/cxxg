@@ -8,6 +8,7 @@ namespace rogue {
 class RegenSystem : public System {
 public:
   using System::System;
+  bool needsTick() const final { return true; }
   void update() override;
 };
 
