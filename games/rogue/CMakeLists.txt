@@ -72,8 +72,8 @@ set(SOURCE_FILES
   src/Systems/RegenSystem.cpp
   src/Systems/StatsSystem.cpp
   src/Systems/WanderAISystem.cpp
-  src/UI/Controls.cpp
   src/UI/Controller.cpp
+  src/UI/Controls.cpp
   src/UI/Decorator.cpp
   src/UI/Equipment.cpp
   src/UI/Frame.cpp
@@ -83,6 +83,7 @@ set(SOURCE_FILES
   src/UI/ListSelect.cpp
   src/UI/SelectBox.cpp
   src/UI/TextBox.cpp
+  src/UI/Tooltip.cpp
   src/UI/Widget.cpp
   src/UI/WindowContainer.cpp
   src/UI/WordWrap.cpp

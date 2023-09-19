@@ -37,9 +37,10 @@ bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
        (Type & ItemType::Consumable) != ItemType::None);
 }
 
-ItemPrototype::ItemPrototype(int ItemId, std::string N, ItemType Type,
-                             int MaxStatckSize, std::vector<EffectInfo> Eff)
-    : ItemId(ItemId), Name(std::move(N)), Type(Type),
+ItemPrototype::ItemPrototype(int ItemId, std::string N, std::string D,
+                             ItemType Type, int MaxStatckSize,
+                             std::vector<EffectInfo> Eff)
+    : ItemId(ItemId), Name(std::move(N)), Description(std::move(D)), Type(Type),
       MaxStatckSize(MaxStatckSize), Effects(std::move(Eff)) {}
 
 bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
@@ -102,6 +103,11 @@ Item::Item(const ItemPrototype &Proto, int StackSize,
 std::string Item::getName() const {
   // TODO make name depend on quality etc
   return getProto().Name;
+}
+
+std::string Item::getDescription() const {
+  // TODO make description depend on quality etc
+  return getProto().Description;
 }
 
 ItemType Item::getType() const {

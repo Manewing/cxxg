@@ -2,12 +2,16 @@
 #include <iomanip>
 #include <rogue/Components/Items.h>
 #include <rogue/Inventory.h>
-#include <rogue/UI/Frame.h>
 #include <rogue/UI/Controls.h>
+#include <rogue/UI/Frame.h>
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/ListSelect.h>
+#include <rogue/UI/Tooltip.h>
 
 namespace rogue::ui {
+
+constexpr cxxg::types::Size TooltipSize = {40, 10};
+constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
 InventoryControllerBase::InventoryControllerBase(Inventory &Inv,
                                                  entt::entity Entity,
@@ -26,6 +30,11 @@ void InventoryControllerBase::setPos(cxxg::types::Position P) {
 
 bool InventoryControllerBase::handleInput(int Char) {
   switch (Char) {
+  case Controls::Info.Char: {
+    const auto &It = Inv.getItem(List->getSelectedElement());
+    Tooltip =
+        std::make_shared<ItemTooltip>(Pos + TooltipOffset, TooltipSize, It);
+  } break;
   case 'i':
     return false;
   default:
@@ -38,6 +47,12 @@ void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
   updateElements();
   BaseRect::draw(Scr);
   Decorated->draw(Scr);
+
+  if (Tooltip) {
+    Tooltip->draw(Scr);
+    // FIXME we need a handler for focus change etc
+    Tooltip = nullptr;
+  }
 }
 
 void InventoryControllerBase::updateElements() const {
@@ -110,7 +125,7 @@ std::string InventoryController::getInteractMsg() const {
   }
 
   const auto &SelectedItem = Inv.getItem(List->getSelectedElement());
-  std::vector<KeyOption> Options = {Controls::Drop};
+  std::vector<KeyOption> Options = {Controls::Info, Controls::Drop};
   if ((SelectedItem.getType() & ItemType::EquipmentMask) != ItemType::None) {
     Options.push_back(Controls::Equip);
   }
@@ -147,7 +162,8 @@ std::string LootController::getInteractMsg() const {
   if (Inv.empty()) {
     return "";
   }
-  return "[E] Take";
+  std::vector<KeyOption> Options = {Controls::Info, Controls::Take};
+  return KeyOption::getInteractMsg(Options);
 }
 
 } // namespace rogue::ui

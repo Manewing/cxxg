@@ -37,6 +37,8 @@ protected:
   entt::registry &Reg;
   std::shared_ptr<ListSelect> List;
   std::shared_ptr<Widget> Decorated;
+  // FIXME we want to reset this upon draw
+  mutable std::shared_ptr<Widget> Tooltip;
 };
 
 class InventoryController : public InventoryControllerBase {

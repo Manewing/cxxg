@@ -29,17 +29,17 @@ static void fillItemDatabase(ItemDatabase &DB) {
       StatsBuffComp{{1U}, StatPoints{0, 1, 0, 0}});
 
   std::vector<ItemPrototype> ItemProtos = {
-      ItemPrototype(0, "Berry", ItemType::Consumable, MaxStackSize,
+      ItemPrototype(0, "Berry", "A berry that can be eaten", ItemType::Consumable, MaxStackSize,
                     {{CapabilityFlags::UseOn, HealEffectx10},
                      {CapabilityFlags::UseOn, HealthRegenBuffEffect}}),
 
-      ItemPrototype(1, "Poison Berry", ItemType::Consumable, MaxStackSize,
+      ItemPrototype(1, "Poison Berry", "A berry, better not to eat it. It looks poisonous", ItemType::Consumable, MaxStackSize,
                     {{CapabilityFlags::UseOn, DamageEffectx10},
                      {CapabilityFlags::UseOn, PoisonDebuffEffect}}),
 
-      ItemPrototype(2, "Wood", ItemType::Crafting, MaxStackSize, {}),
+      ItemPrototype(2, "Wooden Log", "A log of wood", ItemType::Crafting, MaxStackSize, {}),
 
-      ItemPrototype(3, "Stone",
+      ItemPrototype(3, "Stone", "A stone, better not to drop it on your foot",
                     ItemType::Weapon | ItemType::Consumable |
                         ItemType::Crafting,
                     MaxStackSize,
@@ -47,7 +47,7 @@ static void fillItemDatabase(ItemDatabase &DB) {
                      {CapabilityFlags::UseOn, BleeedingDebuffEffect},
                      {CapabilityFlags::UseOn, DamageEffectx10}}),
 
-      ItemPrototype(4, "Sword", ItemType::Weapon, 1,
+      ItemPrototype(4, "Small Sword", "A small sword", ItemType::Weapon, 1,
                     {{CapabilityFlags::Equipment, StatBuffEffect},
                      {CapabilityFlags::Equipment, PoisonDebuffEffect}})};
 

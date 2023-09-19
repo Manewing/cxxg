@@ -33,6 +33,7 @@ protected:
   entt::registry &Reg;
   std::shared_ptr<ItemSelect> ItSel;
   std::shared_ptr<Widget> Dec;
+  mutable std::shared_ptr<Widget> Tooltip;
 };
 
 } // namespace rogue::ui

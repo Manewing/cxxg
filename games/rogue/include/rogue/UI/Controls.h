@@ -15,7 +15,7 @@ struct KeyOption {
 };
 
 struct Controls {
-  static constexpr KeyOption Info = {'i', "Info", "Show info about the item"};
+  static constexpr KeyOption Info = {'q', "Info", "Show info about the item"};
   static constexpr KeyOption Navigate = {'^', "Navigate", "Navigate the menu"};
   static constexpr KeyOption Take = {'e', "Take", "Take the item"};
   static constexpr KeyOption Equip = {'e', "Equip", "Equip the selected item"};

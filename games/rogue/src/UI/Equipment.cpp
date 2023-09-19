@@ -5,8 +5,12 @@
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/ItemSelect.h>
+#include <rogue/UI/Tooltip.h>
 
 namespace rogue::ui {
+
+constexpr cxxg::types::Size TooltipSize = {40, 10};
+constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
 namespace {
 
@@ -60,7 +64,15 @@ bool EquipmentController::handleInput(int Char) {
     return false;
   case 'o':
     return false;
-  case 'u': {
+  case Controls::Info.Char: {
+    auto SelIdx = ItSel->getSelectedIdx();
+    auto *ES = Equip.all().at(SelIdx);
+    if (ES->It) {
+      Tooltip = std::make_shared<ItemTooltip>(Pos + TooltipOffset, TooltipSize,
+                                              *ES->It);
+    }
+  } break;
+  case Controls::Unequip.Char: {
     auto InvComp = Reg.try_get<InventoryComp>(Entity);
     if (!InvComp) {
       // FIXME message
@@ -90,9 +102,11 @@ std::string EquipmentController::getInteractMsg() const {
   auto SelIdx = ItSel->getSelectedIdx();
   auto *ES = Equip.all().at(SelIdx);
 
-  if (ES->It &&
-      ES->It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
-    Options.push_back(Controls::Unequip);
+  if (ES->It) {
+    Options.push_back(Controls::Info);
+    if (ES->It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
+      Options.push_back(Controls::Unequip);
+    }
   }
 
   return KeyOption::getInteractMsg(Options);
@@ -102,6 +116,11 @@ void EquipmentController::draw(cxxg::Screen &Scr) const {
   updateSelectValues();
   BaseRect::draw(Scr);
   Dec->draw(Scr);
+  if (Tooltip) {
+    Tooltip->draw(Scr);
+    // FIXME we need a handler for focus change etc
+    Tooltip = nullptr;
+  }
 }
 
 namespace {

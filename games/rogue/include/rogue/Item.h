@@ -145,7 +145,8 @@ public:
   static bool canApply(ItemType Type, CapabilityFlags Flags);
 
 public:
-  ItemPrototype(int ItemId, std::string Name, ItemType Type, int MaxStatckSize,
+  ItemPrototype(int ItemId, std::string Name, std::string Description,
+                ItemType Type, int MaxStatckSize,
                 std::vector<EffectInfo> Effects);
 
   // TODO add:
@@ -166,6 +167,7 @@ public:
 public:
   int ItemId;
   std::string Name;
+  std::string Description;
   ItemType Type = ItemType::None;
   int MaxStatckSize = 1;
 
@@ -179,6 +181,7 @@ public:
   virtual ~Item() = default;
 
   std::string getName() const;
+  std::string getDescription() const;
 
   ItemType getType() const;
 
