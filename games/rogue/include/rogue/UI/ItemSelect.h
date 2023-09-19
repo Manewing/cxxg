@@ -21,7 +21,7 @@ public:
   bool isSlected() const;
 
   bool handleInput(int Char) override;
-  std::string_view getInteractMsg() const override;
+  std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
 protected:
@@ -35,7 +35,7 @@ public:
                 unsigned Width);
 
   const std::string &getLabel() const;
-  std::string_view getInteractMsg() const override;
+  std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
 private:
@@ -69,7 +69,7 @@ public:
 
   void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
-  std::string_view getInteractMsg() const override;
+  std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
   void handleSelect() const;

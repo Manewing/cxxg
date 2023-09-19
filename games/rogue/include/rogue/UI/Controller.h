@@ -23,7 +23,7 @@ class Controller {
 public:
   Controller(cxxg::Screen &Scr);
   void draw(int LevelIdx, int Health, int MaxHealth,
-            std::string_view InteractStr);
+            std::string InteractStr);
   bool isUIActive() const;
   void handleInput(int Char);
 

@@ -184,7 +184,7 @@ void Game::handleDraw() {
   // Draw map
   Scr << Render.get();
 
-  std::string_view InteractStr = "";
+  std::string InteractStr = "";
   if (auto *Interact = getAvailableInteraction()) {
     InteractStr = "[E] " + Interact->Msg;
   }

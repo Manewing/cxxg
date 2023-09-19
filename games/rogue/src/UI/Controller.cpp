@@ -32,7 +32,7 @@ Controller::Controller(cxxg::Screen &Scr)
     : Scr(Scr), WdwContainer({1, 2}, getWindowContainerSize(Scr)) {}
 
 void Controller::draw(int LevelIdx, int Health, int MaxHealth,
-                      std::string_view InteractStr) {
+                      std::string InteractStr) {
   // Define colors
   const auto NoColor = cxxg::types::Color::NONE;
   const auto NoInterColor = cxxg::types::Color::GREY;

@@ -37,7 +37,7 @@ bool WindowContainer::handleInput(int Char) {
   return false;
 }
 
-std::string_view WindowContainer::getInteractMsg() const {
+std::string WindowContainer::getInteractMsg() const {
   if (hasActiveWindow()) {
     return getActiveWindow().getInteractMsg();
   }

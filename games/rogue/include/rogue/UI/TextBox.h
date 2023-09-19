@@ -13,7 +13,7 @@ public:
 
   bool handleInput(int Char) final;
 
-  std::string_view getInteractMsg() const final;
+  std::string getInteractMsg() const final;
 
   void draw(cxxg::Screen &Scr) const override;
 

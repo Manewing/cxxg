@@ -72,6 +72,7 @@ set(SOURCE_FILES
   src/Systems/RegenSystem.cpp
   src/Systems/StatsSystem.cpp
   src/Systems/WanderAISystem.cpp
+  src/UI/Controls.cpp
   src/UI/Controller.cpp
   src/UI/Decorator.cpp
   src/UI/Equipment.cpp

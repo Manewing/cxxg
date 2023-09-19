@@ -3,6 +3,7 @@
 #include <rogue/Components/Items.h>
 #include <rogue/Inventory.h>
 #include <rogue/UI/Frame.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/ListSelect.h>
 
@@ -62,7 +63,7 @@ bool InventoryController::handleInput(int Char) {
   }
 
   switch (Char) {
-  case 'e': {
+  case Controls::Equip.Char: {
     auto Equip = Reg.try_get<EquipmentComp>(Entity);
     if (!Equip) {
       // FIXME message
@@ -84,7 +85,7 @@ bool InventoryController::handleInput(int Char) {
     Equip->Equip.equip(Inv.takeItem(List->getSelectedElement(), /*Count=*/1));
     updateElements();
   } break;
-  case 'u':
+  case Controls::Unequip.Char:
     if (!Inv.getItem(List->getSelectedElement())
              .canApplyTo(Entity, Reg, CapabilityFlags::UseOn)) {
       // FIXME message
@@ -94,7 +95,7 @@ bool InventoryController::handleInput(int Char) {
         .applyTo(Entity, Reg, CapabilityFlags::UseOn);
     updateElements();
     break;
-  case 'd':
+  case Controls::Drop.Char:
     // Inv.dropItem(List.getSelectedElement());
     break;
   default:
@@ -103,22 +104,23 @@ bool InventoryController::handleInput(int Char) {
   return true;
 }
 
-std::string_view InventoryController::getInteractMsg() const {
+std::string InventoryController::getInteractMsg() const {
   if (Inv.empty()) {
     return "";
   }
-  // FIXME item may have multiple options...
+
   const auto &SelectedItem = Inv.getItem(List->getSelectedElement());
+  std::vector<KeyOption> Options = {Controls::Drop};
   if ((SelectedItem.getType() & ItemType::EquipmentMask) != ItemType::None) {
-    return "[E] Equip";
+    Options.push_back(Controls::Equip);
   }
   if ((SelectedItem.getType() & ItemType::Crafting) != ItemType::None) {
-    return "[C] Craft";
+    Options.push_back(Controls::Craft);
   }
   if ((SelectedItem.getType() & ItemType::Consumable) != ItemType::None) {
-    return "[U] Use";
+    Options.push_back(Controls::Use);
   }
-  return "[D] Drop";
+  return KeyOption::getInteractMsg(Options);
 }
 
 LootController::LootController(Inventory &Inv, entt::entity Entity,
@@ -141,7 +143,7 @@ bool LootController::handleInput(int Char) {
   return !Inv.empty();
 }
 
-std::string_view LootController::getInteractMsg() const {
+std::string LootController::getInteractMsg() const {
   if (Inv.empty()) {
     return "";
   }

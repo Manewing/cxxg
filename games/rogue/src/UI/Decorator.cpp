@@ -18,7 +18,7 @@ void Decorator::setComp(std::shared_ptr<Widget> Comp) {
 
 bool Decorator::handleInput(int Char) { return Comp->handleInput(Char); }
 
-std::string_view Decorator::getInteractMsg() const {
+std::string Decorator::getInteractMsg() const {
   return Comp->getInteractMsg();
 }
 

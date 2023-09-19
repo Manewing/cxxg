@@ -1,6 +1,7 @@
 #include <cxxg/Utils.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Item.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/ItemSelect.h>
@@ -83,8 +84,18 @@ bool EquipmentController::handleInput(int Char) {
   return true;
 }
 
-std::string_view EquipmentController::getInteractMsg() const {
-  return "[^v] Nav.";
+std::string EquipmentController::getInteractMsg() const {
+  std::vector<KeyOption> Options = {Controls::Navigate};
+
+  auto SelIdx = ItSel->getSelectedIdx();
+  auto *ES = Equip.all().at(SelIdx);
+
+  if (ES->It &&
+      ES->It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
+    Options.push_back(Controls::Unequip);
+  }
+
+  return KeyOption::getInteractMsg(Options);
 }
 
 void EquipmentController::draw(cxxg::Screen &Scr) const {

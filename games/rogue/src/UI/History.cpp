@@ -37,7 +37,7 @@ bool HistoryController::handleInput(int Char) {
   return true;
 }
 
-std::string_view HistoryController::getInteractMsg() const {
+std::string HistoryController::getInteractMsg() const {
   return "[^/v] Navigate";
 }
 

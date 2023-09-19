@@ -29,7 +29,7 @@ bool TextBox::handleInput(int Char) {
   return true;
 }
 
-std::string_view TextBox::getInteractMsg() const { return ""; }
+std::string TextBox::getInteractMsg() const { return ""; }
 
 void TextBox::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);

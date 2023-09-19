@@ -28,7 +28,7 @@ public:
 
   bool handleInput(int Char) override;
 
-  std::string_view getInteractMsg() const override;
+  std::string getInteractMsg() const override;
 
   void draw(cxxg::Screen &Scr) const override;
 

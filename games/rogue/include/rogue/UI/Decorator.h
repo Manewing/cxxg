@@ -17,7 +17,7 @@ public:
 
   void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
-  std::string_view getInteractMsg() const override;
+  std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
 protected:

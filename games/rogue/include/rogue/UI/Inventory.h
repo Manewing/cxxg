@@ -43,14 +43,14 @@ class InventoryController : public InventoryControllerBase {
 public:
   InventoryController(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   bool handleInput(int Char) final;
-  std::string_view getInteractMsg() const final;
+  std::string getInteractMsg() const final;
 };
 
 class LootController : public InventoryControllerBase {
 public:
   LootController(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   bool handleInput(int Char) final;
-  std::string_view getInteractMsg() const final;
+  std::string getInteractMsg() const final;
 };
 
 } // namespace rogue::ui

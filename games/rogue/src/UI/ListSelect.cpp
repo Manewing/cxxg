@@ -44,7 +44,7 @@ bool ListSelect::handleInput(int Char) {
   return true;
 }
 
-std::string_view ListSelect::getInteractMsg() const { return ""; }
+std::string ListSelect::getInteractMsg() const { return ""; }
 
 void ListSelect::draw(cxxg::Screen &Scr) const {
   // Fill rect

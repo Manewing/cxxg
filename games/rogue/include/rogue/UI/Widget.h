@@ -19,7 +19,7 @@ public:
   virtual void setPos(cxxg::types::Position P) { Pos = P; }
 
   virtual bool handleInput(int Char) = 0;
-  virtual std::string_view getInteractMsg() const = 0;
+  virtual std::string getInteractMsg() const = 0;
   virtual void draw(cxxg::Screen &Scr) const = 0;
 
 protected:

@@ -28,7 +28,7 @@ bool Select::handleInput(int Char) {
   return false;
 }
 
-std::string_view Select::getInteractMsg() const { return ""; }
+std::string Select::getInteractMsg() const { return ""; }
 
 void Select::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
@@ -45,7 +45,7 @@ LabeledSelect::LabeledSelect(std::string Label, std::string Value,
 
 const std::string &LabeledSelect::getLabel() const { return Label; }
 
-std::string_view LabeledSelect::getInteractMsg() const { return ""; }
+std::string LabeledSelect::getInteractMsg() const { return ""; }
 
 void LabeledSelect::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
@@ -131,7 +131,7 @@ bool ItemSelect::handleInput(int Char) {
   return true;
 }
 
-std::string_view ItemSelect::getInteractMsg() const { return "[^v] Nav."; }
+std::string ItemSelect::getInteractMsg() const { return "[^v] Nav."; }
 
 void ItemSelect::draw(cxxg::Screen &Scr) const {
   for (const auto &S : Selects) {
