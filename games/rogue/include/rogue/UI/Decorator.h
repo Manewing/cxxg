@@ -2,9 +2,9 @@
 #define ROGUE_UI_DECORATOR_H
 
 #include <cxxg/Types.h>
+#include <functional>
 #include <memory>
 #include <rogue/UI/Widget.h>
-#include <functional>
 
 namespace rogue::ui {
 
@@ -22,6 +22,19 @@ public:
 
 protected:
   std::shared_ptr<Widget> Comp;
+};
+
+class BaseRectDecorator : public Decorator {
+public:
+  BaseRectDecorator(cxxg::types::Position Pos, cxxg::types::Size Size,
+                    std::shared_ptr<Widget> Comp);
+  void setPos(cxxg::types::Position Pos) override;
+  void draw(cxxg::Screen &Scr) const override;
+
+  cxxg::types::Size getSize() const { return Rect.getSize(); }
+
+protected:
+  BaseRect Rect;
 };
 
 // PreventCloseDecorator

@@ -18,6 +18,7 @@ struct Controls {
   static constexpr KeyOption Info = {'q', "Info", "Show info about the item"};
   static constexpr KeyOption Navigate = {'^', "Navigate", "Navigate the menu"};
   static constexpr KeyOption Take = {'e', "Take", "Take the item"};
+  static constexpr KeyOption SpendPoint = {'e', "Spend", "Spend a point"};
   static constexpr KeyOption Equip = {'e', "Equip", "Equip the selected item"};
   static constexpr KeyOption Unequip = {'u', "Unequip",
                                         "Unequip the selected item"};

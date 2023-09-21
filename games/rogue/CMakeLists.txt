@@ -78,6 +78,7 @@ set(SOURCE_FILES
   src/UI/Equipment.cpp
   src/UI/Frame.cpp
   src/UI/History.cpp
+  src/UI/Stats.cpp
   src/UI/Inventory.cpp
   src/UI/ItemSelect.cpp
   src/UI/ListSelect.cpp

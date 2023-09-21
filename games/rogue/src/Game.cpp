@@ -103,15 +103,26 @@ bool Game::handleInput(int Char) {
     }
     auto &EquipComp = getLvlReg().get<EquipmentComp>(Player);
     // UI interaction do not update level
-    UICtrl.setEquipmentUI(EquipComp.Equip, Player, CurrentLevel->Reg);
+    UICtrl.setEquipmentUI(EquipComp.Equip, Player, getLvlReg());
     return true;
   }
   case 'h':
     UICtrl.setHistoryUI(Hist);
     return true;
-  case 'c':
-    // TODO help show controls
-    return false;
+  case 'c': {
+    if (UICtrl.hasStatsUI()) {
+      UICtrl.closeStatsUI();
+      return true;
+    }
+    auto Player = getPlayerOrNull();
+    if (Player == entt::null) {
+      return false;
+    }
+    auto &Stats = getLvlReg().get<StatsComp>(Player);
+    UICtrl.setStatsUI(Stats, Player, getLvlReg());
+    return true;
+  }
+  // TODO show controls
   default:
     break;
   }

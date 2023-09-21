@@ -33,6 +33,10 @@ public:
   cxxg::types::Size getSize() const { return Size; }
   virtual void setSize(cxxg::types::Size S) { Size = S; }
 
+  bool handleInput(int) override { return false; }
+
+  std::string getInteractMsg() const override { return ""; }
+
   void draw(cxxg::Screen &Scr) const override;
 
 protected:

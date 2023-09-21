@@ -15,6 +15,7 @@ namespace rogue {
 class History;
 class Inventory;
 class Equipment;
+struct StatsComp;
 } // namespace rogue
 
 namespace rogue::ui {
@@ -35,6 +36,10 @@ public:
   void setInventoryUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   bool hasInventoryUI() const;
   void closeInventoryUI();
+
+  void setStatsUI(StatsComp &Stats, entt::entity Entity, entt::registry &Reg);
+  bool hasStatsUI() const;
+  void closeStatsUI();
 
   void setLootUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
   void setHistoryUI(History &Hist);

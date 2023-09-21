@@ -5,6 +5,7 @@
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/History.h>
 #include <rogue/UI/Inventory.h>
+#include <rogue/UI/Stats.h>
 
 namespace rogue::ui {
 
@@ -94,6 +95,20 @@ bool Controller::hasInventoryUI() const {
 
 void Controller::closeInventoryUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<InventoryController>());
+}
+
+void Controller::setStatsUI(StatsComp &Stats, entt::entity Entity,
+                            entt::registry &Reg) {
+  WdwContainer.addWindow<StatsController>(Stats, Entity, Reg);
+  WdwContainer.autoLayoutWindows();
+}
+
+bool Controller::hasStatsUI() const {
+  return WdwContainer.hasWindowOfType<StatsController>();
+}
+
+void Controller::closeStatsUI() {
+  WdwContainer.closeWindow(WdwContainer.getWindowOfType<StatsController>());
 }
 
 void Controller::setLootUI(Inventory &Inv, entt::entity Entity,

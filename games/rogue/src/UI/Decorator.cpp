@@ -18,11 +18,24 @@ void Decorator::setComp(std::shared_ptr<Widget> Comp) {
 
 bool Decorator::handleInput(int Char) { return Comp->handleInput(Char); }
 
-std::string Decorator::getInteractMsg() const {
-  return Comp->getInteractMsg();
-}
+std::string Decorator::getInteractMsg() const { return Comp->getInteractMsg(); }
 
 void Decorator::draw(cxxg::Screen &Scr) const { Comp->draw(Scr); }
+
+BaseRectDecorator::BaseRectDecorator(cxxg::types::Position Pos,
+                                     cxxg::types::Size Size,
+                                     std::shared_ptr<Widget> Comp)
+    : Decorator(Pos, std::move(Comp)), Rect(Pos, Size) {}
+
+void BaseRectDecorator::setPos(cxxg::types::Position Pos) {
+  Decorator::setPos(Pos);
+  Rect.setPos(Pos);
+}
+
+void BaseRectDecorator::draw(cxxg::Screen &Scr) const {
+  Rect.draw(Scr);
+  Decorator::draw(Scr);
+}
 
 void ExitHandlerProvider::registerExitHandler(ExitHandlerCallback EMC) {
   this->EMC = std::move(EMC);
