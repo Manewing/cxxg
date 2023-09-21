@@ -51,7 +51,7 @@ void Controller::draw(int LevelIdx, int Health, int MaxHealth,
     InterColor = NoInterColor;
   }
 
-  Scr[0][0] << NoColor.underline() << "Rogue v0.0 [FLOOR]:" << NoColor << " "
+  Scr[0][0] << NoColor.underline() << "[FLOOR]:" << NoColor << " "
             << std::setw(3) << (LevelIdx + 1) << " " << NoColor.underline()
             << "[HEALTH]:" << HealthColor << std::setw(4) << Health << NoColor
             << " | " << InterColor.underline() << InterStr;
