@@ -1,7 +1,29 @@
+#include <ymir/Types.hpp>
 #include <cxxg/Screen.h>
+#include <optional>
 #include <rogue/UI/WindowContainer.h>
 
 namespace rogue::ui {
+
+std::optional<WindowContainer::WindowInfo>
+WindowContainer::WindowInfo::getWindowInfo(Widget *Wdw) {
+  while (auto *Next = dynamic_cast<Decorator *>(Wdw)) {
+    if (auto *BrWdw = dynamic_cast<BaseRectDecorator *>(Wdw)) {
+      auto Size = BrWdw->getSize();
+      return WindowInfo{BrWdw->getPos(), BrWdw->getSize(), Size.X * Size.Y,
+                        Wdw};
+    }
+
+    Wdw = Next->getComp().get();
+  }
+
+  if (auto *BrWdw = dynamic_cast<BaseRect *>(Wdw)) {
+    auto Size = BrWdw->getSize();
+    return WindowInfo{BrWdw->getPos(), BrWdw->getSize(), Size.X * Size.Y, Wdw};
+  }
+
+  return std::nullopt;
+}
 
 WindowContainer::WindowContainer(cxxg::types::Position Pos,
                                  cxxg::types::Size Size)
@@ -98,10 +120,7 @@ bool WindowContainer::closeWindow(Widget *Wdw) {
   return false;
 }
 
-
-bool WindowContainer::closeActiveWindow() {
-  return closeWindow(FocusIdx);
-}
+bool WindowContainer::closeActiveWindow() { return closeWindow(FocusIdx); }
 
 void WindowContainer::addWindow(std::shared_ptr<Widget> Window) {
   Windows.emplace_back(std::move(Window));
@@ -127,14 +146,54 @@ void WindowContainer::selectPrevWindow() {
 
 void WindowContainer::autoLayoutWindows() { autoLayoutWindows(Pos, Size); }
 
+namespace {
+
+ymir::Rect2d<unsigned long> getRect(const WindowContainer::WindowInfo &WdwInfo,
+                                    bool Spacing = false) {
+  return {
+      {static_cast<unsigned long>(WdwInfo.Pos.X),
+       static_cast<unsigned long>(WdwInfo.Pos.Y)},
+      {WdwInfo.Size.X + (Spacing ? 1 : 0), WdwInfo.Size.Y + (Spacing ? 1 : 0)}};
+}
+
+bool isOverlapping(const WindowContainer::WindowInfo &WdwInfo,
+                   const std::vector<WindowContainer::WindowInfo> &WdwInfos) {
+  const auto ThisRect = getRect(WdwInfo);
+  for (const auto &Other : WdwInfos) {
+    if (WdwInfo.Wdw == Other.Wdw || (Other.Pos.X == -1 && Other.Pos.Y == -1)) {
+      continue;
+    }
+    if (ThisRect.overlaps(getRect(Other, true))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::optional<cxxg::types::Position> findPositionForWindow(
+    cxxg::types::Position StartPos, cxxg::types::Size Size,
+    WindowContainer::WindowInfo &WdwInfo,
+    const std::vector<WindowContainer::WindowInfo> &WdwInfos) {
+  for (unsigned long Y = StartPos.Y; Y < StartPos.Y + Size.Y; ++Y) {
+    for (unsigned long X = StartPos.X; X < StartPos.X + Size.X; ++X) {
+      if (X + WdwInfo.Size.X > StartPos.X + Size.X ||
+          Y + WdwInfo.Size.Y > StartPos.Y + Size.Y) {
+        continue;
+      }
+      WdwInfo.Pos = {static_cast<int>(X), static_cast<int>(Y)};
+      if (!isOverlapping(WdwInfo, WdwInfos)) {
+        return WdwInfo.Pos;
+      }
+    }
+  }
+  WdwInfo.Pos = {-1, -1};
+  return std::nullopt;
+}
+
+} // namespace
+
 void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
                                         cxxg::types::Size Size) {
-  struct WindowInfo {
-    cxxg::types::Position Pos{};
-    cxxg::types::Size Size{};
-    unsigned long Area = 0;
-    Widget *Wdw = nullptr;
-  };
   if (Windows.empty()) {
     return;
   }
@@ -142,16 +201,11 @@ void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
   WdwInfos.reserve(Windows.size());
 
   for (auto &Wdw : Windows) {
-    auto *W = Wdw.get();
-    while (auto *Next = dynamic_cast<Decorator *>(W)) {
-      W = Next->getComp().get();
-    }
-    if (auto *BrWdw = dynamic_cast<BaseRect *>(W)) {
-      auto Size = BrWdw->getSize();
-      WdwInfos.push_back(WindowInfo{BrWdw->getPos(), BrWdw->getSize(),
-                                    Size.X * Size.Y, Wdw.get()});
+    if (auto WI = WindowInfo::getWindowInfo(Wdw.get())) {
+      WdwInfos.push_back(*WI);
     }
   }
+
   if (WdwInfos.empty()) {
     return;
   }
@@ -159,24 +213,15 @@ void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
   std::sort(WdwInfos.begin(), WdwInfos.end(),
             [](const auto &A, const auto &B) { return A.Area > B.Area; });
 
-  auto PlacePos = StartPos;
-  //    auto *LastWdwInfo = &WdwInfos.at(0);
-  unsigned Height = WdwInfos.at(0).Size.Y;
+  // Auto layout windows based on their rectangle
   for (auto &WdwInfo : WdwInfos) {
-
-    if (PlacePos.X + WdwInfo.Size.X > Size.X) {
-      if (PlacePos.Y + WdwInfo.Size.Y > Size.Y) {
-        // abort, can't handle
-        return;
-      }
-      // FIXME adding the current height does not make sense
-      PlacePos = {0, PlacePos.Y + static_cast<int>(Height)};
-      Height = WdwInfo.Size.Y;
+    WdwInfo.Pos = {-1, -1};
+  }
+  WdwInfos.front().Pos = StartPos;
+  for (auto &WdwInfo : WdwInfos) {
+    if (auto Pos = findPositionForWindow(StartPos, Size, WdwInfo, WdwInfos)) {
+      WdwInfo.Wdw->setPos(*Pos);
     }
-
-    WdwInfo.Wdw->setPos(PlacePos);
-
-    PlacePos.X += static_cast<int>(WdwInfo.Size.X + 1);
   }
 }
 
