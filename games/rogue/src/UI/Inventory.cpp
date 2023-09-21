@@ -100,7 +100,7 @@ bool InventoryController::handleInput(int Char) {
     Equip->Equip.equip(Inv.takeItem(List->getSelectedElement(), /*Count=*/1));
     updateElements();
   } break;
-  case Controls::Unequip.Char:
+  case Controls::Use.Char:
     if (!Inv.getItem(List->getSelectedElement())
              .canApplyTo(Entity, Reg, CapabilityFlags::UseOn)) {
       // FIXME message

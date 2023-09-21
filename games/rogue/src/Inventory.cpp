@@ -25,7 +25,9 @@ Item Inventory::takeItem(std::size_t ItemIdx, unsigned Count) {
   Item &It = Items.at(ItemIdx);
   if (It.StackSize > static_cast<int>(Count)) {
     It.StackSize -= Count;
-    return It;
+    auto SubStack = It;
+    SubStack.StackSize = Count;
+    return SubStack;
   }
   // Count exceeds stack size, just return everything
   return takeItem(ItemIdx);
