@@ -30,7 +30,7 @@ Game::Game(cxxg::Screen &Scr)
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.setEventHub(&EvHub);
 
-  switchLevel(0);
+  switchLevel(0, /*ToEntry=*/true);
 
   // DEBUG ==>
   auto Player = CurrentLevel->getPlayer();
@@ -48,7 +48,7 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   handleDraw();
 }
 
-void Game::switchLevel(int Level) {
+void Game::switchLevel(int Level, bool ToEntry) {
   if (Level < 0) {
     Hist.warn() << "One can never leave...";
     return;
@@ -60,10 +60,14 @@ void Game::switchLevel(int Level) {
     Levels.back()->setEventHub(&EvHub);
   }
 
+  const auto &LevelPtr = Levels.at(Level);
+
   if (!CurrentLevel) {
-    Levels.at(Level)->createPlayer();
+    LevelPtr->createPlayer();
   } else if (CurrentLevel != Levels.at(Level)) {
-    Levels.at(Level)->movePlayer(*CurrentLevel);
+    auto ToPos =
+        ToEntry ? LevelPtr->getPlayerStartPos() : LevelPtr->getPlayerEndPos();
+    LevelPtr->movePlayer(*CurrentLevel, ToPos);
   }
 
   CurrentLevel = Levels.at(Level);

@@ -27,7 +27,10 @@ public:
 
   void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0) final;
 
-  void switchLevel(int Level);
+  /// Switches to the level with the selected index \p Level
+  /// \param Level The level index to switch to
+  /// \param ToEntry If true, the player will be moved to the entry else exit
+  void switchLevel(int Level, bool ToEntry);
 
   bool handleInput(int Char) final;
 

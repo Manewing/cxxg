@@ -36,8 +36,8 @@ void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<TileComp>(Entity, T);
   Reg.emplace<InteractableComp>(
       Entity, Interaction{IsExit ? "Previous Level" : "Next level",
-                          [LevelId](auto &G, auto, auto &) {
-                            G.switchLevel(LevelId);
+                          [LevelId, IsExit](auto &G, auto, auto &) {
+                            G.switchLevel(LevelId, /*ToEntry=*/!IsExit);
                           }});
   Reg.emplace<CollisionComp>(Entity);
   if (IsExit) {

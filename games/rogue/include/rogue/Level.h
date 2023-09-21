@@ -8,6 +8,7 @@
 #include <rogue/Tile.h>
 #include <vector>
 #include <ymir/LayeredMap.hpp>
+#include <ymir/Types.hpp>
 
 namespace rogue {
 class System;
@@ -39,7 +40,7 @@ public:
   bool update(bool IsTick);
 
   void createPlayer();
-  void movePlayer(Level &From);
+  void movePlayer(Level &From, ymir::Point2d<int> AtPos);
   void removePlayer();
   const entt::entity &getPlayer() const;
 
