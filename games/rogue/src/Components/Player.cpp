@@ -1,4 +1,6 @@
 #include <rogue/Components/AI.h>
+#include <rogue/Components/Buffs.h>
+#include <rogue/Components/Helpers.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Level.h>
 #include <rogue/Components/Player.h>
@@ -8,6 +10,11 @@
 
 namespace rogue {
 namespace {
+
+using PlayerCompList =
+    ComponentList<TileComp, FactionComp, PlayerComp, PositionComp, StatsComp,
+                  HealthComp, NameComp, LineOfSightComp, AgilityComp,
+                  MeleeAttackComp, MovementComp, InventoryComp, EquipmentComp>;
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
                           const PositionComp &PosComp, const StatsComp &Stats,
@@ -57,13 +64,9 @@ entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
   entt::entity PlayerEntity = entt::null;
   auto View = RegFrom.view<PlayerComp>();
   for (auto Entity : View) {
-    PlayerEntity = ::rogue::createPlayer(
-        RegTo, RegFrom.get<PlayerComp>(Entity),
-        RegFrom.get<PositionComp>(Entity), RegFrom.get<StatsComp>(Entity),
-        RegFrom.get<HealthComp>(Entity), RegFrom.get<NameComp>(Entity),
-        RegFrom.get<LineOfSightComp>(Entity), RegFrom.get<AgilityComp>(Entity),
-        RegFrom.get<MeleeAttackComp>(Entity), RegFrom.get<MovementComp>(Entity),
-        RegFrom.get<InventoryComp>(Entity), RegFrom.get<EquipmentComp>(Entity));
+    PlayerEntity = RegTo.create();
+    copyComponentsOrFail<PlayerCompList>(Entity, RegFrom, PlayerEntity, RegTo);
+    copyBuffs(Entity, RegFrom, PlayerEntity, RegTo);
   }
   return PlayerEntity;
 }

@@ -56,4 +56,13 @@ std::string_view ManaRegenBuffComp::getName() const {
   return "Mana regeneration buff";
 }
 
+void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
+               entt::entity EntityTo, entt::registry &RegTo) {
+  copyComponents<BuffTypeList>(EntityFrom, RegFrom, EntityTo, RegTo);
+}
+
+void removeBuffs(entt::entity Entity, entt::registry &Reg) {
+  removeComponents<BuffTypeList>(Entity, Reg);
+}
+
 } // namespace rogue

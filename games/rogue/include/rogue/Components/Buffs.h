@@ -1,6 +1,8 @@
 #ifndef ROGUE_COMPONENTS_BUFFS_H
 #define ROGUE_COMPONENTS_BUFFS_H
 
+#include <entt/entt.hpp>
+#include <rogue/Components/Helpers.h>
 #include <rogue/Components/Stats.h>
 #include <string_view>
 
@@ -77,6 +79,15 @@ struct ManaRegenBuffComp : public RegenerationBuff {
 public:
   std::string_view getName() const;
 };
+
+using BuffTypeList = ComponentList<StatsBuffComp, StatsTimedBuffComp,
+                                   PoisonDebuffComp, BleedingDebuffComp,
+                                   HealthRegenBuffComp, ManaRegenBuffComp>;
+
+void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
+               entt::entity EntityTo, entt::registry &RegTo);
+
+void removeBuffs(entt::entity Entity, entt::registry &Reg);
 
 } // namespace rogue
 
