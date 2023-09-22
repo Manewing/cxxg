@@ -183,7 +183,8 @@ bool Game::handleUpdates(bool IsTick) {
 
 void Game::handleDraw() {
   // Render the current map
-  const auto RenderSize = ymir::Size2d<int>{80, 24};
+  const auto RenderSize = ymir::Size2d<int>{static_cast<int>(Scr.getSize().X),
+                                            static_cast<int>(Scr.getSize().Y)};
 
   // FIXME need to check that player is still alive!
   auto Player = getPlayer();
@@ -206,14 +207,6 @@ void Game::handleDraw() {
 
   // Draw UI overlay
   UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, InteractStr);
-
-  /// DEBUG==>
-  // const auto &SC = CurrentLevel->Reg.get<StatsComp>(Player);
-  // Scr[1][0] << "Int: " << SC.effective().Int << ", Str: " <<
-  // SC.effective().Str
-  //           << ", Dex: " << SC.effective().Dex
-  //           << ", Vit: " << SC.effective().Vit;
-  /// <== DEBUG
 
   cxxg::Game::handleDraw();
 }

@@ -4,6 +4,7 @@
 #include <memory>
 #include <rogue/UI/Decorator.h>
 #include <rogue/UI/Widget.h>
+#include <optional>
 #include <vector>
 
 namespace rogue::ui {
