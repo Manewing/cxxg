@@ -62,7 +62,8 @@ static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
           {"stats_buff_comp",
            [](const auto &V) {
              StatPoints P = parseStatPoints(V["stats"]);
-             StatsBuffComp Buff{{1U}, P};
+             StatsBuffComp Buff;
+             Buff.Bonus = P;
              return makeApplyBuffItemEffect<StatsBuffComp, StatsComp>(Buff);
            }},
       };

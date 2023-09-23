@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 #include <rogue/Components/Stats.h>
+#include <rogue/Components/Buffs.h>
 #include <string>
 #include <vector>
 #include <ymir/Enum.hpp>
@@ -82,7 +83,9 @@ public:
 
 class HealItemEffect : public ItemEffect {
 public:
-  HealItemEffect(StatValue Amount);
+  explicit HealItemEffect(StatValue Amount);
+  StatValue getAmount() const { return Amount; }
+
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
   void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
 
@@ -92,7 +95,9 @@ private:
 
 class DamageItemEffect : public ItemEffect {
 public:
-  DamageItemEffect(StatValue Amount);
+  explicit DamageItemEffect(StatValue Amount);
+  StatValue getAmount() const { return Amount; }
+
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
   void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
 
@@ -100,10 +105,17 @@ private:
   StatValue Amount;
 };
 
+class ApplyBuffItemEffectBase : public ItemEffect {
+public:
+  virtual const BuffBase &getBuff() const = 0;
+};
+
 template <typename BuffType, typename... RequiredComps>
-class ApplyBuffItemEffect : public ItemEffect {
+class ApplyBuffItemEffect : public ApplyBuffItemEffectBase {
 public:
   explicit ApplyBuffItemEffect(const BuffType &Buff) : Buff(Buff) {}
+
+  const BuffBase &getBuff() const final { return Buff; }
 
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
     return Reg.all_of<RequiredComps...>(Et);
@@ -196,7 +208,8 @@ public:
   };
 
 public:
-  void addSpecialization(CapabilityFlags Flags, std::shared_ptr<ItemSpecialization> Spec);
+  void addSpecialization(CapabilityFlags Flags,
+                         std::shared_ptr<ItemSpecialization> Spec);
   std::shared_ptr<ItemPrototype> actualize(const ItemPrototype &Proto) const;
 
 private:
@@ -213,6 +226,7 @@ public:
   std::string getDescription() const;
   ItemType getType() const;
   int getMaxStackSize() const;
+  std::vector<ItemPrototype::EffectInfo> getAllEffects() const;
 
   /// Returns true if other Item has same prototype and specialization
   bool isSameKind(const Item &Other) const;

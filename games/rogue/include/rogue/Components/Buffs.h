@@ -8,6 +8,12 @@
 
 namespace rogue {
 
+// All buffs that can be applied to an entity have to inherit from this class
+struct BuffBase {
+  virtual std::string_view getName() const = 0;
+  virtual std::string getDescription() const = 0;
+};
+
 struct AdditiveBuff {
   unsigned SourceCount = 1;
   void add();
@@ -37,9 +43,10 @@ public:
   StatValue ReduceAmount = 0.5;
 };
 
-struct StatsBuffComp : public AdditiveBuff {
+struct StatsBuffComp : public AdditiveBuff, public BuffBase {
 public:
-  std::string_view getName() const;
+  std::string_view getName() const override;
+  std::string getDescription() const override;
   void add(const StatsBuffComp &Other);
   bool remove(const StatsBuffComp &Other);
 
@@ -48,7 +55,8 @@ public:
 };
 
 struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
-  std::string_view getName() const;
+  std::string_view getName() const override;
+  std::string getDescription() const override;
   void add(const StatsTimedBuffComp &Other);
 };
 
@@ -60,29 +68,33 @@ struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
 //      - Slow
 //      - Blinded
 
-struct PoisonDebuffComp : public ReductionBuff {
+struct PoisonDebuffComp : public ReductionBuff, public BuffBase {
 public:
-  std::string_view getName() const;
+  std::string_view getName() const override;
+  std::string getDescription() const override;
 };
 
-struct BleedingDebuffComp : public ReductionBuff {
+struct BleedingDebuffComp : public ReductionBuff, public BuffBase {
 public:
-  std::string_view getName() const;
+  std::string_view getName() const override;
+  std::string getDescription() const override;
 };
 
-struct HealthRegenBuffComp : public RegenerationBuff {
+struct HealthRegenBuffComp : public RegenerationBuff, public BuffBase {
 public:
-  std::string_view getName() const;
+  std::string_view getName() const override;
+  std::string getDescription() const override;
 };
 
-struct ManaRegenBuffComp : public RegenerationBuff {
+struct ManaRegenBuffComp : public RegenerationBuff, public BuffBase {
 public:
-  std::string_view getName() const;
+  std::string_view getName() const override;
+  std::string getDescription() const override;
 };
 
-using BuffTypeList = ComponentList<StatsBuffComp, StatsTimedBuffComp,
-                                   PoisonDebuffComp, BleedingDebuffComp,
-                                   HealthRegenBuffComp, ManaRegenBuffComp>;
+using BuffTypeList =
+    ComponentList<StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
+                  BleedingDebuffComp, HealthRegenBuffComp, ManaRegenBuffComp>;
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);

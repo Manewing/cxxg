@@ -112,7 +112,8 @@ std::shared_ptr<ItemEffect> StatsBuffSpecialization::createEffect() const {
     *Stat += 1;
   }
 
-  StatsBuffComp Buff{{1U}, Stats};
+  StatsBuffComp Buff;
+  Buff.Bonus = Stats;
   return std::make_shared<ApplyBuffItemEffect<StatsBuffComp, StatsComp>>(Buff);
 }
 
@@ -158,6 +159,23 @@ ItemType Item::getType() const {
 }
 
 int Item::getMaxStackSize() const { return getProto().MaxStackSize; }
+
+std::vector<ItemPrototype::EffectInfo> Item::getAllEffects() const {
+  std::vector<ItemPrototype::EffectInfo> AllEffects;
+  auto NumEffects = getProto().Effects.size();
+  NumEffects += Specialization ? Specialization->Effects.size() : 0;
+  AllEffects.reserve(NumEffects);
+
+  for (const auto &Info : getProto().Effects) {
+    AllEffects.push_back(Info);
+  }
+  if (Specialization) {
+    for (const auto &Info : Specialization->Effects) {
+      AllEffects.push_back(Info);
+    }
+  }
+  return AllEffects;
+}
 
 bool Item::isSameKind(const Item &Other) const {
   return Proto == Other.Proto && Specialization == Other.Specialization;
