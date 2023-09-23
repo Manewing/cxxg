@@ -84,6 +84,7 @@ protected:
 private:
   cxxg::types::Size Size;
   std::size_t FocusIdx = 0;
+  std::size_t PrevFocusIdx = 0;
   std::shared_ptr<MoveDecorator> MoveDeco = nullptr;
   std::vector<std::shared_ptr<Widget>> Windows;
 };

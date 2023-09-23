@@ -108,6 +108,7 @@ bool WindowContainer::closeWindow(std::size_t Idx) {
   }
   Windows.erase(Windows.begin() + Idx);
   FocusIdx = 0;
+  selectWindow(PrevFocusIdx);
   return !Windows.empty();
 }
 
@@ -124,10 +125,11 @@ bool WindowContainer::closeActiveWindow() { return closeWindow(FocusIdx); }
 
 void WindowContainer::addWindow(std::shared_ptr<Widget> Window) {
   Windows.emplace_back(std::move(Window));
-  FocusIdx = Windows.size() - 1;
+  selectWindow(Windows.size() - 1);
 }
 
 void WindowContainer::selectWindow(std::size_t Idx) {
+  PrevFocusIdx = FocusIdx;
   FocusIdx = Idx;
   if (FocusIdx >= Windows.size()) {
     FocusIdx = 0;
