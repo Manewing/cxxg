@@ -1,7 +1,7 @@
 #include <map>
 #include <rogue/ItemType.h>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 
 namespace rogue {
 

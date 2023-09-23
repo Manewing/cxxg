@@ -1,5 +1,6 @@
 #include <memory>
 #include <rogue/Components/Buffs.h>
+#include <rogue/ItemEffect.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/TextBox.h>
 #include <rogue/UI/Tooltip.h>
@@ -15,7 +16,6 @@ Tooltip::Tooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
 }
 
 namespace {
-
 
 std::string getEffectDescription(const ItemPrototype::EffectInfo &EffInfo) {
   std::stringstream SS;

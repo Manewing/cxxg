@@ -2,16 +2,10 @@
 #include <ranges>
 #include <rogue/Components/Buffs.h>
 #include <rogue/ItemDatabase.h>
+#include <rogue/ItemEffect.h>
 #include <rogue/JSON.h>
 
 namespace rogue {
-
-template <typename BuffType, typename... RequiredComps>
-static std::shared_ptr<ApplyBuffItemEffect<BuffType, RequiredComps...>>
-makeApplyBuffItemEffect(const BuffType &Buff) {
-  return std::make_shared<ApplyBuffItemEffect<BuffType, RequiredComps...>>(
-      Buff);
-}
 
 static StatPoints parseStatPoints(const rapidjson::Value &V) {
   StatPoints P;

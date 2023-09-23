@@ -1,8 +1,8 @@
 #ifndef ROGUE_ITEM_TYPE_H
 #define ROGUE_ITEM_TYPE_H
 
-#include <ymir/Enum.hpp>
 #include <string>
+#include <ymir/Enum.hpp>
 
 namespace rogue {
 
@@ -34,7 +34,6 @@ enum class ItemType {
 ItemType getItemType(const std::string &Type);
 std::string getItemTypeLabel(ItemType Type);
 
-
 enum class CapabilityFlags {
   None = 0x0,
   UseOn = 0x1,
@@ -45,8 +44,7 @@ enum class CapabilityFlags {
   Equipment = 0x6,
 };
 
-CapabilityFlags
-getCapabilityFlag(const std::string &CapabilityFlagStr);
+CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr);
 const char *getCapabilityFlagLabel(CapabilityFlags Flags);
 
 } // namespace rogue
