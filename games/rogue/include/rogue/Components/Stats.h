@@ -2,6 +2,7 @@
 #define ROGUE_COMPONENTS_STATS_H
 
 #include <algorithm>
+#include <array>
 
 namespace rogue {
 
@@ -9,15 +10,21 @@ using StatPoint = int;
 using StatValue = double;
 
 struct StatPoints {
-  StatPoint Int = 11;
-  StatPoint Str = 11;
-  StatPoint Dex = 11;
-  StatPoint Vit = 11;
+  StatPoint Int = 0;
+  StatPoint Str = 0;
+  StatPoint Dex = 0;
+  StatPoint Vit = 0;
 
   StatPoints &operator+=(const StatPoints &Other) {
     *this = {Int + Other.Int, Str + Other.Str, Dex + Other.Dex,
              Vit + Other.Vit};
     return *this;
+  }
+
+  inline std::array<StatPoint *, 4> all() { return {{&Int, &Str, &Dex, &Vit}}; }
+
+  inline std::array<const StatPoint *, 4> all() const {
+    return {{&Int, &Str, &Dex, &Vit}};
   }
 };
 

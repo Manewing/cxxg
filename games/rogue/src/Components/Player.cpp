@@ -53,10 +53,11 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
 entt::entity PlayerComp::createPlayer(entt::registry &Reg,
                                       const std::string &Name,
                                       ymir::Point2d<int> Pos) {
-  return ::rogue::createPlayer(
-      Reg, PlayerComp{}, PositionComp{Pos}, StatsComp{}, HealthComp{},
-      NameComp{Name}, LineOfSightComp{}, AgilityComp{}, MeleeAttackComp{},
-      MovementComp{}, InventoryComp{}, EquipmentComp{});
+  return ::rogue::createPlayer(Reg, PlayerComp{}, PositionComp{Pos},
+                               StatsComp{StatPoints{11, 11, 11, 11}, {}},
+                               HealthComp{}, NameComp{Name}, LineOfSightComp{},
+                               AgilityComp{}, MeleeAttackComp{}, MovementComp{},
+                               InventoryComp{}, EquipmentComp{});
 }
 
 entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,

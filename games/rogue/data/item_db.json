@@ -39,6 +39,13 @@
       }
     }
   },
+  "item_specializations": {
+    "common_stats_buff_effect": {
+      "type": "stats_buff_comp_spec",
+      "min_points": 1,
+      "max_points": 3
+    }
+  },
   "item_prototypes": [
     {
       "name": "Blueberry",
@@ -100,10 +107,11 @@
       "description": "A small sword",
       "max_stack_size": 1,
       "types": ["weapon"],
-      "capabilities": [
+      "capabilities": [],
+      "specializations": [
         {
           "type": "equipment",
-          "effect": "stats_buff_effect"
+          "specialization": "common_stats_buff_effect"
         }
       ]
     },
@@ -112,10 +120,11 @@
       "description": "A worn down leather tunic",
       "max_stack_size": 1,
       "types": ["chest_plate"],
-      "capabilities": [
+      "capabilities": [],
+      "specializations": [
         {
           "type": "equipment",
-          "effect": "stats_buff_effect"
+          "specialization": "common_stats_buff_effect"
         }
       ]
     }

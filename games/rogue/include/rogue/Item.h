@@ -3,6 +3,7 @@
 
 #include <array>
 #include <entt/entt.hpp>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <rogue/Components/Stats.h>
@@ -172,6 +173,34 @@ public:
   int MaxStackSize = 1;
 
   std::vector<EffectInfo> Effects;
+};
+
+struct ItemSpecialization {
+  virtual std::shared_ptr<ItemEffect> createEffect() const = 0;
+};
+
+struct StatsBuffSpecialization : public ItemSpecialization {
+  StatPoints StatsMin;
+  StatPoints StatsMax;
+  StatPoint MinPoints;
+  StatPoint MaxPoints;
+
+  std::shared_ptr<ItemEffect> createEffect() const override;
+};
+
+class ItemSpecializations {
+public:
+  struct SpecializationInfo {
+    CapabilityFlags Flags;
+    std::shared_ptr<ItemSpecialization> Specialization;
+  };
+
+public:
+  void addSpecialization(CapabilityFlags Flags, std::shared_ptr<ItemSpecialization> Spec);
+  std::shared_ptr<ItemPrototype> actualize(const ItemPrototype &Proto) const;
+
+private:
+  std::vector<SpecializationInfo> Generators;
 };
 
 class Item {

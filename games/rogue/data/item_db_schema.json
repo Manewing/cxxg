@@ -3,7 +3,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "JSON Schema the item database",
   "type": "object",
-  "required": ["item_prototypes", "item_effects"],
+  "required": ["item_prototypes", "item_effects", "item_specializations"],
   "properties": {
     "item_prototypes": {
       "type": "array",
@@ -58,6 +58,24 @@
                   "enum": ["use_on", "equip_on", "unequip_from", "equipment"]
                 },
                 "effect": {
+                  "type": "string",
+                  "description": "The effect of the capability"
+                }
+              }
+            }
+          },
+          "specialization": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "effect"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "The type of the capability",
+                  "enum": ["use_on", "equip_on", "unequip_from", "equipment"]
+                },
+                "specialization": {
                   "type": "string",
                   "description": "The effect of the capability"
                 }

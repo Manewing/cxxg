@@ -10,12 +10,14 @@ namespace rogue {
 class ItemDatabase {
 public:
   static ItemType getItemType(const std::string &ItemTypeStr);
-  static CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr);
+  static CapabilityFlags
+  getCapabilityFlag(const std::string &CapabilityFlagStr);
 
   static ItemDatabase load(const std::filesystem::path &ItemDbConfig);
 
 public:
-  void addItemProto(const ItemPrototype &ItemProto);
+  void addItemProto(const ItemPrototype &ItemProto,
+                    const ItemSpecializations *ItemSpec = nullptr);
 
   Item createItem(int ItemId, int StackSize = 1) const;
 
@@ -23,6 +25,7 @@ public:
 
 private:
   std::map<int, ItemPrototype> ItemProtos;
+  std::map<int, ItemSpecializations> ItemSpecs;
 };
 
 } // namespace rogue

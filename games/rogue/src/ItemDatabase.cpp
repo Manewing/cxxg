@@ -13,6 +13,15 @@ makeApplyBuffItemEffect(const BuffType &Buff) {
       Buff);
 }
 
+static StatPoints parseStatPoints(const rapidjson::Value &V) {
+  StatPoints P;
+  P.Str = V["str"].GetInt();
+  P.Dex = V["dex"].GetInt();
+  P.Int = V["int"].GetInt();
+  P.Vit = V["vit"].GetInt();
+  return P;
+}
+
 static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
   static const std::map<std::string, std::function<std::shared_ptr<ItemEffect>(
                                          const rapidjson::Value &)>>
@@ -52,20 +61,43 @@ static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
            }},
           {"stats_buff_comp",
            [](const auto &V) {
-             StatPoints P;
-             P.Str = V["stats"]["str"].GetInt();
-             P.Dex = V["stats"]["dex"].GetInt();
-             P.Int = V["stats"]["int"].GetInt();
-             P.Vit = V["stats"]["vit"].GetInt();
+             StatPoints P = parseStatPoints(V["stats"]);
              StatsBuffComp Buff{{1U}, P};
              return makeApplyBuffItemEffect<StatsBuffComp, StatsComp>(Buff);
            }},
       };
 
   const auto EffectType = V["type"].GetString();
-  const auto &Factory = Factories.at(EffectType);
+  const auto It = Factories.find(EffectType);
+  if (It == Factories.end()) {
+    throw std::out_of_range("Unknown item effect: " + std::string(EffectType));
+  }
 
-  return Factory(V);
+  return It->second(V);
+}
+
+static std::shared_ptr<ItemSpecialization>
+createSpecialization(const rapidjson::Value &V) {
+  static std::map<std::string,
+                  std::function<std::shared_ptr<ItemSpecialization>(
+                      const rapidjson::Value &)>>
+      Factories = {
+          {"stats_buff_comp_spec",
+           [](const auto &V) {
+             StatsBuffSpecialization SBS;
+             SBS.MinPoints = V["min_points"].GetInt();
+             SBS.MaxPoints = V["max_points"].GetInt();
+             return std::make_unique<StatsBuffSpecialization>(SBS);
+           }},
+      };
+
+  const auto EffectType = V["type"].GetString();
+  const auto It = Factories.find(EffectType);
+  if (It == Factories.end()) {
+    throw std::out_of_range("Unknown item specialization: " +
+                            std::string(EffectType));
+  }
+  return It->second(V);
 }
 
 ItemType ItemDatabase::getItemType(const std::string &Type) {
@@ -122,6 +154,19 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     Effects.emplace(EffectName, Effect);
   }
 
+  // Create specializations
+  std::map<std::string, std::shared_ptr<ItemSpecialization>> Specializations;
+  const auto &SpecializationsJson = Doc["item_specializations"].GetObject();
+  for (const auto &[K, V] : SpecializationsJson) {
+    const auto SpecName = std::string(K.GetString());
+    // Check if already registered
+    if (Specializations.count(SpecName) != 0) {
+      throw std::runtime_error("Duplicate item specialization: " + SpecName);
+    }
+    auto Spec = createSpecialization(V);
+    Specializations.emplace(SpecName, Spec);
+  }
+
   // Create item prototypes
   int ItemId = 0;
   const auto &ItemProtosJson = Doc["item_prototypes"].GetArray();
@@ -144,18 +189,34 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       EffectInfos.push_back({Flag, Effect});
     }
 
+    std::unique_ptr<ItemSpecializations> Specialization;
+    if (ItemProtoJson.HasMember("specializations")) {
+      Specialization = std::make_unique<ItemSpecializations>();
+      for (const auto &SpecJson : ItemProtoJson["specializations"].GetArray()) {
+        const auto &SpecInfo = SpecJson.GetObject();
+        const auto Flags = getCapabilityFlag(SpecInfo["type"].GetString());
+        const auto Spec =
+            Specializations.at(SpecInfo["specialization"].GetString());
+        Specialization->addSpecialization(Flags, Spec);
+      }
+    }
+
     ItemPrototype Proto(ItemId++, Name, Description, ItType, MaxStackSize,
                         std::move(EffectInfos));
-    DB.addItemProto(Proto);
+    DB.addItemProto(Proto, Specialization.get());
   }
 
   return DB;
 }
 
-void ItemDatabase::addItemProto(const ItemPrototype &ItemProto) {
+void ItemDatabase::addItemProto(const ItemPrototype &ItemProto,
+                                const ItemSpecializations *ItemSpec) {
   // FIXME ID not yet taken
   assert(ItemProtos.count(ItemProto.ItemId) == 0);
   ItemProtos.emplace(ItemProto.ItemId, ItemProto);
+  if (ItemSpec) {
+    ItemSpecs.emplace(ItemProto.ItemId, *ItemSpec);
+  }
 }
 
 Item ItemDatabase::createItem(int ItemId, int StackSize) const {
@@ -163,7 +224,12 @@ Item ItemDatabase::createItem(int ItemId, int StackSize) const {
   if (It == ItemProtos.end()) {
     throw std::out_of_range("Unknown item id: " + std::to_string(ItemId));
   }
-  return Item(It->second, StackSize);
+  // Actualize the specialization
+  std::shared_ptr<ItemPrototype> Spec = nullptr;
+  if (auto SpecIt = ItemSpecs.find(ItemId); SpecIt != ItemSpecs.end()) {
+    Spec = SpecIt->second.actualize(It->second);
+  }
+  return Item(It->second, StackSize, Spec);
 }
 
 int ItemDatabase::getRandomItemId() const {
