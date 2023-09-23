@@ -5,6 +5,7 @@
 
 namespace rogue {
 
+// FIXME split into timed and non timed
 class StatsSystem : public System {
 public:
   using System::System;

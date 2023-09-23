@@ -83,8 +83,8 @@ std::string_view PoisonDebuffComp::getName() const { return "Poison debuff"; }
 
 std::string PoisonDebuffComp::getDescription() const {
   std::stringstream SS;
-  SS << "Poison reduces health by " << ReduceAmount << " for "
-     << TicksLeft << " ticks";
+  SS << "Poison reduces health by " << ReduceAmount << " for " << TicksLeft
+     << " ticks";
   return SS.str();
 }
 
@@ -94,8 +94,8 @@ std::string_view BleedingDebuffComp::getName() const {
 
 std::string BleedingDebuffComp::getDescription() const {
   std::stringstream SS;
-  SS << "Bleeding reduces health by " << ReduceAmount << " for "
-     << TicksLeft << " ticks";
+  SS << "Bleeding reduces health by " << ReduceAmount << " for " << TicksLeft
+     << " ticks";
   return SS.str();
 }
 
@@ -116,8 +116,8 @@ std::string_view ManaRegenBuffComp::getName() const {
 
 std::string ManaRegenBuffComp::getDescription() const {
   std::stringstream SS;
-  SS << "Mana regeneration increased by " << RegenAmount << " for "
-     << TicksLeft << " ticks";
+  SS << "Mana regeneration increased by " << RegenAmount << " for " << TicksLeft
+     << " ticks";
   return SS.str();
 }
 

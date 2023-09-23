@@ -21,6 +21,4 @@ std::string KeyOption::getInteractMsg(const std::vector<KeyOption> &Options) {
   return SS.str();
 }
 
-
-
-}
+} // namespace rogue::ui

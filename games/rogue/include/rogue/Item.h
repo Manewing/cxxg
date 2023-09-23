@@ -6,8 +6,8 @@
 #include <functional>
 #include <memory>
 #include <optional>
-#include <rogue/Components/Stats.h>
 #include <rogue/Components/Buffs.h>
+#include <rogue/Components/Stats.h>
 #include <string>
 #include <vector>
 #include <ymir/Enum.hpp>

@@ -2,9 +2,9 @@
 #define ROGUE_UI_WINDOW_CONTAINER_H
 
 #include <memory>
+#include <optional>
 #include <rogue/UI/Decorator.h>
 #include <rogue/UI/Widget.h>
-#include <optional>
 #include <vector>
 
 namespace rogue::ui {

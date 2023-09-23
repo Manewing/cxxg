@@ -9,16 +9,16 @@ namespace rogue::ui {
 
 class Tooltip : public Decorator {
 public:
-  Tooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
-          std::string Text, std::string Header = "");
+  Tooltip(cxxg::types::Position Pos, cxxg::types::Size Size, std::string Text,
+          std::string Header = "");
 };
 
-class ItemTooltip : public  Tooltip {
+class ItemTooltip : public Tooltip {
 public:
-  ItemTooltip(cxxg::types::Position Pos, cxxg::types::Size Size,const Item &It);
+  ItemTooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
+              const Item &It);
 };
 
-
-}
+} // namespace rogue::ui
 
 #endif // #define ROGUE_UI_ITEM_TOOLTIP_H

@@ -1,7 +1,7 @@
-#include <ymir/Types.hpp>
 #include <cxxg/Screen.h>
 #include <optional>
 #include <rogue/UI/WindowContainer.h>
+#include <ymir/Types.hpp>
 
 namespace rogue::ui {
 

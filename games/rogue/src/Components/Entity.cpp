@@ -55,7 +55,7 @@ void generateRandomLoot(Inventory &Inv, ItemDatabase &ItemDb) {
   //  common items based on entity level
 
   // DEBUG ==>
-  unsigned NumItems =  rand() % 5 + 1;
+  unsigned NumItems = rand() % 5 + 1;
   for (unsigned I = 0; I < NumItems; ++I) {
     auto It = ItemDb.createItem(ItemDb.getRandomItemId());
     It.StackSize = rand() % (It.getMaxStackSize() / 2 + 1) + 1;

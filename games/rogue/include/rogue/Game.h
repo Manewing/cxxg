@@ -17,7 +17,7 @@
 namespace rogue {
 struct Interaction;
 struct GameConfig;
-}
+} // namespace rogue
 
 namespace rogue {
 
