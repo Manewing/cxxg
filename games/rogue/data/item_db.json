@@ -46,7 +46,12 @@
     "common_stats_buff_effect": {
       "type": "stats_buff_comp_spec",
       "min_points": 1,
-      "max_points": 3
+      "max_points": 4
+    },
+    "rare_stats_buff_effect": {
+      "type": "stats_buff_comp_spec",
+      "min_points": 4,
+      "max_points": 12
     }
   },
   "item_prototypes": [
@@ -54,7 +59,9 @@
       "name": "Blueberry",
       "description": "A blue berry that can be eaten",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": [
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -66,7 +73,10 @@
       "name": "Poison Berry",
       "description": "A berry, better not to eat it. It looks poisonous",
       "max_stack_size": 99,
-      "types": ["consumable", "crafting"],
+      "types": [
+        "consumable",
+        "crafting"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -82,14 +92,20 @@
       "name": "Wooden Log",
       "description": "A log of wood",
       "max_stack_size": 99,
-      "types": ["crafting"],
+      "types": [
+        "crafting"
+      ],
       "capabilities": []
     },
     {
       "name": "Stone",
       "description": "A stone better not to drop it on your foot",
       "max_stack_size": 99,
-      "types": ["crafting", "weapon", "consumable"],
+      "types": [
+        "crafting",
+        "weapon",
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -109,7 +125,9 @@
       "name": "Small Sword",
       "description": "A small sword",
       "max_stack_size": 1,
-      "types": ["weapon"],
+      "types": [
+        "weapon"
+      ],
       "capabilities": [],
       "specializations": [
         {
@@ -122,12 +140,74 @@
       "name": "Leather Tunic",
       "description": "A worn down leather tunic",
       "max_stack_size": 1,
-      "types": ["chest_plate"],
+      "types": [
+        "chest_plate"
+      ],
       "capabilities": [],
       "specializations": [
         {
           "type": "equipment",
           "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Leather Boots",
+      "description": "Worn down leather boots",
+      "max_stack_size": 1,
+      "types": [
+        "boots"
+      ],
+      "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Leather Pants",
+      "description": "Worn down leather pants",
+      "max_stack_size": 1,
+      "types": [
+        "pants"
+      ],
+      "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Leather Helmet",
+      "description": "Worn down leather helmet",
+      "max_stack_size": 1,
+      "types": [
+        "helmet"
+      ],
+      "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Iron Sword",
+      "description": "A sword made of iron",
+      "max_stack_size": 1,
+      "types": [
+        "weapon"
+      ],
+      "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
         }
       ]
     }
