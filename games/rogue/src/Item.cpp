@@ -1,119 +1,8 @@
-#include <array>
-#include <rogue/Components/Buffs.h>
-#include <rogue/Components/Stats.h>
 #include <rogue/Item.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/ItemPrototype.h>
 
 namespace rogue {
-
-bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
-  return
-      // Equipment
-      ((Flags & CapabilityFlags::Equipment) != CapabilityFlags::None &&
-       (Type & ItemType::EquipmentMask) != ItemType::None) ||
-      // Consumable
-      ((Flags & CapabilityFlags::UseOn) != CapabilityFlags::None &&
-       (Type & ItemType::Consumable) != ItemType::None);
-}
-
-ItemPrototype::ItemPrototype(int ItemId, std::string N, std::string D,
-                             ItemType Type, int MaxStatckSize,
-                             std::vector<EffectInfo> Eff)
-    : ItemId(ItemId), Name(std::move(N)), Description(std::move(D)), Type(Type),
-      MaxStackSize(MaxStatckSize), Effects(std::move(Eff)) {}
-
-bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
-                               CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return false;
-  }
-  bool CanApply = true;
-  for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
-      CanApply = CanApply && Info.Effect->canApplyTo(Entity, Reg);
-    }
-  }
-  return CanApply;
-}
-
-void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
-                            CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return;
-  }
-  for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
-      Info.Effect->applyTo(Entity, Reg);
-    }
-  }
-}
-
-bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
-                                  entt::registry &Reg,
-                                  CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return false;
-  }
-  bool CanRemove = true;
-  for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
-      CanRemove = CanRemove && Info.Effect->canRemoveFrom(Entity, Reg);
-    }
-  }
-  return CanRemove;
-}
-
-void ItemPrototype::removeFrom(const entt::entity &Entity, entt::registry &Reg,
-                               CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return;
-  }
-  for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
-      Info.Effect->removeFrom(Entity, Reg);
-    }
-  }
-}
-
-std::shared_ptr<ItemEffect> StatsBuffSpecialization::createEffect() const {
-  // Compute points to spent
-  assert(MinPoints <= MaxPoints);
-  StatPoint Points = rand() % (MaxPoints - MinPoints + 1) + MinPoints;
-
-  StatPoints Stats;
-  auto AllStats = Stats.all();
-
-  // Distribute points
-  while (Points-- > 0) {
-    auto *Stat = AllStats[rand() % AllStats.size()];
-    *Stat += 1;
-  }
-
-  StatsBuffComp Buff;
-  Buff.Bonus = Stats;
-  return std::make_shared<ApplyBuffItemEffect<StatsBuffComp, StatsComp>>(Buff);
-}
-
-void ItemSpecializations::addSpecialization(
-    CapabilityFlags Flags, std::shared_ptr<ItemSpecialization> Spec) {
-  Generators.push_back({Flags, std::move(Spec)});
-}
-
-std::shared_ptr<ItemPrototype>
-ItemSpecializations::actualize(const ItemPrototype &Proto) const {
-  std::vector<ItemPrototype::EffectInfo> AllEffects;
-  AllEffects.reserve(Proto.Effects.size() + Generators.size());
-  for (const auto &Info : Proto.Effects) {
-    AllEffects.push_back(Info);
-  }
-  for (const auto &Gen : Generators) {
-    AllEffects.push_back({Gen.Flags, Gen.Specialization->createEffect()});
-  }
-  return std::make_shared<ItemPrototype>(Proto.ItemId, Proto.Name,
-                                         Proto.Description, Proto.Type,
-                                         Proto.MaxStackSize, AllEffects);
-}
-
 Item::Item(const ItemPrototype &Proto, int StackSize,
            const std::shared_ptr<ItemPrototype> &Spec)
     : StackSize(StackSize), Proto(&Proto), Specialization(Spec) {}
@@ -137,8 +26,8 @@ ItemType Item::getType() const {
 
 int Item::getMaxStackSize() const { return getProto().MaxStackSize; }
 
-std::vector<ItemPrototype::EffectInfo> Item::getAllEffects() const {
-  std::vector<ItemPrototype::EffectInfo> AllEffects;
+std::vector<EffectInfo> Item::getAllEffects() const {
+  std::vector<EffectInfo> AllEffects;
   auto NumEffects = getProto().Effects.size();
   NumEffects += Specialization ? Specialization->Effects.size() : 0;
   AllEffects.reserve(NumEffects);

@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Stats.h>
+#include <rogue/ItemType.h>
 
 namespace rogue {
 

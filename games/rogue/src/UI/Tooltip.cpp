@@ -17,7 +17,7 @@ Tooltip::Tooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
 
 namespace {
 
-std::string getEffectDescription(const ItemPrototype::EffectInfo &EffInfo) {
+std::string getEffectDescription(const EffectInfo &EffInfo) {
   std::stringstream SS;
   SS << getCapabilityFlagLabel(EffInfo.Flags) << ": ";
   if (const auto *HIE = dynamic_cast<HealItemEffect *>(EffInfo.Effect.get())) {

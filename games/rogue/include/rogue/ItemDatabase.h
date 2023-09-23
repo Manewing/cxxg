@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <map>
 #include <rogue/Item.h>
+#include <rogue/ItemPrototype.h>
+#include <rogue/ItemSpecialization.h>
 
 namespace rogue {
 

@@ -5,85 +5,15 @@
 #include <entt/entt.hpp>
 #include <memory>
 #include <optional>
-#include <rogue/Components/Stats.h>
 #include <rogue/ItemType.h>
 #include <string>
 #include <vector>
 
 namespace rogue {
-class ItemEffect;
+class ItemPrototype;
 }
 
 namespace rogue {
-
-class ItemPrototype {
-public:
-  struct EffectInfo {
-    CapabilityFlags Flags;
-    std::shared_ptr<ItemEffect> Effect;
-  };
-
-public:
-  static bool canApply(ItemType Type, CapabilityFlags Flags);
-
-public:
-  ItemPrototype(int ItemId, std::string Name, std::string Description,
-                ItemType Type, int MaxStackSize,
-                std::vector<EffectInfo> Effects);
-
-  // TODO add:
-  // attack melee
-  // attack ranged
-  // defense
-  // craft
-
-  bool canApplyTo(const entt::entity &Entity, entt::registry &Reg,
-                  CapabilityFlags Flags) const;
-  void applyTo(const entt::entity &Entity, entt::registry &Reg,
-               CapabilityFlags Flags) const;
-  bool canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
-                     CapabilityFlags Flags) const;
-  void removeFrom(const entt::entity &Entity, entt::registry &Reg,
-                  CapabilityFlags Flags) const;
-
-public:
-  int ItemId;
-  std::string Name;
-  std::string Description;
-  ItemType Type = ItemType::None;
-  int MaxStackSize = 1;
-
-  std::vector<EffectInfo> Effects;
-};
-
-struct ItemSpecialization {
-  virtual std::shared_ptr<ItemEffect> createEffect() const = 0;
-};
-
-struct StatsBuffSpecialization : public ItemSpecialization {
-  StatPoints StatsMin;
-  StatPoints StatsMax;
-  StatPoint MinPoints;
-  StatPoint MaxPoints;
-
-  std::shared_ptr<ItemEffect> createEffect() const override;
-};
-
-class ItemSpecializations {
-public:
-  struct SpecializationInfo {
-    CapabilityFlags Flags;
-    std::shared_ptr<ItemSpecialization> Specialization;
-  };
-
-public:
-  void addSpecialization(CapabilityFlags Flags,
-                         std::shared_ptr<ItemSpecialization> Spec);
-  std::shared_ptr<ItemPrototype> actualize(const ItemPrototype &Proto) const;
-
-private:
-  std::vector<SpecializationInfo> Generators;
-};
 
 class Item {
 public:
@@ -95,7 +25,7 @@ public:
   std::string getDescription() const;
   ItemType getType() const;
   int getMaxStackSize() const;
-  std::vector<ItemPrototype::EffectInfo> getAllEffects() const;
+  std::vector<EffectInfo> getAllEffects() const;
 
   /// Returns true if other Item has same prototype and specialization
   bool isSameKind(const Item &Other) const;

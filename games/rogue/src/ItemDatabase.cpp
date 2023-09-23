@@ -3,6 +3,8 @@
 #include <rogue/Components/Buffs.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/ItemPrototype.h>
+#include <rogue/ItemSpecialization.h>
 #include <rogue/JSON.h>
 
 namespace rogue {
@@ -141,7 +143,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       ItType |= getItemType(ItemTypeStr);
     }
 
-    std::vector<ItemPrototype::EffectInfo> EffectInfos;
+    std::vector<EffectInfo> EffectInfos;
     for (const auto &CapJson : ItemProtoJson["capabilities"].GetArray()) {
       const auto &CapInfo = CapJson.GetObject();
       const auto Flag = getCapabilityFlag(CapInfo["type"].GetString());

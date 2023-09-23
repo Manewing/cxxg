@@ -1,6 +1,7 @@
 #ifndef ROGUE_ITEM_TYPE_H
 #define ROGUE_ITEM_TYPE_H
 
+#include <memory>
 #include <string>
 #include <ymir/Enum.hpp>
 
@@ -46,6 +47,12 @@ enum class CapabilityFlags {
 
 CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr);
 const char *getCapabilityFlagLabel(CapabilityFlags Flags);
+
+class ItemEffect;
+struct EffectInfo {
+  CapabilityFlags Flags;
+  std::shared_ptr<ItemEffect> Effect;
+};
 
 } // namespace rogue
 
