@@ -35,7 +35,10 @@
     "stats_buff_effect_str_1": {
       "type": "stats_buff_comp",
       "stats": {
-        "str": 1
+        "str": 1,
+        "dex": 0,
+        "int": 0,
+        "vit": 0
       }
     }
   },

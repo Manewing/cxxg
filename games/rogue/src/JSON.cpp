@@ -3,6 +3,7 @@
 #include <rapidjson/stringbuffer.h>
 #include <rogue/JSON.h>
 #include <string>
+#include <sstream>
 
 namespace {
 std::pair<std::string, rapidjson::Document>

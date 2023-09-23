@@ -10,6 +10,7 @@ namespace rogue {
 
 // All buffs that can be applied to an entity have to inherit from this class
 struct BuffBase {
+  virtual ~BuffBase() = default;
   virtual std::string_view getName() const = 0;
   virtual std::string getDescription() const = 0;
 };

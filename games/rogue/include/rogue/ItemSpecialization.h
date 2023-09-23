@@ -12,6 +12,7 @@ class ItemPrototype;
 namespace rogue {
 
 struct ItemSpecialization {
+  virtual ~ItemSpecialization() = default;
   virtual std::shared_ptr<ItemEffect> createEffect() const = 0;
 };
 
