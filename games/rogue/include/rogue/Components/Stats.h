@@ -21,12 +21,25 @@ struct StatPoints {
     return *this;
   }
 
+  StatPoints &operator-=(const StatPoints &Other) {
+    *this = {Int - Other.Int, Str - Other.Str, Dex - Other.Dex,
+             Vit - Other.Vit};
+    return *this;
+  }
+
   inline std::array<StatPoint *, 4> all() { return {{&Int, &Str, &Dex, &Vit}}; }
 
   inline std::array<const StatPoint *, 4> all() const {
     return {{&Int, &Str, &Dex, &Vit}};
   }
 };
+
+inline StatPoints operator-(const StatPoints &Lhs,
+                            const StatPoints &Rhs) noexcept {
+  auto Copy = Lhs;
+  Copy -= Rhs;
+  return Copy;
+}
 
 inline StatPoints operator+(const StatPoints &Lhs,
                             const StatPoints &Rhs) noexcept {

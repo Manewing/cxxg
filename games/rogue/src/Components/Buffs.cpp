@@ -32,7 +32,7 @@ void StatsBuffComp::add(const StatsBuffComp &Other) {
 }
 
 bool StatsBuffComp::remove(const StatsBuffComp &Other) {
-  Bonus += Other.Bonus;
+  Bonus -= Other.Bonus;
   return AdditiveBuff::remove(Other);
 }
 
