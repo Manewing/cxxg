@@ -8,7 +8,8 @@ namespace rogue {
 GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
   GameConfig Config;
 
-  auto [DocStr, Doc] = loadJSON(ConfigFile, nullptr);
+  const auto SchemaFile = ConfigFile.parent_path() / "game_config_schema.json";
+  auto [DocStr, Doc] = loadJSON(ConfigFile, &SchemaFile);
 
   auto ConfigDir = ConfigFile.parent_path();
   const auto LevelConfig = Doc["level_config"].GetString();

@@ -1,0 +1,17 @@
+{
+  "$id": "https://rogue-todo.com/game-config-schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Schema the game config",
+  "type": "object",
+  "required": ["level_config", "item_db_config"],
+  "properties": {
+    "level_config": {
+      "type": "string",
+      "description": "Path to the level config file"
+    },
+		"item_db_config": {
+			"type": "string",
+			"description": "Path to the item db config file"
+		}
+  }
+}

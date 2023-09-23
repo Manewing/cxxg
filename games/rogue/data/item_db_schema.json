@@ -84,6 +84,34 @@
           }
         }
       }
+    },
+    "item_effects": {
+      "type": "object",
+      "description": "Map of item effects by identifier",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the effect"
+          }
+        }
+      }
+    },
+    "item_specializations": {
+      "type": "object",
+      "description": "Map of item specializations by identifier",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the specialization"
+          }
+        }
+      }
     }
   }
 }

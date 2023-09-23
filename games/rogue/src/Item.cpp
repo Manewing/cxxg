@@ -3,6 +3,7 @@
 #include <rogue/ItemPrototype.h>
 
 namespace rogue {
+
 Item::Item(const ItemPrototype &Proto, int StackSize,
            const std::shared_ptr<ItemPrototype> &Spec)
     : StackSize(StackSize), Proto(&Proto), Specialization(Spec) {}
