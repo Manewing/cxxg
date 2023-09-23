@@ -92,7 +92,20 @@ struct AgilityComp {
 struct MeleeAttackComp {
   StatValue Damage = 10;
   StatValue APCost = 5;
+
+  StatValue getEffectiveDamage(StatPoints Stats) const {
+    return (Damage + Stats.Str) * (100.0 + Stats.Str) / 100.0;
+  }
+
+  StatValue getEffectiveDamage(StatsComp *SC) const {
+    if (!SC) {
+      return Damage;
+    }
+    return getEffectiveDamage(SC->effective());
+  }
 };
+
+// TODO ArmorComp
 
 } // namespace rogue
 

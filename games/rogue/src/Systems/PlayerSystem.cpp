@@ -32,13 +32,16 @@ void PlayerSystem::update() {
       // FIXME create damage system and spawn melee damage entity
       auto &THealth = Reg.get<HealthComp>(Et);
 
-      THealth.reduce(MA.Damage);
+      auto *SC = Reg.try_get<StatsComp>(PlayerEt);
+      unsigned Damage = MA.getEffectiveDamage(SC);
+
+      THealth.reduce(Damage);
 
       // publish
       const auto Nm = Reg.try_get<NameComp>(PlayerEt);
       const auto TNm = Reg.try_get<NameComp>(Et);
       if (Nm && TNm) {
-        publish(DebugMessageEvent() << Nm->Name << " dealt " << MA.Damage
+        publish(DebugMessageEvent() << Nm->Name << " dealt " << Damage
                                     << " melee damage to " << TNm->Name);
       }
       return;
