@@ -1,0 +1,44 @@
+#ifndef ROGUE_EQUIPMENT_H
+#define ROGUE_EQUIPMENT_H
+
+#include <array>
+#include <optional>
+#include <rogue/Item.h>
+#include <rogue/ItemType.h>
+
+namespace rogue {
+
+struct EquipmentSlot {
+  const ItemType BaseTypeFilter = ItemType::None;
+  std::optional<Item> It = std::nullopt;
+  ItemType TypeFilter = ItemType::None;
+};
+
+class Equipment {
+public:
+  EquipmentSlot Ring = {ItemType::Ring};
+  EquipmentSlot Amulet = {ItemType::Amulet};
+  EquipmentSlot Helmet = {ItemType::Helmet};
+  EquipmentSlot ChestPlate = {ItemType::ChestPlate};
+  EquipmentSlot Pants = {ItemType::Pants};
+  EquipmentSlot Boots = {ItemType::Boots};
+  EquipmentSlot Weapon = {ItemType::Weapon};
+  EquipmentSlot OffHand = {ItemType::OffHand};
+
+  inline std::array<EquipmentSlot *, 8> all() {
+    return {&Ring,  &Amulet, &Helmet, &ChestPlate,
+            &Pants, &Boots,  &Weapon, &OffHand};
+  }
+
+  EquipmentSlot &getSlot(ItemType It);
+  const EquipmentSlot &getSlot(ItemType It) const;
+
+  bool isEquipped(ItemType Type) const;
+  bool canEquip(ItemType Type) const;
+  void equip(Item Item);
+  Item unequip(ItemType Type);
+};
+
+} // namespace rogue
+
+#endif // #ifndef ROGUE_EQUIPMENT_H

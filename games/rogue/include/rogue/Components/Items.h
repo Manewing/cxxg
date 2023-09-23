@@ -2,6 +2,7 @@
 #define ROGUE_COMPONENTS_ITEMS_H
 
 #include <rogue/Inventory.h>
+#include <rogue/Equipment.h>
 
 namespace rogue {
 
