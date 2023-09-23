@@ -1,5 +1,6 @@
 #include <cxxg/Screen.h>
 #include <memory>
+#include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/ItemSelect.h>
@@ -27,9 +28,10 @@ static constexpr std::array<StatsInfo, 4> StatsInfos = {{
 
 namespace rogue::ui {
 
-StatsController::StatsController(StatsComp &Stats, entt::entity Entity,
-                                 entt::registry &Reg)
-    : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Stats(Stats) {
+StatsController::StatsController(Controller &Ctrl, StatsComp &Stats,
+                                 entt::entity Entity, entt::registry &Reg)
+    : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Ctrl(Ctrl),
+      Stats(Stats) {
   // FIXME can we drop this
   (void)Entity;
   (void)Reg;
@@ -49,8 +51,8 @@ bool StatsController::handleInput(int Char) {
   case Controls::Info.Char: {
     auto SelIdx = ItSel->getSelectedIdx();
     const auto &SI = StatsInfos.at(SelIdx);
-    Tp = std::make_shared<Tooltip>(Pos + SI.Offset + TooltipOffset, TooltipSize,
-                                   SI.Desc, SI.Name);
+    Ctrl.addWindow(std::make_shared<Tooltip>(Pos + SI.Offset + TooltipOffset,
+                                             TooltipSize, SI.Desc, SI.Name));
   } break;
   default:
     return ItSel->handleInput(Char);
@@ -82,13 +84,8 @@ void StatsController::draw(cxxg::Screen &Scr) const {
 
   BaseRectDecorator::draw(Scr);
 
+  // FIXME points to spend
   Scr[Pos.Y + getSize().Y - 2][Pos.X + 2] << "Available Points: 0000";
-
-  if (Tp) {
-    Tp->draw(Scr);
-    // FIXME we need a handler for focus change etc
-    Tp = nullptr;
-  }
 }
 
 } // namespace rogue::ui

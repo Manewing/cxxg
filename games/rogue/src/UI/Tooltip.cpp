@@ -1,6 +1,7 @@
 #include <memory>
 #include <rogue/Components/Buffs.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/TextBox.h>
 #include <rogue/UI/Tooltip.h>
@@ -13,6 +14,13 @@ Tooltip::Tooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
     : Decorator(Pos, nullptr) {
   Comp = std::make_shared<TextBox>(Pos, Size, Text);
   Comp = std::make_shared<Frame>(Comp, Pos, Size, Header);
+}
+
+bool Tooltip::handleInput(int Char) {
+  if (Char == Controls::Info.Char) {
+    return false;
+  }
+  return Decorator::handleInput(Char);
 }
 
 namespace {

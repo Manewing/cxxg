@@ -20,12 +20,15 @@ struct StatsComp;
 
 namespace rogue::ui {
 
+
 class Controller {
 public:
   Controller(cxxg::Screen &Scr);
   void draw(int LevelIdx, int Health, int MaxHealth, std::string InteractStr);
   bool isUIActive() const;
   void handleInput(int Char);
+
+  void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false);
 
   void setEquipmentUI(Equipment &Equip, entt::entity Entity,
                       entt::registry &Reg);

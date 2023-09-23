@@ -9,6 +9,7 @@
 
 namespace rogue {
 class Equipment;
+class Controller;
 struct EquipmentSlot;
 } // namespace rogue
 
@@ -16,7 +17,7 @@ namespace rogue::ui {
 
 class EquipmentController : public BaseRect {
 public:
-  EquipmentController(Equipment &Equip, entt::entity Entity,
+  EquipmentController(Controller &Ctrl, Equipment &Equip, entt::entity Entity,
                       entt::registry &Reg, cxxg::types::Position Pos);
   void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) final;
@@ -28,12 +29,12 @@ protected:
   void updateSelectValues() const;
 
 protected:
+  Controller &Ctrl;
   Equipment &Equip;
   entt::entity Entity;
   entt::registry &Reg;
   std::shared_ptr<ItemSelect> ItSel;
   std::shared_ptr<Widget> Dec;
-  mutable std::shared_ptr<Widget> Tooltip;
 };
 
 } // namespace rogue::ui

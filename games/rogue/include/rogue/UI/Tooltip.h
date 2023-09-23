@@ -11,6 +11,7 @@ class Tooltip : public Decorator {
 public:
   Tooltip(cxxg::types::Position Pos, cxxg::types::Size Size, std::string Text,
           std::string Header = "");
+  bool handleInput(int Char) override;
 };
 
 class ItemTooltip : public Tooltip {

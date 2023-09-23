@@ -6,23 +6,25 @@
 #include <rogue/UI/Decorator.h>
 
 namespace rogue::ui {
+class Controller;
 class ItemSelect;
-}
+} // namespace rogue::ui
 
 namespace rogue::ui {
 
 class StatsController : public BaseRectDecorator {
 public:
   StatsController() = delete;
-  StatsController(StatsComp &Stats, entt::entity Entity, entt::registry &Reg);
+  StatsController(Controller &Ctrl, StatsComp &Stats, entt::entity Entity,
+                  entt::registry &Reg);
   bool handleInput(int Char) final;
   std::string getInteractMsg() const final;
   void draw(cxxg::Screen &Scr) const final;
 
 protected:
+  Controller &Ctrl;
   StatsComp &Stats;
   std::shared_ptr<ItemSelect> ItSel;
-  mutable std::shared_ptr<Widget> Tp;
 };
 
 } // namespace rogue::ui

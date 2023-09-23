@@ -68,9 +68,17 @@ void Controller::handleInput(int Char) {
   WdwContainer.handleInput(Char);
 }
 
+void Controller::addWindow(std::shared_ptr<Widget> Wdw,
+                           bool AutoLayoutWindows) {
+  WdwContainer.addWindow(std::move(Wdw));
+  if (AutoLayoutWindows) {
+    WdwContainer.autoLayoutWindows();
+  }
+}
+
 void Controller::setEquipmentUI(Equipment &Equip, entt::entity Entity,
                                 entt::registry &Reg) {
-  WdwContainer.addWindow<EquipmentController>(Equip, Entity, Reg,
+  WdwContainer.addWindow<EquipmentController>(*this, Equip, Entity, Reg,
                                               cxxg::types::Position{2, 2});
   WdwContainer.autoLayoutWindows();
 }
@@ -85,7 +93,7 @@ void Controller::closeEquipmentUI() {
 
 void Controller::setInventoryUI(Inventory &Inv, entt::entity Entity,
                                 entt::registry &Reg) {
-  WdwContainer.addWindow<InventoryController>(Inv, Entity, Reg);
+  WdwContainer.addWindow<InventoryController>(*this, Inv, Entity, Reg);
   WdwContainer.autoLayoutWindows();
 }
 
@@ -99,7 +107,7 @@ void Controller::closeInventoryUI() {
 
 void Controller::setStatsUI(StatsComp &Stats, entt::entity Entity,
                             entt::registry &Reg) {
-  WdwContainer.addWindow<StatsController>(Stats, Entity, Reg);
+  WdwContainer.addWindow<StatsController>(*this, Stats, Entity, Reg);
   WdwContainer.autoLayoutWindows();
 }
 
@@ -113,7 +121,7 @@ void Controller::closeStatsUI() {
 
 void Controller::setLootUI(Inventory &Inv, entt::entity Entity,
                            entt::registry &Reg) {
-  WdwContainer.addWindow<LootController>(Inv, Entity, Reg);
+  WdwContainer.addWindow<LootController>(*this, Inv, Entity, Reg);
   WdwContainer.autoLayoutWindows();
 }
 

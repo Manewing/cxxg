@@ -11,18 +11,20 @@ class Inventory;
 
 namespace rogue::ui {
 class ListSelect;
-}
+class Controller;
+} // namespace rogue::ui
 
 namespace rogue::ui {
 
 class InventoryControllerBase : public BaseRect {
 public:
   /// @brief Creates a new inventory UI controller
+  /// @param Ctrl The parent UI controller
   /// @param Inv The inventory that is acccessed
   /// @param Entity The entity accessing the inventory
   /// @param Reg The registry the entity belongs to
   /// @param Header The header to display for the inventory
-  InventoryControllerBase(Inventory &Inv, entt::entity Entity,
+  InventoryControllerBase(Controller &Ctrl, Inventory &Inv, entt::entity Entity,
                           entt::registry &Reg, const std::string &Header);
   void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
@@ -32,25 +34,26 @@ protected:
   void updateElements() const;
 
 protected:
+  Controller &Ctrl;
   Inventory &Inv;
   entt::entity Entity;
   entt::registry &Reg;
   std::shared_ptr<ListSelect> List;
   std::shared_ptr<Widget> Decorated;
-  // FIXME we want to reset this upon draw
-  mutable std::shared_ptr<Widget> Tooltip;
 };
 
 class InventoryController : public InventoryControllerBase {
 public:
-  InventoryController(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
+  InventoryController(Controller &Ctrl, Inventory &Inv, entt::entity Entity,
+                      entt::registry &Reg);
   bool handleInput(int Char) final;
   std::string getInteractMsg() const final;
 };
 
 class LootController : public InventoryControllerBase {
 public:
-  LootController(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
+  LootController(Controller &Ctrl, Inventory &Inv, entt::entity Entity,
+                 entt::registry &Reg);
   bool handleInput(int Char) final;
   std::string getInteractMsg() const final;
 };

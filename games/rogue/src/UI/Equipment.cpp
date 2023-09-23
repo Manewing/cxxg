@@ -2,6 +2,7 @@
 #include <rogue/Components/Items.h>
 #include <rogue/Item.h>
 #include <rogue/UI/Controls.h>
+#include <rogue/UI/Controller.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/ItemSelect.h>
@@ -12,10 +13,12 @@ namespace rogue::ui {
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
-EquipmentController::EquipmentController(Equipment &Equip, entt::entity Entity,
+EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
+                                         entt::entity Entity,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
-    : BaseRect(Pos, {40, 11}), Equip(Equip), Entity(Entity), Reg(Reg) {
+    : BaseRect(Pos, {40, 11}), Ctrl(Ctrl), Equip(Equip), Entity(Entity),
+      Reg(Reg) {
   ItSel = std::make_shared<ItemSelect>(Pos);
   Dec = std::make_shared<Frame>(ItSel, Pos, Size, "Equipment");
 
@@ -40,8 +43,8 @@ bool EquipmentController::handleInput(int Char) {
     auto SelIdx = ItSel->getSelectedIdx();
     auto *ES = Equip.all().at(SelIdx);
     if (ES->It) {
-      Tooltip = std::make_shared<ItemTooltip>(Pos + TooltipOffset, TooltipSize,
-                                              *ES->It);
+      Ctrl.addWindow(std::make_shared<ItemTooltip>(Pos + TooltipOffset,
+                                                   TooltipSize, *ES->It));
     }
   } break;
   case Controls::Unequip.Char: {
@@ -88,11 +91,6 @@ void EquipmentController::draw(cxxg::Screen &Scr) const {
   updateSelectValues();
   BaseRect::draw(Scr);
   Dec->draw(Scr);
-  if (Tooltip) {
-    Tooltip->draw(Scr);
-    // FIXME we need a handler for focus change etc
-    Tooltip = nullptr;
-  }
 }
 
 namespace {

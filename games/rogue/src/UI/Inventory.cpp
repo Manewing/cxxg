@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <rogue/Components/Items.h>
 #include <rogue/Inventory.h>
+#include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/Inventory.h>
@@ -13,11 +14,13 @@ namespace rogue::ui {
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
-InventoryControllerBase::InventoryControllerBase(Inventory &Inv,
+InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
+                                                 Inventory &Inv,
                                                  entt::entity Entity,
                                                  entt::registry &Reg,
                                                  const std::string &Header)
-    : BaseRect({2, 2}, {30, 18}), Inv(Inv), Entity(Entity), Reg(Reg) {
+    : BaseRect({2, 2}, {30, 18}), Ctrl(Ctrl), Inv(Inv), Entity(Entity),
+      Reg(Reg) {
   List = std::make_shared<ListSelect>(Pos, Size);
   Decorated = std::make_shared<Frame>(List, Pos, Size, Header);
   updateElements();
@@ -32,8 +35,8 @@ bool InventoryControllerBase::handleInput(int Char) {
   switch (Char) {
   case Controls::Info.Char: {
     const auto &It = Inv.getItem(List->getSelectedElement());
-    Tooltip =
-        std::make_shared<ItemTooltip>(Pos + TooltipOffset, TooltipSize, It);
+    Ctrl.addWindow(
+        std::make_shared<ItemTooltip>(Pos + TooltipOffset, TooltipSize, It));
   } break;
   case 'i':
     return false;
@@ -47,12 +50,6 @@ void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
   updateElements();
   BaseRect::draw(Scr);
   Decorated->draw(Scr);
-
-  if (Tooltip) {
-    Tooltip->draw(Scr);
-    // FIXME we need a handler for focus change etc
-    Tooltip = nullptr;
-  }
 }
 
 void InventoryControllerBase::updateElements() const {
@@ -68,9 +65,10 @@ void InventoryControllerBase::updateElements() const {
   List->selectElement(PrevIdx);
 }
 
-InventoryController::InventoryController(Inventory &Inv, entt::entity Entity,
+InventoryController::InventoryController(Controller &Ctrl, Inventory &Inv,
+                                         entt::entity Entity,
                                          entt::registry &Reg)
-    : InventoryControllerBase(Inv, Entity, Reg, "Inventory") {}
+    : InventoryControllerBase(Ctrl, Inv, Entity, Reg, "Inventory") {}
 
 bool InventoryController::handleInput(int Char) {
   if (Inv.empty()) {
@@ -138,9 +136,9 @@ std::string InventoryController::getInteractMsg() const {
   return KeyOption::getInteractMsg(Options);
 }
 
-LootController::LootController(Inventory &Inv, entt::entity Entity,
-                               entt::registry &Reg)
-    : InventoryControllerBase(Inv, Entity, Reg, "Loot") {}
+LootController::LootController(Controller &Ctrl, Inventory &Inv,
+                               entt::entity Entity, entt::registry &Reg)
+    : InventoryControllerBase(Ctrl, Inv, Entity, Reg, "Loot") {}
 
 bool LootController::handleInput(int Char) {
   switch (Char) {
