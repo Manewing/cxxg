@@ -16,13 +16,14 @@
 
 namespace rogue {
 struct Interaction;
+struct GameConfig;
 }
 
 namespace rogue {
 
 class Game : public cxxg::Game {
 public:
-  Game(cxxg::Screen &Scr);
+  Game(cxxg::Screen &Scr, const GameConfig &Cfg);
   virtual ~Game() = default;
 
   void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0) final;
@@ -51,6 +52,7 @@ private:
   Interaction *getAvailableInteraction();
 
 public: // FIXME
+  const GameConfig &Cfg;
   EventHub EvHub;
   History Hist;
   EventHistoryWriter EHW;

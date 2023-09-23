@@ -1,0 +1,71 @@
+{
+  "$id": "https://rogue-todo.com/item-db-schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Schema the item database",
+  "type": "object",
+  "required": ["item_prototypes", "item_effects"],
+  "properties": {
+    "item_prototypes": {
+      "type": "array",
+      "description": "A list of item prototypes",
+      "items": {
+        "description": "An item prototype",
+        "type": "object",
+        "required": ["name", "description", "types", "capabilities"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the item"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the item"
+          },
+          "max_stack_size": {
+            "type": "integer",
+            "description": "The maximum number of this item that can be stacked in a single inventory slot"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "The type of the item",
+              "enum": [
+                "ring",
+                "amulet",
+                "helmet",
+                "chest_plate",
+                "pants",
+                "boots",
+                "weapon",
+                "offhand",
+                "generic",
+                "consumable",
+                "quest",
+                "crafting"
+              ]
+            }
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "effect"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "The type of the capability",
+                  "enum": ["use_on", "equip_on", "unequip_from", "equipment"]
+                },
+                "effect": {
+                  "type": "string",
+                  "description": "The effect of the capability"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

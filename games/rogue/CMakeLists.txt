@@ -22,6 +22,7 @@ set(HEADER_FILES
   include/rogue/Inventory.h
   include/rogue/Item.h
   include/rogue/ItemDatabase.h
+  include/rogue/JSON.h
   include/rogue/Level.h
   include/rogue/LevelGenerator.h
   include/rogue/NPCEntity.h
@@ -35,6 +36,7 @@ set(HEADER_FILES
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
   include/rogue/UI/Controller.h
+  include/rogue/UI/Controls.h
   include/rogue/UI/Decorator.h
   include/rogue/UI/Equipment.h
   include/rogue/UI/Frame.h
@@ -43,7 +45,9 @@ set(HEADER_FILES
   include/rogue/UI/ItemSelect.h
   include/rogue/UI/ListSelect.h
   include/rogue/UI/SelectBox.h
+  include/rogue/UI/Stats.h
   include/rogue/UI/TextBox.h
+  include/rogue/UI/Tooltip.h
   include/rogue/UI/Widget.h
   include/rogue/UI/WindowContainer.h
   include/rogue/UI/WordWrap.h
@@ -56,10 +60,12 @@ set(SOURCE_FILES
   src/Components/Stats.cpp
   src/Entity.cpp
   src/Game.cpp
+  src/GameConfig.cpp
   src/History.cpp
   src/Inventory.cpp
   src/Item.cpp
   src/ItemDatabase.cpp
+  src/JSON.cpp
   src/Level.cpp
   src/LevelGenerator.cpp
   src/NPCEntity.cpp
@@ -104,11 +110,19 @@ target_include_directories(lib${TARGET} PUBLIC include)
 
 ## YMIR
 find_library(LIBYMIR NAMES ymir HINTS "${YMIR_INSTALL}/lib")
-target_include_directories(lib${TARGET} PUBLIC ${YMIR_INSTALL}/include)
 ##
 
 target_link_libraries(lib${TARGET}
   cxxg ${LIBYMIR} EnTT::EnTT
+)
+
+target_include_directories(lib${TARGET}
+  PUBLIC
+    ${YMIR_INSTALL}/include
+)
+target_include_directories(lib${TARGET} SYSTEM
+  PUBLIC
+    ../../third-party/rapidjson/include
 )
 
 target_link_libraries(${TARGET}

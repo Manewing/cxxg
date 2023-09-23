@@ -40,12 +40,13 @@ void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
 
 LevelGenerator::LevelGenerator(GameContext *Ctx) : Ctx(Ctx) {}
 
-std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed,
-                                                     int LevelId) {
+std::shared_ptr<Level>
+LevelGenerator::generateLevel(unsigned Seed, int LevelId,
+                              const std::filesystem::path &LevelConfig) {
   using namespace cxxg::types;
 
   // Load level configuration file
-  auto Cfg = loadConfigurationFile("level.cfg");
+  auto Cfg = loadConfigurationFile(LevelConfig);
   Cfg["dungeon/seed"] = Seed;
 
   // Create new builder pass and register builders at it

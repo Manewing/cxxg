@@ -41,7 +41,7 @@ ItemPrototype::ItemPrototype(int ItemId, std::string N, std::string D,
                              ItemType Type, int MaxStatckSize,
                              std::vector<EffectInfo> Eff)
     : ItemId(ItemId), Name(std::move(N)), Description(std::move(D)), Type(Type),
-      MaxStatckSize(MaxStatckSize), Effects(std::move(Eff)) {}
+      MaxStackSize(MaxStatckSize), Effects(std::move(Eff)) {}
 
 bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
                                CapabilityFlags Flags) const {

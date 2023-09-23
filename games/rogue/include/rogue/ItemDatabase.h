@@ -1,6 +1,7 @@
 #ifndef ROGUE_ITEM_DATABASE_H
 #define ROGUE_ITEM_DATABASE_H
 
+#include <filesystem>
 #include <map>
 #include <rogue/Item.h>
 
@@ -8,9 +9,13 @@ namespace rogue {
 
 class ItemDatabase {
 public:
-  ItemDatabase();
+  static ItemType getItemType(const std::string &ItemTypeStr);
+  static CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr);
 
-  void addItemProto(int ItemId, const ItemPrototype &ItemProto);
+  static ItemDatabase load(const std::filesystem::path &ItemDbConfig);
+
+public:
+  void addItemProto(const ItemPrototype &ItemProto);
 
   Item createItem(int ItemId, int StackSize = 1) const;
 

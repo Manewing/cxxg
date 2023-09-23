@@ -23,7 +23,9 @@ public:
   };
   explicit LevelGenerator(GameContext *Ctx = nullptr);
 
-  std::shared_ptr<Level> generateLevel(unsigned Seed, int LevelId);
+  std::shared_ptr<Level>
+  generateLevel(unsigned Seed, int LevelId,
+                const std::filesystem::path &LevelConfig);
   std::shared_ptr<Level> loadLevel(const std::filesystem::path &LevelFile,
                                    const std::vector<std::string> &Layers,
                                    const std::map<char, CharInfo> &CharInfoMap,

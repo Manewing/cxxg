@@ -1,0 +1,111 @@
+{
+  "item_effects": {
+    "health_effect_10": {
+      "type": "health_item_effect",
+      "health_value": 10
+    },
+    "damage_effect_10": {
+      "type": "damage_item_effect",
+      "damage_value": 10
+    },
+    "poison_effect_10": {
+      "type": "poison_debuff_comp",
+      "reduce_amount": 0.5,
+      "ticks": 10
+    },
+    "health_regen_effect_10": {
+      "type": "health_regen_buff_comp",
+      "regen_amount": 0.7,
+      "ticks": 10
+    },
+    "bleeding_debuff_effect_10": {
+      "type": "bleeding_debuff_comp",
+      "reduce_amount": 0.5,
+      "ticks": 10
+    },
+    "stats_buff_effect": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 10,
+        "dex": 1,
+        "int": 1,
+        "vit": 5
+      }
+    },
+    "stats_buff_effect_str_1": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 1
+      }
+    }
+  },
+  "item_prototypes": [
+    {
+      "name": "Blueberry",
+      "description": "A blue berry that can be eaten",
+      "max_stack_size": 99,
+      "types": ["consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "health_effect_10"
+        }
+      ]
+    },
+    {
+      "name": "Poison Berry",
+      "description": "A berry, better not to eat it. It looks poisonous",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "damage_effect_10"
+        },
+        {
+          "type": "use_on",
+          "effect": "poison_effect_10"
+        }
+      ]
+    },
+    {
+      "name": "Wooden Log",
+      "description": "A log of wood",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Stone",
+      "description": "A stone better not to drop it on your foot",
+      "max_stack_size": 99,
+      "types": ["crafting", "weapon", "consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "damage_effect_10"
+        },
+        {
+          "type": "use_on",
+          "effect": "bleeding_debuff_effect_10"
+        },
+        {
+          "type": "equipment",
+          "effect": "stats_buff_effect_str_1"
+        }
+      ]
+    },
+    {
+      "name": "Small Sword",
+      "description": "A small sword",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "stats_buff_effect"
+        }
+      ]
+    }
+  ]
+}

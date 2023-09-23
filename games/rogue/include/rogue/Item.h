@@ -146,7 +146,7 @@ public:
 
 public:
   ItemPrototype(int ItemId, std::string Name, std::string Description,
-                ItemType Type, int MaxStatckSize,
+                ItemType Type, int MaxStackSize,
                 std::vector<EffectInfo> Effects);
 
   // TODO add:
@@ -169,7 +169,7 @@ public:
   std::string Name;
   std::string Description;
   ItemType Type = ItemType::None;
-  int MaxStatckSize = 1;
+  int MaxStackSize = 1;
 
   std::vector<EffectInfo> Effects;
 };

@@ -9,6 +9,7 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Game.h>
+#include <rogue/GameConfig.h>
 #include <rogue/Renderer.h>
 
 namespace rogue {
@@ -23,8 +24,9 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
   return Scr;
 }
 
-Game::Game(cxxg::Screen &Scr)
-    : cxxg::Game(Scr), Hist(*this), EHW(Hist), ItemDb(), Ctx({*this, ItemDb}),
+Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
+    : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
+      ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)), Ctx({*this, ItemDb}),
       LevelGen(&Ctx), CurrentLevel(nullptr), UICtrl(Scr) {}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
@@ -56,7 +58,7 @@ void Game::switchLevel(int Level, bool ToEntry) {
 
   if (Level >= static_cast<int>(Levels.size())) {
     assert((Level - 1) < static_cast<int>(Levels.size()));
-    Levels.push_back(LevelGen.generateLevel(Level, Level));
+    Levels.push_back(LevelGen.generateLevel(Level, Level, Cfg.LevelConfig));
     Levels.back()->setEventHub(&EvHub);
   }
 
