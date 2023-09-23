@@ -27,7 +27,6 @@ namespace {
 
 std::string getEffectDescription(const EffectInfo &EffInfo) {
   std::stringstream SS;
-  SS << getCapabilityFlagLabel(EffInfo.Flags) << ": ";
   if (const auto *HIE = dynamic_cast<HealItemEffect *>(EffInfo.Effect.get())) {
     SS << "Heals " << HIE->getAmount() << " HP\n";
   }
@@ -43,19 +42,37 @@ std::string getEffectDescription(const EffectInfo &EffInfo) {
   return SS.str();
 }
 
-std::string getItemEffectDescription(const Item &It) {
+std::string getCapabilityDescription(const std::vector<EffectInfo> &AllEffects,
+                                     CapabilityFlags Flag) {
   std::stringstream SS;
-  for (const auto &EffInfo : It.getAllEffects()) {
+  SS << getCapabilityFlagLabel(Flag) << ":\n";
+  bool HasAny = false;
+  for (const auto &EffInfo : AllEffects) {
+    if ((EffInfo.Flags & Flag) == CapabilityFlags::None) {
+      continue;
+    }
+    HasAny = true;
     SS << getEffectDescription(EffInfo);
   }
+  if (!HasAny) {
+    return "";
+  }
+  SS << "\n";
+  return SS.str();
+}
+
+std::string getItemEffectDescription(const Item &It) {
+  std::stringstream SS;
+  const auto AllEffects = It.getAllEffects();
+  SS << getCapabilityDescription(AllEffects, CapabilityFlags::UseOn)
+     << getCapabilityDescription(AllEffects, CapabilityFlags::Equipment);
   return SS.str();
 }
 
 std::string getItemText(const Item &It) {
   std::stringstream SS;
-  SS << "Type: " << getItemTypeLabel(It.getType()) << "\n"
-     << getItemEffectDescription(It) << "\n"
-     << "---\n"
+  SS << "Type: " << getItemTypeLabel(It.getType()) << "\n---\n"
+     << getItemEffectDescription(It) << "---\n"
      << It.getDescription();
   return SS.str();
 }
