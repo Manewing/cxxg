@@ -19,6 +19,9 @@ public:
 
   Item createItem(int ItemId, int StackSize = 1) const;
 
+  int getRandomItemId() const;
+
+private:
   std::map<int, ItemPrototype> ItemProtos;
 };
 

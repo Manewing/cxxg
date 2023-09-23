@@ -4,7 +4,6 @@
 #include <rogue/ItemDatabase.h>
 #include <rogue/JSON.h>
 
-
 namespace rogue {
 
 template <typename BuffType, typename... RequiredComps>
@@ -69,17 +68,26 @@ static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
   return Factory(V);
 }
 
-ItemType ItemDatabase::getItemType(const std::string &ItemType) {
-  if (ItemType == "consumable") {
-    return ItemType::Consumable;
+ItemType ItemDatabase::getItemType(const std::string &Type) {
+  static const std::map<std::string, ItemType> ItemTypes = {
+      {"none", ItemType::None}, // Keep top
+      {"ring", ItemType::Ring}, //
+      {"amulet", ItemType::Amulet},
+      {"helmet", ItemType::Helmet},
+      {"chest_plate", ItemType::ChestPlate},
+      {"pants", ItemType::Pants},
+      {"boots", ItemType::Boots},
+      {"weapon", ItemType::Weapon},
+      {"off_hand", ItemType::OffHand},
+      {"generic", ItemType::Generic},
+      {"consumable", ItemType::Consumable},
+      {"quest", ItemType::Quest},
+      {"crafting", ItemType::Crafting},
+  };
+  if (const auto It = ItemTypes.find(Type); It != ItemTypes.end()) {
+    return It->second;
   }
-  if (ItemType == "weapon") {
-    return ItemType::Weapon;
-  }
-  if (ItemType == "crafting") {
-    return ItemType::Crafting;
-  }
-  throw std::runtime_error("Unknown item type: " + std::string(ItemType));
+  throw std::runtime_error("Unknown item type: " + std::string(Type));
   return ItemType::None;
 }
 
@@ -156,6 +164,12 @@ Item ItemDatabase::createItem(int ItemId, int StackSize) const {
     throw std::out_of_range("Unknown item id: " + std::to_string(ItemId));
   }
   return Item(It->second, StackSize);
+}
+
+int ItemDatabase::getRandomItemId() const {
+  const auto Idx = rand() % ItemProtos.size();
+  const auto It = std::next(ItemProtos.begin(), Idx);
+  return It->first;
 }
 
 } // namespace rogue

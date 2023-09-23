@@ -117,6 +117,8 @@ ItemType Item::getType() const {
   return getProto().Type;
 }
 
+int Item::getMaxStackSize() const { return getProto().MaxStackSize; }
+
 bool Item::isSameKind(const Item &Other) const {
   return Proto == Other.Proto && Specialization == Other.Specialization;
 }

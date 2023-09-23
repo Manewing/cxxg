@@ -106,6 +106,18 @@
           "effect": "stats_buff_effect"
         }
       ]
+    },
+    {
+      "name": "Leather Tunic",
+      "description": "A worn down leather tunic",
+      "max_stack_size": 1,
+      "types": ["chest_plate"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "stats_buff_effect"
+        }
+      ]
     }
   ]
 }

@@ -55,11 +55,12 @@ void generateRandomLoot(Inventory &Inv, ItemDatabase &ItemDb) {
   //  common items based on entity level
 
   // DEBUG ==>
-  Inv.addItem(ItemDb.createItem(0, 20));
-  Inv.addItem(ItemDb.createItem(1, 15));
-  Inv.addItem(ItemDb.createItem(2, 10));
-  Inv.addItem(ItemDb.createItem(3, 2));
-  Inv.addItem(ItemDb.createItem(4, 1));
+  unsigned NumItems =  rand() % 5 + 1;
+  for (unsigned I = 0; I < NumItems; ++I) {
+    auto It = ItemDb.createItem(ItemDb.getRandomItemId());
+    It.StackSize = rand() % (It.getMaxStackSize() / 2 + 1) + 1;
+    Inv.addItem(It);
+  }
   // <== DEBUG
 }
 

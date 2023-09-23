@@ -182,8 +182,8 @@ public:
 
   std::string getName() const;
   std::string getDescription() const;
-
   ItemType getType() const;
+  int getMaxStackSize() const;
 
   /// Returns true if other Item has same prototype and specialization
   bool isSameKind(const Item &Other) const;
@@ -197,11 +197,11 @@ public:
   void removeFrom(const entt::entity &Entity, entt::registry &Reg,
                   CapabilityFlags Flags) const;
 
-public:
-  int StackSize = 1;
-
 private:
   const ItemPrototype &getProto() const;
+
+public:
+  int StackSize = 1;
 
 private:
   const ItemPrototype *Proto = nullptr;
