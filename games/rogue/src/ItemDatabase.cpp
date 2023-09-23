@@ -101,41 +101,6 @@ createSpecialization(const rapidjson::Value &V) {
   return It->second(V);
 }
 
-ItemType ItemDatabase::getItemType(const std::string &Type) {
-  static const std::map<std::string, ItemType> ItemTypes = {
-      {"none", ItemType::None}, // Keep top
-      {"ring", ItemType::Ring}, //
-      {"amulet", ItemType::Amulet},
-      {"helmet", ItemType::Helmet},
-      {"chest_plate", ItemType::ChestPlate},
-      {"pants", ItemType::Pants},
-      {"boots", ItemType::Boots},
-      {"weapon", ItemType::Weapon},
-      {"off_hand", ItemType::OffHand},
-      {"generic", ItemType::Generic},
-      {"consumable", ItemType::Consumable},
-      {"quest", ItemType::Quest},
-      {"crafting", ItemType::Crafting},
-  };
-  if (const auto It = ItemTypes.find(Type); It != ItemTypes.end()) {
-    return It->second;
-  }
-  throw std::runtime_error("Unknown item type: " + std::string(Type));
-  return ItemType::None;
-}
-
-CapabilityFlags
-ItemDatabase::getCapabilityFlag(const std::string &CapabilityFlagStr) {
-  if (CapabilityFlagStr == "use_on") {
-    return CapabilityFlags::UseOn;
-  }
-  if (CapabilityFlagStr == "equipment") {
-    return CapabilityFlags::Equipment;
-  }
-  throw std::runtime_error("Unknown capability: " + CapabilityFlagStr);
-  return CapabilityFlags::None;
-}
-
 ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   ItemDatabase DB;
 

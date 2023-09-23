@@ -12,34 +12,6 @@ namespace rogue::ui {
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
-namespace {
-
-const char *getItemTypeLabel(ItemType It) {
-  switch (It & ItemType::EquipmentMask) {
-  case ItemType::Amulet:
-    return "Amulet";
-  case ItemType::ChestPlate:
-    return "Chest Plate";
-  case ItemType::Boots:
-    return "Boots";
-  case ItemType::Ring:
-    return "Ring";
-  case ItemType::Helmet:
-    return "Helmet";
-  case ItemType::Pants:
-    return "Pants";
-  case ItemType::Weapon:
-    return "Weapon";
-  case ItemType::OffHand:
-    return "Off Hand";
-  default:
-    break;
-  }
-  return "<unimp. ItemType>";
-}
-
-} // namespace
-
 EquipmentController::EquipmentController(Equipment &Equip, entt::entity Entity,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)

@@ -9,10 +9,6 @@ namespace rogue {
 
 class ItemDatabase {
 public:
-  static ItemType getItemType(const std::string &ItemTypeStr);
-  static CapabilityFlags
-  getCapabilityFlag(const std::string &CapabilityFlagStr);
-
   static ItemDatabase load(const std::filesystem::path &ItemDbConfig);
 
 public:

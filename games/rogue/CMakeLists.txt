@@ -21,6 +21,7 @@ set(HEADER_FILES
   include/rogue/History.h
   include/rogue/Inventory.h
   include/rogue/Item.h
+  include/rogue/ItemType.h
   include/rogue/ItemDatabase.h
   include/rogue/JSON.h
   include/rogue/Level.h
@@ -64,6 +65,7 @@ set(SOURCE_FILES
   src/History.cpp
   src/Inventory.cpp
   src/Item.cpp
+  src/ItemType.cpp
   src/ItemDatabase.cpp
   src/JSON.cpp
   src/Level.cpp
