@@ -1,10 +1,11 @@
 #include <cxxg/Utils.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Item.h>
-#include <rogue/UI/Controls.h>
 #include <rogue/UI/Controller.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/Frame.h>
+#include <rogue/UI/Inventory.h>
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/Tooltip.h>
 
@@ -102,18 +103,29 @@ std::string getSelectValue(const EquipmentSlot &ES) {
   return "---";
 }
 
+cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
+  if (ES.It) {
+    return InventoryControllerBase::getColorForItemType(ES.It->getType());
+  }
+  return cxxg::types::Color::NONE;
+}
+
 } // namespace
 
 void EquipmentController::addSelect(const EquipmentSlot &ES,
                                     cxxg::types::Position Pos) {
+  constexpr const auto NoColor = cxxg::types::Color::NONE;
   ItSel->addSelect<LabeledSelect>(getItemTypeLabel(ES.BaseTypeFilter),
-                                  getSelectValue(ES), Pos, 25);
+                                  getSelectValue(ES), Pos, 25, NoColor,
+                                  getSelectColor(ES));
 }
 
 void EquipmentController::updateSelectValues() const {
   std::size_t Count = 0;
   for (const auto *ES : Equip.all()) {
-    ItSel->getSelect(Count++).setValue(getSelectValue(*ES));
+    auto &Sel = ItSel->getSelect(Count++);
+    Sel.setValue(getSelectValue(*ES));
+    Sel.setValueColor(getSelectColor(*ES));
   }
 }
 

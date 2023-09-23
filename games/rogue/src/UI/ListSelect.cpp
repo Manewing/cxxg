@@ -4,7 +4,7 @@
 
 namespace rogue::ui {
 
-void ListSelect::setElements(const std::vector<std::string> &Elements) {
+void ListSelect::setElements(const std::vector<Element> &Elements) {
   this->Elements = Elements;
   SelectedElemIdx = 0;
 }
@@ -60,14 +60,14 @@ void ListSelect::draw(cxxg::Screen &Scr) const {
   }
 }
 
-void ListSelect::drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
+void ListSelect::drawFrameElement(cxxg::Screen &Scr,  const Element &Elem,
                                   cxxg::types::Position Pos, unsigned Width,
                                   bool IsSelected) {
   if (IsSelected) {
     Scr[Pos.Y][Pos.X + 1] << ">";
   }
   (void)Width;
-  Scr[Pos.Y][Pos.X + 2] << Element;
+  Scr[Pos.Y][Pos.X + 2] << Elem.Color << Elem.Text << cxxg::types::Color::NONE;
 }
 
 } // namespace rogue::ui

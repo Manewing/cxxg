@@ -10,14 +10,20 @@ namespace rogue::ui {
 
 class ListSelect : public BaseRect {
 public:
-  static void drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
+  struct Element {
+    std::string Text;
+    cxxg::types::TermColor Color = cxxg::types::Color::NONE;
+  };
+
+public:
+  static void drawFrameElement(cxxg::Screen &Scr, const Element &Elem,
                                cxxg::types::Position Pos, unsigned Width,
                                bool IsSelected);
 
 public:
   using BaseRect::BaseRect;
 
-  void setElements(const std::vector<std::string> &Elements);
+  void setElements(const std::vector<Element> &Elements);
   void selectElement(std::size_t ElemIdx);
   std::size_t getSelectedElement() const;
   void selectNext();
@@ -29,7 +35,7 @@ public:
 
 private:
   std::size_t SelectedElemIdx = 0;
-  std::vector<std::string> Elements;
+  std::vector<Element> Elements;
 };
 
 } // namespace rogue::ui

@@ -7,15 +7,22 @@ namespace rogue::ui {
 namespace {
 static constexpr cxxg::types::RgbColor HighlightColor{255, 255, 255, true,
                                                       100, 100, 100};
-static constexpr auto NoColor = cxxg::types::Color::NONE;
 } // namespace
 
-Select::Select(std::string Value, cxxg::types::Position Pos, unsigned Width)
-    : BaseRect(Pos, {Width, 1}), Value(std::move(Value)) {}
+Select::Select(std::string Value, cxxg::types::Position Pos, unsigned Width,
+               cxxg::types::TermColor ValueColor)
+    : BaseRect(Pos, {Width, 1}), Value(std::move(Value)),
+      ValueColor(ValueColor) {}
 
 void Select::setValue(std::string NewValue) { Value = std::move(NewValue); }
 
 const std::string &Select::getValue() const { return Value; }
+
+const cxxg::types::TermColor &Select::getValueColor() const {
+  return ValueColor;
+}
+
+void Select::setValueColor(cxxg::types::TermColor VC) { ValueColor = VC; }
 
 void Select::unselect() { IsSelected = false; }
 
@@ -35,13 +42,16 @@ void Select::draw(cxxg::Screen &Scr) const {
   if (IsSelected) {
     Scr[Pos.Y][Pos.X] << HighlightColor << Value;
   } else {
-    Scr[Pos.Y][Pos.X] << Value;
+    Scr[Pos.Y][Pos.X] << ValueColor << Value;
   }
 }
 
 LabeledSelect::LabeledSelect(std::string Label, std::string Value,
-                             cxxg::types::Position Pos, unsigned Width)
-    : Select(std::move(Value), Pos, Width), Label(std::move(Label)) {}
+                             cxxg::types::Position Pos, unsigned Width,
+                             cxxg::types::TermColor ValueColor,
+                             cxxg::types::TermColor LabelColor)
+    : Select(std::move(Value), Pos, Width, ValueColor), Label(std::move(Label)),
+      LabelColor(LabelColor) {}
 
 const std::string &LabeledSelect::getLabel() const { return Label; }
 
@@ -50,10 +60,10 @@ std::string LabeledSelect::getInteractMsg() const { return ""; }
 void LabeledSelect::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
   if (IsSelected) {
-    Scr[Pos.Y][Pos.X] << HighlightColor << Label << ":" << NoColor << " "
-                      << Value;
+    Scr[Pos.Y][Pos.X] << HighlightColor << Label << ":"
+                      << " " << ValueColor << Value;
   } else {
-    Scr[Pos.Y][Pos.X] << Label << ": " << Value;
+    Scr[Pos.Y][Pos.X] << LabelColor << Label << ": " << ValueColor << Value;
   }
 }
 

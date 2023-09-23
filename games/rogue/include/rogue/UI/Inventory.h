@@ -2,6 +2,7 @@
 #define ROGUE_UI_INVENTORY_H
 
 #include <entt/entt.hpp>
+#include <rogue/ItemType.h>
 #include <rogue/UI/Widget.h>
 #include <string_view>
 
@@ -17,6 +18,9 @@ class Controller;
 namespace rogue::ui {
 
 class InventoryControllerBase : public BaseRect {
+public:
+  static cxxg::types::TermColor getColorForItemType(ItemType Type);
+
 public:
   /// @brief Creates a new inventory UI controller
   /// @param Ctrl The parent UI controller

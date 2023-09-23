@@ -11,10 +11,14 @@ namespace rogue::ui {
 
 class Select : public BaseRect {
 public:
-  Select(std::string Value, cxxg::types::Position Pos, unsigned Width);
+  Select(std::string Value, cxxg::types::Position Pos, unsigned Width,
+         cxxg::types::TermColor ValueColor = cxxg::types::Color::NONE);
 
   void setValue(std::string NewValue);
   const std::string &getValue() const;
+
+  const cxxg::types::TermColor &getValueColor() const;
+  void setValueColor(cxxg::types::TermColor ValueColor);
 
   void unselect();
   void select();
@@ -27,19 +31,24 @@ public:
 protected:
   bool IsSelected = false;
   std::string Value;
+  cxxg::types::TermColor ValueColor = cxxg::types::Color::NONE;
 };
 
 class LabeledSelect : public Select {
 public:
   LabeledSelect(std::string Label, std::string Value, cxxg::types::Position Pos,
-                unsigned Width);
+                unsigned Width,
+                cxxg::types::TermColor ValueColor = cxxg::types::Color::NONE,
+                cxxg::types::TermColor LabelColor = cxxg::types::Color::NONE);
 
   const std::string &getLabel() const;
+  const cxxg::types::TermColor &getLabelColor() const;
   std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
 private:
   std::string Label;
+  cxxg::types::TermColor LabelColor = cxxg::types::Color::NONE;
 };
 
 class ItemSelect : public Widget {

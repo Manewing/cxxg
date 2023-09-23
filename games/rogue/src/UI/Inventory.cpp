@@ -1,3 +1,4 @@
+#include <cxxg/Types.h>
 #include <cxxg/Utils.h>
 #include <iomanip>
 #include <rogue/Components/Items.h>
@@ -13,6 +14,22 @@ namespace rogue::ui {
 
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
+
+cxxg::types::TermColor InventoryControllerBase::getColorForItemType(ItemType Type) {
+  if ((Type & ItemType::Quest) != ItemType::None) {
+    return cxxg::types::RgbColor{195, 196, 90};
+  }
+  if ((Type & ItemType::EquipmentMask) != ItemType::None) {
+    return cxxg::types::RgbColor{227, 175, 91};
+  }
+  if ((Type & ItemType::Consumable) != ItemType::None) {
+    return cxxg::types::RgbColor{112, 124, 219};
+  }
+  if ((Type & ItemType::Crafting) != ItemType::None) {
+    return cxxg::types::RgbColor{182, 186, 214};
+  }
+  return cxxg::types::Color::NONE;
+}
 
 InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  Inventory &Inv,
@@ -52,13 +69,18 @@ void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
   Decorated->draw(Scr);
 }
 
+
 void InventoryControllerBase::updateElements() const {
-  std::vector<std::string> Elements;
+  std::vector<ListSelect::Element> Elements;
   Elements.reserve(Inv.getItems().size());
   for (const auto &Item : Inv.getItems()) {
     std::stringstream SS;
-    SS << std::setw(3) << Item.StackSize << "x " << Item.getName();
-    Elements.push_back(SS.str());
+    if (Item.getMaxStackSize() == 1) {
+      SS << "     " << Item.getName();
+    } else {
+      SS << std::setw(3) << Item.StackSize << "x " << Item.getName();
+    }
+    Elements.push_back({SS.str(), getColorForItemType(Item.getType())});
   }
   auto PrevIdx = List->getSelectedElement();
   List->setElements(Elements);
