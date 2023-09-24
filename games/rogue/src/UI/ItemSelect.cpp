@@ -7,6 +7,7 @@ namespace rogue::ui {
 namespace {
 static constexpr cxxg::types::RgbColor HighlightColor{255, 255, 255, true,
                                                       100, 100, 100};
+static constexpr auto NoColor = cxxg::types::Color::NONE;
 } // namespace
 
 Select::Select(std::string Value, cxxg::types::Position Pos, unsigned Width,
@@ -40,9 +41,9 @@ std::string Select::getInteractMsg() const { return ""; }
 void Select::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
   if (IsSelected) {
-    Scr[Pos.Y][Pos.X] << HighlightColor << Value;
+    Scr[Pos.Y][Pos.X] << HighlightColor << Value << NoColor;
   } else {
-    Scr[Pos.Y][Pos.X] << ValueColor << Value;
+    Scr[Pos.Y][Pos.X] << ValueColor << Value << NoColor;
   }
 }
 
@@ -61,9 +62,9 @@ void LabeledSelect::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
   if (IsSelected) {
     Scr[Pos.Y][Pos.X] << HighlightColor << Label << ":"
-                      << " " << ValueColor << Value;
+                      << " " << ValueColor << Value << NoColor;
   } else {
-    Scr[Pos.Y][Pos.X] << LabelColor << Label << ": " << ValueColor << Value;
+    Scr[Pos.Y][Pos.X] << LabelColor << Label << ": " << ValueColor << Value << NoColor;
   }
 }
 
