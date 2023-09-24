@@ -93,19 +93,18 @@ struct MeleeAttackComp {
   StatValue Damage = 10;
   StatValue APCost = 5;
 
-  StatValue getEffectiveDamage(StatPoints Stats) const {
-    return (Damage + Stats.Str) * (100.0 + Stats.Str) / 100.0;
+  StatValue getEffectiveDamage(StatPoints SrcStats) const {
+    auto Str = StatValue(SrcStats.Str);
+    return (Damage + Str) * (100.0 + Str) / 100.0;
   }
 
-  StatValue getEffectiveDamage(StatsComp *SC) const {
-    if (!SC) {
+  StatValue getEffectiveDamage(StatsComp *SrcSC) const {
+    if (!SrcSC) {
       return Damage;
     }
-    return getEffectiveDamage(SC->effective());
+    return getEffectiveDamage(SrcSC->effective());
   }
 };
-
-// TODO ArmorComp
 
 } // namespace rogue
 

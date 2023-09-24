@@ -1,4 +1,5 @@
 #include <rogue/Components/AI.h>
+#include <rogue/Components/Buffs.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
@@ -29,13 +30,19 @@ void AttackAISystem::update() {
           return;
         }
 
-        THealth.reduce(MA.Damage);
+        auto *SC = Reg.try_get<StatsComp>(Entity);
+        unsigned Damage = MA.getEffectiveDamage(SC);
+        if (auto *ABC = Reg.try_get<ArmorBuffComp>(TEntity)) {
+          Damage =
+              ABC->getEffectiveDamage(Damage, Reg.try_get<StatsComp>(TEntity));
+        }
+        THealth.reduce(Damage);
 
         // publish
         const auto Nm = Reg.try_get<NameComp>(Entity);
         const auto TNm = Reg.try_get<NameComp>(TEntity);
         if (Nm && TNm) {
-          publish(DebugMessageEvent() << Nm->Name << " dealt " << MA.Damage
+          publish(DebugMessageEvent() << Nm->Name << " dealt " << Damage
                                       << " melee damage to " << TNm->Name);
         }
       }

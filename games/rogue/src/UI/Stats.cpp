@@ -1,5 +1,6 @@
 #include <cxxg/Screen.h>
 #include <memory>
+#include <rogue/Components/Buffs.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
@@ -31,10 +32,7 @@ namespace rogue::ui {
 StatsController::StatsController(Controller &Ctrl, StatsComp &Stats,
                                  entt::entity Entity, entt::registry &Reg)
     : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Ctrl(Ctrl),
-      Stats(Stats) {
-  // FIXME can we drop this
-  (void)Entity;
-  (void)Reg;
+      Stats(Stats), Entity(Entity), Reg(Reg) {
   ItSel = std::make_shared<ItemSelect>(Pos);
 
   // Str, Dex, Int, Vit
@@ -83,6 +81,11 @@ void StatsController::draw(cxxg::Screen &Scr) const {
   ItSel->getSelect(3).setValue(getStatsStr(Stats.Base.Vit, Stats.Bonus.Vit));
 
   BaseRectDecorator::draw(Scr);
+
+  // Add armor info
+  if (const auto *ABC = Reg.try_get<ArmorBuffComp>(Entity)) {
+    Scr[Pos.Y + getSize().Y - 3][Pos.X + 2] << ABC->getDescription();
+  }
 
   // FIXME points to spend
   Scr[Pos.Y + getSize().Y - 2][Pos.X + 2] << "Available Points: 0000";

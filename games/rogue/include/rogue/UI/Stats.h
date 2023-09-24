@@ -24,6 +24,8 @@ public:
 protected:
   Controller &Ctrl;
   StatsComp &Stats;
+  entt::entity Entity;
+  entt::registry &Reg;
   std::shared_ptr<ItemSelect> ItSel;
 };
 

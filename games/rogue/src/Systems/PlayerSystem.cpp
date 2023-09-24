@@ -1,5 +1,6 @@
 #include <entt/entt.hpp>
 #include <rogue/Components/AI.h>
+#include <rogue/Components/Buffs.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
@@ -34,7 +35,9 @@ void PlayerSystem::update() {
 
       auto *SC = Reg.try_get<StatsComp>(PlayerEt);
       unsigned Damage = MA.getEffectiveDamage(SC);
-
+      if (auto *ABC = Reg.try_get<ArmorBuffComp>(Et)) {
+        Damage = ABC->getEffectiveDamage(Damage, Reg.try_get<StatsComp>(Et));
+      }
       THealth.reduce(Damage);
 
       // publish

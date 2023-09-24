@@ -32,10 +32,7 @@ void ItemSpecializations::addSpecialization(
 std::shared_ptr<ItemPrototype>
 ItemSpecializations::actualize(const ItemPrototype &Proto) const {
   std::vector<EffectInfo> AllEffects;
-  AllEffects.reserve(Proto.Effects.size() + Generators.size());
-  for (const auto &Info : Proto.Effects) {
-    AllEffects.push_back(Info);
-  }
+  AllEffects.reserve(Generators.size());
   for (const auto &Gen : Generators) {
     AllEffects.push_back({Gen.Flags, Gen.Specialization->createEffect()});
   }

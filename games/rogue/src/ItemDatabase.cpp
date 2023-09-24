@@ -62,7 +62,12 @@ static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
              Buff.Bonus = P;
              return makeApplyBuffItemEffect<StatsBuffComp, StatsComp>(Buff);
            }},
-      };
+          {"armor_buff_comp", [](const auto &V) {
+             ArmorBuffComp Armor;
+             Armor.BaseArmor = V["base_armor"].GetDouble();
+             Armor.MagicArmor = V["magic_armor"].GetDouble();
+             return makeApplyBuffItemEffect<ArmorBuffComp>(Armor);
+           }}};
 
   const auto EffectType = V["type"].GetString();
   const auto It = Factories.find(EffectType);

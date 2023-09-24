@@ -93,9 +93,27 @@ public:
   std::string getDescription() const override;
 };
 
+struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
+  StatValue BaseArmor = 0;
+  StatValue MagicArmor = 0;  // FIXME not yet used
+
+  std::string_view getName() const override;
+  std::string getDescription() const override;
+
+  void add(const ArmorBuffComp &Other);
+  bool remove(const ArmorBuffComp &Other);
+
+  // Vitality increases armor by 0.5% per point
+  StatValue getEffectiveArmor(StatPoints DstStats) const;
+
+  // Armor reduces damage by 1/x where x is armor * 0.5
+  StatValue getEffectiveDamage(StatValue Damage, StatsComp *DstSC) const;
+};
+
 using BuffTypeList =
     ComponentList<StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
-                  BleedingDebuffComp, HealthRegenBuffComp, ManaRegenBuffComp>;
+                  BleedingDebuffComp, HealthRegenBuffComp, ManaRegenBuffComp,
+                  ArmorBuffComp>;
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);

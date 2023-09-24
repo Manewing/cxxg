@@ -40,6 +40,11 @@
         "int": 0,
         "vit": 0
       }
+    },
+    "armor_5": {
+      "type": "armor_buff_comp",
+      "base_armor": 5,
+      "magic_armor": 0
     }
   },
   "item_specializations": {
@@ -143,7 +148,12 @@
       "types": [
         "chest_plate"
       ],
-      "capabilities": [],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_5"
+        }
+      ],
       "specializations": [
         {
           "type": "equipment",
@@ -158,7 +168,12 @@
       "types": [
         "boots"
       ],
-      "capabilities": [],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_5"
+        }
+      ],
       "specializations": [
         {
           "type": "equipment",
@@ -173,7 +188,12 @@
       "types": [
         "pants"
       ],
-      "capabilities": [],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_5"
+        }
+      ],
       "specializations": [
         {
           "type": "equipment",
@@ -188,7 +208,12 @@
       "types": [
         "helmet"
       ],
-      "capabilities": [],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_5"
+        }
+      ],
       "specializations": [
         {
           "type": "equipment",

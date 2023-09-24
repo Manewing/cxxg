@@ -1,5 +1,6 @@
 #include <rogue/Components/Buffs.h>
 #include <sstream>
+#include <string_view>
 
 namespace rogue {
 
@@ -119,6 +120,52 @@ std::string ManaRegenBuffComp::getDescription() const {
   SS << "Mana regeneration increased by " << RegenAmount << " for " << TicksLeft
      << " ticks";
   return SS.str();
+}
+
+std::string_view ArmorBuffComp::getName() const { return "Armor buff"; }
+
+std::string ArmorBuffComp::getDescription() const {
+  std::stringstream SS;
+  const char *Pred = "";
+  if (BaseArmor > 0) {
+    SS << Pred << "+ " << BaseArmor << " Armor";
+    Pred = ", ";
+  }
+  if (MagicArmor > 0) {
+    SS << Pred << "+ " << MagicArmor << " Magic Armor";
+    Pred = ", ";
+  }
+  auto Str = SS.str();
+  if (Str.empty()) {
+    return "Nothing";
+  }
+  return Str;
+}
+
+void ArmorBuffComp::add(const ArmorBuffComp &Other) {
+  AdditiveBuff::add();
+  BaseArmor += Other.BaseArmor;
+  MagicArmor += Other.MagicArmor;
+}
+
+bool ArmorBuffComp::remove(const ArmorBuffComp &Other) {
+  BaseArmor -= Other.BaseArmor;
+  MagicArmor -= Other.MagicArmor;
+  return AdditiveBuff::remove(Other);
+}
+
+StatValue ArmorBuffComp::getEffectiveArmor(StatPoints DstStats) const {
+  auto Vit = StatValue(DstStats.Vit);
+  return BaseArmor * (1000.0 + Vit * 5) / 1000.0;
+}
+
+StatValue ArmorBuffComp::getEffectiveDamage(StatValue Damage,
+                                            StatsComp *DstSC) const {
+  auto Armor = BaseArmor;
+  if (DstSC) {
+    Armor = getEffectiveArmor(DstSC->effective());
+  }
+  return Damage * 100.0 / (100.0 + Armor * 0.5);
 }
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
