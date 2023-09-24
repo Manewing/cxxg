@@ -46,7 +46,8 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
   std::string_view Header = "History";
 
   // Draw header
-  Frame::drawFrameHeader(Scr, {Pos.X, Pos.Y}, Header, Scr.getSize().X);
+  Frame::drawFrameHeader(Scr, {Pos.X, Pos.Y}, Header, Scr.getSize().X,
+                         cxxg::types::Color::NONE, cxxg::types::Color::NONE);
 
   const auto &Msgs = Hist.getMessages();
   for (unsigned int Idx = 0; Idx < NumHistoryRows; Idx++) {
@@ -81,7 +82,8 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
   std::string Footer = std::to_string(Start) + "-" + std::to_string(End);
 
   Frame::drawFrameHeader(Scr, {Pos.X, Pos.Y + NumHistoryRows + 1}, Footer,
-                         Scr.getSize().X);
+                         Scr.getSize().X, cxxg::types::Color::NONE,
+                         cxxg::types::Color::NONE);
 }
 
 } // namespace rogue::ui

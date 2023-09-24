@@ -1,6 +1,9 @@
 #include <cxxg/Screen.h>
 #include <optional>
+#include <rogue/UI/Frame.h>
+#include <rogue/UI/Widget.h>
 #include <rogue/UI/WindowContainer.h>
+#include <variant>
 #include <ymir/Types.hpp>
 
 namespace rogue::ui {
@@ -128,11 +131,51 @@ void WindowContainer::addWindow(std::shared_ptr<Widget> Window) {
   selectWindow(Windows.size() - 1);
 }
 
+namespace {
+
+Frame *getFrameFromWidget(Widget *W) {
+  if (auto *F = dynamic_cast<Frame *>(W)) {
+    return F;
+  }
+  while (auto *Next = dynamic_cast<Decorator *>(W)) {
+    W = Next->getComp().get();
+    if (auto *F = dynamic_cast<Frame *>(W)) {
+      return F;
+    }
+  }
+  return nullptr;
+}
+
+void changeWindowHighlight(Widget &W, bool Highlight) {
+  if (auto *F = getFrameFromWidget(&W)) {
+    if (Highlight) {
+      F->setFrameColor(cxxg::types::RgbColor{255, 255, 200}.bold());
+    } else {
+      F->setFrameColor(cxxg::types::Color::NONE);
+    }
+
+    if (const auto HC = F->getHeaderColor();
+        std::holds_alternative<cxxg::types::RgbColor>(HC)) {
+      F->setHeaderColor(std::get<cxxg::types::RgbColor>(HC).bold(Highlight));
+    }
+  }
+}
+
+} // namespace
+
 void WindowContainer::selectWindow(std::size_t Idx) {
+  if (FocusIdx < Windows.size()) {
+    changeWindowHighlight(*Windows.at(FocusIdx), false);
+  }
+
   PrevFocusIdx = FocusIdx;
   FocusIdx = Idx;
   if (FocusIdx >= Windows.size()) {
     FocusIdx = 0;
+  }
+
+  if (!Windows.empty()) {
+    changeWindowHighlight(*Windows.at(FocusIdx), true);
   }
 }
 
