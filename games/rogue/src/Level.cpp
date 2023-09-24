@@ -19,6 +19,7 @@ Level::Level(int LevelId, const std::vector<std::string> &Layers,
     : Map(Layers, Size), LevelId(LevelId), PlayerDijkstraMap(Size),
       PlayerSeenMap(Size) {
   Systems = {
+      std::make_shared<TimedStatsSystem>(Reg),
       std::make_shared<StatsSystem>(Reg),
       std::make_shared<AgilitySystem>(Reg),
       std::make_shared<RegenSystem>(Reg),

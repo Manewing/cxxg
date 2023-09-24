@@ -17,17 +17,6 @@ void updateStats(entt::registry &Reg) {
   // Apply static stats buff
   Reg.view<StatsComp, const StatsBuffComp>().each(
       [](auto &S, auto const &SB) { S.add(SB.Bonus); });
-
-  // Apply timed stats buff
-  Reg.view<StatsComp, StatsTimedBuffComp>().each(
-      [&Reg](auto Entity, auto &S, auto &STB) {
-        // Post decrement to match count
-        if (STB.TicksLeft-- == 0) {
-          Reg.erase<StatsBuffComp>(Entity);
-          return;
-        }
-        S.add(STB.Bonus);
-      });
 }
 
 void applyStatEffects(entt::registry &Reg) {
@@ -50,11 +39,28 @@ void applyStatEffects(entt::registry &Reg) {
   });
 }
 
+void updateTimedStats(entt::registry &Reg) {
+  // Apply timed stats buff
+  Reg.view<StatsComp, StatsTimedBuffComp>().each(
+      [&Reg](auto Entity, auto &S, auto &STB) {
+        // Post decrement to match count
+        if (STB.TicksLeft-- == 0) {
+          Reg.erase<StatsBuffComp>(Entity);
+          return;
+        }
+        S.add(STB.Bonus);
+      });
+}
+
 } // namespace
 
 void StatsSystem::update() {
   updateStats(Reg);
   applyStatEffects(Reg);
+}
+
+void TimedStatsSystem::update() {
+  updateTimedStats(Reg);
 }
 
 } // namespace rogue
