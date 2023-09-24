@@ -15,7 +15,8 @@ namespace rogue::ui {
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
-cxxg::types::TermColor InventoryControllerBase::getColorForItemType(ItemType Type) {
+cxxg::types::TermColor
+InventoryControllerBase::getColorForItemType(ItemType Type) {
   if ((Type & ItemType::Quest) != ItemType::None) {
     return cxxg::types::RgbColor{195, 196, 90};
   }
@@ -69,7 +70,6 @@ void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
   Decorated->draw(Scr);
 }
 
-
 void InventoryControllerBase::updateElements() const {
   std::vector<ListSelect::Element> Elements;
   Elements.reserve(Inv.getItems().size());
@@ -106,7 +106,11 @@ bool InventoryController::handleInput(int Char) {
     }
     const auto &It = Inv.getItem(List->getSelectedElement());
 
-    if (Equip->Equip.isEquipped(It.getType())) {
+    if (Equip->Equip.isEquipped(It.getType()) &&
+        Equip->Equip.getSlot(It.getType())
+            .It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
+      Equip->Equip.getSlot(It.getType())
+          .It->removeFrom(Entity, Reg, CapabilityFlags::UnequipFrom);
       auto EquippedIt = Equip->Equip.unequip(It.getType());
       Inv.addItem(EquippedIt);
       // FIXME message
