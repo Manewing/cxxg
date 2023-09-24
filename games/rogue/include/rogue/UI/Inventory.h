@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <rogue/ItemType.h>
 #include <rogue/UI/Widget.h>
+#include <rogue/UI/Decorator.h>
 #include <string_view>
 
 namespace rogue {
@@ -17,7 +18,7 @@ class Controller;
 
 namespace rogue::ui {
 
-class InventoryControllerBase : public BaseRect {
+class InventoryControllerBase : public BaseRectDecorator {
 public:
   static cxxg::types::TermColor getColorForItemType(ItemType Type);
 
@@ -30,7 +31,6 @@ public:
   /// @param Header The header to display for the inventory
   InventoryControllerBase(Controller &Ctrl, Inventory &Inv, entt::entity Entity,
                           entt::registry &Reg, const std::string &Header);
-  void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
   void draw(cxxg::Screen &Scr) const final;
 
@@ -43,7 +43,6 @@ protected:
   entt::entity Entity;
   entt::registry &Reg;
   std::shared_ptr<ListSelect> List;
-  std::shared_ptr<Widget> Decorated;
 };
 
 class InventoryController : public InventoryControllerBase {

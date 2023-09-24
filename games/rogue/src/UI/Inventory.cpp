@@ -1,4 +1,3 @@
-#include <cxxg/Types.h>
 #include <cxxg/Utils.h>
 #include <iomanip>
 #include <rogue/Components/Items.h>
@@ -37,16 +36,11 @@ InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  entt::entity Entity,
                                                  entt::registry &Reg,
                                                  const std::string &Header)
-    : BaseRect({2, 2}, {30, 18}), Ctrl(Ctrl), Inv(Inv), Entity(Entity),
-      Reg(Reg) {
-  List = std::make_shared<ListSelect>(Pos, Size);
-  Decorated = std::make_shared<Frame>(List, Pos, Size, Header);
+    : BaseRectDecorator({2, 2}, {30, 18}, nullptr), Ctrl(Ctrl), Inv(Inv),
+      Entity(Entity), Reg(Reg) {
+  List = std::make_shared<ListSelect>(Pos, getSize());
+  Comp = std::make_shared<Frame>(List, Pos, getSize(), Header);
   updateElements();
-}
-
-void InventoryControllerBase::setPos(cxxg::types::Position P) {
-  BaseRect::setPos(P);
-  Decorated->setPos(Pos);
 }
 
 bool InventoryControllerBase::handleInput(int Char) {
@@ -66,8 +60,7 @@ bool InventoryControllerBase::handleInput(int Char) {
 
 void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
   updateElements();
-  BaseRect::draw(Scr);
-  Decorated->draw(Scr);
+  BaseRectDecorator::draw(Scr);
 }
 
 void InventoryControllerBase::updateElements() const {

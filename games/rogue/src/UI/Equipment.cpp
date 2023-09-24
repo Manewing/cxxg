@@ -18,20 +18,15 @@ EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
                                          entt::entity Entity,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
-    : BaseRect(Pos, {40, 11}), Ctrl(Ctrl), Equip(Equip), Entity(Entity),
+    : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip), Entity(Entity),
       Reg(Reg) {
   ItSel = std::make_shared<ItemSelect>(Pos);
-  Dec = std::make_shared<Frame>(ItSel, Pos, Size, "Equipment");
+  Comp = std::make_shared<Frame>(ItSel, Pos, getSize(), "Equipment");
 
   int Count = 0;
   for (const auto *ES : Equip.all()) {
     addSelect(*ES, {Pos.X + 1, Pos.Y + Count++});
   }
-}
-
-void EquipmentController::setPos(cxxg::types::Position Pos) {
-  BaseRect::setPos(Pos);
-  Dec->setPos(Pos);
 }
 
 bool EquipmentController::handleInput(int Char) {
@@ -90,8 +85,7 @@ std::string EquipmentController::getInteractMsg() const {
 
 void EquipmentController::draw(cxxg::Screen &Scr) const {
   updateSelectValues();
-  BaseRect::draw(Scr);
-  Dec->draw(Scr);
+  BaseRectDecorator::draw(Scr);
 }
 
 namespace {
