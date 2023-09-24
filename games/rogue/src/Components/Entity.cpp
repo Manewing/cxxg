@@ -12,7 +12,8 @@
 namespace rogue {
 
 void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
-                 const std::string &Name, const Inventory &I, const StatPoints &Stats) {
+                 const std::string &Name, const Inventory &I,
+                 const StatPoints &Stats) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<HealthComp>(Entity);
@@ -31,6 +32,21 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<InventoryComp>(Entity).Inv = I;
   Reg.emplace<StatsComp>(Entity).Base = Stats;
   Reg.emplace<EquipmentComp>(Entity);
+
+  // FIXME this should be part of an enemy/NPC AI system
+  // Try equipping items
+  auto &Inv = Reg.get<InventoryComp>(Entity).Inv;
+  auto &Equip = Reg.get<EquipmentComp>(Entity).Equip;
+  for (std::size_t Idx = 0; Idx < Inv.size(); Idx++) {
+    const auto &It = Inv.getItem(Idx);
+    if ((It.getType() & ItemType::EquipmentMask) != ItemType::None &&
+        Equip.canEquip(It.getType()) && It.getMaxStackSize() == 1 &&
+        It.canApplyTo(Entity, Reg, CapabilityFlags::EquipOn)) {
+      It.applyTo(Entity, Reg, CapabilityFlags::EquipOn);
+      Equip.equip(Inv.takeItem(Idx));
+      Idx -= 1;
+    }
+  }
 }
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,

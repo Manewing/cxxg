@@ -12,10 +12,21 @@ namespace {
 
 std::optional<Inventory>
 getDropInventoryFromEntity(entt::entity Entity, entt::registry &Reg){
+  std::optional<Inventory> Inv;
   if (auto *IC = Reg.try_get<InventoryComp>(Entity)) {
-    return IC->Inv;
+    Inv = IC->Inv;
   }
-  return std::nullopt;
+  if (auto *EC = Reg.try_get<EquipmentComp>(Entity)) {
+    if (!Inv) {
+      Inv = Inventory{};
+    }
+    for (const auto &ES : EC->Equip.all()) {
+      if (!ES->empty()) {
+        Inv->addItem(ES->unequip());
+      }
+    }
+  }
+  return Inv;
 } 
 
 }
