@@ -1,5 +1,6 @@
 #include <rogue/Components/Entity.h>
 #include <rogue/Context.h>
+#include <rogue/ItemDatabase.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/Parser.h>
 #include <ymir/Dungeon/BuilderPass.hpp>
@@ -111,13 +112,46 @@ void LevelGenerator::spawnEntities(Level &L) {
   EntitiesMap.fill(Level::EmptyTile);
 }
 
+namespace {
+
+/// Generates an inventory with random loot including all items from the item
+/// database
+Inventory generateRandomLootInventory(const ItemDatabase &ItemDb,
+                                      const unsigned MaxNumItems = 5,
+                                      const unsigned MinNumItems = 1) {
+  // TODO what kind of loot is there?
+  //  special items based on entity kind (e.g. boss)
+  //  common items based on entity level
+  assert(MaxNumItems >= MinNumItems);
+
+  Inventory Inv;
+
+  unsigned NumItems = rand() % (MaxNumItems - MinNumItems + 1) + MinNumItems;
+  for (unsigned I = 0; I < NumItems; ++I) {
+    auto It = ItemDb.createItem(ItemDb.getRandomItemId());
+    It.StackSize = rand() % (It.getMaxStackSize() / 2 + 1) + 1;
+    Inv.addItem(It);
+  }
+
+  return Inv;
+}
+
+} // namespace
+
 void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
+  static const std::map<char, StatPoints> EnemyStats = {
+      {'s', StatPoints{/*Int=*/1, /*Str=*/2, /*Dex=*/3, /*Vit=*/1}},
+      {'t', StatPoints{/*Int=*/1, /*Str=*/5, /*Dex=*/3, /*Vit=*/3}},
+  };
+
   switch (T.kind()) {
   case 's':
-    createEnemy(L.Reg, Pos, T, "Skeleton");
+    createEnemy(L.Reg, Pos, T, "Skeleton",
+                generateRandomLootInventory(Ctx->ItemDb), EnemyStats.at('s'));
     break;
   case 't':
-    createEnemy(L.Reg, Pos, T, "Troll");
+    createEnemy(L.Reg, Pos, T, "Troll",
+                generateRandomLootInventory(Ctx->ItemDb), EnemyStats.at('t'));
     break;
   case 'H': {
     int PrevLevelId = L.getLevelId() - 1;
@@ -128,7 +162,7 @@ void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
     createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false, NextLevelId);
   } break;
   case 'C':
-    createChestEntity(L.Reg, Pos, T);
+    createChestEntity(L.Reg, Pos, T, generateRandomLootInventory(Ctx->ItemDb));
     break;
   default:
     throw std::runtime_error("Invalid entity kind: " +

@@ -12,21 +12,25 @@
 namespace rogue {
 
 void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
-                 const std::string &Name) {
+                 const std::string &Name, const Inventory &I, const StatPoints &Stats) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
-  Reg.emplace<HealthComp>(Entity, HealthComp{{T.kind() == 't' ? 30.0 : 10.0,
-                                              T.kind() == 't' ? 30.0 : 10.0}});
+  Reg.emplace<HealthComp>(Entity);
   Reg.emplace<WanderAIComp>(Entity);
   Reg.emplace<TileComp>(Entity, T);
   Reg.emplace<NameComp>(Entity, Name);
   Reg.emplace<LineOfSightComp>(Entity);
   Reg.emplace<AttackAIComp>(Entity);
-  Reg.emplace<MeleeAttackComp>(Entity, T.kind() == 't' ? 3.0 : 6.0);
+  Reg.emplace<MeleeAttackComp>(Entity, 1.0);
   Reg.emplace<FactionComp>(Entity, T.kind() == 't' ? FactionKind::Nature
                                                    : FactionKind::Enemy);
   Reg.emplace<AgilityComp>(Entity);
   Reg.emplace<CollisionComp>(Entity);
+
+  // FIXME make this optional depending on enemy kind
+  Reg.emplace<InventoryComp>(Entity).Inv = I;
+  Reg.emplace<StatsComp>(Entity).Base = Stats;
+  Reg.emplace<EquipmentComp>(Entity);
 }
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
@@ -47,34 +51,17 @@ void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   }
 }
 
-namespace {
-
-void generateRandomLoot(Inventory &Inv, ItemDatabase &ItemDb) {
-  // TODO what kind of loot is there?
-  //  special items based on entity kind (e.g. boss)
-  //  common items based on entity level
-
-  // DEBUG ==>
-  unsigned NumItems = rand() % 5 + 1;
-  for (unsigned I = 0; I < NumItems; ++I) {
-    auto It = ItemDb.createItem(ItemDb.getRandomItemId());
-    It.StackSize = rand() % (It.getMaxStackSize() / 2 + 1) + 1;
-    Inv.addItem(It);
-  }
-  // <== DEBUG
-}
-
-} // namespace
-
-void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
+void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                       const Inventory &I) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
   Reg.emplace<ChestComp>(Entity);
   Reg.emplace<CollisionComp>(Entity);
 
+  // Copy inventory
   auto &Inv = Reg.get<ChestComp>(Entity).Inv;
-  generateRandomLoot(Inv, Reg.ctx().get<GameContext>().ItemDb);
+  Inv = I;
 
   Reg.emplace<InteractableComp>(
       Entity, Interaction{"Open Chest", [&Inv](auto &G, auto Et, auto &Reg) {
@@ -82,7 +69,8 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
                           }});
 }
 
-void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos) {
+void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
+                      const Inventory &I) {
   static constexpr Tile DropTile{{'o', cxxg::types::RgbColor{120, 90, 40}}};
 
   auto Entity = Reg.create();
@@ -91,7 +79,7 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos) {
   Reg.emplace<DropComp>(Entity);
 
   auto &Inv = Reg.get<DropComp>(Entity).Inv;
-  generateRandomLoot(Inv, Reg.ctx().get<GameContext>().ItemDb);
+  Inv = I;
 
   Reg.emplace<InteractableComp>(
       Entity, Interaction{"Loot", [&Inv](auto &G, auto Et, auto &Reg) {

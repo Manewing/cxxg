@@ -8,7 +8,7 @@ namespace {
 
 static constexpr float HealthPerVit = 9.1f;
 static constexpr float ManaPerInt = 9.1f;
-static constexpr float AgilityPerDex = 2.73f;
+static constexpr float AgilityPerDex = 1.0f;
 
 void updateStats(entt::registry &Reg) {
   // Reset stats

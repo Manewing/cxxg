@@ -2,7 +2,7 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Systems/AgilitySystem.h>
 
-static constexpr float APPerAgilityPoint = 0.12f;
+static constexpr float APPerAgilityPoint = 2.0f;
 
 namespace rogue {
 

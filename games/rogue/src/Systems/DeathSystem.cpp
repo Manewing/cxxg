@@ -8,6 +8,18 @@
 
 namespace rogue {
 
+namespace {
+
+std::optional<Inventory>
+getDropInventoryFromEntity(entt::entity Entity, entt::registry &Reg){
+  if (auto *IC = Reg.try_get<InventoryComp>(Entity)) {
+    return IC->Inv;
+  }
+  return std::nullopt;
+} 
+
+}
+
 void DeathSystem::update() {
   auto View = Reg.view<const HealthComp, const PositionComp>();
   View.each([this](const auto &Entity, const auto &Health, const auto &Pos) {
@@ -17,11 +29,13 @@ void DeathSystem::update() {
     bool IsPlayer = Reg.any_of<PlayerComp>(Entity);
     publish(EntityDiedEvent{{}, Entity, IsPlayer});
 
+    // Create loot from entity
+    if (auto InvOrNone = getDropInventoryFromEntity(Entity, Reg)) {
+      createDropEntity(Reg, Pos.Pos, InvOrNone.value());
+    }
+
     // FIXME player can't die at the moment
     if (!IsPlayer) {
-      // FIXME create loot generation system
-      createDropEntity(Reg, Pos);
-
       Reg.destroy(Entity);
     }
   });

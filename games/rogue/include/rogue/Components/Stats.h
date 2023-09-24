@@ -93,6 +93,7 @@ struct MeleeAttackComp {
   StatValue Damage = 10;
   StatValue APCost = 5;
 
+  /// Strength increases melee damage by 1 and by 1% per point
   StatValue getEffectiveDamage(StatPoints SrcStats) const {
     auto Str = StatValue(SrcStats.Str);
     return (Damage + Str) * (100.0 + Str) / 100.0;
