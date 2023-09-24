@@ -16,6 +16,7 @@ public:
   Item takeItem(std::size_t ItemIdx);
   Item takeItem(std::size_t ItemIdx, unsigned Count);
 
+  std::size_t size() const { return Items.size(); }
   bool empty() const;
 
 private:

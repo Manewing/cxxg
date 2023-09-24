@@ -11,7 +11,11 @@ namespace rogue {
 struct EquipmentSlot {
   const ItemType BaseTypeFilter = ItemType::None;
   std::optional<Item> It = std::nullopt;
-  ItemType TypeFilter = ItemType::None;
+
+  inline bool empty() const { return It == std::nullopt; }
+
+  void equip(Item Item);
+  Item unequip();
 };
 
 class Equipment {
@@ -24,6 +28,8 @@ public:
   EquipmentSlot Boots = {ItemType::Boots};
   EquipmentSlot Weapon = {ItemType::Weapon};
   EquipmentSlot OffHand = {ItemType::OffHand};
+
+  Equipment() = default;
 
   inline std::array<EquipmentSlot *, 8> all() {
     return {&Ring,  &Amulet, &Helmet, &ChestPlate,

@@ -57,7 +57,7 @@ bool EquipmentController::handleInput(int Char) {
       break;
     }
     ES->It->removeFrom(Entity, Reg, CapabilityFlags::UnequipFrom);
-    InvComp->Inv.addItem(Equip.unequip(ES->BaseTypeFilter));
+    InvComp->Inv.addItem(ES->unequip());
     updateSelectValues();
   } break;
 

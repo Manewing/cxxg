@@ -2,6 +2,24 @@
 
 namespace rogue {
 
+void EquipmentSlot::equip(Item I) {
+  if ((I.getType() & BaseTypeFilter) == ItemType::None) {
+    throw std::runtime_error("Can not equip item: " + I.getName() +
+                             +" of type " + getItemTypeLabel(I.getType()) +
+                             " (" + std::to_string(int(I.getType())) +
+                             ") to slot: " + getItemTypeLabel(BaseTypeFilter) +
+                             " (" + std::to_string(int(BaseTypeFilter)) + ")");
+  }
+  It = std::move(I);
+}
+
+Item EquipmentSlot::unequip() {
+  assert(It != std::nullopt);
+  Item I = std::move(*It);
+  It = std::nullopt;
+  return I;
+}
+
 EquipmentSlot &Equipment::getSlot(ItemType It) {
   return const_cast<EquipmentSlot &>(
       static_cast<const Equipment *>(this)->getSlot(It));
@@ -39,17 +57,15 @@ bool Equipment::isEquipped(ItemType Type) const {
   return getSlot(Type).It != std::nullopt;
 }
 
-void Equipment::equip(Item Item) {
-  auto Type = Item.getType();
-  auto &ES = getSlot(Type);
-  ES.It = std::move(Item);
+bool Equipment::canEquip(ItemType Type) const {
+  if ((Type & ItemType::EquipmentMask) == ItemType::None) {
+    return false;
+  }
+  return !isEquipped(Type);
 }
 
-Item Equipment::unequip(ItemType Type) {
-  auto &ES = getSlot(Type);
-  Item It = std::move(*ES.It);
-  ES.It = std::nullopt;
-  return It;
-}
+void Equipment::equip(Item It) { getSlot(It.getType()).equip(std::move(It)); }
+
+Item Equipment::unequip(ItemType Type) { return getSlot(Type).unequip(); }
 
 } // namespace rogue
