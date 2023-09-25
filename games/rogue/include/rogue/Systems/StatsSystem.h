@@ -8,17 +8,7 @@ namespace rogue {
 class StatsSystem : public System {
 public:
   using System::System;
-  bool needsTick() const final { return false; }
-  void update() override;
-};
-
-/// Updates stats that are providing time based modifiers, needs to run after
-/// StatsSystem
-class TimedStatsSystem : public System {
-public:
-  using System::System;
-  bool needsTick() const final { return true; }
-  void update() override;
+  void update(UpdateType Type) override;
 };
 
 } // namespace rogue

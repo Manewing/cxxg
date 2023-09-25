@@ -4,9 +4,15 @@
 
 namespace rogue {
 
-void AdditiveBuff::add() { SourceCount++; }
+void AdditiveBuff::add(const AdditiveBuff &Other) { 
+  SourceCount += Other.SourceCount;
+  }
 
-bool AdditiveBuff::remove(const AdditiveBuff &) { return --SourceCount == 0; }
+bool AdditiveBuff::remove(const AdditiveBuff &Other) {
+  assert(SourceCount >= Other.SourceCount);
+  SourceCount -= Other.SourceCount;
+  return SourceCount == 0;
+}
 
 void RegenerationBuff::add(const RegenerationBuff &Other) {
   if (Other.total() > total()) {
@@ -45,7 +51,7 @@ std::string StatsTimedBuffComp::getDescription() const {
 }
 
 void StatsBuffComp::add(const StatsBuffComp &Other) {
-  AdditiveBuff::add();
+  AdditiveBuff::add(Other);
   Bonus += Other.Bonus;
 }
 
@@ -123,7 +129,7 @@ std::string ArmorBuffComp::getDescription() const {
 }
 
 void ArmorBuffComp::add(const ArmorBuffComp &Other) {
-  AdditiveBuff::add();
+  AdditiveBuff::add(Other);
   BaseArmor += Other.BaseArmor;
   MagicArmor += Other.MagicArmor;
 }
@@ -146,6 +152,49 @@ StatValue ArmorBuffComp::getEffectiveDamage(StatValue Damage,
     Armor = getEffectiveArmor(DstSC->effective());
   }
   return Damage * 100.0 / (100.0 + Armor * 0.5);
+}
+
+std::string_view StatsBuffPerHitComp::getName() const {
+  return "Stats buff per hit";
+}
+
+std::string StatsBuffPerHitComp::getDescription() const {
+  std::stringstream SS;
+  SS << "Upon hit: " << SBC.getDescription() << " for " << MaxTicks
+     << ", stacks: " << MaxStacks;
+  return SS.str();
+}
+
+void StatsBuffPerHitComp::add(const StatsBuffPerHitComp &Other) {
+  *this = Other;
+}
+
+bool StatsBuffPerHitComp::remove(const StatsBuffPerHitComp &) { return true; }
+
+bool StatsBuffPerHitComp::tick() {
+  bool Expired = TimedBuff::tick();
+  if (Expired) {
+    Stacks = 0;
+  }
+  return Expired;
+}
+
+bool StatsBuffPerHitComp::addStack() {
+  TicksLeft = MaxTicks;
+  if (Stacks < MaxStacks) {
+    Stacks++;
+    return true;
+  }
+  return false;
+}
+
+StatsBuffComp StatsBuffPerHitComp::getEffectiveBuff() const {
+  StatsBuffComp B;
+  for (int I = 0; I < Stacks; ++I) {
+    B.add(SBC);
+  }
+  B.SourceCount = 1;
+  return B;
 }
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,

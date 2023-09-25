@@ -10,8 +10,7 @@ class Level;
 class PlayerSystem : public System {
 public:
   explicit PlayerSystem(Level &L);
-  bool needsTick() const final { return true; }
-  void update() override;
+  void update(UpdateType Type) override;
 
 private:
   Level &L;

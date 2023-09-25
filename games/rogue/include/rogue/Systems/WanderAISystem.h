@@ -20,8 +20,7 @@ namespace rogue {
 class WanderAISystem : public System {
 public:
   explicit WanderAISystem(Level &L, entt::registry &Reg) : System(Reg), L(L) {}
-  bool needsTick() const final { return true; }
-  void update() override;
+  void update(UpdateType Type) override;
 
 private:
   std::optional<entt::entity> checkForTarget(const entt::entity &Entity,

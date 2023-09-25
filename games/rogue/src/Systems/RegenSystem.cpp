@@ -71,7 +71,11 @@ runReductionBuffUpdate(System &Sys, entt::registry &Reg) {
 
 } // namespace
 
-void RegenSystem::update() {
+void RegenSystem::update(UpdateType Type) {
+  if (Type != UpdateType::Tick) {
+    return;
+  }
+
   // Run regeneration
   runRegenUpdate<HealthComp>(Reg);
   runRegenUpdate<ManaComp>(Reg);

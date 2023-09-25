@@ -17,12 +17,21 @@ struct BuffBase {
 
 struct AdditiveBuff {
   unsigned SourceCount = 1;
-  void add();
+  void add(const AdditiveBuff &Other);
   bool remove(const AdditiveBuff &Other);
 };
 
 struct TimedBuff {
   unsigned TicksLeft = 10;
+
+  /// Post-decrement to match count, returns true when hitting zero
+  bool tick() {
+    if (TicksLeft == 0) {
+      return true;
+    }
+    return TicksLeft-- == 0;
+  }
+
   bool remove(const TimedBuff &) { return false; }
 };
 
@@ -95,7 +104,7 @@ public:
 
 struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
   StatValue BaseArmor = 0;
-  StatValue MagicArmor = 0;  // FIXME not yet used
+  StatValue MagicArmor = 0; // FIXME not yet used
 
   std::string_view getName() const override;
   std::string getDescription() const override;
@@ -110,10 +119,31 @@ struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
   StatValue getEffectiveDamage(StatValue Damage, StatsComp *DstSC) const;
 };
 
+/// Applies a time based stats buff every time the entity hits sth, only one can
+/// be active
+struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
+  std::string_view getName() const override;
+  std::string getDescription() const override;
+
+  void add(const StatsBuffPerHitComp &Other);
+  bool remove(const StatsBuffPerHitComp &Other);
+  bool tick();
+
+  bool addStack();
+
+  StatsBuffComp getEffectiveBuff() const;
+
+  StatPoint Stacks = 0;
+  StatPoint MaxStacks = 0;
+  unsigned MaxTicks = 0;
+  StatsBuffComp SBC;
+  bool Applied = false;
+};
+
 using BuffTypeList =
     ComponentList<StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
                   BleedingDebuffComp, HealthRegenBuffComp, ManaRegenBuffComp,
-                  ArmorBuffComp>;
+                  ArmorBuffComp, StatsBuffPerHitComp>;
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);

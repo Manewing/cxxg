@@ -10,7 +10,11 @@ static std::random_device RandomEngine;
 
 namespace rogue {
 
-void WanderAISystem::update() {
+void WanderAISystem::update(UpdateType Type) {
+  if (Type == UpdateType::NoTick) {
+    return;
+  }
+
   auto View = Reg.view<PositionComp, WanderAIComp, AgilityComp>();
   View.each([this](const auto &Entity, auto &Pos, auto &AI, auto &Ag) {
     switch (AI.State) {

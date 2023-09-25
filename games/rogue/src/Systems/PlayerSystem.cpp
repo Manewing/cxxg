@@ -14,7 +14,11 @@ namespace rogue {
 
 PlayerSystem::PlayerSystem(Level &L) : System(L.Reg), L(L) {}
 
-void PlayerSystem::update() {
+void PlayerSystem::update(UpdateType Type) {
+  if (Type == UpdateType::NoTick) {
+    return;
+  }
+
   auto View =
       Reg.view<PlayerComp, PositionComp, const MeleeAttackComp, MovementComp>();
   View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp,
@@ -39,6 +43,10 @@ void PlayerSystem::update() {
         Damage = ABC->getEffectiveDamage(Damage, Reg.try_get<StatsComp>(Et));
       }
       THealth.reduce(Damage);
+
+      if (auto *SBPH = Reg.try_get<StatsBuffPerHitComp>(PlayerEt)) {
+        SBPH->addStack();
+      }
 
       // publish
       const auto Nm = Reg.try_get<NameComp>(PlayerEt);

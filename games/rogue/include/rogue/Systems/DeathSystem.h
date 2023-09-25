@@ -13,7 +13,7 @@ struct EntityDiedEvent : public Event {
 class DeathSystem : public System {
 public:
   using System::System;
-  void update() override;
+  void update(UpdateType Type) override;
 };
 
 } // namespace rogue

@@ -9,7 +9,11 @@
 
 namespace rogue {
 
-void AttackAISystem::update() {
+void AttackAISystem::update(UpdateType Type) {
+  if (Type == UpdateType::NoTick) {
+    return;
+  }
+
   auto View = Reg.view<const PositionComp, AttackAIComp, const MeleeAttackComp,
                        AgilityComp, const FactionComp>();
   auto TargetView =

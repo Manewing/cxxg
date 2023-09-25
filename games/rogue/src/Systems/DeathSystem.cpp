@@ -31,7 +31,9 @@ getDropInventoryFromEntity(entt::entity Entity, entt::registry &Reg){
 
 }
 
-void DeathSystem::update() {
+void DeathSystem::update(UpdateType Type) {
+  (void)Type; // Always run
+
   auto View = Reg.view<const HealthComp, const PositionComp>();
   View.each([this](const auto &Entity, const auto &Health, const auto &Pos) {
     if (Health.Value != 0) {

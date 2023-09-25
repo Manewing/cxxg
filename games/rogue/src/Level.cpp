@@ -19,7 +19,6 @@ Level::Level(int LevelId, const std::vector<std::string> &Layers,
     : Map(Layers, Size), LevelId(LevelId), PlayerDijkstraMap(Size),
       PlayerSeenMap(Size) {
   Systems = {
-      std::make_shared<TimedStatsSystem>(Reg),
       std::make_shared<StatsSystem>(Reg),
       std::make_shared<AgilitySystem>(Reg),
       std::make_shared<RegenSystem>(Reg),
@@ -47,10 +46,7 @@ bool Level::update(bool IsTick) {
   updateEntityPosCache();
 
   for (auto &Sys : Systems) {
-    if (!IsTick && Sys->needsTick()) {
-      continue;
-    }
-    Sys->update();
+    Sys->update(IsTick ? System::UpdateType::Tick : System::UpdateType::NoTick);
   }
 
   return true;
