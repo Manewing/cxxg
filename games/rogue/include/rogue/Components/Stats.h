@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iosfwd>
 
 namespace rogue {
 
@@ -32,7 +33,22 @@ struct StatPoints {
   inline std::array<const StatPoint *, 4> all() const {
     return {{&Int, &Str, &Dex, &Vit}};
   }
+
+  inline auto tie() { return std::tie(Int, Str, Dex, Vit); }
+  inline auto tie() const { return std::tie(Int, Str, Dex, Vit); }
+
+  std::ostream &dump(std::ostream &Out, bool DumpZero) const;
 };
+
+std::ostream &operator<<(std::ostream &Out, const StatPoints &SP);
+
+inline bool operator==(const StatPoints &Lhs, const StatPoints &Rhs) noexcept {
+  return Lhs.tie() == Rhs.tie();
+}
+
+inline bool operator!=(const StatPoints &Lhs, const StatPoints &Rhs) noexcept {
+  return !(Lhs == Rhs);
+}
 
 inline StatPoints operator-(const StatPoints &Lhs,
                             const StatPoints &Rhs) noexcept {

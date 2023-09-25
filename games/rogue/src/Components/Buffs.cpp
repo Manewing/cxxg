@@ -30,28 +30,8 @@ std::string_view StatsBuffComp::getName() const { return "Stats buff"; }
 
 std::string StatsBuffComp::getDescription() const {
   std::stringstream SS;
-  const char *Pred = "";
-  if (Bonus.Str > 0) {
-    SS << Pred << "Str +" << Bonus.Str;
-    Pred = ", ";
-  }
-  if (Bonus.Dex > 0) {
-    SS << Pred << "Dex +" << Bonus.Dex;
-    Pred = ", ";
-  }
-  if (Bonus.Int > 0) {
-    SS << Pred << "Int +" << Bonus.Int;
-    Pred = ", ";
-  }
-  if (Bonus.Vit > 0) {
-    SS << Pred << "Vit +" << Bonus.Vit;
-    Pred = ", ";
-  }
-  auto DescStr = SS.str();
-  if (DescStr.empty()) {
-    return "Nothing";
-  }
-  return DescStr;
+  Bonus.dump(SS, /*DumpZero=*/false);
+  return SS.str();
 }
 
 std::string_view StatsTimedBuffComp::getName() const {
