@@ -6,6 +6,7 @@
 #include <rogue/UI/Widget.h>
 #include <rogue/UI/WindowContainer.h>
 #include <string_view>
+#include <ymir/Types.hpp>
 
 namespace cxxg {
 class Screen;
@@ -16,6 +17,7 @@ class History;
 class Inventory;
 class Equipment;
 struct StatsComp;
+class Level;
 } // namespace rogue
 
 namespace rogue::ui {
@@ -60,6 +62,13 @@ public:
   void setHistoryUI(History &Hist);
   bool hasHistoryUI() const;
   void closeHistoryUI();
+
+  /// Create target UI
+  /// \param TargetPos The position to target
+  /// \param Lvl The level
+  void setTargetUI(ymir::Point2d<int> TargetPos, Level &Lvl);
+  bool hasTargetUI() const;
+  void closeTargetUI();
 
 private:
   cxxg::Screen &Scr;

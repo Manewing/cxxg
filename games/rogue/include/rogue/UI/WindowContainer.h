@@ -37,10 +37,10 @@ public:
 
   bool hasActiveWindow() const;
 
-  template <typename T> Widget *getWindowOfType() const {
+  template <typename T> T *getWindowOfType() const {
     for (const auto &Wdw : Windows) {
-      if (dynamic_cast<T *>(Wdw.get())) {
-        return Wdw.get();
+      if (auto *TWdw = dynamic_cast<T *>(Wdw.get())) {
+        return TWdw;
       }
     }
     return nullptr;

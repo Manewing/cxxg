@@ -21,7 +21,14 @@ struct Controls {
   static constexpr KeyOption EquipmentUI = {'o', "Equipment", "Open equipment"};
   static constexpr KeyOption HistoryUI = {'h', "History", "Open history"};
   static constexpr KeyOption BuffsUI = {'b', "Buffs", "Open buffs"};
+  static constexpr KeyOption TargetUI = {'t', "Target",
+                                         "Target object for info/attack"};
 
+  // Game controls
+  static constexpr KeyOption MoveUp = {'w', "Move up", "Move up"};
+  static constexpr KeyOption MoveDown = {'s', "Move down", "Move down"};
+  static constexpr KeyOption MoveLeft = {'a', "Move left", "Move left"};
+  static constexpr KeyOption MoveRight = {'d', "Move right", "Move right"};
 
   // Inventory controls
   static constexpr KeyOption Info = {'q', "Info", "Show info about the item"};

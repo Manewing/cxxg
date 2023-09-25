@@ -7,12 +7,16 @@ namespace rogue {
 
 struct TileComp {
   Tile T;
+
+  /// Higher z-index means closer to user (overlaps)
   int ZIndex = 0;
 };
 
 struct NameComp {
   std::string Name;
 };
+
+struct CursorComp {};
 
 } // namespace rogue
 

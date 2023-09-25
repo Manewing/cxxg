@@ -125,6 +125,17 @@ bool Game::handleInput(int Char) {
     }
     return true;
   }
+  case ui::Controls::TargetUI.Char: {
+    handleUpdates(/*IsTick=*/false);
+    if (UICtrl.hasTargetUI()) {
+      UICtrl.closeTargetUI();
+    } else {
+      UICtrl.setTargetUI(getLvlReg().get<PositionComp>(getPlayer()),
+                         *CurrentLevel);
+    }
+    return true;
+  }
+
   // TODO show controls
   default:
     break;

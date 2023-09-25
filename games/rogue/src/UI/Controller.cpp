@@ -7,6 +7,7 @@
 #include <rogue/UI/History.h>
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/Stats.h>
+#include <rogue/UI/TargetUI.h>
 
 // FIXME get rid of dep
 #include <rogue/Components/Items.h>
@@ -177,6 +178,21 @@ bool Controller::hasHistoryUI() const {
 
 void Controller::closeHistoryUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<HistoryController>());
+}
+
+void Controller::setTargetUI(ymir::Point2d<int> TargetPos, Level &Lvl) {
+  WdwContainer.addWindow<TargetUI>(*this, TargetPos, Lvl);
+  WdwContainer.autoLayoutWindows();
+}
+
+bool Controller::hasTargetUI() const {
+  return WdwContainer.hasWindowOfType<TargetUI>();
+}
+
+void Controller::closeTargetUI() {
+  auto *TUI = WdwContainer.getWindowOfType<TargetUI>();
+  WdwContainer.closeWindow(TUI);
+  TUI->destroyCursor();
 }
 
 } // namespace rogue::ui
