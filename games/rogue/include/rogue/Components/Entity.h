@@ -6,6 +6,9 @@
 #include <string>
 #include <ymir/Types.hpp>
 
+// FIXME decouple
+#include <rogue/Components/AI.h>
+
 namespace rogue {
 class Inventory;
 struct StatPoints;
@@ -15,7 +18,7 @@ namespace rogue {
 
 void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                  const std::string &Name, const Inventory &Inv,
-                 const StatPoints &Stats);
+                 const StatPoints &Stats, FactionKind Faction, RaceKind Race);
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                           bool IsExit, int LevelId);

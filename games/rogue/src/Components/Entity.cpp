@@ -13,7 +13,7 @@ namespace rogue {
 
 void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                  const std::string &Name, const Inventory &I,
-                 const StatPoints &Stats) {
+                 const StatPoints &Stats, FactionKind Faction, RaceKind Race) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<HealthComp>(Entity);
@@ -23,8 +23,8 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<LineOfSightComp>(Entity);
   Reg.emplace<AttackAIComp>(Entity);
   Reg.emplace<MeleeAttackComp>(Entity, 1.0);
-  Reg.emplace<FactionComp>(Entity, T.kind() == 't' ? FactionKind::Nature
-                                                   : FactionKind::Enemy);
+  Reg.emplace<FactionComp>(Entity, Faction);
+  Reg.emplace<RaceComp>(Entity, Race);
   Reg.emplace<AgilityComp>(Entity);
   Reg.emplace<CollisionComp>(Entity);
 

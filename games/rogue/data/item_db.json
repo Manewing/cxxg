@@ -50,7 +50,7 @@
         "vit": 0
       },
       "max_stacks": 5,
-      "ticks": 2
+      "ticks": 5
     },
     "armor_5": {
       "type": "armor_buff_comp",
@@ -266,6 +266,24 @@
           "specialization": "rare_stats_buff_effect"
         }
       ]
+    },
+    {
+      "name": "Bone",
+      "description": "A bone from a dead creature",
+      "max_stack_size": 99,
+      "types": [
+        "crafting"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Troll Tooth",
+      "description": "A troll tooth from a troll",
+      "max_stack_size": 99,
+      "types": [
+        "crafting"
+      ],
+      "capabilities": []
     }
   ]
 }

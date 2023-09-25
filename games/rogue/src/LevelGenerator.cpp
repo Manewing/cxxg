@@ -139,20 +139,29 @@ Inventory generateRandomLootInventory(const ItemDatabase &ItemDb,
 } // namespace
 
 void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
-  static const std::map<char, StatPoints> EnemyStats = {
-      {'s', StatPoints{/*Int=*/1, /*Str=*/2, /*Dex=*/3, /*Vit=*/1}},
-      {'t', StatPoints{/*Int=*/1, /*Str=*/5, /*Dex=*/3, /*Vit=*/3}},
+  struct EnemyInfo {
+    std::string Name;
+    StatPoints Stats;
+    FactionKind Faction;
+    RaceKind Race;
+  };
+  static const std::map<char, EnemyInfo> EnemyStats = {
+      {'s',
+       {"Skeleton", StatPoints{/*Int=*/1, /*Str=*/2, /*Dex=*/3, /*Vit=*/1},
+        FactionKind::Enemy, RaceKind::Undead}},
+      {'t',
+       {"Troll", StatPoints{/*Int=*/1, /*Str=*/5, /*Dex=*/3, /*Vit=*/3},
+        FactionKind::Enemy, RaceKind::Troll}},
   };
 
   switch (T.kind()) {
-  case 's':
-    createEnemy(L.Reg, Pos, T, "Skeleton",
-                generateRandomLootInventory(Ctx->ItemDb), EnemyStats.at('s'));
-    break;
   case 't':
-    createEnemy(L.Reg, Pos, T, "Troll",
-                generateRandomLootInventory(Ctx->ItemDb), EnemyStats.at('t'));
-    break;
+  case 's': {
+    const auto &EI = EnemyStats.at(T.kind());
+    createEnemy(L.Reg, Pos, T, EI.Name,
+                generateRandomLootInventory(Ctx->ItemDb), EI.Stats, EI.Faction,
+                EI.Race);
+  } break;
   case 'H': {
     int PrevLevelId = L.getLevelId() - 1;
     createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/true, PrevLevelId);

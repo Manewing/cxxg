@@ -27,6 +27,12 @@ struct FactionComp {
   FactionKind Faction = FactionKind::Nature;
 };
 
+enum class RaceKind { Human, Elf, Dwarf, Orc, Troll, Goblin, Undead, Creature };
+
+struct RaceComp {
+  RaceKind Kind;
+};
+
 } // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_AI_H
