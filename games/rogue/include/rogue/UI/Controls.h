@@ -15,6 +15,15 @@ struct KeyOption {
 };
 
 struct Controls {
+  // UI controls
+  static constexpr KeyOption InventoryUI = {'i', "Inventory", "Open inventory"};
+  static constexpr KeyOption CharacterUI = {'c', "Character", "Open character"};
+  static constexpr KeyOption EquipmentUI = {'o', "Equipment", "Open equipment"};
+  static constexpr KeyOption HistoryUI = {'h', "History", "Open history"};
+  static constexpr KeyOption BuffsUI = {'b', "Buffs", "Open buffs"};
+
+
+  // Inventory controls
   static constexpr KeyOption Info = {'q', "Info", "Show info about the item"};
   static constexpr KeyOption Navigate = {'^', "Navigate", "Navigate the menu"};
   static constexpr KeyOption Take = {'e', "Take", "Take the item"};

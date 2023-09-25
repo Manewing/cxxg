@@ -6,11 +6,11 @@
 #include <rogue/Components/AI.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Player.h>
-#include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Game.h>
 #include <rogue/GameConfig.h>
 #include <rogue/Renderer.h>
+#include <rogue/UI/Controls.h>
 
 namespace rogue {
 
@@ -80,48 +80,43 @@ bool Game::handleInput(int Char) {
 
   // Override keys
   switch (Char) {
-  case 'i': {
-    auto Player = getPlayerOrNull();
-    if (Player == entt::null) {
-      return false;
-    }
+  case ui::Controls::InventoryUI.Char: {
     if (UICtrl.hasInventoryUI()) {
       UICtrl.closeInventoryUI();
-      return true;
+    } else {
+      UICtrl.setInventoryUI(getPlayerOrNull(), getLvlReg());
     }
-    auto &InvComp = getLvlReg().get<InventoryComp>(Player);
-    // UI interaction do not update level
-    UICtrl.setInventoryUI(InvComp.Inv, Player, CurrentLevel->Reg);
     return true;
   }
-  case 'o': {
-    auto Player = getPlayerOrNull();
-    if (Player == entt::null) {
-      return false;
-    }
+  case ui::Controls::EquipmentUI.Char: {
     if (UICtrl.hasEquipmentUI()) {
       UICtrl.closeEquipmentUI();
-      return true;
+    } else {
+      UICtrl.setEquipmentUI(getPlayerOrNull(), getLvlReg());
     }
-    auto &EquipComp = getLvlReg().get<EquipmentComp>(Player);
-    // UI interaction do not update level
-    UICtrl.setEquipmentUI(EquipComp.Equip, Player, getLvlReg());
     return true;
   }
-  case 'h':
-    UICtrl.setHistoryUI(Hist);
+  case ui::Controls::BuffsUI.Char: {
+    if (UICtrl.hasBuffUI()) {
+      UICtrl.closeBuffUI();
+    } else {
+      UICtrl.setBuffUI(getPlayerOrNull(), getLvlReg());
+    }
     return true;
-  case 'c': {
+  }
+  case ui::Controls::HistoryUI.Char:
+    if (UICtrl.hasHistoryUI()) {
+      UICtrl.closeHistoryUI();
+    } else {
+      UICtrl.setHistoryUI(Hist);
+    }
+    return true;
+  case ui::Controls::CharacterUI.Char: {
     if (UICtrl.hasStatsUI()) {
       UICtrl.closeStatsUI();
-      return true;
+    } else {
+      UICtrl.setStatsUI(getPlayerOrNull(), getLvlReg());
     }
-    auto Player = getPlayerOrNull();
-    if (Player == entt::null) {
-      return false;
-    }
-    auto &Stats = getLvlReg().get<StatsComp>(Player);
-    UICtrl.setStatsUI(Stats, Player, getLvlReg());
     return true;
   }
   // TODO show controls

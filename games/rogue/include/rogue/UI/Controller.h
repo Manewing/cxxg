@@ -30,21 +30,36 @@ public:
 
   void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false);
 
-  void setEquipmentUI(Equipment &Equip, entt::entity Entity,
+  void setEquipmentUI(entt::entity Entity,
                       entt::registry &Reg);
   bool hasEquipmentUI() const;
   void closeEquipmentUI();
 
-  void setInventoryUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
+  void setInventoryUI(entt::entity Entity, entt::registry &Reg);
   bool hasInventoryUI() const;
   void closeInventoryUI();
 
-  void setStatsUI(StatsComp &Stats, entt::entity Entity, entt::registry &Reg);
+  /// Opens stats UI for the selected entity
+  void setStatsUI(entt::entity Entity, entt::registry &Reg);
   bool hasStatsUI() const;
   void closeStatsUI();
 
-  void setLootUI(Inventory &Inv, entt::entity Entity, entt::registry &Reg);
+  /// Creates a buff UI for the selected entity
+  void setBuffUI(entt::entity Entity, entt::registry &Reg);
+  bool hasBuffUI() const;
+  void closeBuffUI();
+
+  /// Creates a loot UI
+  /// \param Entity The entity that is looting
+  /// \param InvEt The entity that is being looted
+  /// \param Reg The registry
+  void setLootUI(entt::entity Entity, entt::entity InvEt, entt::registry &Reg);
+  bool hasLootUI() const;
+  void closeLootUI();
+
   void setHistoryUI(History &Hist);
+  bool hasHistoryUI() const;
+  void closeHistoryUI();
 
 private:
   cxxg::Screen &Scr;

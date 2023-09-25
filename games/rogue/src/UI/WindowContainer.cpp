@@ -9,18 +9,19 @@
 namespace rogue::ui {
 
 std::optional<WindowContainer::WindowInfo>
-WindowContainer::WindowInfo::getWindowInfo(Widget *Wdw) {
-  while (auto *Next = dynamic_cast<Decorator *>(Wdw)) {
+WindowContainer::WindowInfo::getWindowInfo(Widget *const Wdw) {
+  Widget *NextWdw = Wdw;
+  while (auto *Next = dynamic_cast<Decorator *>(NextWdw)) {
     if (auto *BrWdw = dynamic_cast<BaseRectDecorator *>(Wdw)) {
       auto Size = BrWdw->getSize();
       return WindowInfo{BrWdw->getPos(), BrWdw->getSize(), Size.X * Size.Y,
                         Wdw};
     }
 
-    Wdw = Next->getComp().get();
+    NextWdw = Next->getComp().get();
   }
 
-  if (auto *BrWdw = dynamic_cast<BaseRect *>(Wdw)) {
+  if (auto *BrWdw = dynamic_cast<BaseRect *>(NextWdw)) {
     auto Size = BrWdw->getSize();
     return WindowInfo{BrWdw->getPos(), BrWdw->getSize(), Size.X * Size.Y, Wdw};
   }

@@ -72,16 +72,15 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
-  Reg.emplace<ChestComp>(Entity);
   Reg.emplace<CollisionComp>(Entity);
 
   // Copy inventory
-  auto &Inv = Reg.get<ChestComp>(Entity).Inv;
+  auto &Inv = Reg.emplace<InventoryComp>(Entity).Inv;
   Inv = I;
 
   Reg.emplace<InteractableComp>(
-      Entity, Interaction{"Open Chest", [&Inv](auto &G, auto Et, auto &Reg) {
-                            G.UICtrl.setLootUI(Inv, Et, Reg);
+      Entity, Interaction{"Open Chest", [Entity](auto &G, auto Et, auto &Reg) {
+                            G.UICtrl.setLootUI(Et, Entity, Reg);
                           }});
 }
 
@@ -92,14 +91,12 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, DropTile, -1);
-  Reg.emplace<DropComp>(Entity);
-
-  auto &Inv = Reg.get<DropComp>(Entity).Inv;
+  auto &Inv = Reg.emplace<InventoryComp>(Entity).Inv;
   Inv = I;
 
   Reg.emplace<InteractableComp>(
-      Entity, Interaction{"Loot", [&Inv](auto &G, auto Et, auto &Reg) {
-                            G.UICtrl.setLootUI(Inv, Et, Reg);
+      Entity, Interaction{"Loot", [Entity](auto &G, auto Et, auto &Reg) {
+                            G.UICtrl.setLootUI(Et, Entity, Reg);
                           }});
 }
 

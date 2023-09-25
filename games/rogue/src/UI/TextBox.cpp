@@ -8,6 +8,10 @@ TextBox::TextBox(cxxg::types::Position Pos, cxxg::types::Size Size,
                  const std::string &Text, cxxg::types::Size Pd)
     : BaseRect(Pos, Size), Wrap(Text, Size.X - Pd.X * 2), Padding(Pd) {}
 
+void TextBox::setText(const std::string &Text) {
+  Wrap = WordWrap(Text, Size.X - Padding.X * 2);
+}
+
 bool TextBox::handleInput(int Char) {
   switch (Char) {
   case cxxg::utils::KEY_ESC:

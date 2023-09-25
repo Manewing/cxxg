@@ -54,8 +54,12 @@ void DeathSystem::update(UpdateType Type) {
   });
 
   // FIXME should this be done somewhere else?
-  auto DropView = Reg.view<const DropComp>();
+  auto DropView = Reg.view<const InventoryComp>();
   DropView.each([this](const auto &Entity, const auto &Drop) {
+    // Empty inventory will be removed unless there is a health component
+    if (Reg.any_of<HealthComp>(Entity)) {
+      return;
+    }
     if (Drop.Inv.empty()) {
       Reg.destroy(Entity);
     }
