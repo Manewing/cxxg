@@ -7,6 +7,7 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Components/Combat.h>
 
 namespace rogue {
 namespace {

@@ -1,4 +1,5 @@
 #include <rogue/Components/AI.h>
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Level.h>

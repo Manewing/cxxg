@@ -8,6 +8,7 @@ if(EXISTS "${YMIR_INSTALL}/include/ymir")
 
 set(HEADER_FILES
   include/rogue/Components/AI.h
+  include/rogue/Components/Combat.h
   include/rogue/Components/Entity.h
   include/rogue/Components/Level.h
   include/rogue/Components/Player.h
@@ -34,6 +35,7 @@ set(HEADER_FILES
   include/rogue/Parser.h
   include/rogue/Renderer.h
   include/rogue/Systems/AttackAISystem.h
+  include/rogue/Systems/CombatSystem.h
   include/rogue/Systems/DeathSystem.h
   include/rogue/Systems/PlayerSystem.h
   include/rogue/Systems/RegenSystem.h
@@ -84,6 +86,7 @@ set(SOURCE_FILES
   src/Renderer.cpp
   src/Systems/AgilitySystem.cpp
   src/Systems/AttackAISystem.cpp
+  src/Systems/CombatSystem.cpp
   src/Systems/DeathSystem.cpp
   src/Systems/PlayerSystem.cpp
   src/Systems/RegenSystem.cpp

@@ -4,6 +4,7 @@
 #include <rogue/Level.h>
 #include <rogue/Systems/AgilitySystem.h>
 #include <rogue/Systems/AttackAISystem.h>
+#include <rogue/Systems/CombatSystem.h>
 #include <rogue/Systems/DeathSystem.h>
 #include <rogue/Systems/PlayerSystem.h>
 #include <rogue/Systems/RegenSystem.h>
@@ -25,6 +26,7 @@ Level::Level(int LevelId, const std::vector<std::string> &Layers,
       std::make_shared<PlayerSystem>(*this),
       std::make_shared<WanderAISystem>(*this, Reg),
       std::make_shared<AttackAISystem>(Reg),
+      std::make_shared<CombatSystem>(Reg),
       std::make_shared<DeathSystem>(Reg),
   };
   PlayerSeenMap.fill(false);
