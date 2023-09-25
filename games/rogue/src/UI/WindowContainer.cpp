@@ -150,13 +150,10 @@ void changeWindowHighlight(Widget &W, bool Highlight) {
   if (auto *F = getFrameFromWidget(&W)) {
     if (Highlight) {
       F->setFrameColor(cxxg::types::RgbColor{255, 255, 200}.bold());
+      F->setHeaderColor(cxxg::types::RgbColor{255, 255, 200}.bold());
     } else {
       F->setFrameColor(cxxg::types::Color::NONE);
-    }
-
-    if (const auto HC = F->getHeaderColor();
-        std::holds_alternative<cxxg::types::RgbColor>(HC)) {
-      F->setHeaderColor(std::get<cxxg::types::RgbColor>(HC).bold(Highlight));
+      F->setHeaderColor(cxxg::types::Color::NONE);
     }
   }
 }
