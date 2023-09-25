@@ -40,6 +40,7 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   InvComp.Inv.addItem(ItemDb.createItem(0, 20));
   InvComp.Inv.addItem(ItemDb.createItem(1, 15));
   InvComp.Inv.addItem(ItemDb.createItem(2, 10));
+  InvComp.Inv.addItem(ItemDb.createItem(10, 1));
   // <== DEBUG
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
@@ -81,6 +82,7 @@ bool Game::handleInput(int Char) {
   // Override keys
   switch (Char) {
   case ui::Controls::InventoryUI.Char: {
+    handleUpdates(/*IsTick=*/false);
     if (UICtrl.hasInventoryUI()) {
       UICtrl.closeInventoryUI();
     } else {
@@ -89,6 +91,7 @@ bool Game::handleInput(int Char) {
     return true;
   }
   case ui::Controls::EquipmentUI.Char: {
+    handleUpdates(/*IsTick=*/false);
     if (UICtrl.hasEquipmentUI()) {
       UICtrl.closeEquipmentUI();
     } else {
@@ -97,6 +100,7 @@ bool Game::handleInput(int Char) {
     return true;
   }
   case ui::Controls::BuffsUI.Char: {
+    handleUpdates(/*IsTick=*/false);
     if (UICtrl.hasBuffUI()) {
       UICtrl.closeBuffUI();
     } else {
@@ -105,6 +109,7 @@ bool Game::handleInput(int Char) {
     return true;
   }
   case ui::Controls::HistoryUI.Char:
+    handleUpdates(/*IsTick=*/false);
     if (UICtrl.hasHistoryUI()) {
       UICtrl.closeHistoryUI();
     } else {
@@ -112,6 +117,7 @@ bool Game::handleInput(int Char) {
     }
     return true;
   case ui::Controls::CharacterUI.Char: {
+    handleUpdates(/*IsTick=*/false);
     if (UICtrl.hasStatsUI()) {
       UICtrl.closeStatsUI();
     } else {

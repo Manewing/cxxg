@@ -41,6 +41,17 @@
         "vit": 0
       }
     },
+    "str_5_per_hit_buff": {
+      "type": "stats_buff_per_hit_comp",
+      "stats": {
+        "str": 5,
+        "dex": 0,
+        "int": 0,
+        "vit": 0
+      },
+      "max_stacks": 5,
+      "ticks": 2
+    },
     "armor_5": {
       "type": "armor_buff_comp",
       "base_armor": 5,
@@ -229,6 +240,26 @@
         "weapon"
       ],
       "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Sword of the Slayer",
+      "description": "A blade that will drive the wielder to new strength",
+      "max_stack_size": 1,
+      "types": [
+        "weapon"
+      ],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "str_5_per_hit_buff"
+        }
+      ],
       "specializations": [
         {
           "type": "equipment",

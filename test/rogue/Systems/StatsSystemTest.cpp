@@ -134,8 +134,8 @@ TEST(TimedStatsSystem, TimedStatSystemStatsBuffPerHit) {
   SBPHC.addStack();
   EXPECT_EQ(SBPHC.Stacks, 2);
   EXPECT_EQ(SBPHC.TicksLeft, 2);
-  EXPECT_EQ(SBPHC.getEffectiveBuff().Bonus, StatPoints + StatPoints);
-  EXPECT_EQ(SBPHC.getEffectiveBuff().SourceCount, 1);
+  EXPECT_EQ(SBPHC.getEffectiveBuff(SBPHC.Stacks).Bonus, StatPoints + StatPoints);
+  EXPECT_EQ(SBPHC.getEffectiveBuff(SBPHC.Stacks).SourceCount, 1);
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Bonus, StatPoints + StatPoints);
   ASSERT_TRUE(Reg.any_of<rogue::StatsBuffPerHitComp>(Entity));
@@ -175,6 +175,8 @@ TEST(TimedStatsSystem, TimedStatSystemStatsBuffPerHit) {
   // Add a stats buff comp
   auto &SBC = Reg.emplace<rogue::StatsBuffComp>(Entity);
   SBC.Bonus = StatPoints;
+  StatsSystem.update(rogue::System::UpdateType::Tick);
+  EXPECT_EQ(Stats.Bonus, StatPoints);
 
   // Fifth hit
   SBPHC.addStack();

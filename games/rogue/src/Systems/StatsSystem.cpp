@@ -24,28 +24,39 @@ void updateStatsTimedBuffComp(entt::entity Entity, entt::registry &Reg,
 }
 
 void updateStatsBuffPerHitComp(entt::entity Entity, entt::registry &Reg,
-                               StatsBuffPerHitComp &SBPH) {
+                               StatsBuffPerHitComp &SBPH, bool Tick) {
+  if (!SBPH.Stacks) {
+    return;
+  }
 
   auto *SC = Reg.try_get<StatsBuffComp>(Entity);
-  if (SC && SBPH.Applied) {
-    if (SC->remove(SBPH.getEffectiveBuff())) {
+  if (SC && SBPH.AppliedStack) {
+    if (SC->remove(SBPH.getEffectiveBuff(*SBPH.AppliedStack))) {
       Reg.erase<StatsBuffComp>(Entity);
       SC = nullptr;
     }
-    SBPH.Applied = false; 
+    SBPH.Applied = nullptr;
+    SBPH.AppliedStack = std::nullopt;
   }
 
-  if (SBPH.tick()) {
+  if (Tick && SBPH.tick()) {
+    SBPH.AppliedStack = std::nullopt;
     return;
   }
 
   if (SC) {
-    SC->add(SBPH.getEffectiveBuff());
+    SC->add(SBPH.getEffectiveBuff(SBPH.Stacks));
   } else {
-    Reg.emplace<StatsBuffComp>(Entity, SBPH.getEffectiveBuff());
+    SC = &Reg.emplace<StatsBuffComp>(Entity, SBPH.getEffectiveBuff(SBPH.Stacks));
   }
+  SBPH.Applied = SC;
+  SBPH.AppliedStack = SBPH.Stacks;
+}
 
-  SBPH.Applied = true;
+void applyStatsBuffPerHitComp(entt::registry &Reg, bool Tick) {
+  Reg.view<StatsBuffPerHitComp>().each([&Reg, Tick](auto Entity, auto &SBPH) {
+    updateStatsBuffPerHitComp(Entity, Reg, SBPH, Tick);
+  });
 }
 
 void applyTimedStatsAndBuffs(entt::registry &Reg) {
@@ -54,17 +65,18 @@ void applyTimedStatsAndBuffs(entt::registry &Reg) {
       [&Reg](auto Entity, auto &S, auto &STB) {
         updateStatsTimedBuffComp(Entity, Reg, S, STB);
       });
-
-  // Update stats buff per hit comp
-  Reg.view<StatsBuffPerHitComp>().each([&Reg](auto Entity, auto &SBPH) {
-    updateStatsBuffPerHitComp(Entity, Reg, SBPH);
-  });
 }
 
 void applyStaticStatBuffs(entt::registry &Reg) {
   // Apply static stats buff
-  Reg.view<StatsComp, const StatsBuffComp>().each(
-      [](auto &S, auto const &SB) { S.add(SB.Bonus); });
+  Reg.view<StatsComp, StatsBuffComp>().each(
+      [&Reg](auto Entity, auto &S, auto const &SB) {
+        if (SB.SourceCount == 0) {
+          Reg.erase<StatsBuffComp>(Entity);
+          return;
+        }
+        S.add(SB.Bonus);
+      });
 }
 
 void applyStatEffects(entt::registry &Reg) {
@@ -97,6 +109,9 @@ void applyStatEffects(entt::registry &Reg) {
 
 void StatsSystem::update(UpdateType Type) {
   resetStats(Reg);
+
+  // Update stats buff per hit comp
+  applyStatsBuffPerHitComp(Reg, UpdateType::Tick == Type);
 
   if (Type == UpdateType::Tick) {
     applyTimedStatsAndBuffs(Reg);

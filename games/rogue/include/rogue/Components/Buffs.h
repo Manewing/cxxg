@@ -26,7 +26,7 @@ struct AdditiveBuff {
 };
 
 struct TimedBuff {
-  unsigned TicksLeft = 10;
+  unsigned TicksLeft = 0;
 
   /// Post-decrement to match count, returns true when hitting zero
   bool tick() {
@@ -135,13 +135,15 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
 
   bool addStack();
 
-  StatsBuffComp getEffectiveBuff() const;
+  StatsBuffComp getEffectiveBuff(StatPoint Stack) const;
 
   StatPoint Stacks = 0;
   StatPoint MaxStacks = 0;
   unsigned MaxTicks = 0;
   StatsBuffComp SBC;
-  bool Applied = false;
+
+  StatsBuffComp *Applied = nullptr;
+  std::optional<StatPoint> AppliedStack = std::nullopt;
 };
 
 using BuffTypeList =
