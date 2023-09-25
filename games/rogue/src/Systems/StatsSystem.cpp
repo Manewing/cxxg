@@ -25,31 +25,24 @@ void applyStatEffects(entt::registry &Reg) {
   Reg.view<const StatsComp, HealthComp>().each(
       [](const auto &St, auto &Health) {
         Health.MaxValue = St.effective().Vit * HealthPerVit;
+        if (Health.Value > Health.MaxValue) {
+          Health.Value = Health.MaxValue;
+        }
       });
 
   // Mana
   // If the entity has stats they override the maximum values defined
   Reg.view<const StatsComp, ManaComp>().each([](const auto &St, auto &Mana) {
     Mana.MaxValue = St.effective().Int * ManaPerInt;
+    if (Mana.Value > Mana.MaxValue) {
+      Mana.Value = Mana.MaxValue;
+    }
   });
 
   // Agility is determined by Dex
   Reg.view<const StatsComp, AgilityComp>().each([](const auto &St, auto &Ag) {
     Ag.Agility = AgilityPerDex * St.effective().Dex;
   });
-}
-
-void updateTimedStats(entt::registry &Reg) {
-  // Apply timed stats buff
-  Reg.view<StatsComp, StatsTimedBuffComp>().each(
-      [&Reg](auto Entity, auto &S, auto &STB) {
-        // Post decrement to match count
-        if (STB.TicksLeft-- == 0) {
-          Reg.erase<StatsBuffComp>(Entity);
-          return;
-        }
-        S.add(STB.Bonus);
-      });
 }
 
 } // namespace
@@ -59,8 +52,23 @@ void StatsSystem::update() {
   applyStatEffects(Reg);
 }
 
-void TimedStatsSystem::update() {
-  updateTimedStats(Reg);
+namespace {
+
+void updateTimedStats(entt::registry &Reg) {
+  // Apply timed stats buff
+  Reg.view<StatsComp, StatsTimedBuffComp>().each(
+      [&Reg](auto Entity, auto &S, auto &STB) {
+        // Post decrement to match count
+        if (STB.TicksLeft-- == 0) {
+          Reg.erase<StatsTimedBuffComp>(Entity);
+          return;
+        }
+        S.add(STB.Bonus);
+      });
 }
+
+} // namespace
+
+void TimedStatsSystem::update() { updateTimedStats(Reg); }
 
 } // namespace rogue

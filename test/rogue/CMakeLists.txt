@@ -1,6 +1,7 @@
 set(SOURCES
   EventHubTest.cpp
-  ComponentHelpersTest.cpp
+  Components/HelpersTest.cpp
+  Systems/StatsSystemTest.cpp
 )
 
 add_cxxg_unittest(
