@@ -1,9 +1,9 @@
 #include <rogue/Components/Buffs.h>
+#include <rogue/Components/Visual.h>
 #include <rogue/Event.h>
 #include <rogue/Game.h>
 #include <rogue/History.h>
 #include <rogue/Systems/DeathSystem.h>
-#include <rogue/Components/Visual.h>
 
 namespace rogue {
 

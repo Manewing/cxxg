@@ -4,6 +4,7 @@
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/History.h>
 
+
 namespace rogue::ui {
 
 HistoryController::HistoryController(cxxg::types::Position Pos,
@@ -71,7 +72,7 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
       continue;
     }
 
-    Scr[LinePos] = Msgs.at(MsgPos);
+    Scr[LinePos][Pos.X] << Msgs.at(MsgPos);
   }
 
   // Draw footer
