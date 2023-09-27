@@ -67,6 +67,9 @@ public:
     return *this;
   }
 
+  /// Dumps the given row to the current row
+  RowAccessor &operator<<(const Row &Rw);
+
   /// Outputs the given type to the row, first the the type will be converted
   /// to string via a string stream, the resulting string will the be output
   /// @param[in] T - The variable with type 'T' to output
