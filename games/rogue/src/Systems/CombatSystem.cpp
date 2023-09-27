@@ -2,6 +2,7 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Event.h>
 #include <rogue/History.h>
 #include <rogue/Systems/CombatSystem.h>
 
@@ -35,12 +36,12 @@ void performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
   }
 
   // publish
-  const auto Nm = Reg.try_get<NameComp>(Attacker);
-  const auto TNm = Reg.try_get<NameComp>(Target);
-  if (Nm && TNm) {
-    EHC.publish(DebugMessageEvent() << Nm->Name << " dealt " << Damage
-                                    << " melee damage to " << TNm->Name);
-  }
+  EntityAttackEvent EAE;
+  EAE.Registry = &Reg;
+  EAE.Attacker = Attacker;
+  EAE.Target = Target;
+  EAE.Damage = Damage;
+  EHC.publish(EAE);
 }
 
 } // namespace

@@ -6,10 +6,9 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Event.h>
 #include <rogue/Level.h>
 #include <rogue/Systems/PlayerSystem.h>
-
-#include <rogue/History.h>
 
 namespace rogue {
 
@@ -39,7 +38,7 @@ void PlayerSystem::update(UpdateType Type) {
     if (!L.isBodyBlocked(NewPos)) {
       L.updateEntityPosition(PlayerEt, PosComp, NewPos);
     } else {
-      publish(DebugMessageEvent() << "Can't move");
+      publish(PlayerInfoMessageEvent() << "Can't move");
     }
   });
 }

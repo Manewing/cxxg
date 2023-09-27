@@ -5,6 +5,7 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
+#include <rogue/Event.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/Systems/DeathSystem.h>
 
@@ -60,40 +61,47 @@ Inventory getDropInventoryFromEntity(entt::entity Entity, entt::registry &Reg) {
   return Inv;
 }
 
+void reapDeadEntities(entt::registry &Reg, EventHubConnector &EHC,
+                      const entt::entity Entity, const HealthComp &HC,
+                      const PositionComp &PC) {
+  if (HC.Value != 0) {
+    return;
+  }
+  EHC.publish(EntityDiedEvent{{}, Entity, &Reg});
+
+  // Create loot from entity
+  if (auto Inv = getDropInventoryFromEntity(Entity, Reg); !Inv.empty()) {
+    createDropEntity(Reg, PC.Pos, Inv);
+  }
+
+  Reg.destroy(Entity);
+}
+
+/// Empty inventory will be removed unless there is a health component
+void removeEmptyContainers(entt::registry &Reg, const entt::entity Entity,
+                           const InventoryComp &IC) {
+  if (Reg.any_of<HealthComp>(Entity)) {
+    return;
+  }
+  if (IC.Inv.empty()) {
+    Reg.destroy(Entity);
+  }
+}
+
 } // namespace
 
 void DeathSystem::update(UpdateType Type) {
   (void)Type; // Always run
 
   auto View = Reg.view<const HealthComp, const PositionComp>();
-  View.each([this](const auto &Entity, const auto &Health, const auto &Pos) {
-    if (Health.Value != 0) {
-      return;
-    }
-    bool IsPlayer = Reg.any_of<PlayerComp>(Entity);
-    publish(EntityDiedEvent{{}, Entity, IsPlayer});
-
-    // Create loot from entity
-    if (auto Inv = getDropInventoryFromEntity(Entity, Reg); !Inv.empty()) {
-      createDropEntity(Reg, Pos.Pos, Inv);
-    }
-
-    // FIXME player can't die at the moment
-    if (!IsPlayer) {
-      Reg.destroy(Entity);
-    }
+  View.each([this](const auto &Entity, const auto &HC, const auto &PC) {
+    reapDeadEntities(Reg, *this, Entity, HC, PC);
   });
 
   // FIXME should this be done somewhere else?
   auto DropView = Reg.view<const InventoryComp>();
-  DropView.each([this](const auto &Entity, const auto &Drop) {
-    // Empty inventory will be removed unless there is a health component
-    if (Reg.any_of<HealthComp>(Entity)) {
-      return;
-    }
-    if (Drop.Inv.empty()) {
-      Reg.destroy(Entity);
-    }
+  DropView.each([this](const auto &Entity, const auto IC) {
+    removeEmptyContainers(Reg, Entity, IC);
   });
 }
 

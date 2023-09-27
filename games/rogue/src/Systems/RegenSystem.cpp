@@ -1,10 +1,8 @@
 #include <entt/entt.hpp>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Stats.h>
+#include <rogue/Event.h>
 #include <rogue/Systems/RegenSystem.h>
-
-// FIXME for debug message
-#include <rogue/History.h>
 
 namespace rogue {
 
@@ -43,7 +41,10 @@ runRegenBuffUpdate(System &Sys, entt::registry &Reg) {
   View.each([&Sys, &Reg](auto Entity, auto &B, auto &C) {
     // Post decrement to match count
     if (B.TicksLeft-- == 0) {
-      Sys.publish(DebugMessageEvent() << B.getName() << " expired");
+      BuffExpiredEvent BEE;
+      BEE.Entity = Entity;
+      BEE.Buff = &B;
+      Sys.publish(BEE);
       Reg.erase<Buff>(Entity);
       return;
     }

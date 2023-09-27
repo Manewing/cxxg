@@ -28,13 +28,6 @@ private:
   std::string Msg;
 };
 
-struct EntityAttackEvent : public Event {
-  Entity &Attacker;
-  Entity &Target;
-  unsigned Damage;
-
-  bool isPlayerAffected() const;
-};
 
 class Entity : public EventHubConnector {
 public:

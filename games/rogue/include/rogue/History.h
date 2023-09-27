@@ -11,7 +11,13 @@
 namespace rogue {
 class Game;
 class History;
+struct DebugMessageEvent;
+struct EntityAttackEvent;
 struct EntityDiedEvent;
+struct BuffExpiredEvent;
+struct PlayerInfoMessageEvent;
+struct WarningMessageEvent;
+struct ErrorMessageEvent;
 } // namespace rogue
 
 namespace rogue {
@@ -50,27 +56,23 @@ private:
   std::vector<cxxg::Row> Messages;
 };
 
-struct DebugMessageEvent : public Event {
-  std::stringstream Message;
-
-  template <typename Type> DebugMessageEvent &operator<<(const Type &T) {
-    Message << T;
-    return *this;
-  }
-};
-
 class EventHistoryWriter : public EventHubConnector {
 public:
-  explicit EventHistoryWriter(History &Hist);
+  explicit EventHistoryWriter(History &Hist, bool Debug = false);
   void setEventHub(EventHub *Hub) final;
 
 private:
   void onEntityAttackEvent(const EntityAttackEvent &EAE);
   void onEntityDiedEvent(const EntityDiedEvent &EDE);
+  void onBuffExpiredEvent(const BuffExpiredEvent &BEE);
+  void onPlayerInfoMessageEvent(const PlayerInfoMessageEvent &PIME);
+  void onWarningMessageEvent(const WarningMessageEvent &WarnEv);
+  void onErrorMessageEvent(const ErrorMessageEvent &ErrEv);
   void onDebugMessageEvent(const DebugMessageEvent &DbgEv);
 
 private:
   History &Hist;
+  bool Debug = false;
 };
 
 } // namespace rogue

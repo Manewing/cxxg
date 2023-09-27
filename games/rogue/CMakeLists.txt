@@ -17,6 +17,7 @@ set(HEADER_FILES
   include/rogue/Components/Visual.h
   include/rogue/Context.h
   include/rogue/Entity.h
+  include/rogue/Event.h
   include/rogue/Equipment.h
   include/rogue/EventHub.h
   include/rogue/Game.h
@@ -69,6 +70,7 @@ set(SOURCE_FILES
   src/Components/Stats.cpp
   src/Entity.cpp
   src/Equipment.cpp
+  src/Event.cpp
   src/Game.cpp
   src/GameConfig.cpp
   src/History.cpp

@@ -6,12 +6,14 @@
 #include <typeindex>
 
 namespace rogue {
+struct BaseEvent;
+}
 
-struct Event {};
+namespace rogue {
 
 class EventHub {
 public:
-  using HandlerType = std::function<void(const Event &)>;
+  using HandlerType = std::function<void(const BaseEvent &)>;
   using HandlerMap = std::map<void *, HandlerType>;
 
 public:
@@ -19,7 +21,7 @@ public:
   void subscribe(SubscriberType &Subscriber,
                  void (SubscriberType::*CallbackFunc)(const EventType &)) {
     Subscribers[typeid(EventType)][&Subscriber] =
-        [&Subscriber, CallbackFunc](const Event &E) {
+        [&Subscriber, CallbackFunc](const BaseEvent &E) {
           (Subscriber.*CallbackFunc)(static_cast<const EventType &>(E));
         };
   }

@@ -1,3 +1,4 @@
+#include <rogue/Event.h>
 #include <rogue/History.h>
 #include <rogue/Level.h>
 #include <rogue/Systems/WanderAISystem.h>
@@ -120,7 +121,7 @@ ymir::Point2d<int> WanderAISystem::chaseTarget(const ymir::Point2d<int> AtPos,
   auto PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
       DM, AtPos - TPos.Pos + DMMidPos, ymir::FourTileDirections<int>(), 1);
   if (PathToTarget.empty()) {
-    publish(DebugMessageEvent()
+    publish(ErrorMessageEvent()
             << "can't find path from " << AtPos << " to " << TPos.Pos);
     return AtPos;
   }
