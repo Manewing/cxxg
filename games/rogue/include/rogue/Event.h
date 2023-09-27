@@ -48,6 +48,19 @@ struct BuffExpiredEvent : public BaseEvent {
   const BuffBase *Buff = nullptr;
 };
 
+struct SwitchLevelEvent : public BaseEvent {
+  int Level = 0;
+  bool ToEntry = false;
+};
+
+struct LootEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
+  entt::entity LootedEntity = entt::null;
+  entt::registry *Registry = nullptr;
+
+  bool isPlayerAffected() const;
+};
+
 } // namespace rogue
 
 #endif // #ifndef ROGUE_EVENT_H

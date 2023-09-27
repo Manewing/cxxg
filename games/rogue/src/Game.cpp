@@ -8,6 +8,7 @@
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Game.h>
+#include <rogue/Event.h>
 #include <rogue/GameConfig.h>
 #include <rogue/Renderer.h>
 #include <rogue/UI/Controls.h>
@@ -31,6 +32,9 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.setEventHub(&EvHub);
+  EHW.subscribe(*this, &Game::onEntityDiedEvent);
+  EHW.subscribe(*this, &Game::onSwitchLevelEvent);
+  EHW.subscribe(*this, &Game::onLootEvent);
 
   switchLevel(0, /*ToEntry=*/true);
 
@@ -196,32 +200,11 @@ bool Game::handleUpdates(bool IsTick) {
 }
 
 void Game::handleDraw() {
-  // Render the current map
-  const auto RenderSize = ymir::Size2d<int>{static_cast<int>(Scr.getSize().X),
-                                            static_cast<int>(Scr.getSize().Y)};
-
-  // FIXME need to check that player is still alive!
-  auto Player = getPlayer();
-  auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
-  auto LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
-  auto Health = getLvlReg().get<HealthComp>(Player);
-
-  Renderer Render(RenderSize, *CurrentLevel, PlayerPos);
-  Render.renderShadow(/*Darkness=*/30);
-  Render.renderFogOfWar(CurrentLevel->getPlayerSeenMap());
-  Render.renderLineOfSight(PlayerPos, /*Range=*/LOSRange);
-
-  // Draw map
-  Scr << Render.get();
-
-  std::string InteractStr = "";
-  if (auto *Interact = getAvailableInteraction()) {
-    InteractStr = "[E] " + Interact->Msg;
+  if (GameRunning) {
+    handleDrawLevel();
+  } else {
+    handleDrawGameOver();
   }
-
-  // Draw UI overlay
-  UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, InteractStr);
-
   cxxg::Game::handleDraw();
 }
 
@@ -244,7 +227,7 @@ void Game::tryInteract() {
   if (auto *Interact = getAvailableInteraction()) {
     auto Player = getPlayer();
     auto &PC = getLvlReg().get<PlayerComp>(Player);
-    Interact->Execute(*this, Player, getLvlReg());
+    Interact->Execute(*CurrentLevel, Player, getLvlReg());
     PC.CurrentInteraction = *Interact;
   }
 }
@@ -281,6 +264,53 @@ Interaction *Game::getAvailableInteraction() {
   auto &Interactable =
       CurrentLevel->Reg.get<InteractableComp>(InteractableEntity);
   return &Interactable.Action;
+}
+
+void Game::onEntityDiedEvent(const EntityDiedEvent &E) {
+  GameRunning = ! E.isPlayerAffected();
+}
+
+void Game::onSwitchLevelEvent(const SwitchLevelEvent &E) {
+  switchLevel(E.Level, E.ToEntry);
+}
+
+void Game::onLootEvent(const LootEvent &E) {
+  if (!E.isPlayerAffected() || !E.Registry) {
+    return;
+  }
+  UICtrl.setLootUI(E.Entity, E.LootedEntity, *E.Registry);
+}
+
+void Game::handleDrawLevel() {
+  // Render the current map
+  const auto RenderSize = ymir::Size2d<int>{static_cast<int>(Scr.getSize().X),
+                                            static_cast<int>(Scr.getSize().Y)};
+
+  // FIXME need to check that player is still alive!
+  auto Player = getPlayer();
+  auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
+  auto LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
+  auto Health = getLvlReg().get<HealthComp>(Player);
+
+  Renderer Render(RenderSize, *CurrentLevel, PlayerPos);
+  Render.renderShadow(/*Darkness=*/30);
+  Render.renderFogOfWar(CurrentLevel->getPlayerSeenMap());
+  Render.renderLineOfSight(PlayerPos, /*Range=*/LOSRange);
+
+  // Draw map
+  Scr << Render.get();
+
+  std::string InteractStr = "";
+  if (auto *Interact = getAvailableInteraction()) {
+    InteractStr = "[E] " + Interact->Msg;
+  }
+
+  // Draw UI overlay
+  UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, InteractStr);
+}
+
+void Game::handleDrawGameOver() {
+  // TODO
 }
 
 } // namespace rogue

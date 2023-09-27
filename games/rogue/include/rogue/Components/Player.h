@@ -8,15 +8,15 @@
 #include <ymir/Types.hpp>
 
 namespace rogue {
-class Game;
-}
+class EventHubConnector;
+} // namespace rogue
 
 namespace rogue {
 
 struct Interaction {
   std::string Msg;
-  std::function<void(Game &, entt::entity, entt::registry &)> Execute =
-      [](auto &, auto, auto &) {};
+  std::function<void(EventHubConnector &, entt::entity, entt::registry &)>
+      Execute = [](auto &, auto, auto &) {};
 };
 
 struct InteractableComp {

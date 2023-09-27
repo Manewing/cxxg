@@ -17,6 +17,9 @@
 namespace rogue {
 struct Interaction;
 struct GameConfig;
+struct EntityDiedEvent;
+struct SwitchLevelEvent;
+struct LootEvent;
 } // namespace rogue
 
 namespace rogue {
@@ -51,7 +54,14 @@ private:
 
   Interaction *getAvailableInteraction();
 
-public: // FIXME
+  void onEntityDiedEvent(const EntityDiedEvent &E);
+  void onSwitchLevelEvent(const SwitchLevelEvent &E);
+  void onLootEvent(const LootEvent &E);
+
+  void handleDrawLevel();
+  void handleDrawGameOver();
+
+private:
   const GameConfig &Cfg;
   EventHub EvHub;
   History Hist;
@@ -62,9 +72,7 @@ public: // FIXME
   int CurrentLevelIdx = 0;
   std::shared_ptr<Level> CurrentLevel;
   std::vector<std::shared_ptr<Level>> Levels;
-
   ui::Controller UICtrl;
-
   long unsigned GameTicks = 0;
 };
 

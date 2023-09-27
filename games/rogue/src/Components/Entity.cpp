@@ -8,7 +8,8 @@
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/Context.h>
-#include <rogue/Game.h>
+#include <rogue/Event.h>
+#include <rogue/EventHub.h>
 
 namespace rogue {
 
@@ -56,10 +57,12 @@ void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
   Reg.emplace<InteractableComp>(
-      Entity, Interaction{IsExit ? "Previous Level" : "Next level",
-                          [LevelId, IsExit](auto &G, auto, auto &) {
-                            G.switchLevel(LevelId, /*ToEntry=*/!IsExit);
-                          }});
+      Entity,
+      Interaction{
+          IsExit ? "Previous Level" : "Next level",
+          [LevelId, IsExit](auto &EHC, auto, auto &) {
+            EHC.publish(SwitchLevelEvent{{}, LevelId, /*ToEntry=*/!IsExit});
+          }});
   Reg.emplace<CollisionComp>(Entity);
   if (IsExit) {
     Reg.emplace<LevelStartComp>(Entity, LevelId);
@@ -80,9 +83,10 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Inv = I;
 
   Reg.emplace<InteractableComp>(
-      Entity, Interaction{"Open Chest", [Entity](auto &G, auto Et, auto &Reg) {
-                            G.UICtrl.setLootUI(Et, Entity, Reg);
-                          }});
+      Entity,
+      Interaction{"Open Chest", [Entity](auto &EHC, auto Et, auto &Reg) {
+                    EHC.publish(LootEvent{{}, Et, Entity, &Reg});
+                  }});
 }
 
 void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
@@ -96,8 +100,8 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   Inv = I;
 
   Reg.emplace<InteractableComp>(
-      Entity, Interaction{"Loot", [Entity](auto &G, auto Et, auto &Reg) {
-                            G.UICtrl.setLootUI(Et, Entity, Reg);
+      Entity, Interaction{"Loot", [Entity](auto &EHC, auto Et, auto &Reg) {
+                            EHC.publish(LootEvent{{}, Et, Entity, &Reg});
                           }});
 }
 
