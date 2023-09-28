@@ -15,19 +15,20 @@ struct BaseEvent {
   // virtual ~BaseEvent() = default;
 };
 
-struct BaseMessageEvent : public BaseEvent {
+template <typename DerivedT> struct BaseMessageEvent : public BaseEvent {
   std::stringstream Message;
 
-  template <typename Type> BaseMessageEvent &operator<<(const Type &T) {
+  template <typename Type> DerivedT &operator<<(const Type &T) {
     Message << T;
-    return *this;
+    return static_cast<DerivedT &>(*this);
   }
 };
 
-struct DebugMessageEvent : public BaseMessageEvent {};
-struct WarningMessageEvent : public BaseMessageEvent {};
-struct ErrorMessageEvent : public BaseMessageEvent {};
-struct PlayerInfoMessageEvent : public BaseMessageEvent {};
+struct DebugMessageEvent : public BaseMessageEvent<DebugMessageEvent> {};
+struct WarningMessageEvent : public BaseMessageEvent<WarningMessageEvent> {};
+struct ErrorMessageEvent : public BaseMessageEvent<ErrorMessageEvent> {};
+struct PlayerInfoMessageEvent
+    : public BaseMessageEvent<PlayerInfoMessageEvent> {};
 
 struct EntityAttackEvent : public BaseEvent {
   entt::entity Attacker = entt::null;
