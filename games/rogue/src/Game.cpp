@@ -179,7 +179,7 @@ bool Game::handleInput(int Char) {
     return true;
   default:
     // Not a valid input do not update
-    return false;
+    return true;
   }
 
   handleUpdates(/*IsTick=*/true);

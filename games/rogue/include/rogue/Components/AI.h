@@ -16,7 +16,7 @@ struct WanderAIComp {
 };
 
 struct LineOfSightComp {
-  unsigned LOSRange = 8;
+  unsigned LOSRange = 14;
 };
 
 struct AttackAIComp {};
