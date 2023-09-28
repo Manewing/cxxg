@@ -7,8 +7,8 @@
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
-#include <rogue/Game.h>
 #include <rogue/Event.h>
+#include <rogue/Game.h>
 #include <rogue/GameConfig.h>
 #include <rogue/Renderer.h>
 #include <rogue/UI/Controls.h>
@@ -201,11 +201,11 @@ bool Game::handleUpdates(bool IsTick) {
 
 void Game::handleDraw() {
   if (GameRunning) {
-    handleDrawLevel();
-  } else {
-    handleDrawGameOver();
+      handleDrawLevel();
+    return;
   }
-  cxxg::Game::handleDraw();
+
+  handleDrawGameOver();
 }
 
 // FIXME move to player system?
@@ -218,8 +218,8 @@ void Game::movePlayer(ymir::Dir2d Dir) {
     return;
   }
   assert(CurrentLevel->Reg.valid(Player));
-  assert(CurrentLevel->Reg.all_of<MovementComp>(Player));
-  CurrentLevel->Reg.get<MovementComp>(Player).Dir = Dir;
+  assert(CurrentLevel->Reg.all_of<PlayerComp>(Player));
+  CurrentLevel->Reg.get<PlayerComp>(Player).MoveDir = Dir;
 }
 
 // FIXME move to player system?
@@ -267,7 +267,7 @@ Interaction *Game::getAvailableInteraction() {
 }
 
 void Game::onEntityDiedEvent(const EntityDiedEvent &E) {
-  GameRunning = ! E.isPlayerAffected();
+  GameRunning = !E.isPlayerAffected();
 }
 
 void Game::onSwitchLevelEvent(const SwitchLevelEvent &E) {
@@ -297,20 +297,23 @@ void Game::handleDrawLevel() {
   Render.renderFogOfWar(CurrentLevel->getPlayerSeenMap());
   Render.renderLineOfSight(PlayerPos, /*Range=*/LOSRange);
 
-  // Draw map
-  Scr << Render.get();
-
   std::string InteractStr = "";
   if (auto *Interact = getAvailableInteraction()) {
     InteractStr = "[E] " + Interact->Msg;
   }
 
+  // Draw map
+  Scr << Render.get();
+
   // Draw UI overlay
   UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, InteractStr);
+
+  cxxg::Game::handleDraw();
 }
 
 void Game::handleDrawGameOver() {
   // TODO
+  cxxg::Game::handleDraw();
 }
 
 } // namespace rogue

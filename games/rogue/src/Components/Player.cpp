@@ -1,5 +1,6 @@
 #include <rogue/Components/AI.h>
 #include <rogue/Components/Buffs.h>
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Helpers.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Level.h>
@@ -7,7 +8,6 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
-#include <rogue/Components/Combat.h>
 
 namespace rogue {
 namespace {
@@ -15,13 +15,13 @@ namespace {
 using PlayerCompList =
     ComponentList<TileComp, FactionComp, PlayerComp, PositionComp, StatsComp,
                   HealthComp, NameComp, LineOfSightComp, AgilityComp,
-                  MeleeAttackComp, MovementComp, InventoryComp, EquipmentComp>;
+                  MeleeAttackComp, InventoryComp, EquipmentComp>;
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
                           const PositionComp &PosComp, const StatsComp &Stats,
                           const HealthComp &HC, const NameComp &NC,
                           const LineOfSightComp LOSC, const AgilityComp &AC,
-                          const MeleeAttackComp &MC, const MovementComp &MVC,
+                          const MeleeAttackComp &MC,
                           const InventoryComp &InvComp,
                           const EquipmentComp &EquipComp) {
   static constexpr Tile PlayerTile{{'@', cxxg::types::RgbColor{255, 255, 50}}};
@@ -41,7 +41,6 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   Reg.emplace<LineOfSightComp>(Entity, LOSC);
   Reg.emplace<AgilityComp>(Entity, AC);
   Reg.emplace<MeleeAttackComp>(Entity, MC);
-  Reg.emplace<MovementComp>(Entity, MVC);
   Reg.emplace<InventoryComp>(Entity, InvComp);
   Reg.emplace<EquipmentComp>(Entity, EquipComp);
   Reg.emplace<CollisionComp>(Entity);
@@ -57,7 +56,7 @@ entt::entity PlayerComp::createPlayer(entt::registry &Reg,
   return ::rogue::createPlayer(Reg, PlayerComp{}, PositionComp{Pos},
                                StatsComp{StatPoints{1, 1, 1, 10}, {}},
                                HealthComp{}, NameComp{Name}, LineOfSightComp{},
-                               AgilityComp{}, MeleeAttackComp{}, MovementComp{},
+                               AgilityComp{}, MeleeAttackComp{},
                                InventoryComp{}, EquipmentComp{});
 }
 

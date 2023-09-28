@@ -14,15 +14,15 @@ namespace rogue {
 
 void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
                           entt::entity PlayerEt, PlayerComp &PC,
-                          PositionComp &PosComp, MovementComp &MC) {
-
-  if (MC.Dir == ymir::Dir2d::NONE) {
+                          PositionComp &PosComp) {
+  if (PC.MoveDir == ymir::Dir2d::NONE) {
     return;
   }
   PC.CurrentInteraction = std::nullopt;
 
-  auto NewPos = PosComp.Pos + MC.Dir;
-  MC.Dir = ymir::Dir2d::NONE;
+  auto NewPos = PosComp.Pos + PC.MoveDir;
+  const auto MoveDir = PC.MoveDir;
+  PC.MoveDir = ymir::Dir2d::NONE;
 
   if (auto Et = L.getEntityAt(NewPos);
       Et != entt::null && Reg.all_of<HealthComp, FactionComp>(Et)) {
@@ -30,10 +30,12 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
     return;
   }
 
-  if (!L.isBodyBlocked(NewPos)) {
-    L.updateEntityPosition(PlayerEt, PosComp, NewPos);
-  } else {
+  if (L.isBodyBlocked(NewPos)) {
     EHC.publish(PlayerInfoMessageEvent() << "Can't move");
+  } else {
+    MovementComp MC;
+    MC.Dir = MoveDir;
+    Reg.emplace<MovementComp>(PlayerEt, MC);
   }
 }
 
@@ -44,9 +46,9 @@ void PlayerSystem::update(UpdateType Type) {
     return;
   }
 
-  auto View = Reg.view<PlayerComp, PositionComp, MovementComp>();
-  View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp, auto &MC) {
-    updatePlayerPosition(L, Reg, *this, PlayerEt, PC, PosComp, MC);
+  auto View = Reg.view<PlayerComp, PositionComp>();
+  View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp) {
+    updatePlayerPosition(L, Reg, *this, PlayerEt, PC, PosComp);
   });
 }
 

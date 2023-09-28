@@ -43,6 +43,7 @@ set(HEADER_FILES
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
+  include/rogue/Systems/MovementSystem.h
   include/rogue/UI/Buffs.h
   include/rogue/UI/Controller.h
   include/rogue/UI/Controls.h
@@ -94,6 +95,7 @@ set(SOURCE_FILES
   src/Systems/PlayerSystem.cpp
   src/Systems/RegenSystem.cpp
   src/Systems/StatsSystem.cpp
+  src/Systems/MovementSystem.cpp
   src/Systems/WanderAISystem.cpp
   src/UI/Buffs.cpp
   src/UI/Controller.cpp

@@ -19,7 +19,7 @@ namespace rogue {
 //  - flee from incoming attacks
 class WanderAISystem : public System {
 public:
-  explicit WanderAISystem(Level &L, entt::registry &Reg) : System(Reg), L(L) {}
+  explicit WanderAISystem(Level &L);
   void update(UpdateType Type) override;
 
 private:

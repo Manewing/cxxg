@@ -11,6 +11,8 @@ static std::random_device RandomEngine;
 
 namespace rogue {
 
+WanderAISystem::WanderAISystem(Level &L) : System(L.Reg), L(L) {}
+
 void WanderAISystem::update(UpdateType Type) {
   if (Type == UpdateType::NoTick) {
     return;
