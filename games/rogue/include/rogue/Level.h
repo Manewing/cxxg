@@ -59,7 +59,8 @@ public:
   bool isLOSBlocked(ymir::Point2d<int> Pos) const;
   bool isBodyBlocked(ymir::Point2d<int> Pos) const;
 
-  ymir::Map<int, int> getDijkstraMap(Tile Target, std::size_t Layer) const;
+  std::pair<ymir::Map<int, int>, std::vector<ymir::Point2d<int>>>
+  getDijkstraMap(Tile Target, std::size_t Layer) const;
 
   const ymir::Map<int, int> &getPlayerDijkstraMap() const;
   const ymir::Map<bool, int> &getPlayerSeenMap() const;

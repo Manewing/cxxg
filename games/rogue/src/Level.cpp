@@ -6,8 +6,8 @@
 #include <rogue/Systems/AttackAISystem.h>
 #include <rogue/Systems/CombatSystem.h>
 #include <rogue/Systems/DeathSystem.h>
-#include <rogue/Systems/PlayerSystem.h>
 #include <rogue/Systems/MovementSystem.h>
+#include <rogue/Systems/PlayerSystem.h>
 #include <rogue/Systems/RegenSystem.h>
 #include <rogue/Systems/StatsSystem.h>
 #include <rogue/Systems/WanderAISystem.h>
@@ -160,13 +160,14 @@ bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
   return MapBlocked || EntityBlocked;
 }
 
-ymir::Map<int, int> Level::getDijkstraMap(Tile Target,
-                                          std::size_t Layer) const {
+std::pair<ymir::Map<int, int>, std::vector<ymir::Point2d<int>>>
+Level::getDijkstraMap(Tile Target, std::size_t Layer) const {
   auto &LayerMap = Map.get(Layer);
   auto TilePos = LayerMap.findTiles(Target);
-  return ymir::Algorithm::getDijkstraMap(
+  auto DM = ymir::Algorithm::getDijkstraMap(
       Map.getSize(), TilePos, [this](auto Pos) { return isBodyBlocked(Pos); },
       ymir::FourTileDirections<int>());
+  return {DM, TilePos};
 }
 
 const ymir::Map<int, int> &Level::getPlayerDijkstraMap() const {

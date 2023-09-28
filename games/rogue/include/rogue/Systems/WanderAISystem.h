@@ -11,7 +11,12 @@
 
 namespace rogue {
 class Level;
-}
+struct PositionComp;
+struct WanderAIComp;
+struct AgilityComp;
+struct LineOfSightComp;
+struct FactionComp;
+} // namespace rogue
 
 namespace rogue {
 
@@ -23,13 +28,17 @@ public:
   void update(UpdateType Type) override;
 
 private:
-  std::optional<entt::entity> checkForTarget(const entt::entity &Entity,
-                                             const ymir::Point2d<int> &AtPos);
+  void updateEntity(entt::entity Entity, PositionComp &Pos, WanderAIComp &AI,
+                    AgilityComp &Ag);
+
+  std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
+  checkForTarget(entt::entity Entity, const ymir::Point2d<int> &AtPos);
 
   ymir::Point2d<int> wander(const ymir::Point2d<int> AtPos);
 
-  ymir::Point2d<int> chaseTarget(const ymir::Point2d<int> AtPos,
-                                 const entt::entity &Target);
+  ymir::Point2d<int> chaseTarget(entt::entity TargetEt,
+                                 const ymir::Point2d<int> AtPos,
+                                 const LineOfSightComp &LOS);
 
 private:
   Level &L;

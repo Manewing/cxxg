@@ -164,9 +164,9 @@ void NPCEntity::handleAction(Level &L) {
 void NPCEntity::searchObject(
     Level &L, Tile T, std::function<void(ymir::Point2d<int>)> FoundCallback) {
   // FIXME do this once at setup of search
-  auto DM = L.getDijkstraMap(T, Level::LayerWallsDecoIdx + 2);
+  auto [DM, TPs] = L.getDijkstraMap(T, Level::LayerWallsDecoIdx + 2);
   auto PathToObject = ymir::Algorithm::getPathFromDijkstraMap(
-      DM, Pos, ymir::FourTileDirections<int>());
+      DM, TPs.at(0), Pos, ymir::FourTileDirections<int>());
   if (PathToObject.empty()) {
     // FIXME add no path found exception
     throw MovementBlockedException({-1, -1});

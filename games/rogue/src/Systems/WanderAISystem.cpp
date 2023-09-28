@@ -20,68 +20,76 @@ void WanderAISystem::update(UpdateType Type) {
 
   auto View = Reg.view<PositionComp, WanderAIComp, AgilityComp>();
   View.each([this](const auto &Entity, auto &Pos, auto &AI, auto &Ag) {
-    switch (AI.State) {
-    case WanderAIState::Idle: {
-      if (AI.IdleDelayLeft-- == 0) {
-        AI.State = WanderAIState::Wander;
-        AI.IdleDelayLeft = AI.IdleDelay;
-      }
-      if (checkForTarget(Entity, Pos)) {
-        AI.State = WanderAIState::Chase;
-      }
-    } break;
-    case WanderAIState::Wander: {
-      // FIXME switch to Idle after random duration
-      if (!Ag.trySpendAP(AI.MoveAPCost)) {
-        break;
-      }
-
-      auto NextPos = wander(Pos);
-      L.updateEntityPosition(Entity, Pos, NextPos);
-      AI.DistanceWalked += 1;
-
-      if (checkForTarget(Entity, Pos)) {
-        AI.State = WanderAIState::Chase;
-      }
-    } break;
-
-    case WanderAIState::Chase: {
-      // If in range stay, otherwise chase
-      auto Target = checkForTarget(Entity, Pos);
-      if (!Target) {
-        AI.State = WanderAIState::Idle;
-        break;
-      }
-      // FIXME check in range
-      auto NextPos = chaseTarget(Pos, *Target);
-      L.updateEntityPosition(Entity, Pos, NextPos);
-      AI.DistanceWalked += 1;
-    } break;
-
-    default:
-      assert(false && "Should never be reached");
-      break;
-    }
+    updateEntity(Entity, Pos, AI, Ag);
   });
 }
 
-std::optional<entt::entity>
-WanderAISystem::checkForTarget(const entt::entity &Entity,
+void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
+                                  WanderAIComp &AI, AgilityComp &Ag) {
+  switch (AI.State) {
+  case WanderAIState::Idle: {
+    if (AI.IdleDelayLeft-- == 0) {
+      AI.State = WanderAIState::Wander;
+      AI.IdleDelayLeft = AI.IdleDelay;
+    }
+    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
+    if (TargetEt != entt::null) {
+      AI.State = WanderAIState::Chase;
+    }
+  } break;
+  case WanderAIState::Wander: {
+    // FIXME switch to Idle after random duration
+    if (!Ag.trySpendAP(AI.MoveAPCost)) {
+      break;
+    }
+
+    auto NextPos = wander(PC);
+    MovementComp MC;
+    MC.Dir = ymir::Dir2d::fromMaxComponent(NextPos - PC.Pos);
+    Reg.emplace<MovementComp>(Entity, MC);
+
+    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
+    if (TargetEt != entt::null) {
+      AI.State = WanderAIState::Chase;
+    }
+  } break;
+
+  case WanderAIState::Chase: {
+    // If in range stay, otherwise chase
+    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
+    if (TargetEt == entt::null) {
+      AI.State = WanderAIState::Idle;
+      break;
+    }
+    auto NextPos = chaseTarget(TargetEt, PC, *LOS);
+    MovementComp MC;
+    MC.Dir = ymir::Dir2d::fromMaxComponent(NextPos - PC.Pos);
+    Reg.emplace<MovementComp>(Entity, MC);
+  } break;
+
+  default:
+    assert(false && "Should never be reached");
+    break;
+  }
+}
+
+std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
+WanderAISystem::checkForTarget(entt::entity Entity,
                                const ymir::Point2d<int> &AtPos) {
   auto LOSComp = Reg.try_get<LineOfSightComp>(Entity);
   auto FacComp = Reg.try_get<FactionComp>(Entity);
   if (!LOSComp || !FacComp) {
-    return std::nullopt;
+    return {entt::null, nullptr, nullptr};
   }
 
   // FIMXE only finds single target, no ordering of distance
-  std::optional<entt::entity> Target;
+  entt::entity TargetEt = entt::null;
   ymir::Algorithm::traverseLOS(
-      [this, &Target, &FacComp](auto Pos) {
+      [this, &TargetEt, &FacComp](auto Pos) {
         if (auto T = L.getEntityAt(Pos); T != entt::null) {
           if (auto TFac = Reg.try_get<FactionComp>(T);
               TFac && FacComp->Faction != TFac->Faction) {
-            Target = T;
+            TargetEt = T;
             // Target blocks LOS
             return true;
           }
@@ -90,7 +98,7 @@ WanderAISystem::checkForTarget(const entt::entity &Entity,
       },
       AtPos, LOSComp->LOSRange);
 
-  return Target;
+  return {TargetEt, LOSComp, FacComp};
 }
 
 ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
@@ -105,29 +113,46 @@ ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
   return *It;
 }
 
-ymir::Point2d<int> WanderAISystem::chaseTarget(const ymir::Point2d<int> AtPos,
-                                               const entt::entity &Target) {
-  const auto &TPos = Reg.get<PositionComp>(Target);
+ymir::Point2d<int> WanderAISystem::chaseTarget(entt::entity TargetEt,
+                                               const ymir::Point2d<int> AtPos,
+                                               const LineOfSightComp &LOS) {
+  const auto &TPC = Reg.get<PositionComp>(TargetEt);
+  auto TPos = TPC.Pos;
+
+  const auto &TMC = Reg.try_get<MovementComp>(TargetEt);
+  if (TMC) {
+    TPos += TMC->Dir;
+  }
+
+  if (ymir::FourTileDirections<int>::isNextTo(AtPos, TPos)) {
+    return AtPos;
+  }
 
   // FIXME avoid recomputing this every time
-  unsigned LOSRange = 8; // FIXME get from LOS Comp
+  unsigned LOSRange = LOS.LOSRange;
   ymir::Size2d<int> DMSize(LOSRange * 2 + 1, LOSRange * 2 + 1);
   ymir::Point2d<int> DMMidPos(LOSRange + 1, LOSRange + 1);
   auto DM = ymir::Algorithm::getDijkstraMap(
       DMSize, DMMidPos,
-      [this, &TPos, &DMMidPos](auto Pos) {
-        return L.isBodyBlocked(Pos + TPos.Pos - DMMidPos);
+      [this, &TPC, &TPos, &DMMidPos](auto Pos) {
+        auto RealPos = Pos + TPos - DMMidPos;
+        if (RealPos == TPC.Pos) {
+          return false;
+        }
+        return L.isBodyBlocked(RealPos);
       },
       ymir::FourTileDirections<int>());
 
+  std::uniform_int_distribution<int> OneZero(0, 1);
   auto PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
-      DM, AtPos - TPos.Pos + DMMidPos, ymir::FourTileDirections<int>(), 1);
+      DM, DMMidPos, AtPos - TPos + DMMidPos, ymir::FourTileDirections<int>(), 1,
+      OneZero(RandomEngine));
   if (PathToTarget.empty()) {
     publish(ErrorMessageEvent()
-            << "can't find path from " << AtPos << " to " << TPos.Pos);
+            << "can't find path from " << AtPos << " to " << TPos);
     return AtPos;
   }
-  auto TargetPos = PathToTarget.at(0) + TPos.Pos - DMMidPos;
+  auto TargetPos = PathToTarget.at(0) + TPos - DMMidPos;
 
   if (!L.isBodyBlocked(TargetPos)) {
     return TargetPos;
