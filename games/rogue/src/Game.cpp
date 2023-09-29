@@ -25,6 +25,32 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
   return Scr;
 }
 
+void RenderEventCollector::setEventHub(EventHub *EH) {
+  EventHubConnector::setEventHub(EH);
+  EH->subscribe(*this, &RenderEventCollector::onEntityAttackEvent);
+}
+
+void RenderEventCollector::onEntityAttackEvent(const EntityAttackEvent &E) {
+  auto *PC = E.Registry->try_get<PositionComp>(E.Target);
+  if (!PC) {
+    return;
+  }
+  auto const AtPos = PC->Pos;
+  RenderFns.push_back([AtPos](Renderer &R) {
+    R.renderEffect(
+        cxxg::types::ColoredChar{'*', cxxg::types::RgbColor{155, 20, 20}},
+        AtPos);
+  });
+}
+
+void RenderEventCollector::apply(Renderer &R) {
+  for (auto &Fn : RenderFns) {
+    Fn(R);
+  }
+}
+
+void RenderEventCollector::clear() { RenderFns.clear(); }
+
 Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
       ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)), Ctx({*this, ItemDb}),
@@ -35,6 +61,7 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.subscribe(*this, &Game::onEntityDiedEvent);
   EHW.subscribe(*this, &Game::onSwitchLevelEvent);
   EHW.subscribe(*this, &Game::onLootEvent);
+  REC.setEventHub(&EvHub);
 
   switchLevel(0, /*ToEntry=*/true);
 
@@ -60,6 +87,8 @@ void Game::switchLevel(int Level, bool ToEntry) {
     Hist.warn() << "One can never leave...";
     return;
   }
+
+  REC.clear();
 
   if (Level >= static_cast<int>(Levels.size())) {
     assert((Level - 1) < static_cast<int>(Levels.size()));
@@ -313,6 +342,8 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   Render.renderShadow(/*Darkness=*/30);
   Render.renderFogOfWar(CurrentLevel->getPlayerSeenMap());
   Render.renderLineOfSight(PlayerPos, /*Range=*/LOSRange);
+  REC.apply(Render);
+  REC.clear();
 
   std::string InteractStr = "";
   if (auto *Interact = getAvailableInteraction()) {

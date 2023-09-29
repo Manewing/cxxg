@@ -73,6 +73,14 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
   }
 }
 
+void Renderer::renderEffect(cxxg::types::ColoredChar EffC,
+                            ymir::Point2d<int> AtPos) {
+  if (!VisibleMap.contains(AtPos + Offset)) {
+    return;
+  }
+  VisibleMap.getTile(AtPos + Offset) = EffC;
+}
+
 void Renderer::renderEntities() {
   L.Reg.sort<TileComp>(
       [](const auto &Lhs, const auto &Rhs) { return Lhs.ZIndex < Rhs.ZIndex; });

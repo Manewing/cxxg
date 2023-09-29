@@ -20,9 +20,22 @@ struct GameConfig;
 struct EntityDiedEvent;
 struct SwitchLevelEvent;
 struct LootEvent;
+struct EntityAttackEvent;
+class Renderer;
 } // namespace rogue
 
 namespace rogue {
+
+class RenderEventCollector : public EventHubConnector {
+public:
+  void setEventHub(EventHub *EH) override;
+  void onEntityAttackEvent(const EntityAttackEvent &E);
+  void apply(Renderer &R);
+  void clear();
+
+private:
+  std::vector<std::function<void(Renderer &)>> RenderFns;
+};
 
 class Game : public cxxg::Game {
 public:
@@ -71,6 +84,7 @@ private:
   LevelGenerator LevelGen;
   int CurrentLevelIdx = 0;
   std::shared_ptr<Level> CurrentLevel;
+  RenderEventCollector REC;
   std::vector<std::shared_ptr<Level>> Levels;
   ui::Controller UICtrl;
   long unsigned GameTicks = 0;
