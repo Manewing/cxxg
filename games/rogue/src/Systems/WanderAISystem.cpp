@@ -61,9 +61,12 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
       AI.State = WanderAIState::Idle;
       break;
     }
-    auto NextPos = chaseTarget(TargetEt, PC, *LOS);
+    auto NextPosOrNone = chaseTarget(TargetEt, PC, *LOS);
+    if (!NextPosOrNone) {
+      break;
+    }
     MovementComp MC;
-    MC.Dir = ymir::Dir2d::fromMaxComponent(NextPos - PC.Pos);
+    MC.Dir = ymir::Dir2d::fromMaxComponent(*NextPosOrNone - PC.Pos);
     Reg.emplace<MovementComp>(Entity, MC);
   } break;
 
@@ -113,11 +116,14 @@ ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
   return *It;
 }
 
-ymir::Point2d<int> WanderAISystem::chaseTarget(entt::entity TargetEt,
+std::optional<ymir::Point2d<int>> WanderAISystem::chaseTarget(entt::entity TargetEt,
                                                const ymir::Point2d<int> AtPos,
                                                const LineOfSightComp &LOS) {
   const auto &TPC = Reg.get<PositionComp>(TargetEt);
   auto TPos = TPC.Pos;
+  if (ymir::FourTileDirections<int>::isNextTo(AtPos, TPos)) {
+    return std::nullopt;
+  }
 
   const auto &TMC = Reg.try_get<MovementComp>(TargetEt);
   if (TMC) {
@@ -125,7 +131,7 @@ ymir::Point2d<int> WanderAISystem::chaseTarget(entt::entity TargetEt,
   }
 
   if (ymir::FourTileDirections<int>::isNextTo(AtPos, TPos)) {
-    return AtPos;
+    return std::nullopt;
   }
 
   // FIXME avoid recomputing this every time
@@ -157,7 +163,7 @@ ymir::Point2d<int> WanderAISystem::chaseTarget(entt::entity TargetEt,
   if (!L.isBodyBlocked(TargetPos)) {
     return TargetPos;
   }
-  return AtPos;
+  return std::nullopt;
 }
 
 } // namespace rogue

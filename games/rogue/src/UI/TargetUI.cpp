@@ -1,3 +1,4 @@
+#include <cxxg/Screen.h>
 #include <cxxg/Types.h>
 #include <cxxg/Utils.h>
 #include <rogue/Components/Buffs.h>
@@ -15,7 +16,7 @@
 namespace rogue::ui {
 
 TargetInfo::TargetInfo(Controller &C, entt::entity TEt, entt::registry &R)
-    : BaseRectDecorator({2, 2}, {15, 10}, nullptr), Ctrl(C), TargetEt(TEt),
+    : BaseRectDecorator({2, 2}, {25, 10}, nullptr), Ctrl(C), TargetEt(TEt),
       Reg(R) {
   auto *NC = Reg.try_get<NameComp>(TargetEt);
   std::string Hdr = NC ? NC->Name : "Unknown";
@@ -64,8 +65,20 @@ bool TargetInfo::handleInput(int Char) {
   }
 }
 
-std::string TargetInfo::getInteractMsg() const {
-  return Comp->getInteractMsg();
+void TargetInfo::draw(cxxg::Screen &Scr) const {
+  cxxg::types::Position DrawPos = Pos + cxxg::types::Position{2, 1};
+
+  // FIXME move this to general stats?
+  if (auto *HC = Reg.try_get<HealthComp>(TargetEt)) {
+    Scr[DrawPos.Y][DrawPos.X] << "Health: " << HC->Value << "/" << HC->MaxValue;
+    DrawPos += cxxg::types::Position{0, 1};
+  }
+  if (auto *AG = Reg.try_get<AgilityComp>(TargetEt)) {
+    Scr[DrawPos.Y][DrawPos.X] << "AP: " << AG->AP << " AG: " << AG->Agility;
+    DrawPos += cxxg::types::Position{0, 1};
+  }
+
+  Comp->draw(Scr);
 }
 
 TargetUI::TargetUI(Controller &Ctrl, ymir::Point2d<int> TargetPos, Level &Lvl)

@@ -1,6 +1,7 @@
 #ifndef ROGUE_COMPONENTS_TRANSFORM_H
 #define ROGUE_COMPONENTS_TRANSFORM_H
 
+#include <rogue/Components/Stats.h>
 #include <ymir/Types.hpp>
 
 namespace rogue {
@@ -14,6 +15,8 @@ struct PositionComp {
 };
 
 struct MovementComp {
+  static constexpr StatValue MoveAPCost = 10;
+
   ymir::Dir2d Dir = ymir::Dir2d::NONE;
 
   // Allow implicit conversion

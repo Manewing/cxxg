@@ -6,13 +6,18 @@ namespace rogue {
 
 namespace {
 
+
 void applyMovementComp(entt::registry &Reg, Level &L, entt::entity Entity,
                        PositionComp &PC, const MovementComp &MC) {
-  (void)Reg;
-  (void)Entity;
   if (MC.Dir == ymir::Dir2d::NONE) {
     return;
   }
+
+  auto *AG = Reg.try_get<AgilityComp>(Entity);
+  if (AG && !AG->trySpendAP(MovementComp::MoveAPCost)) {
+    return;
+  }
+
   auto NewPos = PC.Pos + MC.Dir;
   if (!L.isBodyBlocked(NewPos)) {
     L.updateEntityPosition(Entity, PC, NewPos);

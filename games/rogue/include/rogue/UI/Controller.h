@@ -25,7 +25,8 @@ namespace rogue::ui {
 class Controller {
 public:
   Controller(cxxg::Screen &Scr);
-  void draw(int LevelIdx, int Health, int MaxHealth, std::string InteractStr);
+  void draw(int LevelIdx, int Health, int MaxHealth, int AP, int AG,
+            std::string InteractStr);
   bool isUIActive() const;
   void handleInput(int Char);
 

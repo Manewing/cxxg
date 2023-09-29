@@ -92,14 +92,15 @@ struct HealthComp : public ValueRegenCompBase {
 struct ManaComp : public ValueRegenCompBase {};
 
 struct AgilityComp {
-  StatValue Agility = 30;
+  StatValue Agility = 0;
   StatValue AP = 0;
-  StatValue MaxAP = 20;
 
-  void gainAP(unsigned APAmount) { AP = std::min(MaxAP, AP + APAmount); }
+  void gainAP(StatValue APAmount) { AP += APAmount; }
 
-  bool trySpendAP(unsigned APAmount) {
-    if (AP < APAmount) {
+  bool hasEnoughAP(StatValue APAmount) const { return AP >= APAmount; }
+
+  bool trySpendAP(StatValue APAmount) {
+    if (!hasEnoughAP(APAmount)) {
       return false;
     }
     AP -= APAmount;

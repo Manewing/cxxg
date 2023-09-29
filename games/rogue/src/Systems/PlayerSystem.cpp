@@ -14,7 +14,7 @@ namespace rogue {
 
 void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
                           entt::entity PlayerEt, PlayerComp &PC,
-                          PositionComp &PosComp) {
+                          PositionComp &PosComp, AgilityComp &AG) {
   if (PC.MoveDir == ymir::Dir2d::NONE) {
     return;
   }
@@ -22,7 +22,17 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
 
   auto NewPos = PosComp.Pos + PC.MoveDir;
   const auto MoveDir = PC.MoveDir;
-  PC.MoveDir = ymir::Dir2d::NONE;
+
+  // FIXME waiting a turn will clear the move intention, but may not execute
+  // PC.MoveDir = ymir::Dir2d::NONE;
+
+  // FIXME this does not count in combat
+  // -> check instead of an action was successfully performed
+  PC.IsReady = AG.hasEnoughAP(MovementComp::MoveAPCost);
+
+  if (!PC.IsReady) {
+    return;
+  }
 
   if (auto Et = L.getEntityAt(NewPos);
       Et != entt::null && Reg.all_of<HealthComp, FactionComp>(Et)) {
@@ -32,11 +42,12 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
 
   if (L.isBodyBlocked(NewPos)) {
     EHC.publish(PlayerInfoMessageEvent() << "Can't move");
-  } else {
-    MovementComp MC;
-    MC.Dir = MoveDir;
-    Reg.emplace<MovementComp>(PlayerEt, MC);
   }
+
+  // Always move the player, even if blocked to consume AP for action
+  MovementComp MC;
+  MC.Dir = MoveDir;
+  Reg.emplace<MovementComp>(PlayerEt, MC);
 }
 
 PlayerSystem::PlayerSystem(Level &L) : System(L.Reg), L(L) {}
@@ -46,9 +57,9 @@ void PlayerSystem::update(UpdateType Type) {
     return;
   }
 
-  auto View = Reg.view<PlayerComp, PositionComp>();
-  View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp) {
-    updatePlayerPosition(L, Reg, *this, PlayerEt, PC, PosComp);
+  auto View = Reg.view<PlayerComp, PositionComp, AgilityComp>();
+  View.each([this](const auto &PlayerEt, auto &PC, auto &PosComp, auto &AG) {
+    updatePlayerPosition(L, Reg, *this, PlayerEt, PC, PosComp, AG);
   });
 }
 

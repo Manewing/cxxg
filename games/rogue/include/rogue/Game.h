@@ -58,7 +58,7 @@ private:
   void onSwitchLevelEvent(const SwitchLevelEvent &E);
   void onLootEvent(const LootEvent &E);
 
-  void handleDrawLevel();
+  void handleDrawLevel(bool UpdateScreen);
   void handleDrawGameOver();
 
 private:

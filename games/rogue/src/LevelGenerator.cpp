@@ -147,10 +147,10 @@ void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
   };
   static const std::map<char, EnemyInfo> EnemyStats = {
       {'s',
-       {"Skeleton", StatPoints{/*Int=*/1, /*Str=*/2, /*Dex=*/3, /*Vit=*/1},
+       {"Skeleton", StatPoints{/*Int=*/1, /*Str=*/1, /*Dex=*/30, /*Vit=*/1},
         FactionKind::Enemy, RaceKind::Undead}},
       {'t',
-       {"Troll", StatPoints{/*Int=*/1, /*Str=*/5, /*Dex=*/3, /*Vit=*/3},
+       {"Troll", StatPoints{/*Int=*/1, /*Str=*/5, /*Dex=*/5, /*Vit=*/3},
         FactionKind::Enemy, RaceKind::Troll}},
   };
 

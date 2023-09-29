@@ -37,7 +37,7 @@ cxxg::types::Size getWindowContainerSize(cxxg::Screen &Scr) {
 Controller::Controller(cxxg::Screen &Scr)
     : Scr(Scr), WdwContainer({1, 2}, getWindowContainerSize(Scr)) {}
 
-void Controller::draw(int LevelIdx, int Health, int MaxHealth,
+void Controller::draw(int LevelIdx, int Health, int MaxHealth, int AP, int AG,
                       std::string InteractStr) {
   // Define colors
   const auto NoColor = cxxg::types::Color::NONE;
@@ -59,7 +59,8 @@ void Controller::draw(int LevelIdx, int Health, int MaxHealth,
   Scr[0][0] << NoColor.underline() << "[FLOOR]:" << NoColor << " "
             << std::setw(3) << (LevelIdx + 1) << " " << NoColor.underline()
             << "[HEALTH]:" << HealthColor << std::setw(4) << Health << NoColor
-            << " | " << InterColor.underline() << InterStr;
+            << " [AP]: " << AP << " [AG]: " << AG << " | "
+            << InterColor.underline() << InterStr;
 
   WdwContainer.draw(Scr);
 }

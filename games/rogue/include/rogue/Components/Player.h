@@ -36,6 +36,7 @@ public:
 public:
   std::optional<Interaction> CurrentInteraction;
   ymir::Dir2d MoveDir = ymir::Dir2d::NONE;
+  bool IsReady = false;
 };
 
 } // namespace rogue

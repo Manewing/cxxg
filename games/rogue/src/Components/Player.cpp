@@ -54,7 +54,7 @@ entt::entity PlayerComp::createPlayer(entt::registry &Reg,
                                       const std::string &Name,
                                       ymir::Point2d<int> Pos) {
   return ::rogue::createPlayer(Reg, PlayerComp{}, PositionComp{Pos},
-                               StatsComp{StatPoints{1, 1, 1, 10}, {}},
+                               StatsComp{StatPoints{1, 1, 10, 10}, {}},
                                HealthComp{}, NameComp{Name}, LineOfSightComp{},
                                AgilityComp{}, MeleeAttackComp{},
                                InventoryComp{}, EquipmentComp{});

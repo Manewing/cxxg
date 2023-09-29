@@ -22,6 +22,11 @@ void performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
     return;
   }
 
+  auto *AG = Reg.try_get<AgilityComp>(Attacker);
+  if (AG && !AG->trySpendAP(MA->APCost)) {
+    return;
+  }
+
   // Compute the effective damage and apply it
   auto *SC = Reg.try_get<StatsComp>(Attacker);
   unsigned Damage = MA->getEffectiveDamage(SC);

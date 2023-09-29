@@ -8,7 +8,11 @@ namespace {
 
 static constexpr float HealthPerVit = 9.1f;
 static constexpr float ManaPerInt = 9.1f;
-static constexpr float AgilityPerDex = 1.0f;
+
+// Based on minimum AP cost of 10, see Balancing sheet
+static constexpr float AgilityPerDexLogBase = 1.2f;
+static constexpr float AgilityPerDexScale = 10.0f;
+static constexpr float AgilityPerDexLogOffset = 1.0f;
 
 void resetStats(entt::registry &Reg) {
   Reg.view<StatsComp>().each([](auto &S) { S.reset(); });
@@ -102,7 +106,9 @@ void applyStatEffects(entt::registry &Reg) {
 
   // Agility is determined by Dex
   Reg.view<const StatsComp, AgilityComp>().each([](const auto &St, auto &Ag) {
-    Ag.Agility = AgilityPerDex * St.effective().Dex;
+    Ag.Agility = std::log(AgilityPerDexLogBase + St.effective().Dex) /
+                 std::log(AgilityPerDexLogBase + AgilityPerDexLogOffset) *
+                 AgilityPerDexScale;
   });
 }
 

@@ -12,7 +12,7 @@ struct CombatComp {
 
 struct MeleeAttackComp {
   StatValue Damage = 10;
-  StatValue APCost = 5;
+  StatValue APCost = 10;
 
   /// Strength increases melee damage by 1 and by 1% per point
   StatValue getEffectiveDamage(StatPoints SrcStats) const {

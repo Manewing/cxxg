@@ -32,7 +32,7 @@ void AttackAISystem::update(UpdateType Type) {
       }
       auto Dist =
           std::abs(Pos.Pos.X - TPos.Pos.X) + std::abs(Pos.Pos.Y - TPos.Pos.Y);
-      if (Dist <= 1 && Ag.trySpendAP(MA.APCost)) {
+      if (Dist <= 1 && Ag.hasEnoughAP(MA.APCost)) {
         Reg.emplace<CombatComp>(Entity, TEntity);
       }
     });

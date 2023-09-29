@@ -182,30 +182,46 @@ bool Game::handleInput(int Char) {
     return true;
   }
 
-  handleUpdates(/*IsTick=*/true);
-
-  return true;
+  return handleUpdates(/*IsTick=*/true);
 }
 
 bool Game::handleUpdates(bool IsTick) {
-  if (IsTick) {
+  if (!IsTick) {
+    CurrentLevel->update(IsTick);
+    return true;
+  }
+
+  // While the game is running update the level and draw to screen.
+  // We will perform ticks until enough ticks have passed for the player to have
+  // gained enough AP to take an action.
+  while (GameRunning) {
+    CurrentLevel->update(true);
     GameTicks++;
+
+    if (!GameRunning) {
+      break;
+    }
+
+    handleDrawLevel(true);
+    cxxg::utils::sleep(70000);
+
+    auto PC = getLvlReg().get<PlayerComp>(getPlayer());
+    if (PC.IsReady) {
+      break;
+    }
   }
-  if (!CurrentLevel->update(IsTick)) {
-    // FIXME return false currently indicates player died, refactor for event
-    // of player death
-    return false;
-  }
+
   return true;
 }
 
 void Game::handleDraw() {
   if (GameRunning) {
-    handleDrawLevel();
-    return;
+    handleDrawLevel(false);
+  } else {
+    handleDrawGameOver();
   }
 
-  handleDrawGameOver();
+  cxxg::Game::handleDraw();
 }
 
 // FIXME move to player system?
@@ -281,7 +297,7 @@ void Game::onLootEvent(const LootEvent &E) {
   UICtrl.setLootUI(E.Entity, E.LootedEntity, *E.Registry);
 }
 
-void Game::handleDrawLevel() {
+void Game::handleDrawLevel(bool UpdateScreen) {
   // Render the current map
   const auto RenderSize = ymir::Size2d<int>{static_cast<int>(Scr.getSize().X),
                                             static_cast<int>(Scr.getSize().Y)};
@@ -291,6 +307,7 @@ void Game::handleDrawLevel() {
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
   auto LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
   auto Health = getLvlReg().get<HealthComp>(Player);
+  auto AGC = getLvlReg().get<AgilityComp>(Player);
 
   Renderer Render(RenderSize, *CurrentLevel, PlayerPos);
   Render.renderShadow(/*Darkness=*/30);
@@ -306,14 +323,18 @@ void Game::handleDrawLevel() {
   Scr << Render.get();
 
   // Draw UI overlay
-  UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, InteractStr);
+  UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, AGC.AP,
+              AGC.Agility, InteractStr);
 
-  cxxg::Game::handleDraw();
+  if (UpdateScreen) {
+    handleShowNotifications(false);
+    Scr.update();
+    Scr.clear();
+  }
 }
 
 void Game::handleDrawGameOver() {
   // TODO
-  cxxg::Game::handleDraw();
 }
 
 } // namespace rogue

@@ -17,7 +17,7 @@ class TargetInfo : public BaseRectDecorator {
 public:
   TargetInfo(Controller &Ctrl, entt::entity TargetEt, entt::registry &Reg);
   bool handleInput(int) override;
-  std::string getInteractMsg() const override;
+  void draw(cxxg::Screen &Scr) const override;
 
 private:
   Controller &Ctrl;
