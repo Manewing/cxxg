@@ -5,6 +5,7 @@
 #include <rogue/Components/Helpers.h>
 #include <rogue/Components/Stats.h>
 #include <string_view>
+#include <optional>
 
 namespace rogue {
 

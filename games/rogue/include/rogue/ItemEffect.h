@@ -70,7 +70,11 @@ public:
   const BuffBase &getBuff() const final { return Buff; }
 
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
-    return Reg.all_of<RequiredComps...>(Et);
+    if constexpr (sizeof...(RequiredComps) == 0) {
+      return true;
+    } else {
+      return Reg.all_of<RequiredComps...>(Et);
+    }
   }
 
   void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
@@ -83,7 +87,11 @@ public:
   }
 
   bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    return Reg.all_of<RequiredComps...>(Et);
+    if constexpr (sizeof...(RequiredComps) == 0) {
+      return true;
+    } else {
+      return Reg.all_of<RequiredComps...>(Et);
+    }
   }
 
   void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {

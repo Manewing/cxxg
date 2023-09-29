@@ -22,15 +22,15 @@ TargetInfo::TargetInfo(Controller &C, entt::entity TEt, entt::registry &R)
 
   auto ItSel = std::make_shared<ItemSelect>(Pos);
   int Count = 0;
-  if (auto *EC = Reg.try_get<EquipmentComp>(TargetEt)) {
+  if (Reg.try_get<EquipmentComp>(TargetEt)) {
     ItSel->addSelect<Select>(
         "Equip", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
   }
-  if (auto *IC = Reg.try_get<InventoryComp>(TargetEt)) {
+  if (Reg.try_get<InventoryComp>(TargetEt)) {
     ItSel->addSelect<Select>(
         "Inventory", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
   }
-  if (auto *SC = Reg.try_get<StatsComp>(TargetEt)) {
+  if (Reg.try_get<StatsComp>(TargetEt)) {
     ItSel->addSelect<Select>(
         "Stats", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
   }
