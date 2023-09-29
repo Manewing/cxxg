@@ -5,7 +5,7 @@
 
 namespace rogue {
 
-enum class WanderAIState { Idle, Wander, Chase };
+enum class WanderAIState { Idle = 0, Wander = 1, Chase = 2};
 
 struct WanderAIComp {
   WanderAIState State = WanderAIState::Idle;

@@ -1,6 +1,7 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Types.h>
 #include <cxxg/Utils.h>
+#include <rogue/Components/AI.h>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Stats.h>
@@ -22,7 +23,7 @@ TargetInfo::TargetInfo(Controller &C, entt::entity TEt, entt::registry &R)
   std::string Hdr = NC ? NC->Name : "Unknown";
 
   auto ItSel = std::make_shared<ItemSelect>(Pos);
-  int Count = 0;
+  int Count = 2;
   if (Reg.try_get<EquipmentComp>(TargetEt)) {
     ItSel->addSelect<Select>(
         "Equip", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
@@ -70,11 +71,16 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
 
   // FIXME move this to general stats?
   if (auto *HC = Reg.try_get<HealthComp>(TargetEt)) {
-    Scr[DrawPos.Y][DrawPos.X] << "Health: " << HC->Value << "/" << HC->MaxValue;
+    Scr[DrawPos.Y][DrawPos.X + 1] << "Health: " << HC->Value << "/"
+                                  << HC->MaxValue;
     DrawPos += cxxg::types::Position{0, 1};
   }
   if (auto *AG = Reg.try_get<AgilityComp>(TargetEt)) {
-    Scr[DrawPos.Y][DrawPos.X] << "AP: " << AG->AP << " AG: " << AG->Agility;
+    Scr[DrawPos.Y][DrawPos.X + 1] << "AP: " << AG->AP << " AG: " << AG->Agility;
+    DrawPos += cxxg::types::Position{0, 1};
+  }
+  if (auto *AI = Reg.try_get<WanderAIComp>(TargetEt)) {
+    Scr[DrawPos.Y][DrawPos.X + 1] << "AI: " << int(AI->State);
     DrawPos += cxxg::types::Position{0, 1};
   }
 
