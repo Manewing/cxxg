@@ -232,7 +232,8 @@ bool Game::handleUpdates(bool IsTick) {
     }
 
     handleDrawLevel(true);
-    cxxg::utils::sleep(70000);
+    cxxg::utils::sleep(50000);
+    cxxg::utils::getChar(false);
 
     auto PC = getLvlReg().get<PlayerComp>(getPlayer());
     if (PC.IsReady) {
