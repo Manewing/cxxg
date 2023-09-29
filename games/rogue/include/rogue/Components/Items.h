@@ -1,8 +1,8 @@
 #ifndef ROGUE_COMPONENTS_ITEMS_H
 #define ROGUE_COMPONENTS_ITEMS_H
 
-#include <rogue/Inventory.h>
 #include <rogue/Equipment.h>
+#include <rogue/Inventory.h>
 
 namespace rogue {
 

@@ -8,10 +8,7 @@ namespace rogue {
 
 class System : public EventHubConnector {
 public:
-  enum class UpdateType {
-    Tick,
-    NoTick
-  };
+  enum class UpdateType { Tick, NoTick };
 
 public:
   explicit System(entt::registry &Reg) : Reg(Reg) {}

@@ -16,7 +16,6 @@ const char *MovementBlockedException::what() const noexcept {
   return Msg.c_str();
 }
 
-
 bool Entity::canAttack(ymir::Point2d<int> Pos) const {
   // FIXME only melee check right now
   //   x
@@ -26,9 +25,7 @@ bool Entity::canAttack(ymir::Point2d<int> Pos) const {
   return (Diff.X + Diff.Y) <= 1;
 }
 
-void Entity::attackEntity(Entity &Other) {
-  Other.damage(Damage);
-}
+void Entity::attackEntity(Entity &Other) { Other.damage(Damage); }
 
 void Entity::wander(Level &L) { (void)L; }
 

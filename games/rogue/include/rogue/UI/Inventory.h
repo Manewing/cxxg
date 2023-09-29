@@ -3,8 +3,8 @@
 
 #include <entt/entt.hpp>
 #include <rogue/ItemType.h>
-#include <rogue/UI/Widget.h>
 #include <rogue/UI/Decorator.h>
+#include <rogue/UI/Widget.h>
 #include <string_view>
 
 namespace rogue {

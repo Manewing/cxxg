@@ -4,7 +4,6 @@
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/History.h>
 
-
 namespace rogue::ui {
 
 HistoryController::HistoryController(cxxg::types::Position Pos,

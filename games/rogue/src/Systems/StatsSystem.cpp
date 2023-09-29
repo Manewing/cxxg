@@ -47,7 +47,8 @@ void updateStatsBuffPerHitComp(entt::entity Entity, entt::registry &Reg,
   if (SC) {
     SC->add(SBPH.getEffectiveBuff(SBPH.Stacks));
   } else {
-    SC = &Reg.emplace<StatsBuffComp>(Entity, SBPH.getEffectiveBuff(SBPH.Stacks));
+    SC =
+        &Reg.emplace<StatsBuffComp>(Entity, SBPH.getEffectiveBuff(SBPH.Stacks));
   }
   SBPH.Applied = SC;
   SBPH.AppliedStack = SBPH.Stacks;

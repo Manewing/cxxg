@@ -64,7 +64,8 @@ void LabeledSelect::draw(cxxg::Screen &Scr) const {
     Scr[Pos.Y][Pos.X] << HighlightColor << Label << ":"
                       << " " << ValueColor << Value << NoColor;
   } else {
-    Scr[Pos.Y][Pos.X] << LabelColor << Label << ": " << ValueColor << Value << NoColor;
+    Scr[Pos.Y][Pos.X] << LabelColor << Label << ": " << ValueColor << Value
+                      << NoColor;
   }
 }
 

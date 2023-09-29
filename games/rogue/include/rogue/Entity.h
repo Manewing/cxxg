@@ -28,7 +28,6 @@ private:
   std::string Msg;
 };
 
-
 class Entity : public EventHubConnector {
 public:
   ymir::Point2d<int> Pos;

@@ -1,5 +1,5 @@
-#include <rogue/Components/Stats.h>
 #include <iostream>
+#include <rogue/Components/Stats.h>
 
 namespace rogue {
 

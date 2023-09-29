@@ -60,7 +60,7 @@ void ListSelect::draw(cxxg::Screen &Scr) const {
   }
 }
 
-void ListSelect::drawFrameElement(cxxg::Screen &Scr,  const Element &Elem,
+void ListSelect::drawFrameElement(cxxg::Screen &Scr, const Element &Elem,
                                   cxxg::types::Position Pos, unsigned Width,
                                   bool IsSelected) {
   if (IsSelected) {

@@ -18,8 +18,8 @@ EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
                                          entt::entity Entity,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
-    : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip), Entity(Entity),
-      Reg(Reg) {
+    : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip),
+      Entity(Entity), Reg(Reg) {
   ItSel = std::make_shared<ItemSelect>(Pos);
   Comp = std::make_shared<Frame>(ItSel, Pos, getSize(), "Equipment");
 

@@ -22,7 +22,6 @@ class Level;
 
 namespace rogue::ui {
 
-
 class Controller {
 public:
   Controller(cxxg::Screen &Scr);
@@ -32,8 +31,7 @@ public:
 
   void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false);
 
-  void setEquipmentUI(entt::entity Entity,
-                      entt::registry &Reg);
+  void setEquipmentUI(entt::entity Entity, entt::registry &Reg);
   bool hasEquipmentUI() const;
   void closeEquipmentUI();
 

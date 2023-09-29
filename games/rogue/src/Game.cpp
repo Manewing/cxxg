@@ -201,7 +201,7 @@ bool Game::handleUpdates(bool IsTick) {
 
 void Game::handleDraw() {
   if (GameRunning) {
-      handleDrawLevel();
+    handleDrawLevel();
     return;
   }
 
