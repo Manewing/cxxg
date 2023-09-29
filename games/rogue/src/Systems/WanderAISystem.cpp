@@ -18,28 +18,31 @@ void WanderAISystem::update(UpdateType Type) {
     return;
   }
 
-  auto View = Reg.view<PositionComp, WanderAIComp, AgilityComp>();
-  View.each([this](const auto &Entity, auto &Pos, auto &AI, auto &Ag) {
-    updateEntity(Entity, Pos, AI, Ag);
+  auto View = Reg.view<PositionComp, WanderAIComp>();
+  View.each([this](const auto &Entity, auto &Pos, auto &AI) {
+    updateEntity(Entity, Pos, AI);
   });
 }
 
 void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
-                                  WanderAIComp &AI, AgilityComp &Ag) {
+                                  WanderAIComp &AI) {
   switch (AI.State) {
   case WanderAIState::Idle: {
+    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
+    if (TargetEt != entt::null) {
+      AI.State = WanderAIState::Chase;
+      break;
+    }
+
     if (AI.IdleDelayLeft-- == 0) {
       AI.State = WanderAIState::Wander;
       AI.IdleDelayLeft = AI.IdleDelay;
     }
+  } break;
+  case WanderAIState::Wander: {
     auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
     if (TargetEt != entt::null) {
       AI.State = WanderAIState::Chase;
-    }
-  } break;
-  case WanderAIState::Wander: {
-    // FIXME switch to Idle after random duration
-    if (!Ag.trySpendAP(AI.MoveAPCost)) {
       break;
     }
 
@@ -47,11 +50,6 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
     MovementComp MC;
     MC.Dir = ymir::Dir2d::fromMaxComponent(NextPos - PC.Pos);
     Reg.emplace<MovementComp>(Entity, MC);
-
-    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
-    if (TargetEt != entt::null) {
-      AI.State = WanderAIState::Chase;
-    }
   } break;
 
   case WanderAIState::Chase: {
@@ -59,6 +57,7 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
     auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
     if (TargetEt == entt::null) {
       AI.State = WanderAIState::Idle;
+      AI.IdleDelayLeft = AI.IdleDelay;
       break;
     }
     auto NextPosOrNone = chaseTarget(TargetEt, PC, *LOS);

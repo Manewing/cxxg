@@ -28,8 +28,7 @@ public:
   void update(UpdateType Type) override;
 
 private:
-  void updateEntity(entt::entity Entity, PositionComp &Pos, WanderAIComp &AI,
-                    AgilityComp &Ag);
+  void updateEntity(entt::entity Entity, PositionComp &Pos, WanderAIComp &AI);
 
   std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
   checkForTarget(entt::entity Entity, const ymir::Point2d<int> &AtPos);

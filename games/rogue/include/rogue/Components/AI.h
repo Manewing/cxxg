@@ -11,8 +11,6 @@ struct WanderAIComp {
   WanderAIState State = WanderAIState::Idle;
   unsigned IdleDelay = 2;
   unsigned IdleDelayLeft = 2;
-  unsigned MoveAPCost = 5;
-  unsigned DistanceWalked = 0;
 };
 
 struct LineOfSightComp {
