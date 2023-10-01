@@ -64,6 +64,7 @@ void Level::movePlayer(Level &From, ymir::Point2d<int> ToPos) {
   Player = PlayerComp::movePlayer(From.Reg, Reg);
   auto &PC = Reg.get<PositionComp>(Player);
   PC.Pos = ToPos;
+  updateEntityPosition(Player, PC, ToPos);
 }
 
 void Level::removePlayer() { PlayerComp::removePlayer(Reg); }
@@ -151,10 +152,16 @@ Level::getInteractables(ymir::Point2d<int> AtPos) const {
 }
 
 bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
+  if (!Map.contains(Pos)) {
+    return true;
+  }
   return Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile;
 }
 
 bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
+  if (!Map.contains(Pos)) {
+    return true;
+  }
   bool MapBlocked = Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile;
   bool EntityBlocked = getEntityAt(Pos) != entt::null;
   return MapBlocked || EntityBlocked;
@@ -189,11 +196,11 @@ const entt::entity &Level::getEntityAt(ymir::Point2d<int> AtPos) const {
 void Level::updateEntityPosition(const entt::entity &Entity,
                                  PositionComp &PosComp,
                                  const ymir::Point2d<int> NextPos) {
+  EntityPosCache.setTile(NextPos, Entity);
   if (PosComp.Pos == NextPos) {
     return;
   }
   EntityPosCache.setTile(PosComp, entt::null);
-  EntityPosCache.setTile(NextPos, Entity);
   PosComp.Pos = NextPos;
 }
 

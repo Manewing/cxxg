@@ -15,7 +15,7 @@ namespace {
 using PlayerCompList =
     ComponentList<TileComp, FactionComp, PlayerComp, PositionComp, StatsComp,
                   HealthComp, NameComp, LineOfSightComp, AgilityComp,
-                  MeleeAttackComp, InventoryComp, EquipmentComp>;
+                  MeleeAttackComp, InventoryComp, EquipmentComp, CollisionComp>;
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
                           const PositionComp &PosComp, const StatsComp &Stats,
@@ -64,7 +64,10 @@ entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
                                     entt::registry &RegTo) {
   entt::entity PlayerEntity = entt::null;
   auto View = RegFrom.view<PlayerComp>();
+  bool Found = false;
   for (auto Entity : View) {
+    assert(!Found && "Multiple players found");
+    Found = true;
     PlayerEntity = RegTo.create();
     copyComponentsOrFail<PlayerCompList>(Entity, RegFrom, PlayerEntity, RegTo);
     copyBuffs(Entity, RegFrom, PlayerEntity, RegTo);

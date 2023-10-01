@@ -103,6 +103,7 @@ void Game::switchLevel(int Level, bool ToEntry) {
   } else if (CurrentLevel != Levels.at(Level)) {
     auto ToPos =
         ToEntry ? LevelPtr->getPlayerStartPos() : LevelPtr->getPlayerEndPos();
+    LevelPtr->update(false);
     LevelPtr->movePlayer(*CurrentLevel, ToPos);
   }
 

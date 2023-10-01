@@ -73,6 +73,7 @@ protected:
   void updatePlayerDijkstraMap();
   void updatePlayerSeenMap();
 
+  /// Updates entity positions based on entities with position and collision
   void updateEntityPosCache();
 
 public: // FIXME

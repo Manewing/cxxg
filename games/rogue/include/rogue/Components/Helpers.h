@@ -44,7 +44,11 @@ template <typename T>
 void copyComponentOrFail(entt::entity EntityFrom, entt::registry &RegFrom,
                          entt::entity EntityTo, entt::registry &RegTo) {
   assert(RegFrom.any_of<T>(EntityFrom));
-  RegTo.emplace<T>(EntityTo, RegFrom.get<T>(EntityFrom));
+  if constexpr (sizeof(T) == 1) {
+    RegTo.emplace<T>(EntityTo);
+  } else {
+    RegTo.emplace<T>(EntityTo, RegFrom.get<T>(EntityFrom));
+  }
 }
 
 template <typename ComponentListT>
