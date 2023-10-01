@@ -164,11 +164,15 @@ bool Game::handleInput(int Char) {
     if (UICtrl.hasTargetUI()) {
       UICtrl.closeTargetUI();
     } else {
-      UICtrl.setTargetUI(getLvlReg().get<PositionComp>(getPlayer()),
+      UICtrl.setTargetUI(getPlayer(),
+                         getLvlReg().get<PositionComp>(getPlayer()),
                          *CurrentLevel);
     }
     return true;
   }
+  case 'l':
+    switchLevel(CurrentLevelIdx + 1, true);
+    break;
 
   // TODO show controls
   default:

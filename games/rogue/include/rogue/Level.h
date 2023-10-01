@@ -56,6 +56,7 @@ public:
   bool canInteract(ymir::Point2d<int> Pos) const;
   std::vector<entt::entity> getInteractables(ymir::Point2d<int> Pos) const;
 
+  bool isWallBlocked(ymir::Point2d<int> Pos) const;
   bool isLOSBlocked(ymir::Point2d<int> Pos) const;
   bool isBodyBlocked(ymir::Point2d<int> Pos) const;
 

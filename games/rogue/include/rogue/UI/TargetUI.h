@@ -27,7 +27,7 @@ private:
 
 class TargetUI : public Widget {
 public:
-  TargetUI(Controller &Ctrl, ymir::Point2d<int> TargetPos, Level &Lvl);
+  TargetUI(Controller &Ctrl, entt::entity SrcEt, ymir::Point2d<int> StartPos, Level &Lvl);
   bool handleInput(int) override;
   std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
@@ -38,6 +38,8 @@ public:
 private:
   Controller &Ctrl;
   Level &Lvl;
+  ymir::Point2d<int> StartPos;
+  entt::entity SrcEt = entt::null;
   entt::entity CursorEt = entt::null;
   entt::entity TargetEt = entt::null;
 };

@@ -14,6 +14,9 @@
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/TargetUI.h>
 
+#include <rogue/Components/Combat.h>
+#include <rogue/Event.h>
+
 namespace rogue::ui {
 
 TargetInfo::TargetInfo(Controller &C, entt::entity TEt, entt::registry &R)
@@ -87,10 +90,11 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
   Comp->draw(Scr);
 }
 
-TargetUI::TargetUI(Controller &Ctrl, ymir::Point2d<int> TargetPos, Level &Lvl)
-    : Widget({0, 0}), Ctrl(Ctrl), Lvl(Lvl) {
+TargetUI::TargetUI(Controller &Ctrl, entt::entity SrcEt,
+                   ymir::Point2d<int> StartPos, Level &Lvl)
+    : Widget({0, 0}), Ctrl(Ctrl), Lvl(Lvl), StartPos(StartPos), SrcEt(SrcEt) {
   CursorEt = Lvl.Reg.create();
-  Lvl.Reg.emplace<PositionComp>(CursorEt, TargetPos);
+  Lvl.Reg.emplace<PositionComp>(CursorEt, StartPos);
   Lvl.Reg.emplace<TileComp>(
       CursorEt, Tile{{'X', cxxg::types::RgbColor{255, 0, 0}}}, 3000);
   Lvl.Reg.emplace<CursorComp>(CursorEt);
@@ -127,6 +131,15 @@ bool TargetUI::handleInput(int Char) {
     if (TargetEt != entt::null) {
       showInfoForTarget(TargetEt, Lvl.Reg);
     }
+    break;
+  case ' ': {
+    auto Diff = TargetPos - StartPos;
+    auto MoveDir = ymir::Dir2d::fromVector(Diff);
+    auto PPos = StartPos + MoveDir;
+        createProjectile(Lvl.Reg, SrcEt, 100, 1, MoveDir, PPos, 100);
+    destroyCursor();
+    return false;
+  }
   default:
     break;
   }

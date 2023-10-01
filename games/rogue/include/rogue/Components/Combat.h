@@ -3,6 +3,7 @@
 
 #include <entt/entt.hpp>
 #include <rogue/Components/Stats.h>
+#include <ymir/Types.hpp>
 
 namespace rogue {
 
@@ -27,6 +28,16 @@ struct MeleeAttackComp {
     return getEffectiveDamage(SrcSC->effective());
   }
 };
+
+struct DamageComp {
+  entt::entity Source = entt::null;
+  StatValue Damage = 100;
+  int Hits = 1;
+};
+
+void createProjectile(entt::registry &Reg, entt::entity Source,
+                      StatValue Damage, int Hits, ymir::Dir2d MoveDir, ymir::Point2d<int> Pos,
+                      StatValue Agility = 100);
 
 } // namespace rogue
 

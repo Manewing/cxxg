@@ -151,11 +151,15 @@ Level::getInteractables(ymir::Point2d<int> AtPos) const {
   return Entities;
 }
 
-bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
+bool Level::isWallBlocked(ymir::Point2d<int> Pos) const {
   if (!Map.contains(Pos)) {
     return true;
   }
   return Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile;
+}
+
+bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
+  return isWallBlocked(Pos);
 }
 
 bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
@@ -196,11 +200,16 @@ const entt::entity &Level::getEntityAt(ymir::Point2d<int> AtPos) const {
 void Level::updateEntityPosition(const entt::entity &Entity,
                                  PositionComp &PosComp,
                                  const ymir::Point2d<int> NextPos) {
-  EntityPosCache.setTile(NextPos, Entity);
+  const auto HasCollision = Reg.all_of<CollisionComp>(Entity);
+  if (HasCollision) {
+    EntityPosCache.setTile(NextPos, Entity);
+  }
   if (PosComp.Pos == NextPos) {
     return;
   }
-  EntityPosCache.setTile(PosComp, entt::null);
+  if (HasCollision) {
+    EntityPosCache.setTile(PosComp, entt::null);
+  }
   PosComp.Pos = NextPos;
 }
 

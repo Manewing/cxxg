@@ -181,8 +181,9 @@ void Controller::closeHistoryUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<HistoryController>());
 }
 
-void Controller::setTargetUI(ymir::Point2d<int> TargetPos, Level &Lvl) {
-  WdwContainer.addWindow<TargetUI>(*this, TargetPos, Lvl);
+void Controller::setTargetUI(entt::entity SrcEt, ymir::Point2d<int> TargetPos,
+                             Level &Lvl) {
+  WdwContainer.addWindow<TargetUI>(*this, SrcEt, TargetPos, Lvl);
   WdwContainer.autoLayoutWindows();
 }
 

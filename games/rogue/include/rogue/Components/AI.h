@@ -19,7 +19,7 @@ struct LineOfSightComp {
 
 struct AttackAIComp {};
 
-enum class FactionKind { Nature, Enemy, Player };
+enum class FactionKind { Nature = 0, Enemy = 1, Player = 2 };
 
 struct FactionComp {
   FactionKind Faction = FactionKind::Nature;

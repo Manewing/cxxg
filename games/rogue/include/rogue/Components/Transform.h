@@ -17,7 +17,18 @@ struct PositionComp {
 struct MovementComp {
   static constexpr StatValue MoveAPCost = 10;
 
+  /// Direction of movement
   ymir::Dir2d Dir = ymir::Dir2d::NONE;
+
+  /// Clear movement after being applied
+  bool Clear = true;
+
+  /// True if the movement is flying
+  bool Flying = false;
+
+  /// Kill after hitting wall
+  // FIXME move this
+  bool KillOnWall = false;
 
   // Allow implicit conversion
   MovementComp(const ymir::Dir2d &Dir = ymir::Dir2d::NONE) : Dir(Dir) {}

@@ -115,9 +115,10 @@ ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
   return *It;
 }
 
-std::optional<ymir::Point2d<int>> WanderAISystem::chaseTarget(entt::entity TargetEt,
-                                               const ymir::Point2d<int> AtPos,
-                                               const LineOfSightComp &LOS) {
+std::optional<ymir::Point2d<int>>
+WanderAISystem::chaseTarget(entt::entity TargetEt,
+                            const ymir::Point2d<int> AtPos,
+                            const LineOfSightComp &LOS) {
   const auto &TPC = Reg.get<PositionComp>(TargetEt);
   auto TPos = TPC.Pos;
   if (ymir::FourTileDirections<int>::isNextTo(AtPos, TPos)) {

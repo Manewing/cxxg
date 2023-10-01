@@ -23,9 +23,6 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
   auto NewPos = PosComp.Pos + PC.MoveDir;
   const auto MoveDir = PC.MoveDir;
 
-  // FIXME waiting a turn will clear the move intention, but may not execute
-  // PC.MoveDir = ymir::Dir2d::NONE;
-
   // FIXME this does not count in combat
   // -> check instead of an action was successfully performed
   PC.IsReady = AG.hasEnoughAP(MovementComp::MoveAPCost);

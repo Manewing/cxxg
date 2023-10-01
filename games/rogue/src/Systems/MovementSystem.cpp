@@ -6,21 +6,32 @@ namespace rogue {
 
 namespace {
 
-
 void applyMovementComp(entt::registry &Reg, Level &L, entt::entity Entity,
                        PositionComp &PC, const MovementComp &MC) {
   if (MC.Dir == ymir::Dir2d::NONE) {
+    if (MC.Clear) {
+      Reg.erase<MovementComp>(Entity);
+    }
     return;
   }
 
   auto *AG = Reg.try_get<AgilityComp>(Entity);
   if (AG && !AG->trySpendAP(MovementComp::MoveAPCost)) {
+    if (MC.Clear) {
+      Reg.erase<MovementComp>(Entity);
+    }
     return;
   }
 
   auto NewPos = PC.Pos + MC.Dir;
-  if (!L.isBodyBlocked(NewPos)) {
+  if (MC.Flying || !L.isBodyBlocked(NewPos)) {
     L.updateEntityPosition(Entity, PC, NewPos);
+  }
+
+  if (MC.KillOnWall && L.isWallBlocked(NewPos)) {
+    Reg.destroy(Entity);
+  } else if (MC.Clear) {
+    Reg.erase<MovementComp>(Entity);
   }
 }
 
@@ -36,7 +47,6 @@ void MovementSystem::update(UpdateType Type) {
   auto View = Reg.view<PositionComp, MovementComp>();
   View.each([this](auto Entity, auto &PC, auto &MC) {
     applyMovementComp(Reg, L, Entity, PC, MC);
-    Reg.erase<MovementComp>(Entity);
   });
 }
 

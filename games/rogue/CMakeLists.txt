@@ -65,6 +65,7 @@ set(HEADER_FILES
 )
 
 set(SOURCE_FILES
+  src/Components/Combat.cpp
   src/Components/Buffs.cpp
   src/Components/Entity.cpp
   src/Components/Player.cpp
