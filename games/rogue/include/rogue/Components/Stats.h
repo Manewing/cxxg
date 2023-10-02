@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <iosfwd>
+#include <numeric>
 
 namespace rogue {
 
@@ -28,10 +29,17 @@ struct StatPoints {
     return *this;
   }
 
-  inline std::array<StatPoint *, 4> all() { return {{&Int, &Str, &Dex, &Vit}}; }
-
-  inline std::array<const StatPoint *, 4> all() const {
+  inline constexpr std::array<StatPoint *, 4> all() {
     return {{&Int, &Str, &Dex, &Vit}};
+  }
+
+  inline constexpr std::array<StatPoint, 4> all() const {
+    return {{Int, Str, Dex, Vit}};
+  }
+
+  inline constexpr StatPoint sum() const {
+    const auto All = all();
+    return std::accumulate(All.begin(), All.end(), 0);
   }
 
   inline auto tie() { return std::tie(Int, Str, Dex, Vit); }

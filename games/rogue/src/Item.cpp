@@ -1,6 +1,7 @@
 #include <rogue/Item.h>
 #include <rogue/ItemEffect.h>
 #include <rogue/ItemPrototype.h>
+#include <rogue/Components/Buffs.h>
 
 namespace rogue {
 
@@ -8,8 +9,51 @@ Item::Item(const ItemPrototype &Proto, int StackSize,
            const std::shared_ptr<ItemPrototype> &Spec)
     : StackSize(StackSize), Proto(&Proto), Specialization(Spec) {}
 
+namespace {
+
+std::string getQualifierName(const StatPoints &P) {
+  std::string Prefix = "+" + std::to_string(P.sum()) + " ";
+  if (P.Str >= P.Dex && P.Str >= P.Int && P.Str >= P.Vit) {
+    return Prefix + "Str. ";
+  }
+  if (P.Dex >= P.Str && P.Dex >= P.Int && P.Dex >= P.Vit) {
+    return Prefix + "Fast ";
+  }
+  if (P.Int >= P.Str && P.Int >= P.Dex && P.Int >= P.Vit) {
+    return Prefix + "Wise ";
+  }
+  if (P.Vit >= P.Str && P.Vit >= P.Dex && P.Vit >= P.Int) {
+    return Prefix + "Tgh. ";
+  }
+  if (P.Str == P.Dex && P.Str == P.Int && P.Str == P.Vit) {
+    return Prefix + "Bal. ";
+  }
+  return Prefix;
+}
+
+std::string getQualifierName(const Item &It) {
+  // Check for stats buff effect and return name based strongest
+  // stat point boost
+  for (const auto &ItEff : It.getAllEffects()) {
+    if ((ItEff.Flags & CapabilityFlags::Equipment) == CapabilityFlags::None) {
+      continue;
+    }
+    const auto *StatEff =
+        dynamic_cast<const ApplyBuffItemEffectBase *>(ItEff.Effect.get());
+    if (!StatEff) { continue; }
+    const auto *StatBuff = dynamic_cast<const StatsBuffComp *>(&StatEff->getBuff());
+    if (!StatBuff) { continue; }
+    return getQualifierName(StatBuff->Bonus);
+  }
+  return "";
+}
+
+} // namespace
+
 std::string Item::getName() const {
-  // TODO make name depend on quality etc
+  if ((getType() & ItemType::EquipmentMask) != ItemType::None) {
+    return getQualifierName(*this) + getProto().Name;
+  }
   return getProto().Name;
 }
 

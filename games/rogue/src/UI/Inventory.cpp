@@ -36,7 +36,7 @@ InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  entt::entity Entity,
                                                  entt::registry &Reg,
                                                  const std::string &Header)
-    : BaseRectDecorator({2, 2}, {30, 18}, nullptr), Ctrl(Ctrl), Inv(Inv),
+    : BaseRectDecorator({2, 2}, {40, 18}, nullptr), Ctrl(Ctrl), Inv(Inv),
       Entity(Entity), Reg(Reg) {
   List = std::make_shared<ListSelect>(Pos, getSize());
   Comp = std::make_shared<Frame>(List, Pos, getSize(), Header);

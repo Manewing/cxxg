@@ -70,6 +70,8 @@ bool TargetInfo::handleInput(int Char) {
 }
 
 void TargetInfo::draw(cxxg::Screen &Scr) const {
+  BaseRectDecorator::draw(Scr);
+
   cxxg::types::Position DrawPos = Pos + cxxg::types::Position{2, 1};
 
   // FIXME move this to general stats?
@@ -86,8 +88,6 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
     Scr[DrawPos.Y][DrawPos.X + 1] << "AI: " << int(AI->State);
     DrawPos += cxxg::types::Position{0, 1};
   }
-
-  Comp->draw(Scr);
 }
 
 TargetUI::TargetUI(Controller &Ctrl, entt::entity SrcEt,
