@@ -2,10 +2,10 @@
 #define ROGUE_COMPONENTS_BUFFS_H
 
 #include <entt/entt.hpp>
+#include <optional>
 #include <rogue/Components/Helpers.h>
 #include <rogue/Components/Stats.h>
 #include <string_view>
-#include <optional>
 
 namespace rogue {
 

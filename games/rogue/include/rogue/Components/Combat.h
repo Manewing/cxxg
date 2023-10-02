@@ -36,8 +36,8 @@ struct DamageComp {
 };
 
 void createProjectile(entt::registry &Reg, entt::entity Source,
-                      StatValue Damage, int Hits, ymir::Dir2d MoveDir, ymir::Point2d<int> Pos,
-                      StatValue Agility = 100);
+                      StatValue Damage, int Hits, ymir::Dir2d MoveDir,
+                      ymir::Point2d<int> Pos, StatValue Agility = 100);
 
 } // namespace rogue
 

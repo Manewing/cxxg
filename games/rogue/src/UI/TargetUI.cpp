@@ -136,7 +136,7 @@ bool TargetUI::handleInput(int Char) {
     auto Diff = TargetPos - StartPos;
     auto MoveDir = ymir::Dir2d::fromVector(Diff);
     auto PPos = StartPos + MoveDir;
-        createProjectile(Lvl.Reg, SrcEt, 100, 1, MoveDir, PPos, 100);
+    createProjectile(Lvl.Reg, SrcEt, 100, 1, MoveDir, PPos, 100);
     destroyCursor();
     return false;
   }

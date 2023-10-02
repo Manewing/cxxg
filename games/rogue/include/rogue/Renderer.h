@@ -12,7 +12,6 @@ class Level;
 
 namespace rogue {
 
-
 class Renderer {
 public:
   Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center);
