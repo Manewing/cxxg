@@ -32,6 +32,7 @@ public:
   void onEntityAttackEvent(const EntityAttackEvent &E);
   void apply(Renderer &R);
   void clear();
+  bool hasEvents() const;
 
 private:
   std::vector<std::function<void(Renderer &)>> RenderFns;

@@ -51,6 +51,8 @@ void RenderEventCollector::apply(Renderer &R) {
 
 void RenderEventCollector::clear() { RenderFns.clear(); }
 
+bool RenderEventCollector::hasEvents() const { return !RenderFns.empty(); }
+
 Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
       ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)), Ctx({*this, ItemDb}),
@@ -206,6 +208,7 @@ bool Game::handleInput(int Char) {
     movePlayer(ymir::Dir2d::UP);
     break;
   case cxxg::utils::KEY_SPACE:
+    movePlayer(ymir::Dir2d::NONE);
     break;
   case 'e':
     tryInteract();
@@ -237,7 +240,11 @@ bool Game::handleUpdates(bool IsTick) {
     }
 
     handleDrawLevel(true);
-    cxxg::utils::sleep(50000);
+    if (REC.hasEvents()) {
+      cxxg::utils::sleep(50000);
+    }
+
+    // Clear stdin buffer
     cxxg::utils::getChar(false);
 
     auto PC = getLvlReg().get<PlayerComp>(getPlayer());
