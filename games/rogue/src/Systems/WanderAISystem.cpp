@@ -98,7 +98,7 @@ WanderAISystem::checkForTarget(entt::entity Entity,
         }
         return !L.isLOSBlocked(Pos);
       },
-      AtPos, LOSComp->LOSRange);
+      AtPos, LOSComp->LOSRange, 0.1);
 
   return {TargetEt, LOSComp, FacComp};
 }

@@ -241,9 +241,10 @@ bool Game::handleUpdates(bool IsTick) {
       break;
     }
 
+    auto SlepAfterDraw = REC.hasEvents();
     handleDrawLevel(true);
-    if (REC.hasEvents()) {
-      cxxg::utils::sleep(50000);
+    if (SlepAfterDraw) {
+      cxxg::utils::sleep(200000);
     }
 
     // Clear stdin buffer

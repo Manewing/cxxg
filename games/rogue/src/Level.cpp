@@ -238,7 +238,7 @@ void Level::updatePlayerSeenMap() {
         return !isLOSBlocked(Pos);
       },
       Reg.get<PositionComp>(Player).Pos,
-      Reg.get<LineOfSightComp>(Player).LOSRange, 0.1, 0.001);
+      Reg.get<LineOfSightComp>(Player).LOSRange, 0.1, 0.01);
 }
 
 void Level::updateEntityPosCache() {
