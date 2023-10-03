@@ -12,12 +12,28 @@ GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
   auto [DocStr, Doc] = loadJSON(ConfigFile, &SchemaFile);
 
   auto ConfigDir = ConfigFile.parent_path();
-  const auto LevelConfig = Doc["level_config"].GetString();
-  Config.LevelConfig = ConfigDir / LevelConfig;
   const auto ItemDbConfig = Doc["item_db_config"].GetString();
   Config.ItemDbConfig = ConfigDir / ItemDbConfig;
 
+  for (const auto &Level : Doc["levels"].GetArray()) {
+    LevelConfig LevelCfg;
+    LevelCfg.LevelEndIdx = Level["end"].GetInt();
+    const auto LevelConfig = Level["config"].GetString();
+    LevelCfg.Config = ConfigDir / LevelConfig;
+    Config.Levels.push_back(LevelCfg);
+  }
+
   return Config;
+}
+
+const LevelConfig &GameConfig::getLevelConfig(int LevelIdx) const {
+  for (const auto &Level : Levels) {
+    if (Level.LevelEndIdx >= LevelIdx) {
+      return Level;
+    }
+  }
+  throw std::runtime_error("No level config for level " +
+                           std::to_string(LevelIdx));
 }
 
 } // namespace rogue

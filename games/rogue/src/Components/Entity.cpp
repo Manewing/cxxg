@@ -48,6 +48,23 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   }
 }
 
+void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                           const std::string &Name, const StatPoints &Stats) {
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  Reg.emplace<HealthComp>(Entity);
+  Reg.emplace<WanderAIComp>(Entity);
+  Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, Name);
+  Reg.emplace<LineOfSightComp>(Entity);
+  Reg.emplace<AttackAIComp>(Entity);
+  Reg.emplace<MeleeAttackComp>(Entity, 1.0);
+  Reg.emplace<FactionComp>(Entity, FactionKind::Nature);
+  Reg.emplace<AgilityComp>(Entity);
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<StatsComp>(Entity).Base = Stats;
+}
+
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                           bool IsExit, int LevelId) {
   auto Entity = Reg.create();

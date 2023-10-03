@@ -1,4 +1,17 @@
 {
-	"level_config": "level.cfg",
-	"item_db_config": "item_db.json"
+	"item_db_config": "item_db.json",
+	"levels": [
+		{
+			"end": 2,
+			"config": "levels/skeleton_dungeon.cfg"
+		},
+		{
+			"end": 3,
+			"config": "levels/troll_dungeon.cfg"
+		},
+		{
+			"end": 4,
+			"config": "levels/blob_cave.cfg"
+		}
+	]
 }

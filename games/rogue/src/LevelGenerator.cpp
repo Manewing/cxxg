@@ -150,9 +150,17 @@ void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
        {"Skeleton", StatPoints{/*Int=*/1, /*Str=*/1, /*Dex=*/30, /*Vit=*/1},
         FactionKind::Enemy, RaceKind::Undead}},
       {'t',
-       {"Troll", StatPoints{/*Int=*/1, /*Str=*/5, /*Dex=*/5, /*Vit=*/3},
+       {"Troll", StatPoints{/*Int=*/1, /*Str=*/15, /*Dex=*/5, /*Vit=*/3},
         FactionKind::Enemy, RaceKind::Troll}},
   };
+
+  struct CreatureInfo {
+    std::string Name;
+    StatPoints Stats;
+  };
+  static const std::map<char, CreatureInfo> CreatureStats = {
+      {'b',
+       {"Blob", StatPoints{/*Int=*/0, /*Str=*/12, /*Dex=*/3, /*Vit=*/20}}}};
 
   switch (T.kind()) {
   case 't':
@@ -161,6 +169,10 @@ void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
     createEnemy(L.Reg, Pos, T, EI.Name,
                 generateRandomLootInventory(Ctx->ItemDb), EI.Stats, EI.Faction,
                 EI.Race);
+  } break;
+  case 'b': {
+    const auto &CI = CreatureStats.at(T.kind());
+    createHostileCreature(L.Reg, Pos, T, CI.Name, CI.Stats);
   } break;
   case 'H': {
     int PrevLevelId = L.getLevelId() - 1;
