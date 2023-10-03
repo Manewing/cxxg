@@ -1,6 +1,8 @@
 #include <cxxg/Utils.h>
 #include <iomanip>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/Visual.h>
+#include <rogue/Event.h>
 #include <rogue/Inventory.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
@@ -90,46 +92,69 @@ bool InventoryController::handleInput(int Char) {
     return InventoryControllerBase::handleInput(Char);
   }
 
+  const auto ItemIdx = List->getSelectedElement();
   switch (Char) {
   case Controls::Equip.Char: {
+    const auto &It = Inv.getItem(ItemIdx);
     auto Equip = Reg.try_get<EquipmentComp>(Entity);
     if (!Equip) {
-      // FIXME message
+      Ctrl.publish(PlayerInfoMessageEvent()
+                   << "Can not equip " + It.getName() + " on " +
+                          Reg.get<NameComp>(Entity).Name);
       break;
     }
-    const auto &It = Inv.getItem(List->getSelectedElement());
 
-    if (Equip->Equip.isEquipped(It.getType()) &&
-        Equip->Equip.getSlot(It.getType())
-            .It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
-      Equip->Equip.getSlot(It.getType())
-          .It->removeFrom(Entity, Reg, CapabilityFlags::UnequipFrom);
-      auto EquippedIt = Equip->Equip.unequip(It.getType());
-      Inv.addItem(EquippedIt);
-      // FIXME message
+    if (auto EquipItOrNone =
+            Equip->Equip.tryUnequip(It.getType(), Entity, Reg)) {
+      Inv.addItem(*EquipItOrNone);
     }
 
-    if (!It.canApplyTo(Entity, Reg, CapabilityFlags::EquipOn)) {
-      // FIXME message
+    if (!Equip->Equip.canEquip(It, Entity, Reg)) {
+      Ctrl.publish(PlayerInfoMessageEvent()
+                   << "Can not equip " + It.getName() + " on " +
+                          Reg.get<NameComp>(Entity).Name);
       break;
     }
-    It.applyTo(Entity, Reg, CapabilityFlags::EquipOn);
-    Equip->Equip.equip(Inv.takeItem(List->getSelectedElement(), /*Count=*/1));
+
+    Ctrl.publish(PlayerInfoMessageEvent()
+                 << "Equip " + It.getName() + " on " +
+                        Reg.get<NameComp>(Entity).Name);
+    Equip->Equip.equip(Inv.takeItem(ItemIdx, /*Count=*/1), Entity, Reg);
     updateElements();
   } break;
-  case Controls::Use.Char:
-    if (!Inv.getItem(List->getSelectedElement())
-             .canApplyTo(Entity, Reg, CapabilityFlags::UseOn)) {
-      // FIXME message
-      break;
+  case Controls::Use.Char: {
+    auto ItOrNone =
+        Inv.applyItemTo(ItemIdx, CapabilityFlags::UseOn, Entity, Reg);
+    if (ItOrNone) {
+      // FIXME add information on result of use
+      Ctrl.publish(PlayerInfoMessageEvent()
+                   << "Used " + ItOrNone->getName() + " on " +
+                          Reg.get<NameComp>(Entity).Name);
+    } else {
+      Ctrl.publish(PlayerInfoMessageEvent()
+                   << "Can not use " + Inv.getItem(ItemIdx).getName() + " on " +
+                          Reg.get<NameComp>(Entity).Name);
     }
-    Inv.takeItem(List->getSelectedElement(), /*Count=*/1)
-        .applyTo(Entity, Reg, CapabilityFlags::UseOn);
     updateElements();
-    break;
+  } break;
   case Controls::Drop.Char:
     // Inv.dropItem(List.getSelectedElement());
     break;
+  case Controls::Dismantle.Char: {
+    auto ItOrNone =
+        Inv.applyItemTo(ItemIdx, CapabilityFlags::Dismantle, Entity, Reg);
+    if (ItOrNone) {
+      // FIXME add information on result of dismantle
+      Ctrl.publish(PlayerInfoMessageEvent()
+                   << "Dismantled " + ItOrNone->getName() + " for " +
+                          Reg.get<NameComp>(Entity).Name);
+    } else {
+      Ctrl.publish(PlayerInfoMessageEvent()
+                   << "Cannot dismantle " + Inv.getItem(ItemIdx).getName() +
+                          " for " + Reg.get<NameComp>(Entity).Name);
+    }
+    updateElements();
+  } break;
   default:
     return InventoryControllerBase::handleInput(Char);
   }
@@ -151,6 +176,10 @@ std::string InventoryController::getInteractMsg() const {
   }
   if ((SelectedItem.getType() & ItemType::Consumable) != ItemType::None) {
     Options.push_back(Controls::Use);
+  }
+  if ((SelectedItem.getCapabilityFlags() & CapabilityFlags::Dismantle) !=
+      CapabilityFlags::None) {
+    Options.push_back(Controls::Dismantle);
   }
   return KeyOption::getInteractMsg(Options);
 }

@@ -64,6 +64,7 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.subscribe(*this, &Game::onSwitchLevelEvent);
   EHW.subscribe(*this, &Game::onLootEvent);
   REC.setEventHub(&EvHub);
+  UICtrl.setEventHub(&EvHub);
 
   switchLevel(0, /*ToEntry=*/true);
 

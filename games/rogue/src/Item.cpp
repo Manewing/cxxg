@@ -1,7 +1,7 @@
+#include <rogue/Components/Buffs.h>
 #include <rogue/Item.h>
 #include <rogue/ItemEffect.h>
 #include <rogue/ItemPrototype.h>
-#include <rogue/Components/Buffs.h>
 
 namespace rogue {
 
@@ -40,9 +40,14 @@ std::string getQualifierName(const Item &It) {
     }
     const auto *StatEff =
         dynamic_cast<const ApplyBuffItemEffectBase *>(ItEff.Effect.get());
-    if (!StatEff) { continue; }
-    const auto *StatBuff = dynamic_cast<const StatsBuffComp *>(&StatEff->getBuff());
-    if (!StatBuff) { continue; }
+    if (!StatEff) {
+      continue;
+    }
+    const auto *StatBuff =
+        dynamic_cast<const StatsBuffComp *>(&StatEff->getBuff());
+    if (!StatBuff) {
+      continue;
+    }
     return getQualifierName(StatBuff->Bonus);
   }
   return "";
@@ -88,6 +93,14 @@ std::vector<EffectInfo> Item::getAllEffects() const {
   return AllEffects;
 }
 
+CapabilityFlags Item::getCapabilityFlags() const {
+  auto Flags = getProto().getCapabilityFlags();
+  if (Specialization) {
+    Flags = Flags | Specialization->getCapabilityFlags();
+  }
+  return Flags;
+}
+
 bool Item::isSameKind(const Item &Other) const {
   return Proto == Other.Proto && Specialization == Other.Specialization;
 }
@@ -95,8 +108,8 @@ bool Item::isSameKind(const Item &Other) const {
 bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
                       CapabilityFlags Flags) const {
   bool SpecCanUseOn =
-      !Specialization || Specialization->canApplyTo(Entity, Reg, Flags);
-  return getProto().canApplyTo(Entity, Reg, Flags) && SpecCanUseOn;
+      Specialization && Specialization->canApplyTo(Entity, Reg, Flags);
+  return getProto().canApplyTo(Entity, Reg, Flags) || SpecCanUseOn;
 }
 
 void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,

@@ -41,11 +41,8 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   auto &Equip = Reg.get<EquipmentComp>(Entity).Equip;
   for (std::size_t Idx = 0; Idx < Inv.size(); Idx++) {
     const auto &It = Inv.getItem(Idx);
-    if ((It.getType() & ItemType::EquipmentMask) != ItemType::None &&
-        Equip.canEquip(It.getType()) && It.getMaxStackSize() == 1 &&
-        It.canApplyTo(Entity, Reg, CapabilityFlags::EquipOn)) {
-      It.applyTo(Entity, Reg, CapabilityFlags::EquipOn);
-      Equip.equip(Inv.takeItem(Idx));
+    if (Equip.canEquip(It, Entity, Reg)) {
+      Equip.equip(Inv.takeItem(Idx), Entity, Reg);
       Idx -= 1;
     }
   }

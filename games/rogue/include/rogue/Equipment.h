@@ -40,9 +40,14 @@ public:
   const EquipmentSlot &getSlot(ItemType It) const;
 
   bool isEquipped(ItemType Type) const;
-  bool canEquip(ItemType Type) const;
-  void equip(Item Item);
-  Item unequip(ItemType Type);
+  bool canEquip(const Item &It, entt::entity Entity, entt::registry &Reg) const;
+  bool canUnequip(ItemType Type, entt::entity Entity,
+                  entt::registry &Reg) const;
+  void equip(Item Item, entt::entity Entity, entt::registry &Reg);
+  Item unequip(ItemType Type, entt::entity Entity, entt::registry &Reg);
+
+  std::optional<Item> tryUnequip(ItemType Type, entt::entity Entity,
+                                 entt::registry &Reg);
 };
 
 } // namespace rogue

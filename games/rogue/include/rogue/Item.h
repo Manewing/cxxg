@@ -26,6 +26,8 @@ public:
   int getMaxStackSize() const;
   std::vector<EffectInfo> getAllEffects() const;
 
+  CapabilityFlags getCapabilityFlags() const;
+
   /// Returns true if other Item has same prototype and specialization
   bool isSameKind(const Item &Other) const;
 

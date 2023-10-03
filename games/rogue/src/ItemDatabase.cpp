@@ -18,29 +18,46 @@ static StatPoints parseStatPoints(const rapidjson::Value &V) {
   return P;
 }
 
-static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
-  static const std::map<std::string, std::function<std::shared_ptr<ItemEffect>(
-                                         const rapidjson::Value &)>>
+static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
+  std::map<std::string, int> ItemIdsByName;
+
+  int ItemId = 0;
+  for (const auto &ItemProtoJson : V.GetArray()) {
+    const auto Name = std::string(ItemProtoJson["name"].GetString());
+    if (ItemIdsByName.count(Name) != 0) {
+      throw std::runtime_error("Duplicate item name: " + Name);
+    }
+    ItemIdsByName.emplace(Name, ItemId++);
+  }
+
+  return ItemIdsByName;
+}
+
+static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
+                                                const rapidjson::Value &V) {
+  static const std::map<std::string,
+                        std::function<std::shared_ptr<ItemEffect>(
+                            const ItemDatabase &, const rapidjson::Value &)>>
       Factories = {
           {"health_item_effect",
-           [](const auto &V) {
+           [](const auto &, const auto &V) {
              const auto HealthValue = V["health_value"].GetDouble();
              return std::make_shared<HealItemEffect>(HealthValue);
            }},
           {"damage_item_effect",
-           [](const auto &V) {
+           [](const auto &, const auto &V) {
              const auto DamageValue = V["damage_value"].GetDouble();
              return std::make_shared<DamageItemEffect>(DamageValue);
            }},
           {"poison_debuff_comp",
-           [](const auto &V) {
+           [](const auto &, const auto &V) {
              PoisonDebuffComp Buff;
              Buff.ReduceAmount = V["reduce_amount"].GetDouble();
              Buff.TicksLeft = V["ticks"].GetUint();
              return makeApplyBuffItemEffect<PoisonDebuffComp, HealthComp>(Buff);
            }},
           {"health_regen_buff_comp",
-           [](const auto &V) {
+           [](const auto &, const auto &V) {
              HealthRegenBuffComp Buff;
              Buff.RegenAmount = V["regen_amount"].GetDouble();
              Buff.TicksLeft = V["ticks"].GetUint();
@@ -48,7 +65,7 @@ static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
                  Buff);
            }},
           {"bleeding_debuff_comp",
-           [](const auto &V) {
+           [](const auto &, const auto &V) {
              BleedingDebuffComp Buff;
              Buff.ReduceAmount = V["reduce_amount"].GetDouble();
              Buff.TicksLeft = V["ticks"].GetUint();
@@ -56,20 +73,21 @@ static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
                  Buff);
            }},
           {"stats_buff_comp",
-           [](const auto &V) {
+           [](const auto &, const auto &V) {
              StatPoints P = parseStatPoints(V["stats"]);
              StatsBuffComp Buff;
              Buff.Bonus = P;
              return makeApplyBuffItemEffect<StatsBuffComp, StatsComp>(Buff);
            }},
           {"armor_buff_comp",
-           [](const auto &V) {
+           [](const auto &, const auto &V) {
              ArmorBuffComp Armor;
              Armor.BaseArmor = V["base_armor"].GetDouble();
              Armor.MagicArmor = V["magic_armor"].GetDouble();
              return makeApplyBuffItemEffect<ArmorBuffComp>(Armor);
            }},
-          {"stats_buff_per_hit_comp", [](const auto &V) {
+          {"stats_buff_per_hit_comp",
+           [](const auto &, const auto &V) {
              StatsBuffPerHitComp Buff;
              Buff.SBC.Bonus = parseStatPoints(V["stats"]);
              Buff.MaxTicks = V["ticks"].GetUint();
@@ -77,6 +95,16 @@ static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
              Buff.MaxStacks = V["max_stacks"].GetUint();
              return makeApplyBuffItemEffect<StatsBuffPerHitComp, StatsComp>(
                  Buff);
+           }},
+          {"dismantle", [](const auto &DB, const auto &V) {
+             std::vector<DismantleEffect::DismantleResult> Results;
+             for (const auto &ItemJson : V["items"].GetArray()) {
+               const auto ItemName = std::string(ItemJson["name"].GetString());
+               const auto ItemId = DB.getItemId(ItemName);
+               const auto Amount = ItemJson["amount"].GetUint();
+               Results.push_back({ItemId, Amount});
+             }
+             return std::make_shared<DismantleEffect>(DB, std::move(Results));
            }}};
 
   const auto EffectType = V["type"].GetString();
@@ -85,7 +113,7 @@ static std::shared_ptr<ItemEffect> createEffect(const rapidjson::Value &V) {
     throw std::out_of_range("Unknown item effect: " + std::string(EffectType));
   }
 
-  return It->second(V);
+  return It->second(DB, V);
 }
 
 static std::shared_ptr<ItemSpecialization>
@@ -118,6 +146,9 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   const auto SchemaPath = ItemDbConfig.parent_path() / "item_db_schema.json";
   auto [DocStr, Doc] = loadJSON(ItemDbConfig, &SchemaPath);
 
+  // Get map of item Ids and verify unique names
+  DB.ItemIdsByName = getItemIdsByName(Doc["item_prototypes"]);
+
   // Create effects
   std::map<std::string, std::shared_ptr<ItemEffect>> Effects;
   const auto &EffectsJson = Doc["item_effects"].GetObject();
@@ -127,7 +158,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     if (Effects.count(EffectName) != 0) {
       throw std::runtime_error("Duplicate item effect: " + EffectName);
     }
-    auto Effect = createEffect(V);
+    auto Effect = createEffect(DB, V);
     Effects.emplace(EffectName, Effect);
   }
 
@@ -184,6 +215,14 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   }
 
   return DB;
+}
+
+int ItemDatabase::getItemId(const std::string &ItemName) const {
+  const auto It = ItemIdsByName.find(ItemName);
+  if (It == ItemIdsByName.end()) {
+    throw std::out_of_range("Unknown item name: " + ItemName);
+  }
+  return It->second;
 }
 
 void ItemDatabase::addItemProto(const ItemPrototype &ItemProto,

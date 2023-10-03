@@ -10,7 +10,9 @@ bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
        (Type & ItemType::EquipmentMask) != ItemType::None) ||
       // Consumable
       ((Flags & CapabilityFlags::UseOn) != CapabilityFlags::None &&
-       (Type & ItemType::Consumable) != ItemType::None);
+       (Type & ItemType::Consumable) != ItemType::None)
+      // Dismantle
+      || ((Flags & CapabilityFlags::Dismantle) != CapabilityFlags::None);
 }
 
 ItemPrototype::ItemPrototype(int ItemId, std::string N, std::string D,
@@ -19,9 +21,18 @@ ItemPrototype::ItemPrototype(int ItemId, std::string N, std::string D,
     : ItemId(ItemId), Name(std::move(N)), Description(std::move(D)), Type(Type),
       MaxStackSize(MaxStatckSize), Effects(std::move(Eff)) {}
 
+CapabilityFlags ItemPrototype::getCapabilityFlags() const {
+  CapabilityFlags Flags = CapabilityFlags::None;
+  for (const auto &Info : Effects) {
+    Flags = Flags | Info.Flags;
+  }
+  return Flags;
+}
+
 bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
                                CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
+  if (!canApply(Type, Flags) ||
+      (Flags & getCapabilityFlags()) == CapabilityFlags::None) {
     return false;
   }
   bool CanApply = true;
@@ -35,9 +46,6 @@ bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
 
 void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
                             CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return;
-  }
   for (const auto &Info : Effects) {
     if ((Info.Flags & Flags) != CapabilityFlags::None) {
       Info.Effect->applyTo(Entity, Reg);
@@ -48,7 +56,8 @@ void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
 bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
                                   entt::registry &Reg,
                                   CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
+  if (!canApply(Type, Flags) ||
+      (Flags & getCapabilityFlags()) == CapabilityFlags::None) {
     return false;
   }
   bool CanRemove = true;
@@ -62,9 +71,6 @@ bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
 
 void ItemPrototype::removeFrom(const entt::entity &Entity, entt::registry &Reg,
                                CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return;
-  }
   for (const auto &Info : Effects) {
     if ((Info.Flags & Flags) != CapabilityFlags::None) {
       Info.Effect->removeFrom(Entity, Reg);

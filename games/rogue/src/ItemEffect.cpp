@@ -1,3 +1,5 @@
+#include <rogue/Components/Items.h>
+#include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 
 namespace rogue {
@@ -24,6 +26,25 @@ bool DamageItemEffect::canApplyTo(const entt::entity &Et,
 void DamageItemEffect::applyTo(const entt::entity &Et,
                                entt::registry &Reg) const {
   Reg.get<HealthComp>(Et).reduce(Amount);
+}
+
+DismantleEffect::DismantleEffect(const ItemDatabase &DB,
+                                 std::vector<DismantleResult> Results)
+    : ItemDb(DB), Results(std::move(Results)) {}
+
+bool DismantleEffect::canApplyTo(const entt::entity &Et,
+                                 entt::registry &Reg) const {
+  return Reg.all_of<InventoryComp>(Et);
+}
+
+void DismantleEffect::applyTo(const entt::entity &Et,
+                              entt::registry &Reg) const {
+  auto &Inv = Reg.get<InventoryComp>(Et);
+  for (const auto &Result : Results) {
+    Inv.Inv.addItem(ItemDb.createItem(Result.ItemId, Result.Amount));
+  }
+  // FIXME we need to make item entities and destroy the item here in the
+  // registry (currently handled in UI)
 }
 
 } // namespace rogue

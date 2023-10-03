@@ -56,6 +56,41 @@
       "type": "armor_buff_comp",
       "base_armor": 5,
       "magic_armor": 0
+    },
+    "dismantle_iron_equip": {
+      "type": "dismantle",
+      "items": [
+        {
+          "name": "Iron Scrap",
+          "amount": 2
+        }
+      ]
+    },
+    "dismantle_leather_equip": {
+      "type": "dismantle",
+      "items": [
+        {
+          "name": "Leather Scrap",
+          "amount": 2
+        }
+      ]
+    },
+    "dismantle_rare_iron_equip": {
+      "type": "dismantle",
+      "items": [
+        {
+          "name": "Iron Scrap",
+          "amount": 3
+        },
+        {
+          "name": "Rune Dust",
+          "amount": 1
+        },
+        {
+          "name": "Leather Scrap",
+          "amount": 1
+        }
+      ]
     }
   },
   "item_specializations": {
@@ -144,7 +179,12 @@
       "types": [
         "weapon"
       ],
-      "capabilities": [],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        }
+      ],
       "specializations": [
         {
           "type": "equipment",
@@ -163,6 +203,10 @@
         {
           "type": "equipment",
           "effect": "armor_5"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_leather_equip"
         }
       ],
       "specializations": [
@@ -183,6 +227,10 @@
         {
           "type": "equipment",
           "effect": "armor_5"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_leather_equip"
         }
       ],
       "specializations": [
@@ -203,6 +251,10 @@
         {
           "type": "equipment",
           "effect": "armor_5"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_leather_equip"
         }
       ],
       "specializations": [
@@ -223,6 +275,10 @@
         {
           "type": "equipment",
           "effect": "armor_5"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_leather_equip"
         }
       ],
       "specializations": [
@@ -239,7 +295,12 @@
       "types": [
         "weapon"
       ],
-      "capabilities": [],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        }
+      ],
       "specializations": [
         {
           "type": "equipment",
@@ -258,6 +319,10 @@
         {
           "type": "equipment",
           "effect": "str_5_per_hit_buff"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
         }
       ],
       "specializations": [
@@ -279,6 +344,33 @@
     {
       "name": "Troll Tooth",
       "description": "A troll tooth from a troll",
+      "max_stack_size": 99,
+      "types": [
+        "crafting"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Iron Scrap",
+      "description": "A scrap of iron",
+      "max_stack_size": 99,
+      "types": [
+        "crafting"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Leather Scrap",
+      "description": "A scrap of leather",
+      "max_stack_size": 99,
+      "types": [
+        "crafting"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Rune Dust",
+      "description": "A dust of rune",
       "max_stack_size": 99,
       "types": [
         "crafting"

@@ -23,6 +23,8 @@ public:
   // defense
   // craft
 
+  CapabilityFlags getCapabilityFlags() const;
+
   bool canApplyTo(const entt::entity &Entity, entt::registry &Reg,
                   CapabilityFlags Flags) const;
   void applyTo(const entt::entity &Entity, entt::registry &Reg,

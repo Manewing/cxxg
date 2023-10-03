@@ -43,6 +43,9 @@ enum class CapabilityFlags {
 
   // Mask all equipment
   Equipment = 0x6,
+
+  // Dismantle item
+  Dismantle = 0x8,
 };
 
 CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr);

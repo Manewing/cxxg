@@ -3,6 +3,7 @@
 
 #include <entt/entt.hpp>
 #include <memory>
+#include <rogue/EventHub.h>
 #include <rogue/UI/Widget.h>
 #include <rogue/UI/WindowContainer.h>
 #include <string_view>
@@ -22,7 +23,7 @@ class Level;
 
 namespace rogue::ui {
 
-class Controller {
+class Controller : public EventHubConnector {
 public:
   Controller(cxxg::Screen &Scr);
   void draw(int LevelIdx, int Health, int MaxHealth, int AP, int AG,

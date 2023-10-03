@@ -55,7 +55,7 @@
                 "type": {
                   "type": "string",
                   "description": "The type of the capability",
-                  "enum": ["use_on", "equip_on", "unequip_from", "equipment"]
+                  "enum": ["use_on", "equip_on", "unequip_from", "equipment", "dismantle"]
                 },
                 "effect": {
                   "type": "string",

@@ -39,6 +39,8 @@ struct Controls {
   static constexpr KeyOption Unequip = {'u', "Unequip",
                                         "Unequip the selected item"};
   static constexpr KeyOption Drop = {'d', "Drop", "Drop the selected item"};
+  static constexpr KeyOption Dismantle = {'a', "Dismantle",
+                                          "Dismantle the selected item"};
   static constexpr KeyOption Use = {
       'u', "Use", "Use the selected item, only works for consumables."};
   static constexpr KeyOption Craft = {'x', "Craft",

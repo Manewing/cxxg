@@ -57,15 +57,51 @@ bool Equipment::isEquipped(ItemType Type) const {
   return getSlot(Type).It != std::nullopt;
 }
 
-bool Equipment::canEquip(ItemType Type) const {
+bool Equipment::canEquip(const Item &It, entt::entity Entity,
+                         entt::registry &Reg) const {
+  const auto Type = It.getType();
   if ((Type & ItemType::EquipmentMask) == ItemType::None) {
     return false;
   }
-  return !isEquipped(Type);
+  if (isEquipped(Type)) {
+    return false;
+  }
+  return It.canApplyTo(Entity, Reg, CapabilityFlags::EquipOn);
 }
 
-void Equipment::equip(Item It) { getSlot(It.getType()).equip(std::move(It)); }
+bool Equipment::canUnequip(ItemType Type, entt::entity Entity,
+                           entt::registry &Reg) const {
+  if ((Type & ItemType::EquipmentMask) == ItemType::None) {
+    return false;
+  }
+  if (!isEquipped(Type)) {
+    return false;
+  }
+  return getSlot(Type).It->canRemoveFrom(Entity, Reg,
+                                         CapabilityFlags::UnequipFrom);
+}
 
-Item Equipment::unequip(ItemType Type) { return getSlot(Type).unequip(); }
+void Equipment::equip(Item It, entt::entity Entity, entt::registry &Reg) {
+  assert(canEquip(It, Entity, Reg) && "Can not equip item on entity");
+  It.applyTo(Entity, Reg, CapabilityFlags::EquipOn);
+  getSlot(It.getType()).equip(std::move(It));
+}
+
+Item Equipment::unequip(ItemType Type, entt::entity Entity,
+                        entt::registry &Reg) {
+  assert(canUnequip(Type, Entity, Reg) &&
+         "Can not unequip. Unequip removes item effects from entity");
+  auto &Slot = getSlot(Type);
+  Slot.It->removeFrom(Entity, Reg, CapabilityFlags::UnequipFrom);
+  return Slot.unequip();
+}
+
+std::optional<Item> Equipment::tryUnequip(ItemType Type, entt::entity Entity,
+                                          entt::registry &Reg) {
+  if (!canUnequip(Type, Entity, Reg)) {
+    return std::nullopt;
+  }
+  return unequip(Type, Entity, Reg);
+}
 
 } // namespace rogue

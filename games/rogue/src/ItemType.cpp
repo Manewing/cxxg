@@ -93,6 +93,15 @@ CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr) {
   if (CapabilityFlagStr == "equipment") {
     return CapabilityFlags::Equipment;
   }
+  if (CapabilityFlagStr == "equip_on") {
+    return CapabilityFlags::EquipOn;
+  }
+  if (CapabilityFlagStr == "unequip_from") {
+    return CapabilityFlags::UnequipFrom;
+  }
+  if (CapabilityFlagStr == "dismantle") {
+    return CapabilityFlags::Dismantle;
+  }
   throw std::out_of_range("Unknown capability: " + CapabilityFlagStr);
   return CapabilityFlags::None;
 }

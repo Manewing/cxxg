@@ -14,6 +14,8 @@ public:
   static ItemDatabase load(const std::filesystem::path &ItemDbConfig);
 
 public:
+  int getItemId(const std::string &ItemName) const;
+
   void addItemProto(const ItemPrototype &ItemProto,
                     const ItemSpecializations *ItemSpec = nullptr);
 
@@ -22,6 +24,7 @@ public:
   int getRandomItemId() const;
 
 private:
+  std::map<std::string, int> ItemIdsByName;
   std::map<int, ItemPrototype> ItemProtos;
   std::map<int, ItemSpecializations> ItemSpecs;
 };

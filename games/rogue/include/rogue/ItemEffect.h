@@ -7,6 +7,10 @@
 #include <rogue/ItemType.h>
 
 namespace rogue {
+class ItemDatabase;
+}
+
+namespace rogue {
 
 // Add durability to items:
 //  Durability
@@ -55,6 +59,24 @@ public:
 
 private:
   StatValue Amount;
+};
+
+class DismantleEffect : public ItemEffect {
+public:
+  struct DismantleResult {
+    int ItemId = -1;
+    unsigned Amount = 0;
+  };
+
+public:
+  explicit DismantleEffect(const ItemDatabase &ItemDb,
+                           std::vector<DismantleResult> Results);
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
+
+private:
+  const ItemDatabase &ItemDb;
+  std::vector<DismantleResult> Results;
 };
 
 class ApplyBuffItemEffectBase : public ItemEffect {

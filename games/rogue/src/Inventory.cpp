@@ -33,6 +33,21 @@ Item Inventory::takeItem(std::size_t ItemIdx, unsigned Count) {
   return takeItem(ItemIdx);
 }
 
+std::optional<Item> Inventory::applyItemTo(std::size_t ItemIdx,
+                                           CapabilityFlags Flags,
+                                           entt::entity Entity,
+                                           entt::registry &Reg) {
+  if (!getItem(ItemIdx).canApplyTo(Entity, Reg, Flags)) {
+    // FIXME message
+    return {};
+  }
+  auto It = takeItem(ItemIdx, /*Count=*/1);
+  It.applyTo(Entity, Reg, Flags);
+  return It;
+}
+
+std::size_t Inventory::size() const { return Items.size(); }
+
 bool Inventory::empty() const { return Items.empty(); }
 
 } // namespace rogue
