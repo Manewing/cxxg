@@ -104,14 +104,14 @@ void Game::switchLevel(int Level, bool ToEntry) {
 
   if (!CurrentLevel) {
     LevelPtr->createPlayer();
-  } else if (CurrentLevel != Levels.at(Level)) {
+  } else if (CurrentLevel != LevelPtr) {
     auto ToPos =
         ToEntry ? LevelPtr->getPlayerStartPos() : LevelPtr->getPlayerEndPos();
     LevelPtr->update(false);
     LevelPtr->movePlayer(*CurrentLevel, ToPos);
   }
 
-  CurrentLevel = Levels.at(Level);
+  CurrentLevel = LevelPtr;
   CurrentLevelIdx = Level;
 }
 
