@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <rogue/Item.h>
 #include <vector>
+#include <optional>
 
 namespace rogue {
 

@@ -68,6 +68,7 @@ entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
   for (auto Entity : View) {
     assert(!Found && "Multiple players found");
     Found = true;
+    (void)Found;
     PlayerEntity = RegTo.create();
     copyComponentsOrFail<PlayerCompList>(Entity, RegFrom, PlayerEntity, RegTo);
     copyBuffs(Entity, RegFrom, PlayerEntity, RegTo);

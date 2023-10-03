@@ -2,6 +2,7 @@
 #define ROGUE_GAME_CONFIG_H
 
 #include <filesystem>
+#include <vector>
 
 namespace rogue {
 

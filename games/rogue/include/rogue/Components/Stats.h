@@ -5,6 +5,7 @@
 #include <array>
 #include <iosfwd>
 #include <numeric>
+#include <tuple>
 
 namespace rogue {
 
@@ -37,7 +38,7 @@ struct StatPoints {
     return {{Int, Str, Dex, Vit}};
   }
 
-  inline constexpr StatPoint sum() const {
+  inline StatPoint sum() const {
     const auto All = all();
     return std::accumulate(All.begin(), All.end(), 0);
   }
