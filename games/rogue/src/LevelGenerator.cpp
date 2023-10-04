@@ -147,10 +147,10 @@ void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
   };
   static const std::map<char, EnemyInfo> EnemyStats = {
       {'s',
-       {"Skeleton", StatPoints{/*Int=*/1, /*Str=*/1, /*Dex=*/30, /*Vit=*/1},
+       {"Skeleton", StatPoints{/*Int=*/1, /*Str=*/3, /*Dex=*/30, /*Vit=*/1},
         FactionKind::Enemy, RaceKind::Undead}},
       {'t',
-       {"Troll", StatPoints{/*Int=*/1, /*Str=*/15, /*Dex=*/5, /*Vit=*/3},
+       {"Troll", StatPoints{/*Int=*/1, /*Str=*/15, /*Dex=*/5, /*Vit=*/40},
         FactionKind::Enemy, RaceKind::Troll}},
   };
 
@@ -160,7 +160,7 @@ void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
   };
   static const std::map<char, CreatureInfo> CreatureStats = {
       {'b',
-       {"Blob", StatPoints{/*Int=*/0, /*Str=*/12, /*Dex=*/3, /*Vit=*/20}}}};
+       {"Blob", StatPoints{/*Int=*/0, /*Str=*/4, /*Dex=*/3, /*Vit=*/20}}}};
 
   switch (T.kind()) {
   case 't':

@@ -68,14 +68,11 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
 
   switchLevel(0, /*ToEntry=*/true);
 
-  // DEBUG ==>
+  // FIXME load this from config for initial player
   auto Player = CurrentLevel->getPlayer();
   auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
-  InvComp.Inv.addItem(ItemDb.createItem(0, 20));
-  InvComp.Inv.addItem(ItemDb.createItem(1, 15));
-  InvComp.Inv.addItem(ItemDb.createItem(2, 10));
-  InvComp.Inv.addItem(ItemDb.createItem(10, 1));
-  // <== DEBUG
+  InvComp.Inv.addItem(ItemDb.createItem(ItemDb.getItemId("Small Sword"), 1));
+  InvComp.Inv.addItem(ItemDb.createItem(ItemDb.getItemId("Blueberry"), 5));
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
 

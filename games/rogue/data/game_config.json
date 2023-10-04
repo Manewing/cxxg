@@ -2,16 +2,16 @@
 	"item_db_config": "item_db.json",
 	"levels": [
 		{
-			"end": 2,
+			"end": 3,
+			"config": "levels/blob_cave.cfg"
+		},
+		{
+			"end": 9,
 			"config": "levels/skeleton_dungeon.cfg"
 		},
 		{
-			"end": 3,
+			"end": 6,
 			"config": "levels/troll_dungeon.cfg"
-		},
-		{
-			"end": 4,
-			"config": "levels/blob_cave.cfg"
 		}
 	]
 }
