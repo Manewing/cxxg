@@ -1,9 +1,13 @@
 #ifndef ROGUE_COMPONENTS_RACE_FACTION_H
 #define ROGUE_COMPONENTS_RACE_FACTION_H
 
+#include <string_view>
+
 namespace rogue {
 
 enum class FactionKind { None = 0x0, Nature = 0x1, Enemy = 0x2, Player = 0x4 };
+
+FactionKind getFaction(std::string_view Name);
 
 struct FactionComp {
   FactionKind Faction = FactionKind::Nature;
@@ -20,6 +24,8 @@ enum class RaceKind {
   Undead = 0x40,
   Creature = 0x80
 };
+
+RaceKind getRace(std::string_view Name);
 
 struct RaceComp {
   RaceKind Kind;

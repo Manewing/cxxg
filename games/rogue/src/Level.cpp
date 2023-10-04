@@ -1,7 +1,7 @@
+#include <rogue/Components/AI.h>
 #include <rogue/Components/Level.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
-#include <rogue/Components/AI.h>
 #include <rogue/Level.h>
 #include <rogue/Systems/AgilitySystem.h>
 #include <rogue/Systems/AttackAISystem.h>

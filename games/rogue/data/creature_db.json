@@ -1,0 +1,40 @@
+{
+    "creatures": [
+        {
+            "name": "Blob",
+            "description": "A blob",
+            "stats": {
+                "str": 5,
+                "dex": 0,
+                "int": 0,
+                "vit": 20
+            },
+            "faction": "nature",
+            "race": "creature"
+        },
+        {
+            "name": "Skeleton",
+            "description": "A skeleton",
+            "stats": {
+                "str": 3,
+                "dex": 30,
+                "int": 0,
+                "vit": 1
+            },
+            "faction": "enemy",
+            "race": "undead"
+        },
+        {
+            "name": "Troll",
+            "description": "A troll",
+            "stats": {
+                "str": 15,
+                "dex": 5,
+                "int": 0,
+                "vit": 40
+            },
+            "faction": "enemy",
+            "race": "troll"
+        }
+    ]
+}

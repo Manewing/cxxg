@@ -2,9 +2,9 @@
 #define ROGUE_INVENTORY_H
 
 #include <entt/entt.hpp>
+#include <optional>
 #include <rogue/Item.h>
 #include <vector>
-#include <optional>
 
 namespace rogue {
 

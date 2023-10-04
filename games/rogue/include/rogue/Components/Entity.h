@@ -2,10 +2,10 @@
 #define ROGUE_COMPONENTS_ENTITY_H
 
 #include <entt/entt.hpp>
+#include <rogue/Components/RaceFaction.h>
 #include <rogue/Tile.h>
 #include <string>
 #include <ymir/Types.hpp>
-#include <rogue/Components/RaceFaction.h>
 
 namespace rogue {
 class Inventory;

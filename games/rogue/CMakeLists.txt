@@ -17,9 +17,10 @@ set(HEADER_FILES
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h
   include/rogue/Context.h
+  include/rogue/CreatureDatabase.h
   include/rogue/Entity.h
-  include/rogue/Event.h
   include/rogue/Equipment.h
+  include/rogue/Event.h
   include/rogue/EventHub.h
   include/rogue/Game.h
   include/rogue/History.h
@@ -39,12 +40,12 @@ set(HEADER_FILES
   include/rogue/Systems/AttackAISystem.h
   include/rogue/Systems/CombatSystem.h
   include/rogue/Systems/DeathSystem.h
+  include/rogue/Systems/MovementSystem.h
   include/rogue/Systems/PlayerSystem.h
   include/rogue/Systems/RegenSystem.h
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
-  include/rogue/Systems/MovementSystem.h
   include/rogue/UI/Buffs.h
   include/rogue/UI/Controller.h
   include/rogue/UI/Controls.h
@@ -66,11 +67,13 @@ set(HEADER_FILES
 )
 
 set(SOURCE_FILES
-  src/Components/Combat.cpp
   src/Components/Buffs.cpp
+  src/Components/Combat.cpp
   src/Components/Entity.cpp
   src/Components/Player.cpp
+  src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
+  src/CreatureDatabase.cpp
   src/Entity.cpp
   src/Equipment.cpp
   src/Event.cpp

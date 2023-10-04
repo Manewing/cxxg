@@ -1,0 +1,65 @@
+{
+    "$id": "https://rogue-todo.com/creature-db-schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "JSON Schema the item database",
+    "type": "object",
+    "required": [
+        "creatures"
+    ],
+    "properties": {
+        "creatures": {
+            "type": "array",
+            "description": "A list of creature infos",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "description",
+                    "stats",
+                    "faction",
+                    "race"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the creature"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the creature"
+                    },
+                    "stats": {
+                        "type": "object",
+                        "description": "The stats of the creature",
+                        "required": [
+                            "str",
+                            "dex",
+                            "int",
+                            "vit"
+                        ],
+                        "properties": {
+                            "str": {
+                                "type": "integer"
+                            },
+                            "dex": {
+                                "type": "integer"
+                            },
+                            "int": {
+                                "type": "integer"
+                            },
+                            "vit": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    "faction": {
+                        "type": "string"
+                    },
+                    "race": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

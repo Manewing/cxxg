@@ -25,6 +25,7 @@ public:
 
 private:
   std::map<std::string, int> ItemIdsByName;
+  // FIXME make this a vector Id is index
   std::map<int, ItemPrototype> ItemProtos;
   std::map<int, ItemSpecializations> ItemSpecs;
 };

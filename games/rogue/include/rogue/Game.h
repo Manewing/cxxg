@@ -4,6 +4,7 @@
 #include <cxxg/Game.h>
 #include <memory>
 #include <rogue/Context.h>
+#include <rogue/CreatureDatabase.h>
 #include <rogue/EventHub.h>
 #include <rogue/History.h>
 #include <rogue/ItemDatabase.h>
@@ -81,6 +82,7 @@ private:
   History Hist;
   EventHistoryWriter EHW;
   ItemDatabase ItemDb;
+  CreatureDatabase CreatureDb;
   GameContext Ctx;
   LevelGenerator LevelGen;
   int CurrentLevelIdx = 0;

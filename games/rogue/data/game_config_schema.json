@@ -3,30 +3,39 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "JSON Schema the game config",
   "type": "object",
-  "required": ["levels", "item_db_config"],
+  "required": [
+    "levels",
+    "item_db_config"
+  ],
   "properties": {
     "level_config": {
       "type": "array",
       "description": "Level ranges in the game and their respective config",
       "items": {
         "type": "object",
-        "required": ["end", "config"],
-        "properties":
-          {
-            "end": {
-              "type": "integer",
-              "description": "The level at which this config ends"
-            },
-            "config": {
-              "type": "string",
-              "description": "Path to the level config file"
-            }
+        "required": [
+          "end",
+          "config"
+        ],
+        "properties": {
+          "end": {
+            "type": "integer",
+            "description": "The level at which this config ends"
+          },
+          "config": {
+            "type": "string",
+            "description": "Path to the level config file"
           }
+        }
       }
     },
-		"item_db_config": {
-			"type": "string",
-			"description": "Path to the item db config file"
-		}
+    "item_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the item DB config file"
+    },
+    "creature_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the creature DB config file"
+    }
   }
 }

@@ -12,6 +12,7 @@ struct LevelConfig {
 };
 
 struct GameConfig {
+  std::filesystem::path CreatureDbConfig;
   std::filesystem::path ItemDbConfig;
   std::vector<LevelConfig> Levels;
 

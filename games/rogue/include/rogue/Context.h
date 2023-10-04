@@ -4,13 +4,15 @@
 namespace rogue {
 class Game;
 class ItemDatabase;
+class CreatureDatabase;
 } // namespace rogue
 
 namespace rogue {
 
 struct GameContext {
   Game &G;
-  ItemDatabase &ItemDb;
+  const ItemDatabase &ItemDb;
+  const CreatureDatabase &CreatureDb;
 };
 
 } // namespace rogue

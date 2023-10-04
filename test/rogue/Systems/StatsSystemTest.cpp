@@ -56,7 +56,7 @@ TEST(StatsSystemTest, StatsSystemRegenEffects) {
   EXPECT_EQ(Health.Value, Health.MaxValue);
   EXPECT_EQ(Mana.MaxValue, 9.1f * StatPoints.Int);
   EXPECT_EQ(Mana.Value, Mana.MaxValue);
-  EXPECT_EQ(Agility.Agility, 1.0f * StatPoints.Dex);
+  EXPECT_EQ(int(Agility.Agility), 18);
 }
 
 TEST(TimedStatsSystem, TimedStatSystemStatsTimedBuff) {

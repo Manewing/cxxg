@@ -14,6 +14,8 @@ GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
   auto ConfigDir = ConfigFile.parent_path();
   const auto ItemDbConfig = Doc["item_db_config"].GetString();
   Config.ItemDbConfig = ConfigDir / ItemDbConfig;
+  auto CreatureDbConfig = Doc["creature_db_config"].GetString();
+  Config.CreatureDbConfig = ConfigDir / CreatureDbConfig;
 
   for (const auto &Level : Doc["levels"].GetArray()) {
     LevelConfig LevelCfg;

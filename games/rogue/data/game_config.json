@@ -1,5 +1,6 @@
 {
 	"item_db_config": "item_db.json",
+	"creature_db_config": "creature_db.json",
 	"levels": [
 		{
 			"end": 3,

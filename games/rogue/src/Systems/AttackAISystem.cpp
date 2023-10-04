@@ -1,7 +1,7 @@
 #include <rogue/Components/AI.h>
-#include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
+#include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>

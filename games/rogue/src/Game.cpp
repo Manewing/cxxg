@@ -55,8 +55,10 @@ bool RenderEventCollector::hasEvents() const { return !RenderFns.empty(); }
 
 Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
-      ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)), Ctx({*this, ItemDb}),
-      LevelGen(&Ctx), CurrentLevel(nullptr), UICtrl(Scr) {}
+      ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)),
+      CreatureDb(CreatureDatabase::load(Cfg.CreatureDbConfig)),
+      Ctx({*this, ItemDb, CreatureDb}), LevelGen(&Ctx), CurrentLevel(nullptr),
+      UICtrl(Scr) {}
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.setEventHub(&EvHub);

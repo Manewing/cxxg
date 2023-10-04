@@ -1,4 +1,5 @@
 set(SOURCES
+  CreatureDatabaseTest.cpp
   EventHubTest.cpp
   Components/HelpersTest.cpp
   Systems/StatsSystemTest.cpp

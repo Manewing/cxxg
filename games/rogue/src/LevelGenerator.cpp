@@ -1,6 +1,7 @@
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/RaceFaction.h>
 #include <rogue/Context.h>
+#include <rogue/CreatureDatabase.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/Parser.h>
@@ -140,41 +141,27 @@ Inventory generateRandomLootInventory(const ItemDatabase &ItemDb,
 } // namespace
 
 void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
-  struct EnemyInfo {
-    std::string Name;
-    StatPoints Stats;
-    FactionKind Faction;
-    RaceKind Race;
-  };
-  static const std::map<char, EnemyInfo> EnemyStats = {
-      {'s',
-       {"Skeleton", StatPoints{/*Int=*/1, /*Str=*/3, /*Dex=*/30, /*Vit=*/1},
-        FactionKind::Enemy, RaceKind::Undead}},
-      {'t',
-       {"Troll", StatPoints{/*Int=*/1, /*Str=*/15, /*Dex=*/5, /*Vit=*/40},
-        FactionKind::Enemy, RaceKind::Troll}},
+  // FIXME keys to creature name
+  static const std::map<char, std::string> CreatureNames = {
+      {'b', "Blob"},
+      {'s', "Skeleton"},
+      {'t', "Troll"},
   };
 
-  struct CreatureInfo {
-    std::string Name;
-    StatPoints Stats;
-  };
-  static const std::map<char, CreatureInfo> CreatureStats = {
-      {'b',
-       {"Blob", StatPoints{/*Int=*/0, /*Str=*/4, /*Dex=*/3, /*Vit=*/20}}}};
+  if (auto It = CreatureNames.find(T.kind()); It != CreatureNames.end()) {
+    auto CId = Ctx->CreatureDb.getCreatureId(It->second);
+    const auto &CInfo = Ctx->CreatureDb.getCreature(CId);
+    if (CInfo.Faction == FactionKind::Nature) {
+      createHostileCreature(L.Reg, Pos, T, CInfo.Name, CInfo.Stats);
+    } else {
+      createEnemy(L.Reg, Pos, T, CInfo.Name,
+                  generateRandomLootInventory(Ctx->ItemDb), CInfo.Stats,
+                  CInfo.Faction, CInfo.Race);
+    }
+    return;
+  }
 
   switch (T.kind()) {
-  case 't':
-  case 's': {
-    const auto &EI = EnemyStats.at(T.kind());
-    createEnemy(L.Reg, Pos, T, EI.Name,
-                generateRandomLootInventory(Ctx->ItemDb), EI.Stats, EI.Faction,
-                EI.Race);
-  } break;
-  case 'b': {
-    const auto &CI = CreatureStats.at(T.kind());
-    createHostileCreature(L.Reg, Pos, T, CI.Name, CI.Stats);
-  } break;
   case 'H': {
     int PrevLevelId = L.getLevelId() - 1;
     createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/true, PrevLevelId);
