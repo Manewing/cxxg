@@ -19,18 +19,6 @@ struct LineOfSightComp {
 
 struct AttackAIComp {};
 
-enum class FactionKind { Nature = 0, Enemy = 1, Player = 2 };
-
-struct FactionComp {
-  FactionKind Faction = FactionKind::Nature;
-};
-
-enum class RaceKind { Human, Elf, Dwarf, Orc, Troll, Goblin, Undead, Creature };
-
-struct RaceComp {
-  RaceKind Kind;
-};
-
 } // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_AI_H

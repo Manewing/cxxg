@@ -1,3 +1,7 @@
+#include <rogue/Components/AI.h>
+#include <rogue/Components/RaceFaction.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
 #include <rogue/Event.h>
 #include <rogue/History.h>
 #include <rogue/Level.h>

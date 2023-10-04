@@ -1,5 +1,6 @@
 #include <entt/entt.hpp>
 #include <rogue/Components/AI.h>
+#include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Player.h>

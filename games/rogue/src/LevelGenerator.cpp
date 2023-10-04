@@ -1,4 +1,5 @@
 #include <rogue/Components/Entity.h>
+#include <rogue/Components/RaceFaction.h>
 #include <rogue/Context.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/LevelGenerator.h>

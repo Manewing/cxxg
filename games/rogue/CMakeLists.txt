@@ -12,6 +12,7 @@ set(HEADER_FILES
   include/rogue/Components/Entity.h
   include/rogue/Components/Level.h
   include/rogue/Components/Player.h
+  include/rogue/Components/RaceFaction.h
   include/rogue/Components/Stats.h
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h

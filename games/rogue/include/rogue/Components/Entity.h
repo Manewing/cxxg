@@ -5,9 +5,7 @@
 #include <rogue/Tile.h>
 #include <string>
 #include <ymir/Types.hpp>
-
-// FIXME decouple
-#include <rogue/Components/AI.h>
+#include <rogue/Components/RaceFaction.h>
 
 namespace rogue {
 class Inventory;
