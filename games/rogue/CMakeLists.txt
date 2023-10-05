@@ -18,7 +18,6 @@ set(HEADER_FILES
   include/rogue/Components/Visual.h
   include/rogue/Context.h
   include/rogue/CreatureDatabase.h
-  include/rogue/Entity.h
   include/rogue/Equipment.h
   include/rogue/Event.h
   include/rogue/EventHub.h
@@ -34,7 +33,6 @@ set(HEADER_FILES
   include/rogue/JSON.h
   include/rogue/Level.h
   include/rogue/LevelGenerator.h
-  include/rogue/NPCEntity.h
   include/rogue/Parser.h
   include/rogue/Renderer.h
   include/rogue/Systems/AttackAISystem.h
@@ -42,6 +40,7 @@ set(HEADER_FILES
   include/rogue/Systems/DeathSystem.h
   include/rogue/Systems/MovementSystem.h
   include/rogue/Systems/PlayerSystem.h
+  include/rogue/Systems/NPCSystem.h
   include/rogue/Systems/RegenSystem.h
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
@@ -67,6 +66,7 @@ set(HEADER_FILES
 )
 
 set(SOURCE_FILES
+  src/Components/AI.cpp
   src/Components/Buffs.cpp
   src/Components/Combat.cpp
   src/Components/Entity.cpp
@@ -74,7 +74,6 @@ set(SOURCE_FILES
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
   src/CreatureDatabase.cpp
-  src/Entity.cpp
   src/Equipment.cpp
   src/Event.cpp
   src/Game.cpp
@@ -90,17 +89,17 @@ set(SOURCE_FILES
   src/JSON.cpp
   src/Level.cpp
   src/LevelGenerator.cpp
-  src/NPCEntity.cpp
   src/Parser.cpp
   src/Renderer.cpp
   src/Systems/AgilitySystem.cpp
   src/Systems/AttackAISystem.cpp
   src/Systems/CombatSystem.cpp
   src/Systems/DeathSystem.cpp
+  src/Systems/MovementSystem.cpp
+  src/Systems/NPCSystem.cpp
   src/Systems/PlayerSystem.cpp
   src/Systems/RegenSystem.cpp
   src/Systems/StatsSystem.cpp
-  src/Systems/MovementSystem.cpp
   src/Systems/WanderAISystem.cpp
   src/UI/Buffs.cpp
   src/UI/Controller.cpp

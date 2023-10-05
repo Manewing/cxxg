@@ -2,7 +2,6 @@
 #define ROGUE_SYSTEMS_WANDER_AI_SYSTEM_H
 
 #include <entt/entt.hpp>
-#include <rogue/EventHub.h>
 #include <rogue/Systems/System.h>
 #include <ymir/Types.hpp>
 

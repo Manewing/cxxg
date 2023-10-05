@@ -3,7 +3,6 @@
 
 #include <entt/entt.hpp>
 #include <memory>
-#include <rogue/Entity.h>
 #include <rogue/EventHub.h>
 #include <rogue/Tile.h>
 #include <vector>
@@ -23,6 +22,7 @@ public:
   static constexpr std::size_t LayerGroundDecoIdx = 1;
   static constexpr std::size_t LayerWallsIdx = 2;
   static constexpr std::size_t LayerWallsDecoIdx = 3;
+  static constexpr std::size_t LayerObjectsIdx = 4;
 
   // FIXME move to separate header and use in level gen
   static constexpr Tile EmptyTile = Tile{};
@@ -79,8 +79,6 @@ protected:
 
 public: // FIXME
   ymir::LayeredMap<Tile> Map;
-  std::vector<std::shared_ptr<Entity>> Entities;
-
   entt::registry Reg;
 
 private:

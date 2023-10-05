@@ -114,7 +114,7 @@ ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
   if (It == AllNextPos.end()) {
     // FIXME this may actuall happen if there are many entities body blocking
     // each other...
-    throw MovementBlockedException(AtPos);
+    publish(ErrorMessageEvent() << "can't wander at " << AtPos);
   }
   return *It;
 }

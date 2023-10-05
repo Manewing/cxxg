@@ -2,7 +2,6 @@
 #define ROGUE_HISTORY_H
 
 #include <cxxg/Row.h>
-#include <rogue/Entity.h>
 #include <rogue/EventHub.h>
 #include <sstream>
 #include <string>

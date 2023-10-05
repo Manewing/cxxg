@@ -9,6 +9,7 @@
 #include <rogue/Systems/DeathSystem.h>
 #include <rogue/Systems/MovementSystem.h>
 #include <rogue/Systems/PlayerSystem.h>
+#include <rogue/Systems/NPCSystem.h>
 #include <rogue/Systems/RegenSystem.h>
 #include <rogue/Systems/StatsSystem.h>
 #include <rogue/Systems/WanderAISystem.h>
@@ -26,6 +27,7 @@ Level::Level(int LevelId, const std::vector<std::string> &Layers,
       std::make_shared<AgilitySystem>(Reg),
       std::make_shared<RegenSystem>(Reg),
       std::make_shared<PlayerSystem>(*this),
+      std::make_shared<NPCSystem>(*this),
       std::make_shared<WanderAISystem>(*this),
       std::make_shared<AttackAISystem>(Reg),
       std::make_shared<CombatSystem>(Reg),
@@ -39,9 +41,6 @@ void Level::setEventHub(EventHub *Hub) {
   EventHubConnector::setEventHub(Hub);
   for (auto &Sys : Systems) {
     Sys->setEventHub(Hub);
-  }
-  for (auto &E : Entities) {
-    E->setEventHub(Hub);
   }
 }
 
@@ -169,6 +168,7 @@ bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
     return true;
   }
   bool MapBlocked = Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile;
+  MapBlocked |= Map.get(LayerObjectsIdx).getTile(Pos) != EmptyTile;
   bool EntityBlocked = getEntityAt(Pos) != entt::null;
   return MapBlocked || EntityBlocked;
 }
