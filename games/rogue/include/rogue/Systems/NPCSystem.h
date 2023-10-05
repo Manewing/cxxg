@@ -16,10 +16,11 @@ namespace rogue {
 class NPCSystem : public System {
 public:
   static void decideAction(const PhysState &PS, ReasoningStateComp &RSC);
-  static void handleAction(Level &L, PhysState &PS, PositionComp &PC,
-                           ReasoningStateComp &RSC);
-  static void
-  searchObject(Level &L, ymir::Point2d<int> &Pos, Tile T,
+  static void handleAction(Level &L, entt::entity Entity, PhysState &PS,
+                           const PositionComp &PC, ReasoningStateComp &RSC);
+
+  static std::optional<ymir::Point2d<int>>
+  searchObject(Level &L, ymir::Point2d<int> Pos, Tile T,
                std::function<void(ymir::Point2d<int>)> FoundCallback);
 
 public:

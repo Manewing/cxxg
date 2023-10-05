@@ -3,6 +3,11 @@
 #include <entt/entt.hpp>
 #include <memory>
 #include <rogue/Components/AI.h>
+#include <rogue/Components/Combat.h>
+#include <rogue/Components/Helpers.h>
+#include <rogue/Components/Items.h>
+#include <rogue/Components/RaceFaction.h>
+#include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/LevelGenerator.h>
@@ -35,13 +40,32 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
   return Scr;
 }
 
-entt::entity createNPCEntity(entt::registry &Reg, ymir::Point2d<int> Pos) {
+using NPCCompList =
+    ComponentList<TileComp, FactionComp, PositionComp, StatsComp, HealthComp,
+                  NameComp, LineOfSightComp, AgilityComp, MeleeAttackComp,
+                  InventoryComp, EquipmentComp, CollisionComp>;
+
+entt::entity createNPCEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
+                             StatPoints Stats) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<PhysState>(Entity);
   Reg.emplace<ReasoningStateComp>(Entity);
   Reg.emplace<TileComp>(Entity, NPCTile);
   Reg.emplace<NameComp>(Entity, "NPC");
+  Reg.emplace<AgilityComp>(Entity);
+  Reg.emplace<StatsComp>(Entity, Stats);
+  Reg.emplace<HealthComp>(Entity);
+  Reg.emplace<FactionComp>(Entity, FactionKind::Player);
+  Reg.emplace<RaceComp>(Entity, RaceKind::Human);
+  Reg.emplace<LineOfSightComp>(Entity);
+  Reg.emplace<MeleeAttackComp>(Entity);
+  Reg.emplace<InventoryComp>(Entity);
+  Reg.emplace<EquipmentComp>(Entity);
+  Reg.emplace<CollisionComp>(Entity);
+
+  assert(NPCCompList::validate(Reg, Entity) && "NPC entity is invalid");
+
   return Entity;
 }
 
@@ -67,7 +91,8 @@ int main(int Argc, char *Argv[]) {
       {'B', {BerryBushTile, "objects"}},
   };
   auto Level = LG.loadLevel(Argv[1], Layers, CharInfoMap, 0);
-  auto NPCEntity = createNPCEntity(Level->Reg, {4, 4});
+  auto NPCEntity =
+      createNPCEntity(Level->Reg, {4, 4}, StatPoints{10, 10, 10, 10});
 
   unsigned MaxTick = 1000;
   for (unsigned Tick = 0; Tick < MaxTick; Tick++) {

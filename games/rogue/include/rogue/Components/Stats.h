@@ -74,8 +74,8 @@ inline StatPoints operator+(const StatPoints &Lhs,
 }
 
 struct StatsComp {
-  StatPoints Base;
-  StatPoints Bonus;
+  StatPoints Base = {};
+  StatPoints Bonus = {};
 
   inline void reset() { Bonus = {0, 0, 0, 0}; }
   inline void add(StatPoints Bonus) { this->Bonus += Bonus; }

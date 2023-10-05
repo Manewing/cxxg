@@ -46,6 +46,8 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   Reg.emplace<EquipmentComp>(Entity, EquipComp);
   Reg.emplace<CollisionComp>(Entity);
 
+  assert(PlayerCompList::validate(Reg, Entity) && "Player entity is invalid");
+
   return Entity;
 }
 
@@ -83,6 +85,8 @@ entt::entity PlayerComp::movePlayer(entt::registry &RegFrom,
   removePlayer(RegTo);
   PlayerEntity = copyPlayer(RegFrom, RegTo);
   removePlayer(RegFrom);
+  assert(PlayerCompList::validate(RegTo, PlayerEntity) &&
+         "Player entity is invalid");
   return PlayerEntity;
 }
 

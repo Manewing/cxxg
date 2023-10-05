@@ -41,8 +41,8 @@ void NPCSystem::decideAction(const PhysState &PS, ReasoningStateComp &RSC) {
   }
 }
 
-void NPCSystem::handleAction(Level &L, PhysState &PS, PositionComp &PC,
-                             ReasoningStateComp &RSC) {
+void NPCSystem::handleAction(Level &L, entt::entity Entity, PhysState &PS,
+                             const PositionComp &PC, ReasoningStateComp &RSC) {
   // FIXME
   // REFACTOR
   int SearchCooldown = 5;
@@ -56,20 +56,34 @@ void NPCSystem::handleAction(Level &L, PhysState &PS, PositionComp &PC,
     //  FIXME
     // REFACTOR
     break;
-  case ActionState::SEARCH_DRINK:
-    searchObject(L, PC.Pos, Tile{{'~'}}, [&PS, &RSC](auto) {
+  case ActionState::SEARCH_DRINK: {
+    auto TPosOrNone = searchObject(L, PC.Pos, Tile{{'~'}}, [&PS, &RSC](auto) {
       PS.Thirst += 750;
       RSC.State = ActionState::IDLE;
     });
-    break;
-  case ActionState::SEARCH_FOOD:
+    if (TPosOrNone) {
+      auto Diff = *TPosOrNone - PC.Pos;
+      auto MoveDir = ymir::Dir2d::fromMaxComponent(Diff);
+      MovementComp MC;
+      MC.Dir = MoveDir;
+      L.Reg.emplace<MovementComp>(Entity, MC);
+    }
+  } break;
+  case ActionState::SEARCH_FOOD: {
     // TODO check if has food in inventory
     // consume food in inventory avoid search if possible
-    searchObject(L, PC.Pos, Tile{{'#'}}, [&PS, &RSC](auto) {
+    auto TPosOrNone = searchObject(L, PC.Pos, Tile{{'#'}}, [&PS, &RSC](auto) {
       PS.Hunger += 750;
       RSC.State = ActionState::IDLE;
     });
-    break;
+    if (TPosOrNone) {
+      auto Diff = *TPosOrNone - PC.Pos;
+      auto MoveDir = ymir::Dir2d::fromMaxComponent(Diff);
+      MovementComp MC;
+      MC.Dir = MoveDir;
+      L.Reg.emplace<MovementComp>(Entity, MC);
+    }
+  } break;
   case ActionState::SLEEP:
     if (--SearchCooldown == 0) {
       PS.Fatigue += 750;
@@ -80,34 +94,29 @@ void NPCSystem::handleAction(Level &L, PhysState &PS, PositionComp &PC,
   }
 }
 
-void NPCSystem::searchObject(
-    Level &L, ymir::Point2d<int> &Pos, Tile T,
-    std::function<void(ymir::Point2d<int>)> FoundCallback) {
-  // FIXME
-  // REFACTOR
-
+std::optional<ymir::Point2d<int>>
+NPCSystem::searchObject(Level &L, ymir::Point2d<int> Pos, Tile T,
+                        std::function<void(ymir::Point2d<int>)> FoundCallback) {
   // FIXME do this once at setup of search
   auto [DM, TPs] = L.getDijkstraMap(T, Level::LayerObjectsIdx);
+
   auto PathToObject = ymir::Algorithm::getPathFromDijkstraMap(
       DM, TPs.at(0), Pos, ymir::FourTileDirections<int>());
   if (PathToObject.empty()) {
-    // FIXME add no path found exception
-    throw std::runtime_error("Could not find path to object");
+    return std::nullopt;
   }
+
   auto TargetPos = PathToObject.at(0);
   auto EndPos = PathToObject.back();
 
   // Check if object is in reach
   if (TargetPos == EndPos) {
     FoundCallback(TargetPos);
-    return;
+    return std::nullopt;
   }
 
-  if (!L.isBodyBlocked(TargetPos)) {
-    Pos = PathToObject.at(0);
-  } else {
-    // FIXME should never be reached
-  }
+  assert(!L.isBodyBlocked(TargetPos));
+  return PathToObject.at(0);
 }
 
 NPCSystem::NPCSystem(Level &L) : System(L.Reg), L(L) {}
@@ -126,7 +135,9 @@ void NPCSystem::update(UpdateType Type) {
 
   // 2. do it
   Reg.view<PhysState, PositionComp, ReasoningStateComp>().each(
-      [this](auto &PS, auto &PC, auto &RSC) { handleAction(L, PS, PC, RSC); });
+      [this](auto Et, auto &PS, auto &PC, auto &RSC) {
+        handleAction(L, Et, PS, PC, RSC);
+      });
 }
 
 } // namespace rogue

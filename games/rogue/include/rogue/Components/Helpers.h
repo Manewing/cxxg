@@ -7,6 +7,10 @@ namespace rogue {
 
 template <typename... Args> struct ComponentList {
   using List = std::tuple<Args...>;
+
+  static bool validate(entt::registry &Reg, entt::entity Et) {
+    return Reg.all_of<Args...>(Et);
+  }
 };
 
 template <typename ComponentListT, typename Callable>
