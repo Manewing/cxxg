@@ -123,8 +123,8 @@ void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
 bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
                          CapabilityFlags Flags) const {
   bool SpecCanUnequipFrom =
-      !Specialization || Specialization->canRemoveFrom(Entity, Reg, Flags);
-  return getProto().canRemoveFrom(Entity, Reg, Flags) && SpecCanUnequipFrom;
+      Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags);
+  return getProto().canRemoveFrom(Entity, Reg, Flags) || SpecCanUnequipFrom;
 }
 
 void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,

@@ -60,9 +60,6 @@ bool Equipment::isEquipped(ItemType Type) const {
 bool Equipment::canEquip(const Item &It, entt::entity Entity,
                          entt::registry &Reg) const {
   const auto Type = It.getType();
-  if ((Type & ItemType::EquipmentMask) == ItemType::None) {
-    return false;
-  }
   if (isEquipped(Type)) {
     return false;
   }
@@ -71,9 +68,6 @@ bool Equipment::canEquip(const Item &It, entt::entity Entity,
 
 bool Equipment::canUnequip(ItemType Type, entt::entity Entity,
                            entt::registry &Reg) const {
-  if ((Type & ItemType::EquipmentMask) == ItemType::None) {
-    return false;
-  }
   if (!isEquipped(Type)) {
     return false;
   }

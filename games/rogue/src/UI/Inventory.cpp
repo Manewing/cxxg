@@ -98,9 +98,9 @@ bool InventoryController::handleInput(int Char) {
     const auto &It = Inv.getItem(ItemIdx);
     auto Equip = Reg.try_get<EquipmentComp>(Entity);
     if (!Equip) {
-      Ctrl.publish(PlayerInfoMessageEvent()
-                   << "Can not equip " + It.getName() + " on " +
-                          Reg.get<NameComp>(Entity).Name);
+      Ctrl.publish(ErrorMessageEvent() << "Can not equip " + It.getName() +
+                                              " on " +
+                                              Reg.get<NameComp>(Entity).Name);
       break;
     }
 
@@ -109,6 +109,7 @@ bool InventoryController::handleInput(int Char) {
       Inv.addItem(*EquipItOrNone);
     }
 
+    assert(Equip->Equip.isEquipped(It.getType()) == false);
     if (!Equip->Equip.canEquip(It, Entity, Reg)) {
       Ctrl.publish(PlayerInfoMessageEvent()
                    << "Can not equip " + It.getName() + " on " +
