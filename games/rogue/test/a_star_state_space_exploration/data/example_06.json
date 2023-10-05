@@ -1,0 +1,63 @@
+{
+  "description": "Restore lost health, use bandage in inventory and craft bandage to heal",
+  "goal_heuristic": "health",
+  "initial_state": {
+    "health": 300,
+    "thirst": 1000,
+    "hunger": 1000,
+    "fatigue": 1000,
+    "pos": {
+      "x": 0,
+      "y": 0
+    },
+    "inventory": {
+      "items": [
+        "bandage"
+      ]
+    },
+    "resources": [
+      {
+        "kind": "water",
+        "pos": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "kind": "coconut",
+        "pos": {
+          "x": 4,
+          "y": -3
+        }
+      },
+      {
+        "kind": "berries",
+        "pos": {
+          "x": 40,
+          "y": 0
+        }
+      },
+      {
+        "kind": "cotton",
+        "pos": {
+          "x": -10,
+          "y": 5
+        }
+      },
+      {
+        "kind": "cotton",
+        "pos": {
+          "x": 10,
+          "y": -3
+        }
+      },
+      {
+        "kind": "wood",
+        "pos": {
+          "x": 15,
+          "y": -5
+        }
+      }
+    ]
+  }
+}

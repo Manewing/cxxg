@@ -1,0 +1,44 @@
+{
+  "description": "Satisfy hunger, search for food and eat. More food options.",
+  "goal_heuristic": "hunger",
+  "initial_state": {
+    "health": 1000,
+    "thirst": 1000,
+    "hunger": 500,
+    "fatigue": 1000,
+    "pos": {
+      "x": 0,
+      "y": 0
+    },
+    "resources": [
+      {
+        "kind": "water",
+        "pos": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "kind": "coconut",
+        "pos": {
+          "x": 4,
+          "y": -3
+        }
+      },
+      {
+        "kind": "berries",
+        "pos": {
+          "x": 40,
+          "y": 0
+        }
+      },
+      {
+        "kind": "wood",
+        "pos": {
+          "x": 15,
+          "y": -5
+        }
+      }
+    ]
+  }
+}
