@@ -32,8 +32,11 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
     return;
   }
 
+  PC.Target = entt::null;
+
   if (auto Et = L.getEntityAt(NewPos);
       Et != entt::null && Reg.all_of<HealthComp, FactionComp>(Et)) {
+    PC.Target = Et;
     Reg.emplace<CombatComp>(PlayerEt, Et);
     return;
   }

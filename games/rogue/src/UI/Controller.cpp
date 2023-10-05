@@ -17,6 +17,9 @@ namespace rogue::ui {
 namespace {
 
 cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
+  if (Health <= 0) {
+    return {145, 10, 10};
+  }
   int Percent = (Health * 100) / MaxHealth;
   if (Percent >= 66) {
     return {135, 250, 10};
@@ -37,30 +40,38 @@ cxxg::types::Size getWindowContainerSize(cxxg::Screen &Scr) {
 Controller::Controller(cxxg::Screen &Scr)
     : Scr(Scr), WdwContainer({1, 2}, getWindowContainerSize(Scr)) {}
 
-void Controller::draw(int LevelIdx, int Health, int MaxHealth, int AP, int AG,
-                      std::string InteractStr) {
+void Controller::draw(int LevelIdx, const PlayerInfo &PI,
+                      const std::optional<TargetInfo> &TI) {
   // Define colors
   const auto NoColor = cxxg::types::Color::NONE;
   const auto NoInterColor = cxxg::types::Color::GREY;
   const auto HasInterColor = cxxg::types::RgbColor{80, 200, 145};
-  const auto HealthColor = getHealthColor(Health, MaxHealth);
+  const auto HealthColor = getHealthColor(PI.Health, PI.MaxHealth);
 
+  auto InteractStr = PI.InteractStr;
   if (WdwContainer.hasActiveWindow()) {
     InteractStr = WdwContainer.getActiveWindow().getInteractMsg();
   }
 
   auto InterColor = HasInterColor;
-  auto InterStr = InteractStr;
-  if (InterStr.empty()) {
-    InterStr = "Nothing";
+  if (InteractStr.empty()) {
+    InteractStr = "Nothing";
     InterColor = NoInterColor;
   }
 
-  Scr[0][0] << NoColor.underline() << "[FLOOR]:" << NoColor << " "
-            << std::setw(3) << (LevelIdx + 1) << " " << NoColor.underline()
-            << "[HEALTH]:" << HealthColor << std::setw(4) << Health << NoColor
-            << " [AP]: " << AP << " [AG]: " << AG << " | "
-            << InterColor.underline() << InterStr;
+  auto Acc = Scr[0][0];
+  Acc << NoColor.underline() << "[FLOOR]:" << NoColor << " " << std::setw(3)
+      << (LevelIdx + 1) << " | " << HealthColor << std::setw(4) << PI.Health
+      << " HP" << NoColor << " | " << PI.AP << " AP | " << NoColor.underline()
+      << "[T]:" << NoColor << " ";
+  if (TI) {
+    Acc << TI->Name << " | " << getHealthColor(TI->Health, TI->MaxHealth)
+        << std::setw(4) << TI->Health << " HP" << NoColor;
+  } else {
+    Acc << NoInterColor.underline() << "Nothing" << NoColor;
+  }
+  Acc << " | " << InterColor.underline() << InteractStr;
+  Acc.flushBuffer();
 
   WdwContainer.draw(Scr);
 }

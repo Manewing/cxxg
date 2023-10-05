@@ -52,7 +52,7 @@ void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
         renderVisible(Pos);
         return !L.isLOSBlocked(Pos);
       },
-      AtPos, Range, 0.1, 0.01);
+      AtPos, Range, 0.3, 0.01);
 }
 
 void Renderer::renderVisible(ymir::Point2d<int> AtPos) {

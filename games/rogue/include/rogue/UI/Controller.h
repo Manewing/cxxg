@@ -25,9 +25,23 @@ namespace rogue::ui {
 
 class Controller : public EventHubConnector {
 public:
+  struct PlayerInfo {
+    int Health;
+    int MaxHealth;
+    int AP;
+    std::string InteractStr;
+  };
+
+  struct TargetInfo {
+    std::string Name;
+    int Health;
+    int MaxHealth;
+  };
+
+public:
   Controller(cxxg::Screen &Scr);
-  void draw(int LevelIdx, int Health, int MaxHealth, int AP, int AG,
-            std::string InteractStr);
+  void draw(int LevelIdx, const PlayerInfo &PI,
+            const std::optional<TargetInfo> &TI);
   bool isUIActive() const;
   void handleInput(int Char);
 

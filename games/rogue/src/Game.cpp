@@ -7,6 +7,7 @@
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
 #include <rogue/Event.h>
 #include <rogue/Game.h>
 #include <rogue/GameConfig.h>
@@ -347,12 +348,31 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   const auto RenderSize = ymir::Size2d<int>{static_cast<int>(Scr.getSize().X),
                                             static_cast<int>(Scr.getSize().Y)};
 
-  // FIXME need to check that player is still alive!
+  // Get components for drawing from the current player
   auto Player = getPlayer();
+  const auto &PC = getLvlReg().get<PlayerComp>(Player);
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
-  auto LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
-  auto Health = getLvlReg().get<HealthComp>(Player);
-  auto AGC = getLvlReg().get<AgilityComp>(Player);
+  const auto &LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
+  const auto &Health = getLvlReg().get<HealthComp>(Player);
+  const auto &AGC = getLvlReg().get<AgilityComp>(Player);
+
+  ui::Controller::PlayerInfo PI;
+  PI.Health = Health.Value;
+  PI.MaxHealth = Health.MaxValue;
+  PI.AP = AGC.AP;
+  if (auto *Interact = getAvailableInteraction()) {
+    PI.InteractStr = "[E] " + Interact->Msg;
+  }
+
+  std::optional<ui::Controller::TargetInfo> TI;
+  if (PC.Target != entt::null && getLvlReg().valid(PC.Target)) {
+    TI = ui::Controller::TargetInfo();
+    auto *TNC = getLvlReg().try_get<NameComp>(PC.Target);
+    auto *THC = getLvlReg().try_get<HealthComp>(PC.Target);
+    TI->Name = TNC ? TNC->Name : "<NameCompMissing>";
+    TI->Health = THC ? THC->Value : 0;
+    TI->MaxHealth = THC ? THC->MaxValue : 0;
+  }
 
   Renderer Render(RenderSize, *CurrentLevel, PlayerPos);
   Render.renderShadow(/*Darkness=*/30);
@@ -361,17 +381,11 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   REC.apply(Render);
   REC.clear();
 
-  std::string InteractStr = "";
-  if (auto *Interact = getAvailableInteraction()) {
-    InteractStr = "[E] " + Interact->Msg;
-  }
-
   // Draw map
   Scr << Render.get();
 
   // Draw UI overlay
-  UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, AGC.AP,
-              AGC.Agility, InteractStr);
+  UICtrl.draw(CurrentLevelIdx, PI, TI);
 
   if (UpdateScreen) {
     handleShowNotifications(false);
