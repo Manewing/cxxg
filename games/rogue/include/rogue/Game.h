@@ -22,6 +22,8 @@ struct EntityDiedEvent;
 struct SwitchLevelEvent;
 struct LootEvent;
 struct EntityAttackEvent;
+struct DetectTargetEvent;
+struct LostTargetEvent;
 class Renderer;
 } // namespace rogue
 
@@ -31,6 +33,8 @@ class RenderEventCollector : public EventHubConnector {
 public:
   void setEventHub(EventHub *EH) override;
   void onEntityAttackEvent(const EntityAttackEvent &E);
+  void onDetectTargetEvent(const DetectTargetEvent &E);
+  void onLostTargetEvent(const LostTargetEvent &E);
   void apply(Renderer &R);
   void clear();
   bool hasEvents() const;

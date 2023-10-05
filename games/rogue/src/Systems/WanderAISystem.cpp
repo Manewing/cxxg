@@ -32,9 +32,8 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
                                   WanderAIComp &AI) {
   switch (AI.State) {
   case WanderAIState::Idle: {
-    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
-    if (TargetEt != entt::null) {
-      AI.State = WanderAIState::Chase;
+    if (auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
+        TargetEt != entt::null) {
       break;
     }
 
@@ -44,11 +43,12 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
     }
   } break;
   case WanderAIState::Wander: {
-    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
-    if (TargetEt != entt::null) {
-      AI.State = WanderAIState::Chase;
+    if (auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
+        TargetEt != entt::null) {
       break;
     }
+
+    AI.State = WanderAIState::Wander;
 
     auto NextPos = wander(PC);
     MovementComp MC;
@@ -58,12 +58,11 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
 
   case WanderAIState::Chase: {
     // If in range stay, otherwise chase
-    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC);
+    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
     if (TargetEt == entt::null) {
-      AI.State = WanderAIState::Idle;
-      AI.IdleDelayLeft = AI.IdleDelay;
       break;
     }
+
     auto NextPosOrNone = chaseTarget(TargetEt, PC, *LOS);
     if (!NextPosOrNone) {
       break;
@@ -80,8 +79,42 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
 }
 
 std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
-WanderAISystem::checkForTarget(entt::entity Entity,
-                               const ymir::Point2d<int> &AtPos) {
+WanderAISystem::checkForTarget(entt::entity Entity, PositionComp &PC,
+                               WanderAIComp &AI) {
+  auto [TargetEt, LOS, FC] = findTarget(Entity, PC);
+
+  // Deal with case we lost the target
+  if (TargetEt == entt::null) {
+
+    // Check if we changed the state
+    if (AI.State == WanderAIState::Chase) {
+      LostTargetEvent LTE;
+      LTE.Entity = Entity;
+      LTE.Registry = &Reg;
+      publish(LTE);
+
+      AI.State = WanderAIState::Idle;
+      AI.IdleDelayLeft = AI.IdleDelay;
+    }
+
+    return {TargetEt, LOS, FC};
+  }
+
+  // Check if we changed the state
+  if (AI.State != WanderAIState::Chase) {
+    DetectTargetEvent DTE;
+    DTE.Entity = Entity;
+    DTE.Target = TargetEt;
+    DTE.Registry = &Reg;
+    publish(DTE);
+  }
+  AI.State = WanderAIState::Chase;
+  return {TargetEt, LOS, FC};
+}
+
+std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
+WanderAISystem::findTarget(entt::entity Entity,
+                           const ymir::Point2d<int> &AtPos) {
   auto LOSComp = Reg.try_get<LineOfSightComp>(Entity);
   auto FacComp = Reg.try_get<FactionComp>(Entity);
   if (!LOSComp || !FacComp) {

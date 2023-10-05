@@ -27,7 +27,10 @@ private:
   void updateEntity(entt::entity Entity, PositionComp &Pos, WanderAIComp &AI);
 
   std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
-  checkForTarget(entt::entity Entity, const ymir::Point2d<int> &AtPos);
+  checkForTarget(entt::entity Entity, PositionComp &PC, WanderAIComp &AI);
+
+  std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
+  findTarget(entt::entity Entity, const ymir::Point2d<int> &AtPos);
 
   ymir::Point2d<int> wander(const ymir::Point2d<int> AtPos);
 

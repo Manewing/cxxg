@@ -62,6 +62,17 @@ struct LootEvent : public BaseEvent {
   bool isPlayerAffected() const;
 };
 
+struct DetectTargetEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
+  entt::entity Target = entt::null;
+  entt::registry *Registry = nullptr;
+};
+
+struct LostTargetEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
+  entt::registry *Registry = nullptr;
+};
+
 } // namespace rogue
 
 #endif // #ifndef ROGUE_EVENT_H

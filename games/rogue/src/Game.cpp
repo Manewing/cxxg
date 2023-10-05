@@ -29,6 +29,8 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
 void RenderEventCollector::setEventHub(EventHub *EH) {
   EventHubConnector::setEventHub(EH);
   EH->subscribe(*this, &RenderEventCollector::onEntityAttackEvent);
+  EH->subscribe(*this, &RenderEventCollector::onDetectTargetEvent);
+  EH->subscribe(*this, &RenderEventCollector::onLostTargetEvent);
 }
 
 void RenderEventCollector::onEntityAttackEvent(const EntityAttackEvent &E) {
@@ -40,6 +42,32 @@ void RenderEventCollector::onEntityAttackEvent(const EntityAttackEvent &E) {
   RenderFns.push_back([AtPos](Renderer &R) {
     R.renderEffect(
         cxxg::types::ColoredChar{'*', cxxg::types::RgbColor{155, 20, 20}},
+        AtPos);
+  });
+}
+
+void RenderEventCollector::onDetectTargetEvent(const DetectTargetEvent &E) {
+  auto *PC = E.Registry->try_get<PositionComp>(E.Entity);
+  if (!PC) {
+    return;
+  }
+  auto const AtPos = PC->Pos;
+  RenderFns.push_back([AtPos](Renderer &R) {
+    R.renderEffect(
+        cxxg::types::ColoredChar{'!', cxxg::types::RgbColor{173, 161, 130}},
+        AtPos);
+  });
+}
+
+void RenderEventCollector::onLostTargetEvent(const LostTargetEvent &E) {
+  auto *PC = E.Registry->try_get<PositionComp>(E.Entity);
+  if (!PC) {
+    return;
+  }
+  auto const AtPos = PC->Pos;
+  RenderFns.push_back([AtPos](Renderer &R) {
+    R.renderEffect(
+        cxxg::types::ColoredChar{'?', cxxg::types::RgbColor{56, 55, 89}},
         AtPos);
   });
 }
