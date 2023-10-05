@@ -5,7 +5,7 @@
             "description": "A blob",
             "stats": {
                 "str": 5,
-                "dex": 0,
+                "dex": 1,
                 "int": 0,
                 "vit": 20
             },

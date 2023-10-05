@@ -3,6 +3,18 @@
 
 namespace rogue {
 
+const char *getWanderAIStateStr(WanderAIState State) {
+  switch (State) {
+  case WanderAIState::Idle:
+    return "Idle";
+  case WanderAIState::Wander:
+    return "Wander";
+  case WanderAIState::Chase:
+    return "Chase";
+  }
+  return "<invalid>";
+}
+
 const char *getNeedKindStr(NeedKind Need) {
   switch (Need) {
   case NeedKind::NONE:

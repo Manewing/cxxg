@@ -14,6 +14,8 @@ struct WanderAIComp {
   unsigned IdleDelayLeft = 2;
 };
 
+const char *getWanderAIStateStr(WanderAIState State);
+
 struct LineOfSightComp {
   unsigned LOSRange = 14;
 };

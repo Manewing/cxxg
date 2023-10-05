@@ -85,7 +85,7 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
     DrawPos += cxxg::types::Position{0, 1};
   }
   if (auto *AI = Reg.try_get<WanderAIComp>(TargetEt)) {
-    Scr[DrawPos.Y][DrawPos.X + 1] << "AI: " << int(AI->State);
+    Scr[DrawPos.Y][DrawPos.X + 1] << "AI: " << getWanderAIStateStr(AI->State);
     DrawPos += cxxg::types::Position{0, 1};
   }
 }
