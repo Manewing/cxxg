@@ -16,8 +16,16 @@ struct GameContext;
 namespace rogue {
 
 struct LevelConfig {
+  struct Creature {
+    std::string Name;
+  };
+  struct Chest {
+    std::string LootTableName;
+  };
+
   std::filesystem::path DungeonConfig;
-  std::map<char, std::string> CreatureNames;
+  std::map<char, Creature> Creatures;
+  std::map<char, Chest> Chests;
 };
 
 class LevelGenerator {

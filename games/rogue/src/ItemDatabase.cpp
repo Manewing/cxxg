@@ -140,6 +140,49 @@ createSpecialization(const rapidjson::Value &V) {
   return It->second(V);
 }
 
+static LootTable::LootSlot createLootItemSlot(const ItemDatabase &DB,
+                                              const rapidjson::Value &V) {
+  const auto Weight = V["weight"].GetInt();
+  const auto ItemName = std::string(V["name"].GetString());
+  const auto ItId = DB.getItemId(ItemName);
+  const auto MinCount = V["min_count"].GetUint();
+  const auto MaxCount = V["max_count"].GetUint();
+  return LootTable::LootSlot{
+      std::make_shared<LootItem>(ItId, MinCount, MaxCount), Weight};
+}
+
+static LootTable::LootSlot createLootTableSlot(const ItemDatabase &DB,
+                                               const rapidjson::Value &V) {
+  const auto Weight = V["weight"].GetInt();
+  const auto LootTbName = V["ref"].GetString();
+  return LootTable::LootSlot{DB.getLootTable(LootTbName), Weight};
+}
+
+static LootTable::LootSlot createLootNullSlot(const rapidjson::Value &V) {
+  const auto Weight = V["weight"].GetInt();
+  return LootTable::LootSlot{nullptr, Weight};
+}
+
+static void fillLootTable(const ItemDatabase &DB, const rapidjson::Value &V,
+                          LootTable &LootTb) {
+  const auto NumRolls = V["rolls"].GetUint();
+  std::vector<LootTable::LootSlot> Slots;
+  for (const auto &SlotJson : V["slots"].GetArray()) {
+    const auto Type = std::string(SlotJson["type"].GetString());
+    if (Type == "item") {
+      Slots.push_back(createLootItemSlot(DB, SlotJson));
+    } else if (Type == "table") {
+      Slots.push_back(createLootTableSlot(DB, SlotJson));
+    } else if (Type == "null") {
+      Slots.push_back(createLootNullSlot(SlotJson));
+    } else {
+      throw std::out_of_range("Invalid loot table slot type: " + Type);
+    }
+  }
+
+  LootTb.reset(NumRolls, Slots);
+}
+
 ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   ItemDatabase DB;
 
@@ -214,6 +257,22 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     DB.addItemProto(Proto, Specialization.get());
   }
 
+  // Create loot tables
+  const auto &LootTablesJson = Doc["loot_tables"].GetObject();
+  for (const auto &[K, V] : LootTablesJson) {
+    const auto Name = std::string(K.GetString());
+    // Check if already registered
+    if (DB.LootTables.count(Name) != 0) {
+      throw std::runtime_error("Duplicate loot table: " + Name);
+    }
+    DB.LootTables.emplace(Name, std::make_shared<LootTable>());
+  }
+  for (const auto &[K, V] : LootTablesJson) {
+    const auto Name = std::string(K.GetString());
+    auto &LootTb = DB.LootTables.at(Name);
+    fillLootTable(DB, V, *LootTb);
+  }
+
   return DB;
 }
 
@@ -252,6 +311,15 @@ int ItemDatabase::getRandomItemId() const {
   const auto Idx = rand() % ItemProtos.size();
   const auto It = std::next(ItemProtos.begin(), Idx);
   return It->first;
+}
+
+const std::shared_ptr<LootTable> &
+ItemDatabase::getLootTable(const std::string &Name) const {
+  const auto It = LootTables.find(Name);
+  if (It == LootTables.end()) {
+    throw std::out_of_range("Unknown loot table: " + Name);
+  }
+  return It->second;
 }
 
 } // namespace rogue

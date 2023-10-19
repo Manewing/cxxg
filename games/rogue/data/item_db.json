@@ -377,5 +377,51 @@
       ],
       "capabilities": []
     }
-  ]
+  ],
+  "loot_tables": {
+    "common_equip": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Small Sword",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 40
+        }
+      ]
+    },
+    "common_chest": {
+      "rolls": 5,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Blueberry",
+          "min_count": 5,
+          "max_count": 10,
+          "weight": 50
+        },
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 20
+        },
+        {
+          "type": "item",
+          "name": "Iron Scrap",
+          "min_count": 3,
+          "max_count": 3,
+          "weight": -1
+        },
+        {
+          "type": "null",
+          "weight": 40
+        }
+      ]
+    }
+  }
 }

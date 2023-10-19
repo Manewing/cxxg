@@ -9,5 +9,11 @@
             "key": "t",
             "name": "Troll"
         }
+    ],
+    "chests": [
+        {
+            "key": "C",
+            "loot": "common_chest"
+        }
     ]
 }

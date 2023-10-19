@@ -5,5 +5,11 @@
             "key": "s",
             "name": "Skeleton"
         }
+    ],
+    "chests": [
+        {
+            "key": "C",
+            "loot": "common_chest"
+        }
     ]
 }

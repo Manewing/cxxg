@@ -6,6 +6,7 @@
 #include <rogue/ItemDatabase.h>
 #include <rogue/JSON.h>
 #include <rogue/LevelGenerator.h>
+#include <rogue/LootTable.h>
 #include <rogue/Parser.h>
 #include <ymir/Dungeon/BuilderPass.hpp>
 #include <ymir/Dungeon/CaveRoomGenerator.hpp>
@@ -51,11 +52,22 @@ LevelConfig loadLevelConfig(const std::filesystem::path &LvlCfgPath) {
   auto DngCfg = Doc["dungeon_config"].GetString();
   LvlCfg.DungeonConfig = LvlCfgPath.parent_path() / DngCfg;
 
-
+  // Load level specific creature configuration
   for (const auto &CI : Doc["creatures"].GetArray()) {
     auto Key = std::string(CI["key"].GetString());
     assert(Key.size() == 1);
-    LvlCfg.CreatureNames[Key[0]] = CI["name"].GetString();
+    LevelConfig::Creature C;
+    C.Name = CI["name"].GetString();
+    LvlCfg.Creatures[Key[0]] = C;
+  }
+
+  // Load level specific chest configuration
+  for (const auto &CI : Doc["chests"].GetArray()) {
+    auto Key = std::string(CI["key"].GetString());
+    assert(Key.size() == 1);
+    LevelConfig::Chest C;
+    C.LootTableName = CI["loot"].GetString();
+    LvlCfg.Chests[Key[0]] = C;
   }
 
   return LvlCfg;
@@ -161,14 +173,25 @@ Inventory generateRandomLootInventory(const ItemDatabase &ItemDb,
   return Inv;
 }
 
+Inventory generateLootInventory(const ItemDatabase &ItemDb,
+                                const std::string &LootTableName) {
+  const auto &LtCt = ItemDb.getLootTable(LootTableName);
+  auto Loot = LtCt->generateLoot();
+
+  Inventory Inv;
+  for (const auto &Rw : Loot) {
+    auto It = ItemDb.createItem(Rw.ItId, Rw.Count);
+    Inv.addItem(It);
+  }
+  return Inv;
+}
+
 } // namespace
 
 void LevelGenerator::spawnEntity(const LevelConfig &Cfg, Level &L,
                                  ymir::Point2d<int> Pos, Tile T) {
-  if (auto It = Cfg.CreatureNames.find(T.kind());
-      It != Cfg.CreatureNames.end()) {
-
-    auto CId = Ctx->CreatureDb.getCreatureId(It->second);
+  if (auto It = Cfg.Creatures.find(T.kind()); It != Cfg.Creatures.end()) {
+    auto CId = Ctx->CreatureDb.getCreatureId(It->second.Name);
     const auto &CInfo = Ctx->CreatureDb.getCreature(CId);
     if (CInfo.Faction == FactionKind::Nature) {
       createHostileCreature(L.Reg, Pos, T, CInfo.Name, CInfo.Stats);
@@ -177,6 +200,12 @@ void LevelGenerator::spawnEntity(const LevelConfig &Cfg, Level &L,
                   generateRandomLootInventory(Ctx->ItemDb), CInfo.Stats,
                   CInfo.Faction, CInfo.Race);
     }
+    return;
+  }
+  if (auto It = Cfg.Chests.find(T.kind()); It != Cfg.Chests.end()) {
+    createChestEntity(
+        L.Reg, Pos, T,
+        generateLootInventory(Ctx->ItemDb, It->second.LootTableName));
     return;
   }
 
@@ -189,12 +218,9 @@ void LevelGenerator::spawnEntity(const LevelConfig &Cfg, Level &L,
     int NextLevelId = L.getLevelId() + 1;
     createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false, NextLevelId);
   } break;
-  case 'C':
-    createChestEntity(L.Reg, Pos, T, generateRandomLootInventory(Ctx->ItemDb));
-    break;
   default:
     throw std::runtime_error("Invalid entity kind: " +
-                             std::to_string(T.kind()));
+                             std::string(1, T.kind()));
     break;
   }
 }

@@ -5,5 +5,11 @@
             "key": "b",
             "name": "Blob"
         }
+    ],
+    "chests": [
+        {
+            "key": "C",
+            "loot": "common_chest"
+        }
     ]
 }
