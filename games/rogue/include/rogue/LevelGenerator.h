@@ -36,6 +36,7 @@ public:
     };
 
     std::filesystem::path MapFile;
+    CharInfo DefaultChar;
     std::map<char, CharInfo> CharInfoMap;
   };
 

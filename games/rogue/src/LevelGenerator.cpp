@@ -51,6 +51,24 @@ loadGenMapConfig(const std::filesystem::path &BasePath,
   return MapCfg;
 }
 
+LevelConfig::DesignedMap::CharInfo parseCharInfo(const rapidjson::Value &V) {
+  const auto Color = ymir::Config::parseRgbColor(V["color"].GetString());
+  const auto Key = std::string_view(V["key"].GetString());
+  const auto Layer = std::string(V["layer"].GetString());
+  cxxg::types::RgbColor CxxColor{Color.R, Color.G, Color.B};
+
+  if (V.HasMember("bg_color")) {
+    const auto BgColor = ymir::Config::parseRgbColor(V["bg_color"].GetString());
+    CxxColor.HasBackground = true;
+    CxxColor.BgR = BgColor.R;
+    CxxColor.BgG = BgColor.G;
+    CxxColor.BgB = BgColor.B;
+  }
+
+  Tile T = {{Key[0], CxxColor}};
+  return LevelConfig::DesignedMap::CharInfo{T, Layer};
+}
+
 LevelConfig::DesignedMap loadDesMapConfig(const std::filesystem::path &BasePath,
                                           const rapidjson::Value &MapJson) {
   LevelConfig::DesignedMap MapCfg;
@@ -59,15 +77,10 @@ LevelConfig::DesignedMap loadDesMapConfig(const std::filesystem::path &BasePath,
   // Load the character mapping
   for (const auto &[K, V] : MapJson["char_info"].GetObject()) {
     const auto Char = std::string_view(K.GetString())[0];
-    const auto Color = ymir::Config::parseRgbColor(V["color"].GetString());
-    const auto BgColor = ymir::Config::parseRgbColor(V["bg_color"].GetString());
-    const auto Key = std::string_view(V["key"].GetString());
-    const auto Layer = std::string(V["layer"].GetString());
-    cxxg::types::RgbColor CxxColor{Color.R,   Color.G,   Color.B,  true,
-                                   BgColor.R, BgColor.G, BgColor.B};
-    Tile T = {{Key[0], CxxColor}};
-    MapCfg.CharInfoMap[Char] = LevelConfig::DesignedMap::CharInfo{T, Layer};
+    MapCfg.CharInfoMap[Char] = parseCharInfo(V);
   }
+  MapCfg.DefaultChar = parseCharInfo(MapJson["default_char"]);
+
   return MapCfg;
 }
 
@@ -149,6 +162,9 @@ std::shared_ptr<Level> loadDesignedLevel(const LevelConfig::DesignedMap &MapCfg,
   auto Map = ymir::loadMap(MapCfg.MapFile);
   auto NewLevel = std::make_shared<Level>(LevelId, Map.getSize());
   auto &LevelMap = NewLevel->Map;
+
+  // Setup the default background
+  LevelMap.get(MapCfg.DefaultChar.Layer).fill(MapCfg.DefaultChar.T);
 
   Map.forEach([&LevelMap, &MapCfg](auto Pos, auto Char) {
     auto &[T, Layer] = MapCfg.CharInfoMap.at(Char);

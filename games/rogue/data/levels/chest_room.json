@@ -2,34 +2,34 @@
     "map": {
         "type": "designed",
         "map_file": "chest_room.map",
+        "default_char": {
+            "color": "#222222",
+            "key": " ",
+            "layer": "ground"
+        },
         "char_info": {
             " ": {
-                "color": "#000000",
-                "bg_color": "#000000",
+                "color": "#222222",
                 "key": " ",
                 "layer": "ground"
             },
             "#": {
-                "color": "#3c3c3c",
-                "bg_color": "#000000",
+                "color": "#737373",
                 "key": "#",
                 "layer": "walls"
             },
             "C": {
                 "color": "#fac43c",
-                "bg_color": "#000000",
                 "key": "C",
                 "layer": "entities"
             },
             "H": {
                 "color": "#489dcf",
-                "bg_color": "#000000",
                 "key": "H",
                 "layer": "entities"
             },
             "<": {
                 "color": "#489dcf",
-                "bg_color": "#000000",
                 "key": "<",
                 "layer": "entities"
             }
