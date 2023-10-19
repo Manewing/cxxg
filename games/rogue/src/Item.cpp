@@ -13,6 +13,9 @@ namespace {
 
 std::string getQualifierName(const StatPoints &P) {
   std::string Prefix = "+" + std::to_string(P.sum()) + " ";
+  if (P.Str == P.Dex && P.Str == P.Int && P.Str == P.Vit) {
+    return Prefix + "Bal. ";
+  }
   if (P.Str >= P.Dex && P.Str >= P.Int && P.Str >= P.Vit) {
     return Prefix + "Str. ";
   }
@@ -24,9 +27,6 @@ std::string getQualifierName(const StatPoints &P) {
   }
   if (P.Vit >= P.Str && P.Vit >= P.Dex && P.Vit >= P.Int) {
     return Prefix + "Tgh. ";
-  }
-  if (P.Str == P.Dex && P.Str == P.Int && P.Str == P.Vit) {
-    return Prefix + "Bal. ";
   }
   return Prefix;
 }
