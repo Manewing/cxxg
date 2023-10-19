@@ -7,9 +7,7 @@ static constexpr float APPerAgilityPoint = 0.1f;
 namespace rogue {
 
 namespace {
-void updateAP(AgilityComp &Ag) {
-  Ag.gainAP(APPerAgilityPoint * Ag.Agility);
-}
+void updateAP(AgilityComp &Ag) { Ag.gainAP(APPerAgilityPoint * Ag.Agility); }
 } // namespace
 
 void AgilitySystem::update(UpdateType Type) {

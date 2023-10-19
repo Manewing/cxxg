@@ -52,12 +52,11 @@ class LevelGenerator {
 public:
   explicit LevelGenerator(GameContext *Ctx = nullptr);
 
-  std::shared_ptr<Level>
-  generateLevel(unsigned Seed, int LevelId,
-                const std::filesystem::path &CfgFile);
+  std::shared_ptr<Level> generateLevel(unsigned Seed, int LevelId,
+                                       const std::filesystem::path &CfgFile);
 
-  std::shared_ptr<Level>
-  generateLevel(unsigned Seed, int LevelId, const LevelConfig &Cfg);
+  std::shared_ptr<Level> generateLevel(unsigned Seed, int LevelId,
+                                       const LevelConfig &Cfg);
 
 protected:
   void spawnEntities(const LevelConfig &Cfg, Level &L);

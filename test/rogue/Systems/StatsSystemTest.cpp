@@ -134,7 +134,8 @@ TEST(TimedStatsSystem, TimedStatSystemStatsBuffPerHit) {
   SBPHC.addStack();
   EXPECT_EQ(SBPHC.Stacks, 2);
   EXPECT_EQ(SBPHC.TicksLeft, 2);
-  EXPECT_EQ(SBPHC.getEffectiveBuff(SBPHC.Stacks).Bonus, StatPoints + StatPoints);
+  EXPECT_EQ(SBPHC.getEffectiveBuff(SBPHC.Stacks).Bonus,
+            StatPoints + StatPoints);
   EXPECT_EQ(SBPHC.getEffectiveBuff(SBPHC.Stacks).SourceCount, 1);
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Bonus, StatPoints + StatPoints);

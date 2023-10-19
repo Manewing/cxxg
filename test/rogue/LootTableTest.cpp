@@ -60,7 +60,7 @@ TEST(LootTableTest, NullLoot) {
                               {nullptr, 20},
                               {nullptr, -1},
                           });
-  std::vector<rogue::LootContainer::LootReward> LootRef ;
+  std::vector<rogue::LootContainer::LootReward> LootRef;
   auto Loot = LTB.generateLoot();
   EXPECT_TRUE(Loot.empty());
 }

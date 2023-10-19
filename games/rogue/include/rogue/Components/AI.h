@@ -1,8 +1,8 @@
 #ifndef ROGUE_COMPONENTS_AI_H
 #define ROGUE_COMPONENTS_AI_H
 
-#include <rogue/Tile.h>
 #include <iosfwd>
+#include <rogue/Tile.h>
 
 namespace rogue {
 
@@ -61,9 +61,6 @@ struct ReasoningStateComp {
   ActionState State = ActionState::IDLE;
   int UpdateCooldown = 5;
 };
-
-
-
 
 } // namespace rogue
 
