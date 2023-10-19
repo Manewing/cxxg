@@ -13,7 +13,7 @@ namespace cxxg {
 class Screen {
 public:
   /// String for clearing the terminal
-  static auto constexpr ClearScreenStr = "\e[1;1H\e[2J";
+  static auto constexpr ClearScreenStr = "\e[1;1H";
 
   /// String for turning off cursor in terminal
   static auto constexpr HideCursorStr = "\e[?25l";
