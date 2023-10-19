@@ -15,6 +15,11 @@ struct GameContext;
 
 namespace rogue {
 
+struct LevelConfig {
+  std::filesystem::path DungeonConfig;
+  std::map<char, std::string> CreatureNames;
+};
+
 class LevelGenerator {
 public:
   struct CharInfo {
@@ -32,8 +37,9 @@ public:
                                    int LevelId);
 
 protected:
-  void spawnEntities(Level &L);
-  void spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T);
+  void spawnEntities(const LevelConfig &Cfg, Level &L);
+  void spawnEntity(const LevelConfig &Cfg, Level &L, ymir::Point2d<int> Pos,
+                   Tile T);
 
 protected:
   GameContext *Ctx = nullptr;

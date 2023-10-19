@@ -1,0 +1,9 @@
+{
+    "dungeon_config": "blob_cave.cfg",
+    "creatures":  [
+        {
+            "key": "b",
+            "name": "Blob"
+        }
+    ]
+}

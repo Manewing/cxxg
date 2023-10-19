@@ -4,6 +4,7 @@
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
 #include <rogue/ItemDatabase.h>
+#include <rogue/JSON.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/Parser.h>
 #include <ymir/Dungeon/BuilderPass.hpp>
@@ -40,6 +41,26 @@ void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
   Pass.registerBuilder<ymir::Dungeon::FilterPlacer<T, U, RE>>();
 }
 
+LevelConfig loadLevelConfig(const std::filesystem::path &LvlCfgPath) {
+  LevelConfig LvlCfg;
+
+  const auto SchemaFile =
+      LvlCfgPath.parent_path().parent_path() / "level_config_schema.json";
+  auto [DocStr, Doc] = loadJSON(LvlCfgPath, &SchemaFile);
+
+  auto DngCfg = Doc["dungeon_config"].GetString();
+  LvlCfg.DungeonConfig = LvlCfgPath.parent_path() / DngCfg;
+
+
+  for (const auto &CI : Doc["creatures"].GetArray()) {
+    auto Key = std::string(CI["key"].GetString());
+    assert(Key.size() == 1);
+    LvlCfg.CreatureNames[Key[0]] = CI["name"].GetString();
+  }
+
+  return LvlCfg;
+}
+
 } // namespace
 
 LevelGenerator::LevelGenerator(GameContext *Ctx) : Ctx(Ctx) {}
@@ -50,22 +71,23 @@ LevelGenerator::generateLevel(unsigned Seed, int LevelId,
   using namespace cxxg::types;
 
   // Load level configuration file
-  auto Cfg = loadConfigurationFile(LevelConfig);
-  Cfg["dungeon/seed"] = Seed;
+  auto Cfg = loadLevelConfig(LevelConfig);
+  auto DngCfg = loadConfigurationFile(Cfg.DungeonConfig);
+  DngCfg["dungeon/seed"] = Seed;
 
   // Create new builder pass and register builders at it
   ymir::Dungeon::BuilderPass Pass;
   registerBuilders<Tile, int, ymir::WyHashRndEng>(Pass);
 
   for (auto const &[Alias, Builder] :
-       Cfg.getSubDict("builder_alias/").toVec<std::string>()) {
+       DngCfg.getSubDict("builder_alias/").toVec<std::string>()) {
     Pass.setBuilderAlias(Builder, Alias);
   }
-  Pass.setSequence(Cfg.asList<std::string>("sequence/"));
-  Pass.configure(Cfg);
+  Pass.setSequence(DngCfg.asList<std::string>("sequence/"));
+  Pass.configure(DngCfg);
 
-  const auto Layers = Cfg.asList<std::string>("layers/");
-  const auto Size = Cfg.get<ymir::Size2d<int>>("dungeon/size");
+  const auto Layers = DngCfg.asList<std::string>("layers/");
+  const auto Size = DngCfg.get<ymir::Size2d<int>>("dungeon/size");
   auto NewLevel = std::make_shared<Level>(LevelId, Layers, Size);
   if (Ctx) {
     NewLevel->Reg.ctx().emplace<GameContext>(*Ctx);
@@ -85,7 +107,7 @@ LevelGenerator::generateLevel(unsigned Seed, int LevelId,
     throw E;
   }
 
-  spawnEntities(*NewLevel);
+  spawnEntities(Cfg, *NewLevel);
 
   return NewLevel;
 }
@@ -106,11 +128,11 @@ LevelGenerator::loadLevel(const std::filesystem::path &LevelFile,
   return NewLevel;
 }
 
-void LevelGenerator::spawnEntities(Level &L) {
+void LevelGenerator::spawnEntities(const LevelConfig &Cfg, Level &L) {
   auto &EntitiesMap = L.Map.get("entities");
   const auto AllEntitiesPos = EntitiesMap.findTilesNot(Level::EmptyTile);
   for (const auto &EntityPos : AllEntitiesPos) {
-    spawnEntity(L, EntityPos, EntitiesMap.getTile(EntityPos));
+    spawnEntity(Cfg, L, EntityPos, EntitiesMap.getTile(EntityPos));
   }
   EntitiesMap.fill(Level::EmptyTile);
 }
@@ -141,15 +163,11 @@ Inventory generateRandomLootInventory(const ItemDatabase &ItemDb,
 
 } // namespace
 
-void LevelGenerator::spawnEntity(Level &L, ymir::Point2d<int> Pos, Tile T) {
-  // FIXME keys to creature name
-  static const std::map<char, std::string> CreatureNames = {
-      {'b', "Blob"},
-      {'s', "Skeleton"},
-      {'t', "Troll"},
-  };
+void LevelGenerator::spawnEntity(const LevelConfig &Cfg, Level &L,
+                                 ymir::Point2d<int> Pos, Tile T) {
+  if (auto It = Cfg.CreatureNames.find(T.kind());
+      It != Cfg.CreatureNames.end()) {
 
-  if (auto It = CreatureNames.find(T.kind()); It != CreatureNames.end()) {
     auto CId = Ctx->CreatureDb.getCreatureId(It->second);
     const auto &CInfo = Ctx->CreatureDb.getCreature(CId);
     if (CInfo.Faction == FactionKind::Nature) {

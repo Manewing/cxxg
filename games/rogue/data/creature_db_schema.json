@@ -1,7 +1,7 @@
 {
     "$id": "https://rogue-todo.com/creature-db-schema",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "description": "JSON Schema the item database",
+    "description": "JSON Schema the creature database",
     "type": "object",
     "required": [
         "creatures"

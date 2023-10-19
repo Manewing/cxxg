@@ -1,0 +1,13 @@
+{
+    "dungeon_config": "skeleton_dungeon.cfg",
+    "creatures": [
+        {
+            "key": "s",
+            "name": "Skeleton"
+        },
+        {
+            "key": "t",
+            "name": "Troll"
+        }
+    ]
+}

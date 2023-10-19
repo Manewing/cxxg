@@ -18,7 +18,7 @@ GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
   Config.CreatureDbConfig = ConfigDir / CreatureDbConfig;
 
   for (const auto &Level : Doc["levels"].GetArray()) {
-    LevelConfig LevelCfg;
+    LevelRangeConfig LevelCfg;
     LevelCfg.LevelEndIdx = Level["end"].GetInt();
     const auto LevelConfig = Level["config"].GetString();
     LevelCfg.Config = ConfigDir / LevelConfig;
@@ -28,7 +28,7 @@ GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
   return Config;
 }
 
-const LevelConfig &GameConfig::getLevelConfig(int LevelIdx) const {
+const LevelRangeConfig &GameConfig::getLevelRangeConfig(int LevelIdx) const {
   for (const auto &Level : Levels) {
     if (Level.LevelEndIdx >= LevelIdx) {
       return Level;

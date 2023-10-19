@@ -124,7 +124,7 @@ void Game::switchLevel(int Level, bool ToEntry) {
 
   if (Level >= static_cast<int>(Levels.size())) {
     assert((Level - 1) < static_cast<int>(Levels.size()));
-    const auto &LvlCfg = Cfg.getLevelConfig(Level);
+    const auto &LvlCfg = Cfg.getLevelRangeConfig(Level);
     Levels.push_back(LevelGen.generateLevel(Level, Level, LvlCfg.Config));
     Levels.back()->setEventHub(&EvHub);
   }

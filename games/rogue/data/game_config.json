@@ -4,15 +4,15 @@
 	"levels": [
 		{
 			"end": 3,
-			"config": "levels/blob_cave.cfg"
+			"config": "levels/blob_cave.json"
 		},
 		{
 			"end": 9,
-			"config": "levels/skeleton_dungeon.cfg"
+			"config": "levels/skeleton_dungeon.json"
 		},
 		{
 			"end": 6,
-			"config": "levels/troll_dungeon.cfg"
+			"config": "levels/troll_dungeon.json"
 		}
 	]
 }

@@ -1,0 +1,33 @@
+{
+    "$id": "https://rogue-todo.com/level-config-schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "JSON Schema the level configuration",
+    "type": "object",
+    "required": [
+        "dungeon_config",
+        "creatures"
+    ],
+    "properties": {
+        "creatures": {
+            "type": "array",
+            "description": "A list of key to creature mappings",
+            "items": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "name"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key of the creature in the dungeon"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the creature"
+                    }
+                }
+            }
+        }
+    }
+}

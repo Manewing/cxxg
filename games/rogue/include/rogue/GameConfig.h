@@ -6,7 +6,7 @@
 
 namespace rogue {
 
-struct LevelConfig {
+struct LevelRangeConfig {
   int LevelEndIdx = 0;
   std::filesystem::path Config;
 };
@@ -14,11 +14,11 @@ struct LevelConfig {
 struct GameConfig {
   std::filesystem::path CreatureDbConfig;
   std::filesystem::path ItemDbConfig;
-  std::vector<LevelConfig> Levels;
+  std::vector<LevelRangeConfig> Levels;
 
   static GameConfig load(const std::filesystem::path &ConfigFile);
 
-  const LevelConfig &getLevelConfig(int LevelIdx) const;
+  const LevelRangeConfig &getLevelRangeConfig(int LevelIdx) const;
 };
 
 } // namespace rogue
