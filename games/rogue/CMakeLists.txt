@@ -32,6 +32,7 @@ set(HEADER_FILES
   include/rogue/ItemType.h
   include/rogue/JSON.h
   include/rogue/Level.h
+  include/rogue/LootTable.h
   include/rogue/LevelGenerator.h
   include/rogue/Parser.h
   include/rogue/Renderer.h
@@ -88,6 +89,7 @@ set(SOURCE_FILES
   src/ItemType.cpp
   src/JSON.cpp
   src/Level.cpp
+  src/LootTable.cpp
   src/LevelGenerator.cpp
   src/Parser.cpp
   src/Renderer.cpp

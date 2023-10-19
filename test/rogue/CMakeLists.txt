@@ -1,7 +1,8 @@
 set(SOURCES
+  Components/HelpersTest.cpp
   CreatureDatabaseTest.cpp
   EventHubTest.cpp
-  Components/HelpersTest.cpp
+  LootTableTest.cpp
   Systems/StatsSystemTest.cpp
 )
 
