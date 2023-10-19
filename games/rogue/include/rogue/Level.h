@@ -22,15 +22,17 @@ public:
   static constexpr std::size_t LayerGroundDecoIdx = 1;
   static constexpr std::size_t LayerWallsIdx = 2;
   static constexpr std::size_t LayerWallsDecoIdx = 3;
-  static constexpr std::size_t LayerObjectsIdx = 4;
+  static constexpr std::size_t LayerEntitiesIdx = 4;
+  static constexpr std::size_t LayerObjectsIdx = 5;
+
+  static const std::vector<std::string> LayerNames;
 
   // FIXME move to separate header and use in level gen
   static constexpr Tile EmptyTile = Tile{};
   static constexpr Tile WallTile = Tile{{'#'}};
 
 public:
-  Level(int LevelId, const std::vector<std::string> &Layers,
-        ymir::Size2d<int> Size);
+  Level(int LevelId, ymir::Size2d<int> Size);
 
   int getLevelId() const { return LevelId; }
 

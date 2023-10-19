@@ -1,5 +1,8 @@
 {
-    "dungeon_config": "blob_cave.cfg",
+    "map": {
+        "type": "generated",
+        "config": "blob_cave.cfg"
+    },
     "creatures":  [
         {
             "key": "b",

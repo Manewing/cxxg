@@ -1,5 +1,8 @@
 {
-    "dungeon_config": "skeleton_dungeon.cfg",
+    "map": {
+        "type": "generated",
+        "config": "skeleton_dungeon.cfg"
+    },
     "creatures": [
         {
             "key": "s",

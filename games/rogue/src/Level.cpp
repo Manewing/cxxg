@@ -8,8 +8,8 @@
 #include <rogue/Systems/CombatSystem.h>
 #include <rogue/Systems/DeathSystem.h>
 #include <rogue/Systems/MovementSystem.h>
-#include <rogue/Systems/PlayerSystem.h>
 #include <rogue/Systems/NPCSystem.h>
+#include <rogue/Systems/PlayerSystem.h>
 #include <rogue/Systems/RegenSystem.h>
 #include <rogue/Systems/StatsSystem.h>
 #include <rogue/Systems/WanderAISystem.h>
@@ -18,9 +18,11 @@
 
 namespace rogue {
 
-Level::Level(int LevelId, const std::vector<std::string> &Layers,
-             ymir::Size2d<int> Size)
-    : Map(Layers, Size), LevelId(LevelId), PlayerDijkstraMap(Size),
+const std::vector<std::string> Level::LayerNames = {
+    "ground", "ground_deco", "walls", "walls_deco", "entities", "objects"};
+
+Level::Level(int LevelId, ymir::Size2d<int> Size)
+    : Map(LayerNames, Size), LevelId(LevelId), PlayerDijkstraMap(Size),
       PlayerSeenMap(Size) {
   Systems = {
       std::make_shared<StatsSystem>(Reg),

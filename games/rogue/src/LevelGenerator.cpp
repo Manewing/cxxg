@@ -8,6 +8,7 @@
 #include <rogue/LevelGenerator.h>
 #include <rogue/LootTable.h>
 #include <rogue/Parser.h>
+#include <ymir/Config/Types.hpp>
 #include <ymir/Dungeon/BuilderPass.hpp>
 #include <ymir/Dungeon/CaveRoomGenerator.hpp>
 #include <ymir/Dungeon/CelAltMapFiller.hpp>
@@ -42,15 +43,40 @@ void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
   Pass.registerBuilder<ymir::Dungeon::FilterPlacer<T, U, RE>>();
 }
 
+LevelConfig::GeneratedMap
+loadGenMapConfig(const std::filesystem::path &BasePath,
+                 const rapidjson::Value &MapJson) {
+  LevelConfig::GeneratedMap MapCfg;
+  MapCfg.Config = BasePath / MapJson["config"].GetString();
+  return MapCfg;
+}
+
+LevelConfig::DesignedMap loadDesMapConfig(const std::filesystem::path &BasePath,
+                                          const rapidjson::Value &MapJson) {
+  LevelConfig::DesignedMap MapCfg;
+  MapCfg.MapFile = BasePath / MapJson["map_file"].GetString();
+
+  // Load the character mapping
+  for (const auto &[K, V] : MapJson["char_info"].GetObject()) {
+    const auto Char = std::string_view(K.GetString())[0];
+    const auto Color = ymir::Config::parseRgbColor(V["color"].GetString());
+    const auto BgColor = ymir::Config::parseRgbColor(V["bg_color"].GetString());
+    const auto Key = std::string_view(V["key"].GetString());
+    const auto Layer = std::string(V["layer"].GetString());
+    cxxg::types::RgbColor CxxColor{Color.R,   Color.G,   Color.B,  true,
+                                   BgColor.R, BgColor.G, BgColor.B};
+    Tile T = {{Key[0], CxxColor}};
+    MapCfg.CharInfoMap[Char] = LevelConfig::DesignedMap::CharInfo{T, Layer};
+  }
+  return MapCfg;
+}
+
 LevelConfig loadLevelConfig(const std::filesystem::path &LvlCfgPath) {
   LevelConfig LvlCfg;
 
   const auto SchemaFile =
       LvlCfgPath.parent_path().parent_path() / "level_config_schema.json";
   auto [DocStr, Doc] = loadJSON(LvlCfgPath, &SchemaFile);
-
-  auto DngCfg = Doc["dungeon_config"].GetString();
-  LvlCfg.DungeonConfig = LvlCfgPath.parent_path() / DngCfg;
 
   // Load level specific creature configuration
   for (const auto &CI : Doc["creatures"].GetArray()) {
@@ -70,21 +96,21 @@ LevelConfig loadLevelConfig(const std::filesystem::path &LvlCfgPath) {
     LvlCfg.Chests[Key[0]] = C;
   }
 
+  auto MapCfg = Doc["map"].GetObject();
+  const auto MapCfgType = std::string(MapCfg["type"].GetString());
+  if (MapCfgType == "generated") {
+    LvlCfg.Map = loadGenMapConfig(LvlCfgPath.parent_path(), MapCfg);
+  } else {
+    LvlCfg.Map = loadDesMapConfig(LvlCfgPath.parent_path(), MapCfg);
+  }
+
   return LvlCfg;
 }
 
-} // namespace
-
-LevelGenerator::LevelGenerator(GameContext *Ctx) : Ctx(Ctx) {}
-
 std::shared_ptr<Level>
-LevelGenerator::generateLevel(unsigned Seed, int LevelId,
-                              const std::filesystem::path &LevelConfig) {
-  using namespace cxxg::types;
-
-  // Load level configuration file
-  auto Cfg = loadLevelConfig(LevelConfig);
-  auto DngCfg = loadConfigurationFile(Cfg.DungeonConfig);
+procedurallyGenerateLevel(unsigned Seed, int LevelId,
+                          const LevelConfig::GeneratedMap &MapCfg) {
+  auto DngCfg = loadConfigurationFile(MapCfg.Config);
   DngCfg["dungeon/seed"] = Seed;
 
   // Create new builder pass and register builders at it
@@ -98,12 +124,8 @@ LevelGenerator::generateLevel(unsigned Seed, int LevelId,
   Pass.setSequence(DngCfg.asList<std::string>("sequence/"));
   Pass.configure(DngCfg);
 
-  const auto Layers = DngCfg.asList<std::string>("layers/");
   const auto Size = DngCfg.get<ymir::Size2d<int>>("dungeon/size");
-  auto NewLevel = std::make_shared<Level>(LevelId, Layers, Size);
-  if (Ctx) {
-    NewLevel->Reg.ctx().emplace<GameContext>(*Ctx);
-  }
+  auto NewLevel = std::make_shared<Level>(LevelId, Size);
   ymir::Dungeon::Context<Tile, int> Ctx(NewLevel->Map);
 
   Pass.init(Ctx);
@@ -119,24 +141,51 @@ LevelGenerator::generateLevel(unsigned Seed, int LevelId,
     throw E;
   }
 
-  spawnEntities(Cfg, *NewLevel);
-
   return NewLevel;
 }
 
-std::shared_ptr<Level>
-LevelGenerator::loadLevel(const std::filesystem::path &LevelFile,
-                          const std::vector<std::string> &Layers,
-                          const std::map<char, CharInfo> &CharInfoMap,
-                          int LevelId) {
-  auto Map = ymir::loadMap(LevelFile);
-  auto NewLevel = std::make_shared<Level>(LevelId, Layers, Map.getSize());
+std::shared_ptr<Level> loadDesignedLevel(const LevelConfig::DesignedMap &MapCfg,
+                                         int LevelId) {
+  auto Map = ymir::loadMap(MapCfg.MapFile);
+  auto NewLevel = std::make_shared<Level>(LevelId, Map.getSize());
   auto &LevelMap = NewLevel->Map;
 
-  Map.forEach([&LevelMap, &CharInfoMap](auto Pos, auto Char) {
-    auto &[T, Layer] = CharInfoMap.at(Char);
+  Map.forEach([&LevelMap, &MapCfg](auto Pos, auto Char) {
+    auto &[T, Layer] = MapCfg.CharInfoMap.at(Char);
     LevelMap.get(Layer).setTile(Pos, T);
   });
+  return NewLevel;
+}
+
+} // namespace
+
+LevelGenerator::LevelGenerator(GameContext *Ctx) : Ctx(Ctx) {}
+
+std::shared_ptr<Level>
+LevelGenerator::generateLevel(unsigned Seed, int LevelId,
+                              const std::filesystem::path &CfgFile) {
+  // Load level configuration file
+  auto Cfg = loadLevelConfig(CfgFile);
+  return generateLevel(Seed, LevelId, Cfg);
+}
+
+std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed, int LevelId,
+                                                     const LevelConfig &Cfg) {
+
+  std::shared_ptr<Level> NewLevel;
+  if (auto *GenMapCfg = std::get_if<LevelConfig::GeneratedMap>(&Cfg.Map)) {
+    NewLevel = procedurallyGenerateLevel(Seed, LevelId, *GenMapCfg);
+  } else {
+    auto &DesMapCfg = std::get<LevelConfig::DesignedMap>(Cfg.Map);
+    NewLevel = loadDesignedLevel(DesMapCfg, LevelId);
+  }
+
+  if (Ctx) {
+    NewLevel->Reg.ctx().emplace<GameContext>(*Ctx);
+  }
+
+  spawnEntities(Cfg, *NewLevel);
+
   return NewLevel;
 }
 

@@ -1,0 +1,45 @@
+{
+    "map": {
+        "type": "designed",
+        "map_file": "chest_room.map",
+        "char_info": {
+            " ": {
+                "color": "#000000",
+                "bg_color": "#000000",
+                "key": " ",
+                "layer": "ground"
+            },
+            "#": {
+                "color": "#3c3c3c",
+                "bg_color": "#000000",
+                "key": "#",
+                "layer": "walls"
+            },
+            "C": {
+                "color": "#fac43c",
+                "bg_color": "#000000",
+                "key": "C",
+                "layer": "entities"
+            },
+            "H": {
+                "color": "#489dcf",
+                "bg_color": "#000000",
+                "key": "H",
+                "layer": "entities"
+            },
+            "<": {
+                "color": "#489dcf",
+                "bg_color": "#000000",
+                "key": "<",
+                "layer": "entities"
+            }
+        }
+    },
+    "creatures": [],
+    "chests": [
+        {
+            "key": "C",
+            "loot": "common_chest"
+        }
+    ]
+}

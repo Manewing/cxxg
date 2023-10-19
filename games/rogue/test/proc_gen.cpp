@@ -42,10 +42,6 @@ const Tile WaterTile{
 
 const Tile ChunkMarker{{'x', cxxg::types::RgbColor{255, 0, 0, true, 0, 0, 0}}};
 
-const std::vector<std::string> Layers = {
-    "ground", "ground_deco", "walls", "objects", "walls_deco", "enemies",
-};
-
 ymir::Map<float> generateSimplexNoiseMap(ymir::Size2d<int> Size,
                                          ymir::Point2d<int> Offset = {0, 0},
                                          int Seed = 0, float Scale = 1.0f,
@@ -95,7 +91,7 @@ struct Chunk {
 
 std::shared_ptr<Level> generateChunk(int LevelId, ymir::Rect2d<int> ChunkRect) {
   const auto Size = ChunkRect.Size;
-  auto NewChunk = std::make_shared<Level>(LevelId, Layers, Size);
+  auto NewChunk = std::make_shared<Level>(LevelId, Size);
 
   //  auto HeightMap = generateSimplexNoiseMap(Size, ChunkRect.Pos, 0, 2048.0f,
   //  6);

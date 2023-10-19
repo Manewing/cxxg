@@ -16,33 +16,47 @@ struct GameContext;
 namespace rogue {
 
 struct LevelConfig {
+public:
   struct Creature {
     std::string Name;
   };
+
   struct Chest {
     std::string LootTableName;
   };
 
-  std::filesystem::path DungeonConfig;
+  struct GeneratedMap {
+    std::filesystem::path Config;
+  };
+
+  struct DesignedMap {
+    struct CharInfo {
+      Tile T;
+      std::string Layer;
+    };
+
+    std::filesystem::path MapFile;
+    std::map<char, CharInfo> CharInfoMap;
+  };
+
+  using MapConfig = std::variant<GeneratedMap, DesignedMap>;
+
+public:
+  MapConfig Map;
   std::map<char, Creature> Creatures;
   std::map<char, Chest> Chests;
 };
 
 class LevelGenerator {
 public:
-  struct CharInfo {
-    Tile T;
-    std::string Layer;
-  };
   explicit LevelGenerator(GameContext *Ctx = nullptr);
 
   std::shared_ptr<Level>
   generateLevel(unsigned Seed, int LevelId,
-                const std::filesystem::path &LevelConfig);
-  std::shared_ptr<Level> loadLevel(const std::filesystem::path &LevelFile,
-                                   const std::vector<std::string> &Layers,
-                                   const std::map<char, CharInfo> &CharInfoMap,
-                                   int LevelId);
+                const std::filesystem::path &CfgFile);
+
+  std::shared_ptr<Level>
+  generateLevel(unsigned Seed, int LevelId, const LevelConfig &Cfg);
 
 protected:
   void spawnEntities(const LevelConfig &Cfg, Level &L);

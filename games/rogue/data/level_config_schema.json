@@ -4,8 +4,9 @@
     "description": "JSON Schema the level configuration",
     "type": "object",
     "required": [
-        "dungeon_config",
-        "creatures"
+        "map",
+        "creatures",
+        "chests"
     ],
     "properties": {
         "creatures": {

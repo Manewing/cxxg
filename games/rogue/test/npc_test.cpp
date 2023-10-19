@@ -17,16 +17,6 @@
 
 using namespace rogue;
 
-static const Tile GroundTile{
-    {' ', cxxg::types::RgbColor{0, 0, 0, true, 100, 80, 50}}};
-static const Tile WallTile{
-    {'#', cxxg::types::RgbColor{60, 60, 60, true, 45, 45, 45}}};
-static const Tile WaterTile{
-    {'~', cxxg::types::RgbColor{40, 132, 191, true, 30, 110, 150}}};
-static const Tile TreeTile{
-    {'A', cxxg::types::RgbColor{10, 50, 15, true, 100, 80, 50}}};
-static const Tile BerryBushTile{
-    {'#', cxxg::types::RgbColor{140, 10, 50, true, 10, 50, 15}}};
 static const Tile NPCTile{
     {'@', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
 
@@ -79,18 +69,7 @@ int main(int Argc, char *Argv[]) {
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
   LevelGenerator LG;
-
-  const std::vector<std::string> Layers = {
-      "ground", "ground_deco", "walls", "walls_deco", "objects",
-  };
-  const std::map<char, LevelGenerator::CharInfo> CharInfoMap = {
-      {GroundTile.kind(), {GroundTile, "ground"}},
-      {WallTile.kind(), {WallTile, "walls"}},
-      {WaterTile.kind(), {WaterTile, "objects"}},
-      {TreeTile.kind(), {TreeTile, "objects"}},
-      {'B', {BerryBushTile, "objects"}},
-  };
-  auto Level = LG.loadLevel(Argv[1], Layers, CharInfoMap, 0);
+  auto Level = LG.generateLevel(0, 0, Argv[1]);
   auto NPCEntity =
       createNPCEntity(Level->Reg, {4, 4}, StatPoints{10, 10, 10, 10});
 
