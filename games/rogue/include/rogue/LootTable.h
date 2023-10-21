@@ -2,6 +2,7 @@
 #define ROGUE_LOOT_TABLE_H
 
 #include <vector>
+#include <memory>
 
 namespace rogue {
 

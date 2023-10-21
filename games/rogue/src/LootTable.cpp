@@ -1,5 +1,8 @@
 #include <cassert>
+#include <random>
 #include <rogue/LootTable.h>
+#include <stdexcept>
+#include <algorithm>
 
 namespace rogue {
 
@@ -63,9 +66,8 @@ void LootTable::reset(unsigned NR, const std::vector<LootSlot> &Sls) {
   }
   NumRolls = Slots.empty() ? 0 : NumRolls;
 
-  std::sort(Slots.begin(), Slots.end(), [](const auto &A, const auto &B) {
-    return A.Weight < B.Weight;
-  });
+  std::sort(Slots.begin(), Slots.end(),
+            [](const auto &A, const auto &B) { return A.Weight < B.Weight; });
 }
 
 const std::vector<LootTable::LootSlot> &LootTable::getSlots() const {
