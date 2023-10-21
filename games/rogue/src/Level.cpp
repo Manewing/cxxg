@@ -13,6 +13,7 @@
 #include <rogue/Systems/RegenSystem.h>
 #include <rogue/Systems/StatsSystem.h>
 #include <rogue/Systems/WanderAISystem.h>
+#include <sstream>
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
 
@@ -65,12 +66,16 @@ void Level::createPlayer() {
 void Level::movePlayer(Level &From, ymir::Point2d<int> ToPos) {
   Player = PlayerComp::movePlayer(From.Reg, Reg);
   From.Player = entt::null;
+  From.removePlayer();
   auto &PC = Reg.get<PositionComp>(Player);
   PC.Pos = ToPos;
   updateEntityPosition(Player, PC, ToPos);
 }
 
-void Level::removePlayer() { PlayerComp::removePlayer(Reg); }
+void Level::removePlayer() {
+  PlayerComp::removePlayer(Reg);
+  updateEntityPosCache();
+}
 
 const entt::entity &Level::getPlayer() const { return Player; }
 
@@ -86,8 +91,11 @@ ymir::Point2d<int> getPlayerStartEndPos(const Level &L) {
   }
   auto Pos = L.getNonBodyBlockedPosNextTo(*FoundPos);
   if (!Pos) {
-    throw std::runtime_error(
-        "Could not find non-blocked start/end position for player in level");
+    std::stringstream SS;
+    SS << "Could not find non-blocked start/end position for player in level "
+          "at "
+       << *FoundPos;
+    throw std::runtime_error(SS.str());
   }
   return *Pos;
 }
