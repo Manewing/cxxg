@@ -88,7 +88,7 @@ struct ValueRegenCompBase {
 
   unsigned TickPeriod = 4;
   unsigned TicksLeft = 1;
-  StatValue RegenAmount = 0.1;
+  StatValue RegenAmount = 0.05;
 
   StatValue restore(StatValue Amount);
   StatValue reduce(StatValue Amount);

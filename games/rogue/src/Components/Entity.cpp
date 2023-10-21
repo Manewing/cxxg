@@ -50,7 +50,8 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
 }
 
 void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
-                           const std::string &Name, const StatPoints &Stats) {
+                           const std::string &Name, const Inventory &I,
+                           const StatPoints &Stats) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<HealthComp>(Entity);
@@ -64,6 +65,7 @@ void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<AgilityComp>(Entity);
   Reg.emplace<CollisionComp>(Entity);
   Reg.emplace<StatsComp>(Entity).Base = Stats;
+  Reg.emplace<InventoryComp>(Entity).Inv = I;
 }
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,

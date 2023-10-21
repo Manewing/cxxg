@@ -238,7 +238,10 @@ void LevelGenerator::spawnEntity(const LevelConfig &Cfg, Level &L,
     auto CId = Ctx->CreatureDb.getCreatureId(It->second.Name);
     const auto &CInfo = Ctx->CreatureDb.getCreature(CId);
     if (CInfo.Faction == FactionKind::Nature) {
-      createHostileCreature(L.Reg, Pos, T, CInfo.Name, CInfo.Stats);
+      createHostileCreature(
+          L.Reg, Pos, T, CInfo.Name,
+          generateLootInventory(Ctx->ItemDb, It->second.LootTableName),
+          CInfo.Stats);
     } else {
       createEnemy(L.Reg, Pos, T, CInfo.Name,
                   generateLootInventory(Ctx->ItemDb, It->second.LootTableName),

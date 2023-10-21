@@ -19,7 +19,8 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                  const StatPoints &Stats, FactionKind Faction, RaceKind Race);
 
 void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
-                           const std::string &Name, const StatPoints &Stats);
+                           const std::string &Name, const Inventory &Inv,
+                           const StatPoints &Stats);
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                           bool IsExit, int LevelId);

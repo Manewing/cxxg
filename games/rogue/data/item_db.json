@@ -8,14 +8,14 @@
       "type": "damage_item_effect",
       "damage_value": 10
     },
-    "poison_effect_10": {
+    "minor_poison_effect": {
       "type": "poison_debuff_comp",
-      "reduce_amount": 0.5,
-      "ticks": 10
+      "reduce_amount": 0.1,
+      "ticks": 50
     },
     "minor_health_regen_effect": {
       "type": "health_regen_buff_comp",
-      "regen_amount": 0.25,
+      "regen_amount": 0.1,
       "ticks": 50
     },
     "bleeding_debuff_effect_10": {
@@ -136,6 +136,22 @@
       ]
     },
     {
+      "name": "Rat Meat",
+      "description": "Obtained from the unsavory denizens of the sewers, this dubious food source offers a double-edged benefit.",
+      "max_stack_size": 99,
+      "types": ["consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "health_effect_10"
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_poison_effect"
+        }
+      ]
+    },
+    {
       "name": "Poison Berry",
       "description": "A berry, better not to eat it. It looks poisonous",
       "max_stack_size": 99,
@@ -147,7 +163,7 @@
         },
         {
           "type": "use_on",
-          "effect": "poison_effect_10"
+          "effect": "minor_poison_effect"
         }
       ]
     },
@@ -683,12 +699,28 @@
           "name": "Green Goo",
           "min_count": 2,
           "max_count": 4,
-          "weight": 50
+          "weight": 30
         },
         {
           "type": "null",
-          "weight": 20
-        }
+          "weight": 70
+         }
+      ]
+    },
+    "common_rat": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Rat Meat",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "null",
+          "weight": 70
+         }
       ]
     }
   }

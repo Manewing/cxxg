@@ -7,12 +7,12 @@
     {
       "key": "r",
       "name": "Sewer Rat",
-      "loot": "common_blob"
+      "loot": "common_rat"
     },
     {
       "key": "R",
       "name": "Toxic Rat",
-      "loot": "common_blob"
+      "loot": "common_rat"
     }
   ],
   "chests": [
