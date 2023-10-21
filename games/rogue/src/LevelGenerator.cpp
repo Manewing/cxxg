@@ -97,6 +97,7 @@ LevelConfig loadLevelConfig(const std::filesystem::path &LvlCfgPath) {
     assert(Key.size() == 1);
     LevelConfig::Creature C;
     C.Name = CI["name"].GetString();
+    C.LootTableName = CI["loot"].GetString();
     LvlCfg.Creatures[Key[0]] = C;
   }
 
@@ -216,28 +217,6 @@ void LevelGenerator::spawnEntities(const LevelConfig &Cfg, Level &L) {
 
 namespace {
 
-/// Generates an inventory with random loot including all items from the item
-/// database
-Inventory generateRandomLootInventory(const ItemDatabase &ItemDb,
-                                      const unsigned MaxNumItems = 5,
-                                      const unsigned MinNumItems = 1) {
-  // TODO what kind of loot is there?
-  //  special items based on entity kind (e.g. boss)
-  //  common items based on entity level
-  assert(MaxNumItems >= MinNumItems);
-
-  Inventory Inv;
-
-  unsigned NumItems = rand() % (MaxNumItems - MinNumItems + 1) + MinNumItems;
-  for (unsigned I = 0; I < NumItems; ++I) {
-    auto It = ItemDb.createItem(ItemDb.getRandomItemId());
-    It.StackSize = rand() % (It.getMaxStackSize() / 2 + 1) + 1;
-    Inv.addItem(It);
-  }
-
-  return Inv;
-}
-
 Inventory generateLootInventory(const ItemDatabase &ItemDb,
                                 const std::string &LootTableName) {
   const auto &LtCt = ItemDb.getLootTable(LootTableName);
@@ -262,8 +241,8 @@ void LevelGenerator::spawnEntity(const LevelConfig &Cfg, Level &L,
       createHostileCreature(L.Reg, Pos, T, CInfo.Name, CInfo.Stats);
     } else {
       createEnemy(L.Reg, Pos, T, CInfo.Name,
-                  generateRandomLootInventory(Ctx->ItemDb), CInfo.Stats,
-                  CInfo.Faction, CInfo.Race);
+                  generateLootInventory(Ctx->ItemDb, It->second.LootTableName),
+                  CInfo.Stats, CInfo.Faction, CInfo.Race);
     }
     return;
   }

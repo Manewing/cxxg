@@ -13,10 +13,10 @@
       "reduce_amount": 0.5,
       "ticks": 10
     },
-    "health_regen_effect_10": {
+    "minor_health_regen_effect": {
       "type": "health_regen_buff_comp",
-      "regen_amount": 0.7,
-      "ticks": 10
+      "regen_amount": 0.25,
+      "ticks": 50
     },
     "bleeding_debuff_effect_10": {
       "type": "bleeding_debuff_comp",
@@ -55,6 +55,11 @@
     "armor_5": {
       "type": "armor_buff_comp",
       "base_armor": 5,
+      "magic_armor": 0
+    },
+    "armor_10": {
+      "type": "armor_buff_comp",
+      "base_armor": 10,
       "magic_armor": 0
     },
     "dismantle_iron_equip": {
@@ -110,9 +115,7 @@
       "name": "Blueberry",
       "description": "A blue berry that can be eaten",
       "max_stack_size": 99,
-      "types": [
-        "consumable"
-      ],
+      "types": ["consumable"],
       "capabilities": [
         {
           "type": "use_on",
@@ -121,13 +124,22 @@
       ]
     },
     {
+      "name": "Green Goo",
+      "description": "It may not win any culinary awards for taste, but it holds a unique restorative power.",
+      "max_stack_size": 99,
+      "types": ["consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "minor_health_regen_effect"
+        }
+      ]
+    },
+    {
       "name": "Poison Berry",
       "description": "A berry, better not to eat it. It looks poisonous",
       "max_stack_size": 99,
-      "types": [
-        "consumable",
-        "crafting"
-      ],
+      "types": ["consumable", "crafting"],
       "capabilities": [
         {
           "type": "use_on",
@@ -143,20 +155,14 @@
       "name": "Wooden Log",
       "description": "A log of wood",
       "max_stack_size": 99,
-      "types": [
-        "crafting"
-      ],
+      "types": ["crafting"],
       "capabilities": []
     },
     {
       "name": "Stone",
       "description": "A stone better not to drop it on your foot",
       "max_stack_size": 99,
-      "types": [
-        "crafting",
-        "weapon",
-        "consumable"
-      ],
+      "types": ["crafting", "weapon", "consumable"],
       "capabilities": [
         {
           "type": "use_on",
@@ -176,9 +182,7 @@
       "name": "Small Sword",
       "description": "A small sword",
       "max_stack_size": 1,
-      "types": [
-        "weapon"
-      ],
+      "types": ["weapon"],
       "capabilities": [
         {
           "type": "dismantle",
@@ -196,9 +200,7 @@
       "name": "Leather Tunic",
       "description": "A worn down leather tunic",
       "max_stack_size": 1,
-      "types": [
-        "chest_plate"
-      ],
+      "types": ["chest_plate"],
       "capabilities": [
         {
           "type": "equipment",
@@ -220,9 +222,7 @@
       "name": "Leather Boots",
       "description": "Worn down leather boots",
       "max_stack_size": 1,
-      "types": [
-        "boots"
-      ],
+      "types": ["boots"],
       "capabilities": [
         {
           "type": "equipment",
@@ -244,9 +244,7 @@
       "name": "Leather Pants",
       "description": "Worn down leather pants",
       "max_stack_size": 1,
-      "types": [
-        "pants"
-      ],
+      "types": ["pants"],
       "capabilities": [
         {
           "type": "equipment",
@@ -268,9 +266,7 @@
       "name": "Leather Helmet",
       "description": "Worn down leather helmet",
       "max_stack_size": 1,
-      "types": [
-        "helmet"
-      ],
+      "types": ["helmet"],
       "capabilities": [
         {
           "type": "equipment",
@@ -292,10 +288,96 @@
       "name": "Iron Sword",
       "description": "A sword made of iron",
       "max_stack_size": 1,
-      "types": [
-        "weapon"
-      ],
+      "types": ["weapon"],
       "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Chain Mail",
+      "description": "A chain mail",
+      "max_stack_size": 1,
+      "types": ["chest_plate"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_10"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Plate Boots",
+      "description": "A pair of heavily armored boots",
+      "max_stack_size": 1,
+      "types": ["boots"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_10"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Great Helm",
+      "description": "A medieval knight's iconic headgear with a distinctive pointed top for defense, small vision slits, and ventilation. While formidable in battle, it's often taken off after the initial clash due to limited sight and breathability. A classic Crusader-era symbol of medieval valor.",
+      "max_stack_size": 1,
+      "types": ["helmet"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_10"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Plate Greaves",
+      "description": "These protective leg armor pieces are constructed from durable metal plates, offering superior defense to the wearer's lower legs.",
+      "max_stack_size": 1,
+      "types": ["pants"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_10"
+        },
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
@@ -312,9 +394,7 @@
       "name": "Sword of the Slayer",
       "description": "A blade that will drive the wielder to new strength",
       "max_stack_size": 1,
-      "types": [
-        "weapon"
-      ],
+      "types": ["weapon"],
       "capabilities": [
         {
           "type": "equipment",
@@ -336,45 +416,35 @@
       "name": "Bone",
       "description": "A bone from a dead creature",
       "max_stack_size": 99,
-      "types": [
-        "crafting"
-      ],
+      "types": ["crafting"],
       "capabilities": []
     },
     {
       "name": "Troll Tooth",
       "description": "A troll tooth from a troll",
       "max_stack_size": 99,
-      "types": [
-        "crafting"
-      ],
+      "types": ["crafting"],
       "capabilities": []
     },
     {
       "name": "Iron Scrap",
       "description": "A scrap of iron",
       "max_stack_size": 99,
-      "types": [
-        "crafting"
-      ],
+      "types": ["crafting"],
       "capabilities": []
     },
     {
       "name": "Leather Scrap",
       "description": "A scrap of leather",
       "max_stack_size": 99,
-      "types": [
-        "crafting"
-      ],
+      "types": ["crafting"],
       "capabilities": []
     },
     {
       "name": "Rune Dust",
       "description": "A dust of rune",
       "max_stack_size": 99,
-      "types": [
-        "crafting"
-      ],
+      "types": ["crafting"],
       "capabilities": []
     }
   ],
@@ -391,35 +461,71 @@
         },
         {
           "type": "item",
-          "name":"Leather Boots",
+          "name": "Leather Boots",
           "min_count": 1,
           "max_count": 1,
           "weight": 5
         },
         {
           "type": "item",
-          "name":"Leather Pants",
+          "name": "Leather Pants",
           "min_count": 1,
           "max_count": 1,
           "weight": 5
         },
         {
           "type": "item",
-          "name":"Leather Helmet",
+          "name": "Leather Helmet",
           "min_count": 1,
           "max_count": 1,
           "weight": 5
         },
         {
           "type": "item",
-          "name":"Leather Tunic",
+          "name": "Leather Tunic",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        }
+      ]
+    },
+    "rare_equip": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Iron Sword",
           "min_count": 1,
           "max_count": 1,
           "weight": 5
         },
         {
-          "type": "null",
-          "weight": 40
+          "type": "item",
+          "name": "Plate Boots",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Plate Greaves",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Great Helm",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Chain Mail",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
         }
       ]
     },
@@ -453,6 +559,131 @@
         {
           "type": "null",
           "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        }
+      ]
+    },
+    "rare_chest": {
+      "rolls": 5,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Blueberry",
+          "min_count": 5,
+          "max_count": 10,
+          "weight": 50
+        },
+        {
+          "type": "table",
+          "ref": "rare_equip",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "rare_equip",
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 5
+        },
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Iron Scrap",
+          "min_count": 3,
+          "max_count": 3,
+          "weight": -1
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        }
+      ]
+    },
+    "mixed_chest": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "table",
+          "ref": "common_chest",
+          "weight": 50
+        },
+        {
+          "type": "table",
+          "ref": "rare_chest",
+          "weight": 50
+        }
+      ]
+    },
+    "common_enemy": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 50
+        },
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 10
+        },
+        {
+          "type": "null",
+          "weight": 20
+        }
+      ]
+    },
+    "rare_enemy": {
+      "rolls": 4,
+      "slots": [
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 50
+        },
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 10
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        }
+      ]
+    },
+    "common_blob": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Green Goo",
+          "min_count": 2,
+          "max_count": 4,
+          "weight": 50
         },
         {
           "type": "null",

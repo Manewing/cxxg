@@ -6,13 +6,14 @@
     "creatures": [
         {
             "key": "s",
-            "name": "Skeleton"
+            "name": "Skeleton",
+            "loot": "common_enemy"
         }
     ],
     "chests": [
         {
             "key": "C",
-            "loot": "common_chest"
+            "loot": "rare_chest"
         }
     ]
 }

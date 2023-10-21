@@ -6,7 +6,8 @@
     "creatures":  [
         {
             "key": "b",
-            "name": "Blob"
+            "name": "Blob",
+            "loot": "common_blob"
         }
     ],
     "chests": [

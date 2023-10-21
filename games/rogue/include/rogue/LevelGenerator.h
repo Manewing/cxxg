@@ -19,6 +19,7 @@ struct LevelConfig {
 public:
   struct Creature {
     std::string Name;
+    std::string LootTableName;
   };
 
   struct Chest {

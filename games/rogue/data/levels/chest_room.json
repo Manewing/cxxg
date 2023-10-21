@@ -43,13 +43,14 @@
     "creatures": [
         {
             "key": "s",
-            "name": "Skeleton"
+            "name": "Skeleton",
+            "loot": "rare_enemy"
         }
     ],
     "chests": [
         {
             "key": "C",
-            "loot": "common_chest"
+            "loot": "mixed_chest"
         }
     ]
 }

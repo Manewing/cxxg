@@ -103,7 +103,6 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   auto Player = CurrentLevel->getPlayer();
   auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
   InvComp.Inv.addItem(ItemDb.createItem(ItemDb.getItemId("Small Sword"), 1));
-  InvComp.Inv.addItem(ItemDb.createItem(ItemDb.getItemId("Small Sword"), 1));
   InvComp.Inv.addItem(ItemDb.createItem(ItemDb.getItemId("Blueberry"), 5));
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
