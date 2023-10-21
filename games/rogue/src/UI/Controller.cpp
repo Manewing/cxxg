@@ -204,8 +204,8 @@ bool Controller::hasTargetUI() const {
 
 void Controller::closeTargetUI() {
   auto *TUI = WdwContainer.getWindowOfType<TargetUI>();
-  WdwContainer.closeWindow(TUI);
   TUI->destroyCursor();
+  WdwContainer.closeWindow(TUI);
 }
 
 } // namespace rogue::ui
