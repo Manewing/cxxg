@@ -1,8 +1,8 @@
 {
   "item_effects": {
-    "health_effect_10": {
+    "minor_health_effect": {
       "type": "health_item_effect",
-      "health_value": 10
+      "health_value": 5
     },
     "damage_effect_10": {
       "type": "damage_item_effect",
@@ -119,7 +119,11 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "health_effect_10"
+          "effect": "minor_health_effect"
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_health_regen_effect"
         }
       ]
     },
@@ -143,7 +147,7 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "health_effect_10"
+          "effect": "minor_health_effect"
         },
         {
           "type": "use_on",
@@ -551,9 +555,9 @@
         {
           "type": "item",
           "name": "Blueberry",
-          "min_count": 5,
-          "max_count": 10,
-          "weight": 50
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 20
         },
         {
           "type": "table",
@@ -579,6 +583,10 @@
         {
           "type": "null",
           "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
         }
       ]
     },
@@ -590,7 +598,7 @@
           "name": "Blueberry",
           "min_count": 5,
           "max_count": 10,
-          "weight": 50
+          "weight": 20
         },
         {
           "type": "table",
@@ -618,6 +626,10 @@
           "min_count": 3,
           "max_count": 3,
           "weight": -1
+        },
+        {
+          "type": "null",
+          "weight": 20
         },
         {
           "type": "null",

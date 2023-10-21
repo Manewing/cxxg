@@ -4,7 +4,7 @@
             "name": "Sewer Rat",
             "description": "A rat TODO",
             "stats": {
-                "str": 3,
+                "str": 2,
                 "dex": 6,
                 "int": 0,
                 "vit": 2
@@ -16,7 +16,7 @@
             "name": "Toxic Rat",
             "description": "A toxic rat TODO",
             "stats": {
-                "str": 4,
+                "str": 2,
                 "dex": 6,
                 "int": 0,
                 "vit": 2
