@@ -12,6 +12,7 @@ struct LevelRangeConfig {
 };
 
 struct GameConfig {
+  unsigned Seed = 0;
   std::filesystem::path CreatureDbConfig;
   std::filesystem::path ItemDbConfig;
   std::vector<LevelRangeConfig> Levels;

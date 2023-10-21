@@ -136,7 +136,7 @@
       ]
     },
     {
-      "name": "Rat Meat",
+      "name": "Sewer Meat",
       "description": "Obtained from the unsavory denizens of the sewers, this dubious food source offers a double-edged benefit.",
       "max_stack_size": 99,
       "types": ["consumable"],
@@ -712,7 +712,7 @@
       "slots": [
         {
           "type": "item",
-          "name": "Rat Meat",
+          "name": "Sewer Meat",
           "min_count": 1,
           "max_count": 2,
           "weight": 30
