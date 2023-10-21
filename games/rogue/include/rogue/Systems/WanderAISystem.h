@@ -34,9 +34,13 @@ private:
 
   ymir::Point2d<int> wander(const ymir::Point2d<int> AtPos);
 
-  std::optional<ymir::Point2d<int>> chaseTarget(entt::entity TargetEt,
-                                                const ymir::Point2d<int> AtPos,
-                                                const LineOfSightComp &LOS);
+  std::optional<ymir::Point2d<int>> findPathToPoint(
+      const ymir::Point2d<int> ToPos, const ymir::Point2d<int> FutureToPos,
+      const ymir::Point2d<int> AtPos, const unsigned LOSRange);
+
+  std::optional<ymir::Point2d<int>>
+  chaseTarget(entt::entity TargetEt, const ymir::Point2d<int> AtPos,
+              const LineOfSightComp &LOS);
 
 private:
   Level &L;

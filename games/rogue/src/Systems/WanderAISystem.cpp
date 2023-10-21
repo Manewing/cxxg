@@ -56,6 +56,33 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
     Reg.emplace<MovementComp>(Entity, MC);
   } break;
 
+  case WanderAIState::Search: {
+    // If lost agro stop the search
+    if (AI.SearchDurationLeft-- == 0) {
+      AI.State = WanderAIState::Wander;
+      AI.LastTargetPos = std::nullopt;
+      AI.SearchDurationLeft = 0;
+      break;
+    }
+
+    // If in range chase otherwise continue to last seen pos
+    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
+    std::optional<ymir::Point2d<int>> NextPosOrNone;
+    if (TargetEt != entt::null) {
+      NextPosOrNone = chaseTarget(TargetEt, PC, *LOS);
+    } else {
+      NextPosOrNone = findPathToPoint(*AI.LastTargetPos, *AI.LastTargetPos, PC,
+                                      LOS->LOSRange);
+    }
+    if (!NextPosOrNone) {
+      break;
+    }
+
+    MovementComp MC;
+    MC.Dir = ymir::Dir2d::fromMaxComponent(*NextPosOrNone - PC.Pos);
+    Reg.emplace<MovementComp>(Entity, MC);
+    break;
+  }
   case WanderAIState::Chase: {
     // If in range stay, otherwise chase
     auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
@@ -93,8 +120,7 @@ WanderAISystem::checkForTarget(entt::entity Entity, PositionComp &PC,
       LTE.Registry = &Reg;
       publish(LTE);
 
-      AI.State = WanderAIState::Idle;
-      AI.IdleDelayLeft = AI.IdleDelay;
+      AI.State = WanderAIState::Search;
     }
 
     return {TargetEt, LOS, FC};
@@ -109,6 +135,8 @@ WanderAISystem::checkForTarget(entt::entity Entity, PositionComp &PC,
     publish(DTE);
   }
   AI.State = WanderAIState::Chase;
+  AI.LastTargetPos = Reg.get<PositionComp>(TargetEt).Pos;
+  AI.SearchDurationLeft = AI.SearchDuration;
   return {TargetEt, LOS, FC};
 }
 
@@ -152,6 +180,60 @@ ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
   return *It;
 }
 
+std::optional<ymir::Point2d<int>> WanderAISystem::findPathToPoint(
+    const ymir::Point2d<int> ToPos, const ymir::Point2d<int> FutureToPos,
+    const ymir::Point2d<int> AtPos, const unsigned LOSRange) {
+  ymir::Size2d<int> DMSize(LOSRange * 2 + 1, LOSRange * 2 + 1);
+  ymir::Point2d<int> DMMidPos(LOSRange + 1, LOSRange + 1);
+
+  // FIXME avoid recomputing this every time
+  auto DM = ymir::Algorithm::getDijkstraMap(
+      DMSize, DMMidPos,
+      [this, &ToPos, &FutureToPos, &DMMidPos](auto Pos) {
+        auto RealPos = Pos + FutureToPos - DMMidPos;
+        if (RealPos == ToPos) {
+          return false;
+        }
+        return L.isBodyBlocked(RealPos, /*Hard=*/true);
+      },
+      ymir::FourTileDirections<int>());
+
+  std::uniform_int_distribution<int> OneZero(0, 1);
+  auto PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
+      DM, DMMidPos, AtPos - FutureToPos + DMMidPos,
+      ymir::FourTileDirections<int>(), 1, OneZero(RandomEngine));
+
+  // FIXME avoid recomputing this every time
+  if (PathToTarget.empty()) {
+    DM = ymir::Algorithm::getDijkstraMap(
+        DMSize, DMMidPos,
+        [this, &ToPos, &FutureToPos, &DMMidPos](auto Pos) {
+          auto RealPos = Pos + FutureToPos - DMMidPos;
+          if (RealPos == ToPos) {
+            return false;
+          }
+          return L.isBodyBlocked(RealPos, /*Hard=*/false);
+        },
+        ymir::FourTileDirections<int>());
+
+    std::uniform_int_distribution<int> OneZero(0, 1);
+    PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
+        DM, DMMidPos, AtPos - FutureToPos + DMMidPos,
+        ymir::FourTileDirections<int>(), 1, OneZero(RandomEngine));
+  }
+  if (PathToTarget.empty()) {
+    publish(ErrorMessageEvent()
+            << "can't find path from " << AtPos << " to " << FutureToPos);
+    return AtPos;
+  }
+  auto TargetPos = PathToTarget.at(0) + FutureToPos - DMMidPos;
+
+  if (!L.isBodyBlocked(TargetPos)) {
+    return TargetPos;
+  }
+  return std::nullopt;
+}
+
 std::optional<ymir::Point2d<int>>
 WanderAISystem::chaseTarget(entt::entity TargetEt,
                             const ymir::Point2d<int> AtPos,
@@ -171,36 +253,7 @@ WanderAISystem::chaseTarget(entt::entity TargetEt,
     return std::nullopt;
   }
 
-  // FIXME avoid recomputing this every time
-  unsigned LOSRange = LOS.LOSRange;
-  ymir::Size2d<int> DMSize(LOSRange * 2 + 1, LOSRange * 2 + 1);
-  ymir::Point2d<int> DMMidPos(LOSRange + 1, LOSRange + 1);
-  auto DM = ymir::Algorithm::getDijkstraMap(
-      DMSize, DMMidPos,
-      [this, &TPC, &TPos, &DMMidPos](auto Pos) {
-        auto RealPos = Pos + TPos - DMMidPos;
-        if (RealPos == TPC.Pos) {
-          return false;
-        }
-        return L.isBodyBlocked(RealPos, /*Hard=*/false);
-      },
-      ymir::FourTileDirections<int>());
-
-  std::uniform_int_distribution<int> OneZero(0, 1);
-  auto PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
-      DM, DMMidPos, AtPos - TPos + DMMidPos, ymir::FourTileDirections<int>(), 1,
-      OneZero(RandomEngine));
-  if (PathToTarget.empty()) {
-    publish(ErrorMessageEvent()
-            << "can't find path from " << AtPos << " to " << TPos);
-    return AtPos;
-  }
-  auto TargetPos = PathToTarget.at(0) + TPos - DMMidPos;
-
-  if (!L.isBodyBlocked(TargetPos)) {
-    return TargetPos;
-  }
-  return std::nullopt;
+  return findPathToPoint(TPC.Pos, TPos, AtPos, LOS.LOSRange);
 }
 
 } // namespace rogue

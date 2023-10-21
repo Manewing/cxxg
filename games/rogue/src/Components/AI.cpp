@@ -11,6 +11,8 @@ const char *getWanderAIStateStr(WanderAIState State) {
     return "Wander";
   case WanderAIState::Chase:
     return "Chase";
+  case WanderAIState::Search:
+    return "Search";
   }
   return "<invalid>";
 }

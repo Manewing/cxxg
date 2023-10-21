@@ -2,16 +2,26 @@
 #define ROGUE_COMPONENTS_AI_H
 
 #include <iosfwd>
+#include <optional>
 #include <rogue/Tile.h>
+#include <ymir/Types.hpp>
 
 namespace rogue {
 
-enum class WanderAIState { Idle = 0, Wander = 1, Chase = 2 };
+enum class WanderAIState { Idle = 0, Wander = 1, Chase = 2, Search = 3 };
 
 struct WanderAIComp {
   WanderAIState State = WanderAIState::Idle;
-  unsigned IdleDelay = 2;
-  unsigned IdleDelayLeft = 2;
+  unsigned IdleDelay = 10;
+  unsigned IdleDelayLeft = 10;
+
+  /// Last position a target was seen at
+  std::optional<ymir::Point2d<int>> LastTargetPos;
+
+  /// The amount of ticks to remember the last seen target position, when
+  /// the target was lost
+  unsigned SearchDuration = 40;
+  unsigned SearchDurationLeft = 0;
 };
 
 const char *getWanderAIStateStr(WanderAIState State);
