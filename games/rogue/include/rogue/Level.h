@@ -60,7 +60,10 @@ public:
 
   bool isWallBlocked(ymir::Point2d<int> Pos) const;
   bool isLOSBlocked(ymir::Point2d<int> Pos) const;
-  bool isBodyBlocked(ymir::Point2d<int> Pos) const;
+
+  /// Returns true if the position is body blocked
+  /// \param Hard If true, also checks for entities with collisions
+  bool isBodyBlocked(ymir::Point2d<int> Pos, bool Hard = true) const;
 
   std::pair<ymir::Map<int, int>, std::vector<ymir::Point2d<int>>>
   getDijkstraMap(Tile Target, std::size_t Layer) const;

@@ -182,7 +182,7 @@ WanderAISystem::chaseTarget(entt::entity TargetEt,
         if (RealPos == TPC.Pos) {
           return false;
         }
-        return L.isBodyBlocked(RealPos);
+        return L.isBodyBlocked(RealPos, /*Hard=*/false);
       },
       ymir::FourTileDirections<int>());
 

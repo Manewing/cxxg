@@ -173,12 +173,15 @@ bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
   return isWallBlocked(Pos);
 }
 
-bool Level::isBodyBlocked(ymir::Point2d<int> Pos) const {
+bool Level::isBodyBlocked(ymir::Point2d<int> Pos, bool Hard) const {
   if (!Map.contains(Pos)) {
     return true;
   }
   bool MapBlocked = Map.get(LayerWallsIdx).getTile(Pos) != EmptyTile;
   MapBlocked |= Map.get(LayerObjectsIdx).getTile(Pos) != EmptyTile;
+  if (!Hard) {
+    return MapBlocked;
+  }
   bool EntityBlocked = getEntityAt(Pos) != entt::null;
   return MapBlocked || EntityBlocked;
 }
