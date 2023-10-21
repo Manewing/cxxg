@@ -390,13 +390,41 @@
           "weight": 5
         },
         {
+          "type": "item",
+          "name":"Leather Boots",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name":"Leather Pants",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name":"Leather Helmet",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name":"Leather Tunic",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
           "type": "null",
           "weight": 40
         }
       ]
     },
     "common_chest": {
-      "rolls": 5,
+      "rolls": 4,
       "slots": [
         {
           "type": "item",
@@ -411,6 +439,11 @@
           "weight": 20
         },
         {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 5
+        },
+        {
           "type": "item",
           "name": "Iron Scrap",
           "min_count": 3,
@@ -419,7 +452,11 @@
         },
         {
           "type": "null",
-          "weight": 40
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
         }
       ]
     }

@@ -32,10 +32,20 @@
                 "color": "#489dcf",
                 "key": "<",
                 "layer": "entities"
+            },
+            "s": {
+                "color": "#b8ad74",
+                "key": "s",
+                "layer": "entities"
             }
         }
     },
-    "creatures": [],
+    "creatures": [
+        {
+            "key": "s",
+            "name": "Skeleton"
+        }
+    ],
     "chests": [
         {
             "key": "C",

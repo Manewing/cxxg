@@ -1,3 +1,4 @@
+#include <cassert>
 #include <rogue/LootTable.h>
 
 namespace rogue {
@@ -20,12 +21,38 @@ void LootItem::fillLoot(std::vector<LootReward> &Loot) const {
   Loot.push_back({ItId, Count});
 }
 
+std::size_t LootTable::getSlotForRoll(int Roll,
+                                      const std::vector<LootSlot> &Slots) {
+  for (std::size_t Idx = 0; Idx < Slots.size(); ++Idx) {
+    Roll -= Slots.at(Idx).Weight;
+    if (Roll < 0) {
+      return Idx;
+    }
+  }
+  throw std::runtime_error("LootTable::getSlotForRoll() failed");
+}
+
+std::size_t LootTable::rollForSlot(const std::vector<LootSlot> &Slots) {
+  // FIXME this needs to be based on the seed as well
+  int TotalWeight = 0;
+  for (const auto &Slot : Slots) {
+    TotalWeight += Slot.Weight;
+  }
+  int Roll = std::rand() % TotalWeight;
+  return getSlotForRoll(Roll, Slots);
+}
+
+LootTable::LootTable() { reset(0, {}); }
+
 LootTable::LootTable(unsigned NumRolls, const std::vector<LootSlot> &Sls)
     : NumRolls(NumRolls) {
   reset(NumRolls, Sls);
 }
 
 void LootTable::reset(unsigned NR, const std::vector<LootSlot> &Sls) {
+  GuaranteedSlots.clear();
+  Slots.clear();
+
   NumRolls = NR;
   for (const auto &Slot : Sls) {
     if (Slot.Weight == -1) {
@@ -34,28 +61,19 @@ void LootTable::reset(unsigned NR, const std::vector<LootSlot> &Sls) {
       Slots.push_back(Slot);
     }
   }
+  NumRolls = Slots.empty() ? 0 : NumRolls;
 
-  TotalWeight = 0;
-  for (const auto &Slot : Slots) {
-    TotalWeight += Slot.Weight;
-  }
+  std::sort(Slots.begin(), Slots.end(), [](const auto &A, const auto &B) {
+    return A.Weight < B.Weight;
+  });
 }
 
-const LootTable::LootSlot &LootTable::getSlotForRoll(int Roll) const {
-  assert(Roll >= 0 && Roll < TotalWeight);
-  for (const auto &Slot : Slots) {
-    Roll -= Slot.Weight;
-    if (Roll < 0) {
-      return Slot;
-    }
-  }
-  throw std::runtime_error("LootTable::getSlotForRoll() failed");
+const std::vector<LootTable::LootSlot> &LootTable::getSlots() const {
+  return Slots;
 }
 
-const LootTable::LootSlot &LootTable::rollForSlot() const {
-  // FIXME this needs to be based on the seed as well
-  int Roll = std::rand() % TotalWeight;
-  return getSlotForRoll(Roll);
+const std::vector<LootTable::LootSlot> &LootTable::getGuaranteedSlots() const {
+  return GuaranteedSlots;
 }
 
 void LootTable::fillGuaranteedLoot(std::vector<LootReward> &Loot) const {
@@ -69,12 +87,21 @@ void LootTable::fillGuaranteedLoot(std::vector<LootReward> &Loot) const {
 
 void LootTable::fillLoot(std::vector<LootReward> &Loot) const {
   fillGuaranteedLoot(Loot);
+  std::vector<LootSlot> LeftOverSlots = Slots;
   for (unsigned Cnt = 0; Cnt < NumRolls; Cnt++) {
-    const auto &Slot = rollForSlot();
-    if (!Slot.LC) {
-      continue;
+    if (LeftOverSlots.empty()) {
+      break;
     }
-    Slot.LC->fillLoot(Loot);
+
+    auto SlotIdx = rollForSlot(LeftOverSlots);
+    const auto &Slot = LeftOverSlots.at(SlotIdx);
+    if (Slot.LC) {
+      Slot.LC->fillLoot(Loot);
+    }
+
+    // Remove the slot so the given entry can not be included again
+    // in the loot rewards
+    LeftOverSlots.erase(LeftOverSlots.begin() + SlotIdx);
   }
 }
 

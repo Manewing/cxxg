@@ -51,12 +51,17 @@ public:
   };
 
 public:
-  LootTable() = default;
+  static std::size_t getSlotForRoll(int Roll,
+                                    const std::vector<LootSlot> &Slots);
+  static std::size_t rollForSlot(const std::vector<LootSlot> &Slots);
+
+public:
+  LootTable();
   explicit LootTable(unsigned NumRolls, const std::vector<LootSlot> &Slots);
   void reset(unsigned NumRolls, const std::vector<LootSlot> &Slots);
 
-  const LootSlot &getSlotForRoll(int Roll) const;
-  const LootSlot &rollForSlot() const;
+  const std::vector<LootSlot> &getSlots() const;
+  const std::vector<LootSlot> &getGuaranteedSlots() const;
 
   void fillGuaranteedLoot(std::vector<LootReward> &Loot) const;
   void fillLoot(std::vector<LootReward> &Loot) const final;
@@ -65,7 +70,6 @@ private:
   unsigned NumRolls = 1;
   std::vector<LootSlot> Slots;
   std::vector<LootSlot> GuaranteedSlots;
-  int TotalWeight = 0;
 };
 
 } // namespace rogue

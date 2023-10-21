@@ -3,19 +3,18 @@
 
 namespace {
 
-rogue::LootContainer::ItemId getLootItemId(const rogue::LootContainer &LC) {
-  if (const auto *LI = dynamic_cast<const rogue::LootItem *>(&LC)) {
-    return LI->getItemId();
-  }
-  return -1;
-}
-
 TEST(LootTableTest, LootItemFillLoot) {
   rogue::LootItem LI(1, 42, 42);
   std::vector<rogue::LootContainer::LootReward> LootRef = {{1, 42}};
   std::vector<rogue::LootContainer::LootReward> Loot;
   LI.fillLoot(Loot);
   EXPECT_EQ(Loot, LootRef);
+}
+
+TEST(LootTableTest, EmptyLootTable) {
+  rogue::LootTable LTB;
+  auto Loot = LTB.generateLoot();
+  EXPECT_EQ(Loot.size(), 0);
 }
 
 TEST(LootTableTest, SimpleLoot) {
@@ -27,12 +26,12 @@ TEST(LootTableTest, SimpleLoot) {
 
   // Sum of weight: 35
   // Rnd Weight: 0-35
-  EXPECT_EQ(getLootItemId(*LTB.getSlotForRoll(0).LC), 1);
-  EXPECT_EQ(getLootItemId(*LTB.getSlotForRoll(5).LC), 2);
-  EXPECT_EQ(getLootItemId(*LTB.getSlotForRoll(6).LC), 2);
-  EXPECT_EQ(getLootItemId(*LTB.getSlotForRoll(12).LC), 2);
-  EXPECT_EQ(getLootItemId(*LTB.getSlotForRoll(15).LC), 3);
-  EXPECT_EQ(getLootItemId(*LTB.getSlotForRoll(30).LC), 3);
+  EXPECT_EQ(LTB.getSlotForRoll(0, LTB.getSlots()), 0);
+  EXPECT_EQ(LTB.getSlotForRoll(5, LTB.getSlots()), 1);
+  EXPECT_EQ(LTB.getSlotForRoll(6, LTB.getSlots()), 1);
+  EXPECT_EQ(LTB.getSlotForRoll(12, LTB.getSlots()), 1);
+  EXPECT_EQ(LTB.getSlotForRoll(15, LTB.getSlots()), 2);
+  EXPECT_EQ(LTB.getSlotForRoll(30, LTB.getSlots()), 2);
 
   std::srand(0);
   auto Loot = LTB.generateLoot();
@@ -53,6 +52,11 @@ TEST(LootTableTest, GuaranteedRewards) {
 
   Loot = LTB.generateLoot();
   EXPECT_EQ(Loot.size(), 2);
+
+  // Check reset
+  LTB.reset(1, {});
+  Loot = LTB.generateLoot();
+  EXPECT_EQ(Loot.size(), 0);
 }
 
 TEST(LootTableTest, NullLoot) {
