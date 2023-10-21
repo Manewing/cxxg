@@ -3,6 +3,10 @@
 	"creature_db_config": "creature_db.json",
 	"levels": [
 		{
+			"end": 2,
+			"config": "levels/sewers.json"
+		},
+		{
 			"end": 3,
 			"config": "levels/blob_cave.json"
 		},
@@ -11,11 +15,11 @@
 			"config": "levels/troll_dungeon.json"
 		},
 		{
-			"end": 9,
+			"end": 8,
 			"config": "levels/skeleton_dungeon.json"
 		},
 		{
-			"end": 10,
+			"end": 9,
 			"config": "levels/chest_room.json"
 		}
 	]

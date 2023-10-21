@@ -1,19 +1,19 @@
 {
-    "map": {
-        "type": "generated",
-        "config": "skeleton_dungeon.cfg"
-    },
-    "creatures": [
-        {
-            "key": "s",
-            "name": "Skeleton",
-            "loot": "common_enemy"
-        }
-    ],
-    "chests": [
-        {
-            "key": "C",
-            "loot": "rare_chest"
-        }
-    ]
+  "map": {
+    "type": "generated",
+    "config": "skeleton_dungeon.cfg"
+  },
+  "creatures": [
+    {
+      "key": "s",
+      "name": "Skeleton",
+      "loot": "common_enemy"
+    }
+  ],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "rare_chest"
+    }
+  ]
 }

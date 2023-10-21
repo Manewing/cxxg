@@ -1,8 +1,32 @@
 {
     "creatures": [
         {
+            "name": "Sewer Rat",
+            "description": "A rat TODO",
+            "stats": {
+                "str": 3,
+                "dex": 6,
+                "int": 0,
+                "vit": 2
+            },
+            "faction": "nature",
+            "race": "creature"
+        },
+        {
+            "name": "Toxic Rat",
+            "description": "A toxic rat TODO",
+            "stats": {
+                "str": 4,
+                "dex": 6,
+                "int": 0,
+                "vit": 2
+            },
+            "faction": "nature",
+            "race": "creature"
+        },
+        {
             "name": "Blob",
-            "description": "A blob",
+            "description": "A blob TODO",
             "stats": {
                 "str": 5,
                 "dex": 1,
@@ -14,7 +38,7 @@
         },
         {
             "name": "Skeleton",
-            "description": "A skeleton",
+            "description": "A skeleton TODO",
             "stats": {
                 "str": 3,
                 "dex": 30,
@@ -26,12 +50,24 @@
         },
         {
             "name": "Troll",
-            "description": "A troll",
+            "description": "A troll TODO",
             "stats": {
                 "str": 15,
                 "dex": 5,
                 "int": 0,
                 "vit": 40
+            },
+            "faction": "enemy",
+            "race": "troll"
+        },
+        {
+            "name": "Troll Berserker",
+            "description": "A troll berserker TODO",
+            "stats": {
+                "str": 25,
+                "dex": 8,
+                "int": 0,
+                "vit": 30
             },
             "faction": "enemy",
             "race": "troll"

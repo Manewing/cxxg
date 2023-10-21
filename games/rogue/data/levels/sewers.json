@@ -1,0 +1,24 @@
+{
+  "map": {
+    "type": "generated",
+    "config": "sewers.cfg"
+  },
+  "creatures": [
+    {
+      "key": "r",
+      "name": "Sewer Rat",
+      "loot": "common_blob"
+    },
+    {
+      "key": "R",
+      "name": "Toxic Rat",
+      "loot": "common_blob"
+    }
+  ],
+  "chests": [
+    {
+      "key": "v",
+      "loot": "common_chest"
+    }
+  ]
+}
