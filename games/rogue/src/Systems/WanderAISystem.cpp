@@ -71,6 +71,7 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
     if (TargetEt != entt::null) {
       NextPosOrNone = chaseTarget(TargetEt, PC, *LOS);
     } else {
+      assert(AI.LastTargetPos && "No last target pos for wander system");
       NextPosOrNone = findPathToPoint(*AI.LastTargetPos, *AI.LastTargetPos, PC,
                                       LOS->LOSRange);
     }
@@ -172,10 +173,8 @@ ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
   auto AllNextPos = L.getAllNonBodyBlockedPosNextTo(AtPos);
   auto It =
       ymir::randomIterator(AllNextPos.begin(), AllNextPos.end(), RandomEngine);
-  if (It == AllNextPos.end()) {
-    // FIXME this may actuall happen if there are many entities body blocking
-    // each other...
-    publish(ErrorMessageEvent() << "can't wander at " << AtPos);
+  if (AllNextPos.empty() || It == AllNextPos.end()) {
+    return AtPos;
   }
   return *It;
 }
