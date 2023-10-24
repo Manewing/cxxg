@@ -33,6 +33,20 @@ static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
   return ItemIdsByName;
 }
 
+template <typename T>
+void parseReductionBuff(const rapidjson::Value &V, T &Buff) {
+  Buff.ReduceAmount = V["reduce_amount"].GetDouble();
+  Buff.TickPeriod = V["tick_period"].GetUint();
+  Buff.TickPeriodsLeft = V["ticks"].GetUint();
+}
+
+template <typename T>
+void parseRegenerationBuff(const rapidjson::Value &V, T &Buff) {
+  Buff.RegenAmount = V["regen_amount"].GetDouble();
+  Buff.TickPeriod = V["tick_period"].GetUint();
+  Buff.TickPeriodsLeft = V["ticks"].GetUint();
+}
+
 static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
                                                 const rapidjson::Value &V) {
   static const std::map<std::string,
@@ -52,23 +66,20 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
           {"poison_debuff_comp",
            [](const auto &, const auto &V) {
              PoisonDebuffComp Buff;
-             Buff.ReduceAmount = V["reduce_amount"].GetDouble();
-             Buff.TicksLeft = V["ticks"].GetUint();
+             parseReductionBuff(V, Buff);
              return makeApplyBuffItemEffect<PoisonDebuffComp, HealthComp>(Buff);
            }},
           {"health_regen_buff_comp",
            [](const auto &, const auto &V) {
              HealthRegenBuffComp Buff;
-             Buff.RegenAmount = V["regen_amount"].GetDouble();
-             Buff.TicksLeft = V["ticks"].GetUint();
+             parseRegenerationBuff(V, Buff);
              return makeApplyBuffItemEffect<HealthRegenBuffComp, HealthComp>(
                  Buff);
            }},
           {"bleeding_debuff_comp",
            [](const auto &, const auto &V) {
              BleedingDebuffComp Buff;
-             Buff.ReduceAmount = V["reduce_amount"].GetDouble();
-             Buff.TicksLeft = V["ticks"].GetUint();
+             parseReductionBuff(V, Buff);
              return makeApplyBuffItemEffect<BleedingDebuffComp, HealthComp>(
                  Buff);
            }},

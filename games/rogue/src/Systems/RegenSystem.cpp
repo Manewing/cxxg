@@ -40,7 +40,8 @@ runRegenBuffUpdate(System &Sys, entt::registry &Reg) {
   auto View = Reg.view<Buff, Component>();
   View.each([&Sys, &Reg](auto Entity, auto &B, auto &C) {
     // Post decrement to match count
-    if (B.TicksLeft-- == 0) {
+    auto St = B.tick();
+    if (St == TimedBuff::State::Expired) {
       BuffExpiredEvent BEE;
       BEE.Entity = Entity;
       BEE.Buff = &B;
@@ -48,7 +49,15 @@ runRegenBuffUpdate(System &Sys, entt::registry &Reg) {
       Reg.erase<Buff>(Entity);
       return;
     }
+
+    if (St == TimedBuff::State::Waiting) {
+      return;
+    }
     // Restore the given amount to regenerate
+    Sys.publish(DebugMessageEvent()
+                << B.getName() << " regenerate " << B.RegenAmount << " every "
+                << B.TickPeriod << " ticks for " << B.totalTicksLeft()
+                << " ticks");
     C.restore(B.RegenAmount);
   });
 }
@@ -60,12 +69,23 @@ runReductionBuffUpdate(System &Sys, entt::registry &Reg) {
   auto View = Reg.view<Buff, Component>();
   View.each([&Sys, &Reg](auto Entity, auto &B, auto &C) {
     // Post decrement to match count
-    if (B.TicksLeft-- == 0) {
-      Sys.publish(DebugMessageEvent() << B.getName() << " expired");
+    auto St = B.tick();
+    if (St == TimedBuff::State::Expired) {
+      BuffExpiredEvent BEE;
+      BEE.Entity = Entity;
+      BEE.Buff = &B;
+      Sys.publish(BEE);
       Reg.erase<Buff>(Entity);
       return;
     }
+    if (St == TimedBuff::State::Waiting) {
+      return;
+    }
     // Reduce the given amount
+    Sys.publish(DebugMessageEvent()
+                << B.getName() << " reduce " << B.ReduceAmount << " every "
+                << B.TickPeriod << " ticks for " << B.totalTicksLeft()
+                << " ticks");
     C.reduce(B.ReduceAmount);
   });
 }
@@ -77,13 +97,15 @@ void RegenSystem::update(UpdateType Type) {
     return;
   }
 
-  // Run regeneration
-  runRegenUpdate<HealthComp>(Reg);
+  // Run mana regeneration
   runRegenUpdate<ManaComp>(Reg);
-
-  // Process buffs
-  runRegenBuffUpdate<HealthComp, HealthRegenBuffComp>(*this, Reg);
   runRegenBuffUpdate<ManaComp, ManaRegenBuffComp>(*this, Reg);
+
+  // Run health regeneration
+  runRegenUpdate<HealthComp>(Reg);
+  runRegenBuffUpdate<HealthComp, HealthRegenBuffComp>(*this, Reg);
+
+  // Run health reduction
   runReductionBuffUpdate<HealthComp, PoisonDebuffComp>(*this, Reg);
   runReductionBuffUpdate<HealthComp, BleedingDebuffComp>(*this, Reg);
 }

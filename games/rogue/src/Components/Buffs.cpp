@@ -14,23 +14,56 @@ bool AdditiveBuff::remove(const AdditiveBuff &Other) {
   return SourceCount == 0;
 }
 
-void RegenerationBuff::add(const RegenerationBuff &Other) {
-  if (Other.total() > total()) {
-    RegenAmount = Other.RegenAmount;
-    TicksLeft = Other.TicksLeft;
+TimedBuff::State TimedBuff::tick() {
+  if (TicksLeft-- != 0) {
+    return State::Waiting;
   }
+  if (TickPeriodsLeft-- != 0) {
+    TicksLeft = TickPeriod;
+    return State::Active;
+  }
+  TicksLeft = 0;
+  TickPeriodsLeft = 0;
+  return State::Expired;
 }
 
-StatValue RegenerationBuff::total() const { return RegenAmount * TicksLeft; }
+unsigned TimedBuff::totalTicksLeft() const {
+  return TicksLeft + TickPeriodsLeft * TickPeriod;
+}
+
+void RegenerationBuff::add(const RegenerationBuff &Other) {
+  // Make apply immediate on next tick
+  TicksLeft = 0;
+
+  const auto TotalPerTickOther = Other.total() / Other.totalTicksLeft();
+  RegenAmount += TotalPerTickOther * TickPeriod / RegenAmount;
+
+  TickPeriod = std::min(TickPeriod, Other.TickPeriod);
+
+  const auto TotalTicksLeftOther = Other.totalTicksLeft();
+  TickPeriodsLeft += TotalTicksLeftOther / TickPeriod;
+}
+
+StatValue RegenerationBuff::total() const {
+  return RegenAmount * TickPeriodsLeft;
+}
 
 void ReductionBuff::add(const ReductionBuff &Other) {
-  if (Other.total() > total()) {
-    ReduceAmount = Other.ReduceAmount;
-    TicksLeft = Other.TicksLeft;
-  }
+  // Make apply immediate on next tick
+  TicksLeft = 0;
+
+  const auto TotalPerTickOther = Other.total() / Other.totalTicksLeft();
+  ReduceAmount += TotalPerTickOther * TickPeriod / ReduceAmount;
+
+  TickPeriod = std::min(TickPeriod, Other.TickPeriod);
+
+  const auto TotalTicksLeftOther = Other.totalTicksLeft();
+  TickPeriodsLeft += TotalTicksLeftOther / TickPeriod;
 }
 
-StatValue ReductionBuff::total() const { return ReduceAmount * TicksLeft; }
+StatValue ReductionBuff::total() const {
+  return ReduceAmount * TickPeriodsLeft;
+}
 
 std::string_view StatsBuffComp::getName() const { return "Stats buff"; }
 
@@ -185,7 +218,8 @@ bool StatsBuffPerHitComp::remove(const StatsBuffPerHitComp &) {
 }
 
 bool StatsBuffPerHitComp::tick() {
-  bool Expired = TimedBuff::tick();
+  auto St = TimedBuff::tick();
+  bool Expired = St == TimedBuff::State::Expired;
   if (Expired) {
     Stacks = 0;
   }

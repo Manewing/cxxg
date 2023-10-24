@@ -27,15 +27,20 @@ struct AdditiveBuff {
 };
 
 struct TimedBuff {
+  enum class State {
+    Expired,
+    Waiting,
+    Active
+  };
+
   unsigned TicksLeft = 0;
+  unsigned TickPeriod = 50;
+  unsigned TickPeriodsLeft = 1;
 
   /// Post-decrement to match count, returns true when hitting zero
-  bool tick() {
-    if (TicksLeft == 0) {
-      return true;
-    }
-    return TicksLeft-- == 0;
-  }
+  State tick();
+
+  unsigned totalTicksLeft() const;
 
   bool remove(const TimedBuff &) { return false; }
 };
@@ -43,6 +48,8 @@ struct TimedBuff {
 struct RegenerationBuff : public TimedBuff {
 public:
   void add(const RegenerationBuff &Other);
+
+  /// Returns total amount of regeneration left
   StatValue total() const;
 
 public:
@@ -52,6 +59,8 @@ public:
 struct ReductionBuff : public TimedBuff {
 public:
   void add(const ReductionBuff &Other);
+
+  /// Returns total amount of regeneration left
   StatValue total() const;
 
 public:

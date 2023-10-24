@@ -20,7 +20,8 @@ void resetStats(entt::registry &Reg) {
 
 void updateStatsTimedBuffComp(entt::entity Entity, entt::registry &Reg,
                               StatsComp &S, StatsTimedBuffComp &STB) {
-  if (STB.tick()) {
+  auto St = STB.tick();
+  if (St == TimedBuff::State::Expired) {
     Reg.erase<StatsTimedBuffComp>(Entity);
     return;
   }

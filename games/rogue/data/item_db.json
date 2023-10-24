@@ -10,18 +10,27 @@
     },
     "minor_poison_effect": {
       "type": "poison_debuff_comp",
-      "reduce_amount": 0.1,
-      "ticks": 50
+      "reduce_amount": 0.5,
+      "ticks": 5,
+      "tick_period": 10
+    },
+    "minor_quick_health_regen_effect": {
+      "type": "health_regen_buff_comp",
+      "regen_amount": 1.0,
+      "ticks": 2,
+      "tick_period": 4
     },
     "minor_health_regen_effect": {
       "type": "health_regen_buff_comp",
-      "regen_amount": 0.1,
-      "ticks": 50
+      "regen_amount": 0.5,
+      "ticks": 5,
+      "tick_period": 10
     },
-    "bleeding_debuff_effect_10": {
+    "bleeding_debuff_effect": {
       "type": "bleeding_debuff_comp",
-      "reduce_amount": 0.5,
-      "ticks": 10
+      "reduce_amount": 2.5,
+      "ticks": 5,
+      "tick_period": 10
     },
     "stats_buff_effect": {
       "type": "stats_buff_comp",
@@ -135,7 +144,7 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "minor_health_regen_effect"
+          "effect": "minor_quick_health_regen_effect"
         }
       ]
     },
@@ -190,7 +199,7 @@
         },
         {
           "type": "use_on",
-          "effect": "bleeding_debuff_effect_10"
+          "effect": "bleeding_debuff_effect"
         },
         {
           "type": "equipment",
