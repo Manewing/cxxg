@@ -25,6 +25,13 @@ GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
     Config.Levels.push_back(LevelCfg);
   }
 
+  for (const auto &Item : Doc["initial_items"].GetArray()) {
+    PlayerInitialItemConfig ItemCfg;
+    ItemCfg.Name = Item["name"].GetString();
+    ItemCfg.Count = Item["count"].GetUint();
+    Config.InitialItems.push_back(ItemCfg);
+  }
+
   return Config;
 }
 
@@ -47,6 +54,10 @@ std::ostream &operator<<(std::ostream &Out, const GameConfig &Cfg) {
   for (const auto &Level : Cfg.Levels) {
     Out << "    LevelEndIdx: " << Level.LevelEndIdx << "\n";
     Out << "    Config: " << Level.Config << "\n";
+  }
+  Out << "  InitialItems:\n";
+  for (const auto &Item : Cfg.InitialItems) {
+    Out << "  InitialItem: " << Item.Name << " x" << Item.Count << "\n";
   }
   return Out;
 }

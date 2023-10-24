@@ -5,7 +5,8 @@
   "type": "object",
   "required": [
     "levels",
-    "item_db_config"
+    "item_db_config",
+    "initial_items"
   ],
   "properties": {
     "level_config": {
@@ -36,6 +37,27 @@
     "creature_db_config": {
       "type": "string",
       "description": "Relative (to the config) path to the creature DB config file"
+    },
+    "initial_items": {
+      "type": "array",
+      "description": "Items the player starts with",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "count"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the item"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of items"
+          }
+        }
+      }
     }
   }
 }

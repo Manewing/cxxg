@@ -22,5 +22,15 @@
 			"end": 9,
 			"config": "levels/chest_room.json"
 		}
+	],
+	"initial_items": [
+		{
+			"name": "Small Sword",
+			"count": 1
+		},
+		{
+			"name": "Blueberry",
+			"count": 5
+		}
 	]
 }

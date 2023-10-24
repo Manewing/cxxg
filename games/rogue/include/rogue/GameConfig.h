@@ -12,11 +12,17 @@ struct LevelRangeConfig {
   std::filesystem::path Config;
 };
 
+struct PlayerInitialItemConfig {
+  std::string Name;
+  unsigned Count = 1;
+};
+
 struct GameConfig {
   unsigned Seed = 0;
   std::filesystem::path CreatureDbConfig;
   std::filesystem::path ItemDbConfig;
   std::vector<LevelRangeConfig> Levels;
+  std::vector<PlayerInitialItemConfig> InitialItems;
 
   static GameConfig load(const std::filesystem::path &ConfigFile);
 
