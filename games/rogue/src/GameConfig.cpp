@@ -38,4 +38,17 @@ const LevelRangeConfig &GameConfig::getLevelRangeConfig(int LevelIdx) const {
                            std::to_string(LevelIdx));
 }
 
+std::ostream &operator<<(std::ostream &Out, const GameConfig &Cfg) {
+  Out << "GameConfig:\n";
+  Out << "  Seed: " << Cfg.Seed << "\n";
+  Out << "  ItemDbConfig: " << Cfg.ItemDbConfig << "\n";
+  Out << "  CreatureDbConfig: " << Cfg.CreatureDbConfig << "\n";
+  Out << "  Levels:\n";
+  for (const auto &Level : Cfg.Levels) {
+    Out << "    LevelEndIdx: " << Level.LevelEndIdx << "\n";
+    Out << "    Config: " << Level.Config << "\n";
+  }
+  return Out;
+}
+
 } // namespace rogue

@@ -6,7 +6,8 @@
 
 int main(int Argc, char *Argv[]) {
   if (Argc != 2 && Argc != 4) {
-    std::cout << "Usage: " << Argv[0] << " <game_config.json> (--seed <value>)" << std::endl;
+    std::cout << "Usage: " << Argv[0] << " <game_config.json> (--seed <value>)"
+              << std::endl;
     return 0;
   }
   auto Cfg = rogue::GameConfig::load(Argv[1]);
@@ -16,6 +17,8 @@ int main(int Argc, char *Argv[]) {
   } else {
     Cfg.Seed = std::time(nullptr);
   }
+
+  std::cout << "\033[2J" << Cfg << "\033[2J";
 
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });

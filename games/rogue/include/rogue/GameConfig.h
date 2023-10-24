@@ -3,6 +3,7 @@
 
 #include <filesystem>
 #include <vector>
+#include <iosfwd>
 
 namespace rogue {
 
@@ -21,6 +22,8 @@ struct GameConfig {
 
   const LevelRangeConfig &getLevelRangeConfig(int LevelIdx) const;
 };
+
+std::ostream &operator<<(std::ostream &Out, const GameConfig &Cfg);
 
 } // namespace rogue
 
