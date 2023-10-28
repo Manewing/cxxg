@@ -244,6 +244,7 @@ bool Game::handleInput(int Char) {
     break;
   case cxxg::utils::KEY_SPACE:
     // Wait a turn
+    Hist.info() << "Resting...";
     break;
   case 'e':
     tryInteract();

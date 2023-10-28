@@ -7,7 +7,9 @@ namespace rogue {
 namespace {
 
 static constexpr float HealthPerVit = 9.1f;
+static constexpr float HealthRegenPerVit = 0.02f;
 static constexpr float ManaPerInt = 9.1f;
+static constexpr float ManaRegenPerInt = 0.02f;
 
 // Based on minimum AP cost of 10, see Balancing sheet
 static constexpr float AgilityPerDexLogBase = 1.2f;
@@ -94,6 +96,7 @@ void applyStatEffects(entt::registry &Reg) {
         if (Health.Value > Health.MaxValue) {
           Health.Value = Health.MaxValue;
         }
+        Health.RegenAmount = St.effective().Vit * HealthRegenPerVit;
       });
 
   // Mana
@@ -103,6 +106,7 @@ void applyStatEffects(entt::registry &Reg) {
     if (Mana.Value > Mana.MaxValue) {
       Mana.Value = Mana.MaxValue;
     }
+    Mana.RegenAmount = St.effective().Int * ManaRegenPerInt;
   });
 
   // Agility is determined by Dex

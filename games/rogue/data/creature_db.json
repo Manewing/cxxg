@@ -7,7 +7,7 @@
                 "str": 2,
                 "dex": 6,
                 "int": 0,
-                "vit": 2
+                "vit": 3
             },
             "faction": "nature",
             "race": "creature"
@@ -19,7 +19,7 @@
                 "str": 2,
                 "dex": 6,
                 "int": 0,
-                "vit": 2
+                "vit": 3
             },
             "faction": "nature",
             "race": "creature"

@@ -64,7 +64,7 @@ std::string getItemTypeLabel(ItemType It) {
     Label << Pred << "Shield";
     Pred = ", ";
   }
-  if ((It & ItemType::Shield) != ItemType::None) {
+  if ((It & ItemType::Ranged) != ItemType::None) {
     Label << Pred << "Ranged";
     Pred = ", ";
   }
