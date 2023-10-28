@@ -128,11 +128,7 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "minor_health_effect"
-        },
-        {
-          "type": "use_on",
-          "effect": "minor_health_regen_effect"
+          "effect": "minor_quick_health_regen_effect"
         }
       ]
     },
@@ -144,7 +140,11 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "minor_quick_health_regen_effect"
+          "effect": "minor_health_effect"
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_health_regen_effect"
         }
       ]
     },
@@ -170,10 +170,6 @@
       "max_stack_size": 99,
       "types": ["consumable", "crafting"],
       "capabilities": [
-        {
-          "type": "use_on",
-          "effect": "damage_effect_10"
-        },
         {
           "type": "use_on",
           "effect": "minor_poison_effect"

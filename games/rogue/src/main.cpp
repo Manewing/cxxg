@@ -18,7 +18,8 @@ int main(int Argc, char *Argv[]) {
     Cfg.Seed = std::time(nullptr);
   }
 
-  std::cout << "\033[2J" << Cfg << "\033[2J";
+  // Dump the game configuration and clear the screen
+  std::cout << Cfg << "\033[2J";
 
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });

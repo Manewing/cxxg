@@ -27,11 +27,7 @@ struct AdditiveBuff {
 };
 
 struct TimedBuff {
-  enum class State {
-    Expired,
-    Waiting,
-    Active
-  };
+  enum class State { Expired, Waiting, Active };
 
   unsigned TicksLeft = 0;
   unsigned TickPeriod = 50;
@@ -45,26 +41,30 @@ struct TimedBuff {
   bool remove(const TimedBuff &) { return false; }
 };
 
-struct RegenerationBuff : public TimedBuff {
+struct DiminishingReturnsValueGenBuff : public TimedBuff {
 public:
-  void add(const RegenerationBuff &Other);
+  void add(const DiminishingReturnsValueGenBuff &Other);
 
   /// Returns total amount of regeneration left
   StatValue total() const;
 
-public:
-  StatValue RegenAmount = 0.5;
-};
+  virtual std::string getApplyDesc() const = 0;
 
-struct ReductionBuff : public TimedBuff {
-public:
-  void add(const ReductionBuff &Other);
+protected:
+  std::string getParamApplyDesc(std::string_view Prologue,
+                                std::string_view Epilogue,
+                                std::string_view ValuePointName) const;
+  std::string getParamDescription(std::string_view Prologue,
+                                  std::string_view Epilogue,
+                                  std::string_view ValuePointName) const;
 
-  /// Returns total amount of regeneration left
-  StatValue total() const;
-
 public:
-  StatValue ReduceAmount = 0.5;
+  /// Amount of regeneration/reduction per tick period
+  StatValue TickAmount = 0.5;
+
+  /// Real total amount of regeneration/reduction kept to avoid integer rounding
+  /// errors
+  StatValue RealDuration = 0.5;
 };
 
 struct StatsBuffComp : public AdditiveBuff, public BuffBase {
@@ -92,27 +92,35 @@ struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
 //      - Slow
 //      - Blinded
 
-struct PoisonDebuffComp : public ReductionBuff, public BuffBase {
+struct PoisonDebuffComp : public DiminishingReturnsValueGenBuff,
+                          public BuffBase {
 public:
   std::string_view getName() const override;
+  std::string getApplyDesc() const override;
   std::string getDescription() const override;
 };
 
-struct BleedingDebuffComp : public ReductionBuff, public BuffBase {
+struct BleedingDebuffComp : public DiminishingReturnsValueGenBuff,
+                            public BuffBase {
 public:
   std::string_view getName() const override;
+  std::string getApplyDesc() const override;
   std::string getDescription() const override;
 };
 
-struct HealthRegenBuffComp : public RegenerationBuff, public BuffBase {
+struct HealthRegenBuffComp : public DiminishingReturnsValueGenBuff,
+                             public BuffBase {
 public:
   std::string_view getName() const override;
+  std::string getApplyDesc() const override;
   std::string getDescription() const override;
 };
 
-struct ManaRegenBuffComp : public RegenerationBuff, public BuffBase {
+struct ManaRegenBuffComp : public DiminishingReturnsValueGenBuff,
+                           public BuffBase {
 public:
   std::string_view getName() const override;
+  std::string getApplyDesc() const override;
   std::string getDescription() const override;
 };
 

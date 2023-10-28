@@ -35,16 +35,18 @@ static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
 
 template <typename T>
 void parseReductionBuff(const rapidjson::Value &V, T &Buff) {
-  Buff.ReduceAmount = V["reduce_amount"].GetDouble();
+  Buff.TickAmount = V["reduce_amount"].GetDouble();
   Buff.TickPeriod = V["tick_period"].GetUint();
   Buff.TickPeriodsLeft = V["ticks"].GetUint();
+  Buff.RealDuration = Buff.TickPeriod * Buff.TickPeriodsLeft;
 }
 
 template <typename T>
 void parseRegenerationBuff(const rapidjson::Value &V, T &Buff) {
-  Buff.RegenAmount = V["regen_amount"].GetDouble();
+  Buff.TickAmount = V["regen_amount"].GetDouble();
   Buff.TickPeriod = V["tick_period"].GetUint();
   Buff.TickPeriodsLeft = V["ticks"].GetUint();
+  Buff.RealDuration = Buff.TickPeriod * Buff.TickPeriodsLeft;
 }
 
 static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,

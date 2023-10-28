@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <rogue/Components/Buffs.h>
 #include <sstream>
 #include <string_view>
@@ -31,38 +32,62 @@ unsigned TimedBuff::totalTicksLeft() const {
   return TicksLeft + TickPeriodsLeft * TickPeriod;
 }
 
-void RegenerationBuff::add(const RegenerationBuff &Other) {
+namespace {
+
+/// Computes diminishing returns when adding a value to a start value
+float computeDiminishingReturns(float StartValue, float AdditionalValue,
+                                float Coefficient) {
+  return std::max(StartValue, AdditionalValue) +
+         std::min(StartValue, AdditionalValue) /
+             (std::max(-std::min(.0f, StartValue - AdditionalValue),
+                       StartValue / AdditionalValue) +
+              Coefficient);
+}
+
+} // namespace
+
+void DiminishingReturnsValueGenBuff::add(
+    const DiminishingReturnsValueGenBuff &Other) {
   // Make apply immediate on next tick
   TicksLeft = 0;
 
-  const auto TotalPerTickOther = Other.total() / Other.totalTicksLeft();
-  RegenAmount += TotalPerTickOther * TickPeriod / RegenAmount;
+  // Compute diminishing returns for reduction amount per tick period
+  TickAmount = computeDiminishingReturns(TickAmount, Other.TickAmount,
+                                         /*Coefficient=*/40.0f);
 
-  TickPeriod = std::min(TickPeriod, Other.TickPeriod);
+  // Compute diminishing returns for total amount of reduction
+  RealDuration = computeDiminishingReturns(RealDuration, Other.RealDuration,
+                                           /*Coefficient=*/20.0f);
 
-  const auto TotalTicksLeftOther = Other.totalTicksLeft();
-  TickPeriodsLeft += TotalTicksLeftOther / TickPeriod;
+  // Compute new tick periods left, tick period is kept from existing buff
+  TickPeriodsLeft = RealDuration / TickPeriod;
 }
 
-StatValue RegenerationBuff::total() const {
-  return RegenAmount * TickPeriodsLeft;
+StatValue DiminishingReturnsValueGenBuff::total() const {
+  return TickAmount * TickPeriodsLeft;
 }
 
-void ReductionBuff::add(const ReductionBuff &Other) {
-  // Make apply immediate on next tick
-  TicksLeft = 0;
-
-  const auto TotalPerTickOther = Other.total() / Other.totalTicksLeft();
-  ReduceAmount += TotalPerTickOther * TickPeriod / ReduceAmount;
-
-  TickPeriod = std::min(TickPeriod, Other.TickPeriod);
-
-  const auto TotalTicksLeftOther = Other.totalTicksLeft();
-  TickPeriodsLeft += TotalTicksLeftOther / TickPeriod;
+std::string DiminishingReturnsValueGenBuff::getApplyDesc() const {
+  return getParamApplyDesc("Reduce ", "", "HP");
 }
 
-StatValue ReductionBuff::total() const {
-  return ReduceAmount * TickPeriodsLeft;
+std::string DiminishingReturnsValueGenBuff::getParamApplyDesc(
+    std::string_view Prologue, std::string_view Epilogue,
+    std::string_view ValuePointName) const {
+  std::stringstream SS;
+  SS << Prologue << std::setprecision(2) << TickAmount << " " << ValuePointName
+     << Epilogue;
+  return SS.str();
+}
+
+std::string DiminishingReturnsValueGenBuff::getParamDescription(
+    std::string_view Prologue, std::string_view Epilogue,
+    std::string_view ValuePointName) const {
+  std::stringstream SS;
+  SS << Prologue << std::setprecision(2) << TickAmount << " " << ValuePointName
+     << " every " << TickPeriod << " ticks, for " << totalTicksLeft()
+     << " ticks (" << total() << ValuePointName << ")" << Epilogue;
+  return SS.str();
 }
 
 std::string_view StatsBuffComp::getName() const { return "Stats buff"; }
@@ -101,44 +126,48 @@ void StatsTimedBuffComp::add(const StatsTimedBuffComp &Other) {
 
 std::string_view PoisonDebuffComp::getName() const { return "Poison debuff"; }
 
+std::string PoisonDebuffComp::getApplyDesc() const {
+  return getParamApplyDesc("Poison damage taken ", "", "HP");
+}
+
 std::string PoisonDebuffComp::getDescription() const {
-  std::stringstream SS;
-  SS << "Poison reduces health by " << ReduceAmount << " for " << TicksLeft
-     << " ticks";
-  return SS.str();
+  return getParamDescription("Poison reduces health by ", "", "HP");
 }
 
 std::string_view BleedingDebuffComp::getName() const {
   return "Bleeding debuff";
 }
 
+std::string BleedingDebuffComp::getApplyDesc() const {
+  return getParamApplyDesc("Bleed health by ", "", "HP");
+}
+
 std::string BleedingDebuffComp::getDescription() const {
-  std::stringstream SS;
-  SS << "Bleeding reduces health by " << ReduceAmount << " for " << TicksLeft
-     << " ticks";
-  return SS.str();
+  return getParamDescription("Bleeding reduces health by ", "", "HP");
 }
 
 std::string_view HealthRegenBuffComp::getName() const {
   return "Health regeneration buff";
 }
 
+std::string HealthRegenBuffComp::getApplyDesc() const {
+  return getParamApplyDesc("Health increased by ", "", "HP");
+}
+
 std::string HealthRegenBuffComp::getDescription() const {
-  std::stringstream SS;
-  SS << "Health regeneration increased by " << RegenAmount << " for "
-     << TicksLeft << " ticks";
-  return SS.str();
+  return getParamDescription("Health increased by ", "", "HP");
 }
 
 std::string_view ManaRegenBuffComp::getName() const {
   return "Mana regeneration buff";
 }
 
+std::string ManaRegenBuffComp::getApplyDesc() const {
+  return getParamApplyDesc("Mana increased by ", "", "MP");
+}
+
 std::string ManaRegenBuffComp::getDescription() const {
-  std::stringstream SS;
-  SS << "Mana regeneration increased by " << RegenAmount << " for " << TicksLeft
-     << " ticks";
-  return SS.str();
+  return getParamDescription("Mana increased by ", "", "MP");
 }
 
 std::string_view ArmorBuffComp::getName() const { return "Armor buff"; }
