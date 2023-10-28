@@ -7,7 +7,7 @@
 #include <sstream>
 
 static constexpr cxxg::types::Position DefaultPos = {2, 2};
-static constexpr cxxg::types::Size DefaultSize = {40, 6};
+static constexpr cxxg::types::Size DefaultSize = {40, 16};
 
 namespace rogue::ui {
 

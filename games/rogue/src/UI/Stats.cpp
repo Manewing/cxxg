@@ -1,6 +1,7 @@
 #include <cxxg/Screen.h>
+#include <iomanip>
 #include <memory>
-#include <rogue/Components/Buffs.h>
+#include <rogue/Components/Stats.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
@@ -9,7 +10,7 @@
 #include <rogue/UI/Tooltip.h>
 
 static constexpr cxxg::types::Position DefaultPos = {2, 2};
-static constexpr cxxg::types::Size DefaultSize = {26, 6};
+static constexpr cxxg::types::Size DefaultSize = {32, 12};
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {1, 1};
 
@@ -21,10 +22,18 @@ struct StatsInfo {
   const char *Desc = "<unimp. Stat>";
 };
 static constexpr std::array<StatsInfo, 4> StatsInfos = {{
-    {{0, -1}, "Str", "Strength", "<str>", "Strength of the char"},
-    {{0, 0}, "Dex", "Dexterity", "<dex>", "Dexterity of the char"},
-    {{12, -1}, "Int", "Intelligence", "<int>", "Intelligence of the char"},
-    {{12, 0}, "Vit", "Vitality", "<vit>", "Vitality of the char"},
+    {{0, 0}, "Str", "Strength", "<str>", "Strength of the char"},
+    {{0, 1}, "Dex", "Dexterity", "<dex>", "Dexterity of the char"},
+    {{(DefaultSize.X - 2) / 2, 0},
+     "Int",
+     "Intelligence",
+     "<int>",
+     "Intelligence of the char"},
+    {{(DefaultSize.X - 2) / 2, 1},
+     "Vit",
+     "Vitality",
+     "<vit>",
+     "Vitality of the char"},
 }};
 
 namespace rogue::ui {
@@ -38,7 +47,7 @@ StatsController::StatsController(Controller &Ctrl, StatsComp &Stats,
   // Str, Dex, Int, Vit
   for (const auto &SI : StatsInfos) {
     ItSel->addSelect<LabeledSelect>(SI.Short, SI.DefaultValue, Pos + SI.Offset,
-                                    10);
+                                    (DefaultSize.X - 6) / 2);
   }
 
   Comp = std::make_shared<Frame>(ItSel, Pos, DefaultSize, "Stats");
@@ -82,9 +91,29 @@ void StatsController::draw(cxxg::Screen &Scr) const {
 
   BaseRectDecorator::draw(Scr);
 
-  // Add armor info
-  if (const auto *ABC = Reg.try_get<ArmorBuffComp>(Entity)) {
-    Scr[Pos.Y + getSize().Y - 3][Pos.X + 2] << ABC->getDescription();
+  // Add health info
+  if (const auto *HC = Reg.try_get<HealthComp>(Entity)) {
+    Scr[Pos.Y + getSize().Y - 6][Pos.X + 2] << "HP: " << std::setprecision(2)
+                                            << HC->Value << "/" << HC->MaxValue;
+  } else {
+    Scr[Pos.Y + getSize().Y - 6][Pos.X + 2] << "HP: ---";
+  }
+
+  // Add mana info
+  if (const auto *MC = Reg.try_get<ManaComp>(Entity)) {
+    Scr[Pos.Y + getSize().Y - 5][Pos.X + 2] << "MP: " << std::setprecision(2)
+                                            << MC->Value << "/" << MC->MaxValue;
+  } else {
+    Scr[Pos.Y + getSize().Y - 5][Pos.X + 2] << "MP: ---";
+  }
+
+  // Add agility info
+  if (const auto *AC = Reg.try_get<AgilityComp>(Entity)) {
+    Scr[Pos.Y + getSize().Y - 4][Pos.X + 2]
+        << "Agility: " << std::setprecision(2) << AC->Agility
+        << ", AP: " << AC->AP;
+  } else {
+    Scr[Pos.Y + getSize().Y - 4][Pos.X + 2] << "MP: ---";
   }
 
   // FIXME points to spend
