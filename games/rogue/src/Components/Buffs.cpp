@@ -175,12 +175,12 @@ std::string_view ArmorBuffComp::getName() const { return "Armor buff"; }
 std::string ArmorBuffComp::getDescription() const {
   std::stringstream SS;
   const char *Pred = "";
-  if (BaseArmor > 0) {
-    SS << Pred << "+ " << BaseArmor << " Armor";
+  if (PhysArmor > 0) {
+    SS << Pred << PhysArmor << " armor";
     Pred = ", ";
   }
   if (MagicArmor > 0) {
-    SS << Pred << "+ " << MagicArmor << " Magic Armor";
+    SS << Pred << MagicArmor << " magic Armor";
     Pred = ", ";
   }
   auto Str = SS.str();
@@ -192,28 +192,60 @@ std::string ArmorBuffComp::getDescription() const {
 
 void ArmorBuffComp::add(const ArmorBuffComp &Other) {
   AdditiveBuff::add(Other);
-  BaseArmor += Other.BaseArmor;
+  PhysArmor += Other.PhysArmor;
   MagicArmor += Other.MagicArmor;
 }
 
 bool ArmorBuffComp::remove(const ArmorBuffComp &Other) {
-  BaseArmor -= Other.BaseArmor;
+  PhysArmor -= Other.PhysArmor;
   MagicArmor -= Other.MagicArmor;
   return AdditiveBuff::remove(Other);
 }
 
-StatValue ArmorBuffComp::getEffectiveArmor(StatPoints DstStats) const {
+StatValue ArmorBuffComp::getPhysEffectiveArmor(StatPoints DstStats) const {
   auto Vit = StatValue(DstStats.Vit);
-  return BaseArmor * (1000.0 + Vit * 5) / 1000.0;
+  return PhysArmor * (1000.0 + Vit * 5) / 1000.0;
 }
 
-StatValue ArmorBuffComp::getEffectiveDamage(StatValue Damage,
-                                            StatsComp *DstSC) const {
-  auto Armor = BaseArmor;
+StatValue ArmorBuffComp::getMagicEffectiveArmor(StatPoints DstStats) const {
+  auto Int = StatValue(DstStats.Int);
+  return MagicArmor * (1000.0 + Int * 5) / 1000.0;
+}
+
+StatValue ArmorBuffComp::getPhysEffectiveDamage(StatValue Damage,
+                                                StatsComp *DstSC) const {
+  auto Armor = PhysArmor;
   if (DstSC) {
-    Armor = getEffectiveArmor(DstSC->effective());
+    Armor = getPhysEffectiveArmor(DstSC->effective());
   }
   return Damage * 100.0 / (100.0 + Armor * 0.5);
+}
+
+StatValue ArmorBuffComp::getMagicEffectiveDamage(StatValue Damage,
+                                                 StatsComp *DstSC) const {
+  auto Armor = MagicArmor;
+  if (DstSC) {
+    Armor = getMagicEffectiveArmor(DstSC->effective());
+  }
+  return Damage * 100.0 / (100.0 + Armor * 0.5);
+}
+
+std::string_view BlockBuffComp::getName() const { return "Chance to block"; }
+
+std::string BlockBuffComp::getDescription() const {
+  std::stringstream SS;
+  SS << "Chance to block " << BlockChance << "%";
+  return SS.str();
+}
+
+void BlockBuffComp::add(const BlockBuffComp &Other) {
+  AdditiveBuff::add(Other);
+  BlockChance += Other.BlockChance;
+}
+
+bool BlockBuffComp::remove(const BlockBuffComp &Other) {
+  BlockChance -= Other.BlockChance;
+  return AdditiveBuff::remove(Other);
 }
 
 std::string_view StatsBuffPerHitComp::getName() const {

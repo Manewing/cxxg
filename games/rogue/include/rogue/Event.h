@@ -3,6 +3,7 @@
 
 #include <entt/entt.hpp>
 #include <sstream>
+#include <optional>
 
 namespace rogue {
 struct BuffBase;
@@ -34,7 +35,10 @@ struct EntityAttackEvent : public BaseEvent {
   entt::entity Attacker = entt::null;
   entt::entity Target = entt::null;
   entt::registry *Registry = nullptr;
-  unsigned Damage = 0;
+
+  /// Damage that was dealt to target, nullopt for blocks
+  std::optional<unsigned> Damage = std::nullopt;
+
   bool isPlayerAffected() const;
 };
 

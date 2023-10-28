@@ -60,11 +60,18 @@ void EventHistoryWriter::onEntityAttackEvent(const EntityAttackEvent &EAE) {
   if (!AttackerNC || !TargetNC) {
     return;
   }
-  Hist.info() << cxxg::types::RgbColor{140, 130, 72} << AttackerNC->Name
-              << cxxg::types::Color::NONE << " dealt "
-              << cxxg::types::Color::RED << EAE.Damage << " damage"
-              << cxxg::types::Color::NONE << " to "
-              << cxxg::types::RgbColor{140, 130, 72} << TargetNC->Name
+  if (EAE.Damage) {
+    Hist.info() << cxxg::types::RgbColor{140, 130, 72} << AttackerNC->Name
+                << cxxg::types::Color::NONE << " dealt "
+                << cxxg::types::Color::RED << *EAE.Damage << " damage"
+                << cxxg::types::Color::NONE << " to "
+                << cxxg::types::RgbColor{140, 130, 72} << TargetNC->Name
+                << cxxg::types::Color::NONE;
+    return;
+  }
+  Hist.info() << cxxg::types::RgbColor{140, 130, 72} << TargetNC->Name
+              << cxxg::types::Color::NONE << " blocked attack of "
+              << cxxg::types::RgbColor{140, 130, 72} << AttackerNC->Name
               << cxxg::types::Color::NONE;
 }
 

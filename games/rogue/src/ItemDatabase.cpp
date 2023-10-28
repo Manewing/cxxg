@@ -96,9 +96,15 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
           {"armor_buff_comp",
            [](const auto &, const auto &V) {
              ArmorBuffComp Armor;
-             Armor.BaseArmor = V["base_armor"].GetDouble();
+             Armor.PhysArmor = V["phys_armor"].GetDouble();
              Armor.MagicArmor = V["magic_armor"].GetDouble();
-             return makeApplyBuffItemEffect<ArmorBuffComp>(Armor);
+             return makeApplyBuffItemEffect<ArmorBuffComp, HealthComp>(Armor);
+           }},
+          {"block_comp",
+           [](const auto &, const auto &V) {
+             BlockBuffComp BC;
+             BC.BlockChance = V["block_chance"].GetDouble();
+             return makeApplyBuffItemEffect<BlockBuffComp, HealthComp>(BC);
            }},
           {"melee_attack_comp",
            [](const auto &, const auto &V) {

@@ -125,8 +125,8 @@ public:
 };
 
 struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
-  StatValue BaseArmor = 0;
-  StatValue MagicArmor = 0; // FIXME not yet used
+  StatValue PhysArmor = 0;
+  StatValue MagicArmor = 0;
 
   std::string_view getName() const override;
   std::string getDescription() const override;
@@ -135,10 +135,27 @@ struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
   bool remove(const ArmorBuffComp &Other);
 
   // Vitality increases armor by 0.5% per point
-  StatValue getEffectiveArmor(StatPoints DstStats) const;
+  StatValue getPhysEffectiveArmor(StatPoints DstStats) const;
+
+  // Intelligence increases magic armor by 0.5% per point
+  StatValue getMagicEffectiveArmor(StatPoints DstStats) const;
 
   // Armor reduces damage by 1/x where x is armor * 0.5
-  StatValue getEffectiveDamage(StatValue Damage, StatsComp *DstSC) const;
+  StatValue getPhysEffectiveDamage(StatValue Damage, StatsComp *DstSC) const;
+
+  // Magic armor reduces damage by 1/x where x is armor * 0.5
+  StatValue getMagicEffectiveDamage(StatValue Damage, StatsComp *DstSC) const;
+};
+
+struct BlockBuffComp : public AdditiveBuff, public BuffBase {
+  /// Block chance in percent
+  StatValue BlockChance = 5.0;
+
+  std::string_view getName() const override;
+  std::string getDescription() const override;
+
+  void add(const BlockBuffComp &Other);
+  bool remove(const BlockBuffComp &Other);
 };
 
 /// Applies a time based stats buff every time the entity hits sth, only one can
@@ -167,7 +184,7 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
 using BuffTypeList =
     ComponentList<StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
                   BleedingDebuffComp, HealthRegenBuffComp, ManaRegenBuffComp,
-                  ArmorBuffComp, StatsBuffPerHitComp>;
+                  ArmorBuffComp, BlockBuffComp, StatsBuffPerHitComp>;
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);

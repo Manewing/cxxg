@@ -63,13 +63,22 @@
     },
     "armor_5": {
       "type": "armor_buff_comp",
-      "base_armor": 5,
+      "phys_armor": 5,
       "magic_armor": 0
     },
     "armor_10": {
       "type": "armor_buff_comp",
-      "base_armor": 10,
+      "phys_armor": 10,
       "magic_armor": 0
+    },
+    "magic_armor_10": {
+      "type": "armor_buff_comp",
+      "phys_armor": 0,
+      "magic_armor": 10
+    },
+    "block_10": {
+      "type": "block_comp",
+      "block_chance": 10
     },
     "melee_2": {
       "type": "melee_attack_comp",
@@ -322,6 +331,14 @@
       "types": ["shield"],
       "capabilities": [
         {
+          "type": "equipment",
+          "effect": "armor_5"
+        },
+        {
+          "type": "equipment",
+          "effect": "block_10"
+        },
+        {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
         }
@@ -418,6 +435,28 @@
         {
           "type": "equipment",
           "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Iron Ring",
+      "description": "A ring made of iron",
+      "max_stack_size": 1,
+      "types": ["ring"],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "magic_armor_10"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
         }
       ]
     },

@@ -1,3 +1,4 @@
+#include <random>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Stats.h>
@@ -11,12 +12,24 @@ namespace rogue {
 
 namespace {
 
-unsigned applyDamage(entt::registry &Reg, const entt::entity Target,
-                     HealthComp &THealth, const DamageComp &DC) {
+// FIXME move this, also should this be based on the level seed?
+static std::random_device RandomEngine;
+
+std::optional<unsigned> applyDamage(entt::registry &Reg,
+                                    const entt::entity Target,
+                                    HealthComp &THealth, const DamageComp &DC) {
+  if (auto *BC = Reg.try_get<BlockBuffComp>(Target)) {
+    std::uniform_real_distribution<StatValue> Chance(0, 100.0);
+    if (Chance(RandomEngine) <= BC->BlockChance) {
+      return std::nullopt;
+    }
+  }
+
   DamageComp NewDC = DC;
   if (auto *ABC = Reg.try_get<ArmorBuffComp>(Target)) {
-    NewDC.PhysDamage = ABC->getEffectiveDamage(NewDC.PhysDamage,
-                                               Reg.try_get<StatsComp>(Target));
+    auto *SC = Reg.try_get<StatsComp>(Target);
+    NewDC.PhysDamage = ABC->getPhysEffectiveDamage(NewDC.PhysDamage, SC);
+    NewDC.PhysDamage = ABC->getMagicEffectiveDamage(NewDC.PhysDamage, SC);
   }
   THealth.reduce(NewDC.PhysDamage);
   THealth.reduce(NewDC.MagicDamage);
@@ -56,10 +69,11 @@ bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
     DC.PhysDamage = MA.getPhysEffectiveDamage();
     DC.MagicDamage = MA.getMagicEffectiveDamage();
   }
-  unsigned TotalDamage = applyDamage(Reg, Target, *THealth, DC);
+  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC);
 
   // Check for on hit buffs and apply stacks
-  if (auto *SBPH = Reg.try_get<StatsBuffPerHitComp>(Attacker)) {
+  if (auto *SBPH = Reg.try_get<StatsBuffPerHitComp>(Attacker);
+      TotalDamage && SBPH) {
     SBPH->addStack();
   }
 
@@ -171,7 +185,6 @@ void CombatSystem::update(UpdateType Type) {
       [this](const auto &DmgEt, auto &DC, auto &PC) {
         applyDamage(Reg, DmgEt, DC, PC, *this);
       });
-
 }
 
 } // namespace rogue
