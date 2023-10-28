@@ -15,7 +15,8 @@ ItemType getItemType(const std::string &Type) {
       {"pants", ItemType::Pants},
       {"boots", ItemType::Boots},
       {"weapon", ItemType::Weapon},
-      {"off_hand", ItemType::OffHand},
+      {"shield", ItemType::Shield},
+      {"ranged", ItemType::Ranged},
       {"generic", ItemType::Generic},
       {"consumable", ItemType::Consumable},
       {"quest", ItemType::Quest},
@@ -59,8 +60,12 @@ std::string getItemTypeLabel(ItemType It) {
     Label << Pred << "Weapon";
     Pred = ", ";
   }
-  if ((It & ItemType::OffHand) != ItemType::None) {
-    Label << Pred << "Off Hand";
+  if ((It & ItemType::Shield) != ItemType::None) {
+    Label << Pred << "Shield";
+    Pred = ", ";
+  }
+  if ((It & ItemType::Shield) != ItemType::None) {
+    Label << Pred << "Ranged";
     Pred = ", ";
   }
   if ((It & ItemType::Generic) != ItemType::None) {

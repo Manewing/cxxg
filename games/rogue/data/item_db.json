@@ -222,6 +222,42 @@
       ]
     },
     {
+      "name": "Fire Wand",
+      "description": "A wand casting fire balls",
+      "max_stack_size": 1,
+      "types": ["ranged"],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Wooden Shield",
+      "description": "A shield of wood",
+      "max_stack_size": 1,
+      "types": ["shield"],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
       "name": "Leather Tunic",
       "description": "A worn down leather tunic",
       "max_stack_size": 1,
@@ -511,6 +547,20 @@
           "min_count": 1,
           "max_count": 1,
           "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Wooden Shield",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Fire Wand",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
         }
       ]
     },
@@ -721,7 +771,7 @@
         {
           "type": "null",
           "weight": 70
-         }
+        }
       ]
     },
     "common_rat": {
@@ -737,7 +787,7 @@
         {
           "type": "null",
           "weight": 70
-         }
+        }
       ]
     }
   }

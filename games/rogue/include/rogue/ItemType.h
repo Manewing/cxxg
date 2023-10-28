@@ -18,15 +18,16 @@ enum class ItemType {
   Pants = 0x10,
   Boots = 0x20,
   Weapon = 0x40,
-  OffHand = 0x80,
-  EquipmentMask = 0xff,
+  Shield = 0x80,
+  Ranged = 0x100,
+  EquipmentMask = 0xfff,
 
   // general item types
-  Generic = 0x100,
-  Consumable = 0x200,
-  Quest = 0x400,
-  Crafting = 0x800,
-  GeneralMask = 0xf00,
+  Generic = 0x1000,
+  Consumable = 0x2000,
+  Quest = 0x4000,
+  Crafting = 0x8000,
+  GeneralMask = 0xf000,
 
   // mask for all items
   AnyMask = 0xfffffff

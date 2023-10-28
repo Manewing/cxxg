@@ -27,7 +27,7 @@ public:
   EquipmentSlot Pants = {ItemType::Pants};
   EquipmentSlot Boots = {ItemType::Boots};
   EquipmentSlot Weapon = {ItemType::Weapon};
-  EquipmentSlot OffHand = {ItemType::OffHand};
+  EquipmentSlot OffHand = {ItemType::Shield | ItemType::Ranged};
 
   Equipment() = default;
 

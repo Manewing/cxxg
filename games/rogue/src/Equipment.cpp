@@ -41,7 +41,9 @@ const EquipmentSlot &Equipment::getSlot(ItemType It) const {
     return Boots;
   case ItemType::Weapon:
     return Weapon;
-  case ItemType::OffHand:
+  case ItemType::Ranged:
+    return OffHand;
+  case ItemType::Shield:
     return OffHand;
   default:
     break;
