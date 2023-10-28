@@ -151,7 +151,9 @@ procedurallyGenerateLevel(unsigned Seed, int LevelId,
     Map.forEach([&RenderedLevelMap](auto Pos, auto &Tile) {
       Tile = RenderedLevelMap.getTile(Pos).T;
     });
-    std::cout << Map << std::endl;
+    std::cerr << "std::exception: " << E.what() << std::endl
+              << "Seed was: " << Seed << std::endl
+              << Map << "\033[2J" << std::endl;
     throw E;
   }
 
@@ -191,7 +193,15 @@ std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed, int LevelId,
 
   std::shared_ptr<Level> NewLevel;
   if (auto *GenMapCfg = std::get_if<LevelConfig::GeneratedMap>(&Cfg.Map)) {
-    NewLevel = procedurallyGenerateLevel(Seed, LevelId, *GenMapCfg);
+    while (!NewLevel) {
+      try {
+        NewLevel = procedurallyGenerateLevel(Seed, LevelId, *GenMapCfg);
+        break;
+        // FIXME avoid hard crash for now by cyclic seeds
+      } catch (const std::exception &E) {
+        Seed += 1;
+      }
+    }
   } else {
     auto &DesMapCfg = std::get<LevelConfig::DesignedMap>(Cfg.Map);
     NewLevel = loadDesignedLevel(DesMapCfg, LevelId);
