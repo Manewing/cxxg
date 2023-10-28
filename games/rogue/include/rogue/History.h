@@ -39,20 +39,28 @@ private:
 
 class History {
   friend class HistoryMessageAssembler;
+public:
+  struct Message {
+    // FIXME refactor to decouple from cxxg
+    cxxg::Row Row;
+
+    /// Number of times this message has been repeated
+    unsigned Count = 1;
+  };
 
 public:
   explicit History(Game &G);
   HistoryMessageAssembler info();
   HistoryMessageAssembler warn();
 
-  const std::vector<cxxg::Row> &getMessages() const { return Messages; }
+  const std::vector<Message> &getMessages() const { return Messages; }
 
 private:
   void addMessage(const cxxg::Row &Msg);
 
 private:
   Game &G;
-  std::vector<cxxg::Row> Messages;
+  std::vector<Message> Messages;
 };
 
 class EventHistoryWriter : public EventHubConnector {

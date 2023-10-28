@@ -29,7 +29,13 @@ HistoryMessageAssembler History::warn() {
   return HistoryMessageAssembler(*this, G.notify());
 }
 
-void History::addMessage(const cxxg::Row &Msg) { Messages.push_back(Msg); }
+void History::addMessage(const cxxg::Row &Msg) {
+  if (Messages.size() > 0 && Messages.back().Row == Msg) {
+    Messages.back().Count++;
+    return;
+  }
+  Messages.push_back(Message{Msg});
+}
 
 EventHistoryWriter::EventHistoryWriter(History &Hist, bool Debug)
     : Hist(Hist), Debug(Debug) {}

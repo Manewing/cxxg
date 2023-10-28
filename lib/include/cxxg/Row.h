@@ -149,6 +149,11 @@ private:
   ::std::vector<types::TermColor> ColorInfo;
 };
 
+inline bool operator==(Row const &Lhs, Row const &Rhs) {
+  return Lhs.getBuffer() == Rhs.getBuffer() &&
+         Lhs.getColorInfo() == Rhs.getColorInfo();
+}
+
 } // namespace cxxg
 
 /// Outstream operator of Row for convenience

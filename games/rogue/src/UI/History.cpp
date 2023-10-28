@@ -71,7 +71,12 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
       continue;
     }
 
-    Scr[LinePos][Pos.X] << Msgs.at(MsgPos);
+    const auto &Msg = Msgs.at(MsgPos);
+    if (Msg.Count > 1) {
+      Scr[LinePos][Pos.X] << Msg.Count << "x " << Msgs.at(MsgPos).Row;
+    } else {
+      Scr[LinePos][Pos.X] << Msgs.at(MsgPos).Row;
+    }
   }
 
   // Draw footer
