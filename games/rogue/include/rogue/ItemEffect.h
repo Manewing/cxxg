@@ -79,6 +79,58 @@ private:
   std::vector<DismantleResult> Results;
 };
 
+template <typename CompType, typename... RequiredComps>
+class SetComponentEffect : public ItemEffect {
+public:
+  static const CompType *getOrNull(const ItemEffect &It) {
+    if (auto *SCE = dynamic_cast<const SetComponentEffect<CompType> *>(&It)) {
+      return &SCE->Comp;
+    }
+    return nullptr;
+  }
+
+public:
+  explicit SetComponentEffect(const CompType &Comp) : Comp(Comp) {}
+
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
+    if constexpr (sizeof...(RequiredComps) == 0) {
+      return true;
+    } else {
+      return Reg.all_of<RequiredComps...>(Et);
+    }
+  }
+
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
+    auto *Existing = Reg.try_get<CompType>(Et);
+    if (Existing) {
+      *Existing = Comp;
+    } else {
+      Reg.emplace<CompType>(Et, Comp);
+    }
+  }
+
+  bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) const final {
+    if constexpr (sizeof...(RequiredComps) == 0) {
+      return true;
+    } else {
+      return Reg.all_of<RequiredComps...>(Et);
+    }
+  }
+
+  void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {
+    Reg.remove<CompType>(Et);
+  }
+
+private:
+  CompType Comp;
+};
+
+template <typename CompType, typename... RequiredComps>
+static std::shared_ptr<SetComponentEffect<CompType, RequiredComps...>>
+makeSetComponentEffect(const CompType &Comp) {
+  return std::make_shared<SetComponentEffect<CompType, RequiredComps...>>(Comp);
+}
+
 class ApplyBuffItemEffectBase : public ItemEffect {
 public:
   virtual const BuffBase &getBuff() const = 0;

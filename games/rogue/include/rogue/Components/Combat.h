@@ -8,36 +8,49 @@
 namespace rogue {
 
 struct CombatComp {
+  /// If set, indicates an attack twoards the given entity
   entt::entity Target = entt::null;
+
+  /// If set, indicates a ranged attack towards the given position
+  std::optional<ymir::Point2d<int>> RangedPos = std::nullopt;
+};
+
+struct RangedAttackComp {
+  StatValue PhysDamage = 10;
+  StatValue MagicDamage = 0;
+  StatValue APCost = 15;
+
+  /// Dexterity increases melee damage by 1 and by 1% per point
+  StatValue getPhysEffectiveDamage(const StatPoints *SP = nullptr) const;
+
+  /// Intelligence increases magic damage by 1 and by 1% per point
+  StatValue getMagicEffectiveDamage(const StatPoints *SP = nullptr) const;
 };
 
 struct MeleeAttackComp {
-  StatValue Damage = 10;
+  StatValue PhysDamage = 10;
+  StatValue MagicDamage = 0;
   StatValue APCost = 10;
 
   /// Strength increases melee damage by 1 and by 1% per point
-  StatValue getEffectiveDamage(StatPoints SrcStats) const {
-    auto Str = StatValue(SrcStats.Str);
-    return (Damage + Str) * (100.0 + Str) / 100.0;
-  }
+  StatValue getPhysEffectiveDamage(const StatPoints *SP = nullptr) const;
 
-  StatValue getEffectiveDamage(StatsComp *SrcSC) const {
-    if (!SrcSC) {
-      return Damage;
-    }
-    return getEffectiveDamage(SrcSC->effective());
-  }
+  /// Intelligence increases magic damage by 1 and by 1% per point
+  StatValue getMagicEffectiveDamage(const StatPoints *SP = nullptr) const;
 };
 
 struct DamageComp {
   entt::entity Source = entt::null;
-  StatValue Damage = 100;
+  StatValue PhysDamage = 10;
+  StatValue MagicDamage = 0;
   int Hits = 1;
+
+  StatValue total() const { return PhysDamage + MagicDamage; }
 };
 
-void createProjectile(entt::registry &Reg, entt::entity Source,
-                      StatValue Damage, int Hits, ymir::Dir2d MoveDir,
-                      ymir::Point2d<int> Pos, StatValue Agility = 100);
+void createProjectile(entt::registry &Reg, const DamageComp &DC,
+                      ymir::Point2d<int> Pos, ymir::Point2d<int> TargetPos,
+                      StatValue Agility = 100);
 
 } // namespace rogue
 

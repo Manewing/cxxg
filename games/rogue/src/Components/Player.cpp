@@ -16,13 +16,13 @@ namespace {
 using PlayerCompList =
     ComponentList<TileComp, FactionComp, PlayerComp, PositionComp, StatsComp,
                   HealthComp, NameComp, LineOfSightComp, AgilityComp,
-                  MeleeAttackComp, InventoryComp, EquipmentComp, CollisionComp>;
+                  InventoryComp, EquipmentComp, CollisionComp>;
+using PlayerCompListOpt = ComponentList<MeleeAttackComp, RangedAttackComp>;
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
                           const PositionComp &PosComp, const StatsComp &Stats,
                           const HealthComp &HC, const NameComp &NC,
                           const LineOfSightComp LOSC, const AgilityComp &AC,
-                          const MeleeAttackComp &MC,
                           const InventoryComp &InvComp,
                           const EquipmentComp &EquipComp) {
   static constexpr Tile PlayerTile{{'@', cxxg::types::RgbColor{255, 255, 50}}};
@@ -41,7 +41,6 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   Reg.emplace<NameComp>(Entity, NC);
   Reg.emplace<LineOfSightComp>(Entity, LOSC);
   Reg.emplace<AgilityComp>(Entity, AC);
-  Reg.emplace<MeleeAttackComp>(Entity, MC);
   Reg.emplace<InventoryComp>(Entity, InvComp);
   Reg.emplace<EquipmentComp>(Entity, EquipComp);
   Reg.emplace<CollisionComp>(Entity);
@@ -59,8 +58,7 @@ entt::entity PlayerComp::createPlayer(entt::registry &Reg,
   return ::rogue::createPlayer(
       Reg, PlayerComp{}, PositionComp{Pos},
       StatsComp{StatPoints{1, 1, 4, 2}, {}}, HealthComp{}, NameComp{Name},
-      LineOfSightComp{18}, AgilityComp{}, MeleeAttackComp{}, InventoryComp{},
-      EquipmentComp{});
+      LineOfSightComp{18}, AgilityComp{}, InventoryComp{}, EquipmentComp{});
 }
 
 entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
@@ -74,6 +72,7 @@ entt::entity PlayerComp::copyPlayer(entt::registry &RegFrom,
     (void)Found;
     PlayerEntity = RegTo.create();
     copyComponentsOrFail<PlayerCompList>(Entity, RegFrom, PlayerEntity, RegTo);
+    copyComponents<PlayerCompListOpt>(Entity, RegFrom, PlayerEntity, RegTo);
     copyBuffs(Entity, RegFrom, PlayerEntity, RegTo);
   }
   return PlayerEntity;

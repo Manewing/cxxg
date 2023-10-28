@@ -148,6 +148,7 @@ void Game::switchLevel(int Level, bool ToEntry) {
 }
 
 bool Game::handleInput(int Char) {
+  movePlayer(ymir::Dir2d::NONE);
 
   // Override keys
   switch (Char) {
@@ -218,7 +219,7 @@ bool Game::handleInput(int Char) {
   // Handle UI input
   if (UICtrl.isUIActive()) {
     UICtrl.handleInput(Char);
-    handleUpdates(/*IsTick=*/false);
+    handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
     return true;
   }
 
@@ -242,7 +243,7 @@ bool Game::handleInput(int Char) {
     movePlayer(ymir::Dir2d::UP);
     break;
   case cxxg::utils::KEY_SPACE:
-    movePlayer(ymir::Dir2d::NONE);
+    // Wait a turn
     break;
   case 'e':
     tryInteract();

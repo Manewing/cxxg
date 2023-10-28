@@ -1,5 +1,6 @@
 #include <memory>
 #include <rogue/Components/Buffs.h>
+#include <rogue/Components/Combat.h>
 #include <rogue/ItemEffect.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
@@ -27,17 +28,33 @@ namespace {
 
 std::string getEffectDescription(const EffectInfo &EffInfo) {
   std::stringstream SS;
-  if (const auto *HIE = dynamic_cast<HealItemEffect *>(EffInfo.Effect.get())) {
+
+  const auto *Eff = EffInfo.Effect.get();
+  if (const auto *HIE = dynamic_cast<const HealItemEffect *>(Eff)) {
     SS << "Heals " << HIE->getAmount() << " HP\n";
   }
-  if (const auto *DIE =
-          dynamic_cast<DamageItemEffect *>(EffInfo.Effect.get())) {
+  if (const auto *DIE = dynamic_cast<const DamageItemEffect *>(Eff)) {
     SS << "Deals " << DIE->getAmount() << " damage\n";
   }
-  if (const auto *ABIE =
-          dynamic_cast<ApplyBuffItemEffectBase *>(EffInfo.Effect.get())) {
+  if (const auto *ABIE = dynamic_cast<const ApplyBuffItemEffectBase *>(Eff)) {
     (void)ABIE;
     SS << ABIE->getBuff().getDescription() << "\n";
+  }
+  if (const auto *MA = SetComponentEffect<MeleeAttackComp>::getOrNull(*Eff)) {
+    if (MA->PhysDamage > 0) {
+      SS << MA->PhysDamage << " melee phys. dmg.\n";
+    }
+    if (MA->MagicDamage > 0) {
+      SS << MA->MagicDamage << " melee magic dmg.\n";
+    }
+  }
+  if (const auto *RA = SetComponentEffect<RangedAttackComp>::getOrNull(*Eff)) {
+    if (RA->PhysDamage > 0) {
+      SS << RA->PhysDamage << " ranged phys. dmg.\n";
+    }
+    if (RA->MagicDamage > 0) {
+      SS << RA->MagicDamage << " ranged magic dmg.\n";
+    }
   }
   return SS.str();
 }

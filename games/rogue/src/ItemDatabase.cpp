@@ -1,6 +1,7 @@
 #include <fstream>
 #include <ranges>
 #include <rogue/Components/Buffs.h>
+#include <rogue/Components/Combat.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 #include <rogue/ItemPrototype.h>
@@ -98,6 +99,22 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              Armor.BaseArmor = V["base_armor"].GetDouble();
              Armor.MagicArmor = V["magic_armor"].GetDouble();
              return makeApplyBuffItemEffect<ArmorBuffComp>(Armor);
+           }},
+          {"melee_attack_comp",
+           [](const auto &, const auto &V) {
+             MeleeAttackComp MAC;
+             MAC.PhysDamage = V["phys_damage"].GetDouble();
+             MAC.MagicDamage = V["magic_damage"].GetDouble();
+             MAC.APCost = V["ap_cost"].GetUint();
+             return makeSetComponentEffect<MeleeAttackComp>(MAC);
+           }},
+          {"ranged_attack_comp",
+           [](const auto &, const auto &V) {
+             RangedAttackComp RAC;
+             RAC.PhysDamage = V["phys_damage"].GetDouble();
+             RAC.MagicDamage = V["magic_damage"].GetDouble();
+             RAC.APCost = V["ap_cost"].GetUint();
+             return makeSetComponentEffect<RangedAttackComp>(RAC);
            }},
           {"stats_buff_per_hit_comp",
            [](const auto &, const auto &V) {

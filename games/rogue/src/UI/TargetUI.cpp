@@ -133,10 +133,7 @@ bool TargetUI::handleInput(int Char) {
     }
     break;
   case ' ': {
-    auto Diff = TargetPos - StartPos;
-    auto MoveDir = ymir::Dir2d::fromVector(Diff);
-    auto PPos = StartPos + MoveDir;
-    createProjectile(Lvl.Reg, SrcEt, 100, 1, MoveDir, PPos, 100);
+    Lvl.Reg.emplace<CombatComp>(SrcEt, CombatComp{.RangedPos = TargetPos});
     destroyCursor();
     return false;
   }

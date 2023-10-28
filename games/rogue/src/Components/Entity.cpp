@@ -25,7 +25,6 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<NameComp>(Entity, Name);
   Reg.emplace<LineOfSightComp>(Entity);
   Reg.emplace<AttackAIComp>(Entity);
-  Reg.emplace<MeleeAttackComp>(Entity, 1.0);
   Reg.emplace<FactionComp>(Entity, Faction);
   Reg.emplace<RaceComp>(Entity, Race);
   Reg.emplace<AgilityComp>(Entity);
@@ -60,7 +59,6 @@ void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<NameComp>(Entity, Name);
   Reg.emplace<LineOfSightComp>(Entity);
   Reg.emplace<AttackAIComp>(Entity);
-  Reg.emplace<MeleeAttackComp>(Entity, 1.0);
   Reg.emplace<FactionComp>(Entity, FactionKind::Nature);
   Reg.emplace<AgilityComp>(Entity);
   Reg.emplace<CollisionComp>(Entity);

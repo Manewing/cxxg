@@ -71,6 +71,48 @@
       "base_armor": 10,
       "magic_armor": 0
     },
+    "melee_2": {
+      "type": "melee_attack_comp",
+      "phys_damage": 2,
+      "magic_damage": 0,
+      "ap_cost": 10
+    },
+    "melee_5": {
+      "type": "melee_attack_comp",
+      "phys_damage": 5,
+      "magic_damage": 0,
+      "ap_cost": 10
+    },
+    "melee_10": {
+      "type": "melee_attack_comp",
+      "phys_damage": 10,
+      "magic_damage": 0,
+      "ap_cost": 10
+    },
+    "ranged_2": {
+      "type": "ranged_attack_comp",
+      "phys_damage": 2,
+      "magic_damage": 0,
+      "ap_cost": 20
+    },
+    "ranged_5": {
+      "type": "ranged_attack_comp",
+      "phys_damage": 5,
+      "magic_damage": 0,
+      "ap_cost": 20
+    },
+    "ranged_10": {
+      "type": "ranged_attack_comp",
+      "phys_damage": 10,
+      "magic_damage": 0,
+      "ap_cost": 20
+    },
+    "ranged_magic_2": {
+      "type": "ranged_attack_comp",
+      "phys_damage": 0,
+      "magic_damage": 2,
+      "ap_cost": 20
+    },
     "dismantle_iron_equip": {
       "type": "dismantle",
       "items": [
@@ -200,6 +242,10 @@
         {
           "type": "equipment",
           "effect": "stats_buff_effect_str_1"
+        },
+        {
+          "type": "equipment",
+          "effect": "melee_2"
         }
       ]
     },
@@ -212,6 +258,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "melee_5"
         }
       ],
       "specializations": [
@@ -230,6 +280,32 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "ranged_magic_2"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Wooden Bow",
+      "description": "A wooden bow",
+      "max_stack_size": 1,
+      "types": ["ranged"],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "ranged_2"
         }
       ],
       "specializations": [
@@ -354,6 +430,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "melee_10"
         }
       ],
       "specializations": [
@@ -464,6 +544,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_rare_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "melee_5"
         }
       ],
       "specializations": [
@@ -551,6 +635,13 @@
         {
           "type": "item",
           "name": "Wooden Shield",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Wooden Bow",
           "min_count": 1,
           "max_count": 1,
           "weight": 5

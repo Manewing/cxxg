@@ -16,23 +16,22 @@ namespace rogue {
 void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
                           entt::entity PlayerEt, PlayerComp &PC,
                           PositionComp &PosComp, AgilityComp &AG) {
-  if (PC.MoveDir == ymir::Dir2d::NONE) {
-    return;
-  }
-  PC.CurrentInteraction = std::nullopt;
-
-  auto NewPos = PosComp.Pos + PC.MoveDir;
-  const auto MoveDir = PC.MoveDir;
-
   // FIXME this does not count in combat
   // -> check instead of an action was successfully performed
-  PC.IsReady = AG.hasEnoughAP(MovementComp::MoveAPCost);
+  PC.IsReady = AG.hasEnoughAP(MovementComp::MoveAPCost) &&
+               !Reg.any_of<CombatComp>(PlayerEt);
+  PC.CurrentInteraction = std::nullopt;
 
   if (!PC.IsReady) {
     return;
   }
+  if (PC.MoveDir == ymir::Dir2d::NONE) {
+    AG.trySpendAP(MovementComp::MoveAPCost);
+    return;
+  }
 
   PC.Target = entt::null;
+  auto NewPos = PosComp.Pos + PC.MoveDir;
 
   if (auto Et = L.getEntityAt(NewPos);
       Et != entt::null && Reg.all_of<HealthComp, FactionComp>(Et)) {
@@ -47,7 +46,7 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
 
   // Always move the player, even if blocked to consume AP for action
   MovementComp MC;
-  MC.Dir = MoveDir;
+  MC.Dir = PC.MoveDir;
   Reg.emplace<MovementComp>(PlayerEt, MC);
 }
 

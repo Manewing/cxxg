@@ -20,9 +20,6 @@ struct MovementComp {
   /// Direction of movement
   ymir::Dir2d Dir = ymir::Dir2d::NONE;
 
-  /// Clear movement after being applied
-  bool Clear = true;
-
   /// True if the movement is flying
   bool Flying = false;
 
@@ -33,6 +30,22 @@ struct MovementComp {
   // Allow implicit conversion
   MovementComp(const ymir::Dir2d &Dir = ymir::Dir2d::NONE) : Dir(Dir) {}
   operator const ymir::Dir2d &() const { return Dir; }
+};
+
+
+struct VectorMovementComp {
+  /// Target vector position
+  ymir::Point2d<float> Vector;
+
+  /// Target position
+  ymir::Point2d<float> LastPos;
+
+  /// True if the movement is flying
+  bool Flying = false;
+
+  /// Kill after hitting wall
+  // FIXME move this
+  bool KillOnWall = false;
 };
 
 struct CollisionComp {};

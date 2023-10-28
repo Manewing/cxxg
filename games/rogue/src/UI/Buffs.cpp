@@ -1,4 +1,5 @@
 #include <rogue/Components/Buffs.h>
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Helpers.h>
 #include <rogue/UI/Buffs.h>
 #include <rogue/UI/Frame.h>
@@ -25,6 +26,23 @@ void BuffsInfo::draw(cxxg::Screen &Scr) const {
       SS << "-> " << BB->getDescription() << "\n";
     }
   });
+
+  if (const auto *MA = Reg.try_get<MeleeAttackComp>(Entity)) {
+    if (MA->PhysDamage > 0) {
+      SS << MA->PhysDamage << " melee phys. dmg.\n";
+    }
+    if (MA->MagicDamage > 0) {
+      SS << MA->MagicDamage << " melee magic dmg.\n";
+    }
+  }
+  if (const auto *RA = Reg.try_get<RangedAttackComp>(Entity)) {
+    if (RA->PhysDamage > 0) {
+      SS << RA->PhysDamage << " ranged phys. dmg.\n";
+    }
+    if (RA->MagicDamage > 0) {
+      SS << RA->MagicDamage << " ranged magic dmg.\n";
+    }
+  }
 
   auto Text = SS.str();
   if (Text.empty()) {
