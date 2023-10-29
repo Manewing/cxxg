@@ -104,6 +104,13 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
     assert(false && "Should never be reached");
     break;
   }
+
+  // Always set movement component to consume AP
+  if (!Reg.any_of<MovementComp>(Entity)) {
+    MovementComp MC;
+    MC.Dir = ymir::Dir2d::NONE;
+    Reg.emplace<MovementComp>(Entity, MC);
+  }
 }
 
 std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>

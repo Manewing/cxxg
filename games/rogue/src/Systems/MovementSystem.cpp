@@ -27,13 +27,14 @@ void applyVectorMovementComp(entt::registry &Reg, Level &L, entt::entity Entity,
 
 void applyMovementComp(entt::registry &Reg, Level &L, entt::entity Entity,
                        PositionComp &PC, const MovementComp &MC) {
-  if (MC.Dir == ymir::Dir2d::NONE) {
+  auto *AG = Reg.try_get<AgilityComp>(Entity);
+  if (AG && !AG->trySpendAP(MovementComp::MoveAPCost)) {
     Reg.erase<MovementComp>(Entity);
     return;
   }
 
-  auto *AG = Reg.try_get<AgilityComp>(Entity);
-  if (AG && !AG->trySpendAP(MovementComp::MoveAPCost)) {
+  if (MC.Dir == ymir::Dir2d::NONE) {
+    AG->trySpendAP(MovementComp::MoveAPCost);
     Reg.erase<MovementComp>(Entity);
     return;
   }

@@ -156,6 +156,7 @@ bool Game::handleInput(int Char) {
     handleUpdates(/*IsTick=*/false);
     if (UICtrl.hasInventoryUI()) {
       UICtrl.closeInventoryUI();
+      handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
     } else {
       UICtrl.setInventoryUI(getPlayerOrNull(), getLvlReg());
     }
@@ -165,6 +166,7 @@ bool Game::handleInput(int Char) {
     handleUpdates(/*IsTick=*/false);
     if (UICtrl.hasEquipmentUI()) {
       UICtrl.closeEquipmentUI();
+      handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
     } else {
       UICtrl.setEquipmentUI(getPlayerOrNull(), getLvlReg());
     }
