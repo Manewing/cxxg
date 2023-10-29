@@ -1,10 +1,24 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <execinfo.h>
 #include <rogue/Game.h>
 #include <rogue/GameConfig.h>
+#include <signal.h>
 #include <stdexcept>
+#include <unistd.h>
+
+void handler(int) {
+  void *StackFrames[40];
+  size_t NumFrames = 0;
+  std::cerr << "SEGFAULT" << std::endl;
+  NumFrames = backtrace(StackFrames, 40);
+  backtrace_symbols_fd(StackFrames, NumFrames, STDERR_FILENO);
+  exit(139);
+}
 
 int main(int Argc, char *Argv[]) {
+  signal(SIGSEGV, handler);
+
   if (Argc != 2 && Argc != 4) {
     std::cout << "Usage: " << Argv[0] << " <game_config.json> (--seed <value>)"
               << std::endl;
