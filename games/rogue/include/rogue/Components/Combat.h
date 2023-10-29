@@ -20,7 +20,7 @@ struct RangedAttackComp {
   StatValue MagicDamage = 0;
   StatValue APCost = 15;
 
-  /// Dexterity increases melee damage by 1 and by 1% per point
+  /// Dexterity increases physical damage by 1 and by 1% per point
   StatValue getPhysEffectiveDamage(const StatPoints *SP = nullptr) const;
 
   /// Intelligence increases magic damage by 1 and by 1% per point

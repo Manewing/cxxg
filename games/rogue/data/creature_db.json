@@ -28,10 +28,10 @@
             "name": "Blob",
             "description": "A blob TODO",
             "stats": {
-                "str": 5,
+                "str": 4,
                 "dex": 1,
                 "int": 0,
-                "vit": 20
+                "vit": 14
             },
             "faction": "nature",
             "race": "creature"
@@ -40,10 +40,10 @@
             "name": "Skeleton",
             "description": "A skeleton TODO",
             "stats": {
-                "str": 3,
+                "str": 1,
                 "dex": 30,
                 "int": 0,
-                "vit": 1
+                "vit": 2
             },
             "faction": "enemy",
             "race": "undead"
@@ -52,10 +52,10 @@
             "name": "Troll",
             "description": "A troll TODO",
             "stats": {
-                "str": 15,
+                "str": 2,
                 "dex": 5,
                 "int": 0,
-                "vit": 40
+                "vit": 7
             },
             "faction": "enemy",
             "race": "troll"

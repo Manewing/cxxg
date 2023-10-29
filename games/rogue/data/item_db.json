@@ -59,7 +59,7 @@
         "vit": 0
       },
       "max_stacks": 5,
-      "ticks": 5
+      "ticks": 20
     },
     "armor_5": {
       "type": "armor_buff_comp",
@@ -116,10 +116,10 @@
       "magic_damage": 0,
       "ap_cost": 20
     },
-    "ranged_magic_2": {
+    "ranged_magic_5": {
       "type": "ranged_attack_comp",
       "phys_damage": 0,
-      "magic_damage": 2,
+      "magic_damage": 5,
       "ap_cost": 20
     },
     "dismantle_iron_equip": {
@@ -292,7 +292,7 @@
         },
         {
           "type": "equipment",
-          "effect": "ranged_magic_2"
+          "effect": "ranged_magic_5"
         }
       ],
       "specializations": [
@@ -314,7 +314,7 @@
         },
         {
           "type": "equipment",
-          "effect": "ranged_2"
+          "effect": "ranged_5"
         }
       ],
       "specializations": [
@@ -762,11 +762,9 @@
           "weight": 5
         },
         {
-          "type": "item",
-          "name": "Iron Scrap",
-          "min_count": 3,
-          "max_count": 3,
-          "weight": -1
+          "type": "table",
+          "ref": "rare_equip",
+          "weight": 1
         },
         {
           "type": "null",
