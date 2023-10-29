@@ -101,11 +101,27 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
 
   // Fill player inventory
   auto Player = CurrentLevel->getPlayer();
-  auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
+  auto &Reg = CurrentLevel->Reg;
+  auto &InvComp = Reg.get<InventoryComp>(Player);
+  auto &EquipComp = Reg.get<EquipmentComp>(Player);
+  auto &Inv = InvComp.Inv;
+  auto &Equip = EquipComp.Equip;
+
+  // FIXME this should be part of an enemy/NPC AI system
   for (const auto &ItCfg : Cfg.InitialItems) {
     auto ItId = ItemDb.getItemId(ItCfg.Name);
     auto It = ItemDb.createItem(ItId, ItCfg.Count);
-    InvComp.Inv.addItem(It);
+    Inv.addItem(It);
+  }
+
+  // FIXME this should be part of an enemy/NPC AI system
+  // Try equipping items
+  for (std::size_t Idx = 0; Idx < Inv.size(); Idx++) {
+    const auto &It = Inv.getItem(Idx);
+    if (Equip.canEquip(It, Player, Reg)) {
+      Equip.equip(Inv.takeItem(Idx), Player, Reg);
+      Idx -= 1;
+    }
   }
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
