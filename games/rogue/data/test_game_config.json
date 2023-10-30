@@ -1,0 +1,40 @@
+{
+	"item_db_config": "item_db.json",
+	"creature_db_config": "creature_db.json",
+	"levels": [
+		{
+			"end": 1,
+			"config": "levels/areana.json"
+		}
+	],
+	"initial_items": [
+		{
+			"name": "Small Sword",
+			"count": 1
+		},
+		{
+			"name": "Blueberry",
+			"count": 10
+		},
+		{
+			"name": "Green Goo",
+			"count": 10
+		},
+		{
+			"name": "Great Helm",
+			"count":1
+		},
+		{
+			"name": "Leather Tunic",
+			"count":1
+		},
+		{
+			"name": "Leather Pants",
+			"count":1
+		},
+		{
+			"name": "Wooden Bow",
+			"count":1
+		}
+	]
+}

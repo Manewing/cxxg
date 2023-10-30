@@ -190,7 +190,7 @@ LevelGenerator::generateLevel(unsigned Seed, int LevelId,
 
 std::shared_ptr<Level> LevelGenerator::generateLevel(unsigned Seed, int LevelId,
                                                      const LevelConfig &Cfg) {
-
+  std::srand(Seed);
   std::shared_ptr<Level> NewLevel;
   if (auto *GenMapCfg = std::get_if<LevelConfig::GeneratedMap>(&Cfg.Map)) {
     while (!NewLevel) {
