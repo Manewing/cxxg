@@ -46,7 +46,7 @@ void updateStatsBuffPerHitComp(entt::entity Entity, entt::registry &Reg,
     SBPH.AppliedStack = std::nullopt;
   }
 
-  if (Tick && SBPH.tick()) {
+  if (Tick && SBPH.tick() == TimedBuff::State::Expired) {
     SBPH.AppliedStack = std::nullopt;
     return;
   }

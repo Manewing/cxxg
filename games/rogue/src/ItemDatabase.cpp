@@ -36,18 +36,18 @@ static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
 
 template <typename T>
 void parseReductionBuff(const rapidjson::Value &V, T &Buff) {
-  Buff.TickAmount = V["reduce_amount"].GetDouble();
-  Buff.TickPeriod = V["tick_period"].GetUint();
-  Buff.TickPeriodsLeft = V["ticks"].GetUint();
-  Buff.RealDuration = Buff.TickPeriod * Buff.TickPeriodsLeft;
+  auto TickAmount = V["reduce_amount"].GetDouble();
+  auto TickPeriod = V["tick_period"].GetUint();
+  auto RealDuration = Buff.TickPeriod * V["ticks"].GetUint();
+  Buff.init(TickAmount, RealDuration, TickPeriod);
 }
 
 template <typename T>
 void parseRegenerationBuff(const rapidjson::Value &V, T &Buff) {
-  Buff.TickAmount = V["regen_amount"].GetDouble();
-  Buff.TickPeriod = V["tick_period"].GetUint();
-  Buff.TickPeriodsLeft = V["ticks"].GetUint();
-  Buff.RealDuration = Buff.TickPeriod * Buff.TickPeriodsLeft;
+  auto TickAmount = V["regen_amount"].GetDouble();
+  auto TickPeriod = V["tick_period"].GetUint();
+  auto RealDuration = Buff.TickPeriod * V["ticks"].GetUint();
+  Buff.init(TickAmount, RealDuration, TickPeriod);
 }
 
 static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
@@ -126,8 +126,9 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
            [](const auto &, const auto &V) {
              StatsBuffPerHitComp Buff;
              Buff.SBC.Bonus = parseStatPoints(V["stats"]);
-             Buff.MaxTicks = V["ticks"].GetUint();
+             Buff.TickPeriod = V["ticks"].GetUint();
              Buff.TicksLeft = 0;
+             Buff.TickPeriodsLeft = 0;
              Buff.MaxStacks = V["max_stacks"].GetUint();
              return makeApplyBuffItemEffect<StatsBuffPerHitComp, StatsComp>(
                  Buff);

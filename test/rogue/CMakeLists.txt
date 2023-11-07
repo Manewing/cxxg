@@ -1,5 +1,6 @@
 set(SOURCES
   Components/HelpersTest.cpp
+  Components/BuffsTest.cpp
   CreatureDatabaseTest.cpp
   EventHubTest.cpp
   LootTableTest.cpp

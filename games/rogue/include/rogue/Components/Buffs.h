@@ -5,6 +5,7 @@
 #include <optional>
 #include <rogue/Components/Helpers.h>
 #include <rogue/Components/Stats.h>
+#include <string>
 #include <string_view>
 
 namespace rogue {
@@ -30,11 +31,11 @@ struct TimedBuff {
   enum class State { Expired, Waiting, Active };
 
   unsigned TicksLeft = 0;
-  unsigned TickPeriod = 50;
-  unsigned TickPeriodsLeft = 1;
+  unsigned TickPeriod = 0;
+  unsigned TickPeriodsLeft = 0;
 
   /// Post-decrement to match count, returns true when hitting zero
-  State tick();
+  virtual State tick();
 
   unsigned totalTicksLeft() const;
 
@@ -43,7 +44,13 @@ struct TimedBuff {
 
 struct DiminishingReturnsValueGenBuff : public TimedBuff {
 public:
+  DiminishingReturnsValueGenBuff();
+  DiminishingReturnsValueGenBuff(StatValue TickAmount, StatValue Duration,
+                                 unsigned TickPeriod);
+  void init(StatValue TickAmount, StatValue Duration, unsigned TickPeriod);
   void add(const DiminishingReturnsValueGenBuff &Other);
+
+  State tick() override;
 
   /// Returns total amount of regeneration left
   StatValue total() const;
@@ -60,11 +67,11 @@ protected:
 
 public:
   /// Amount of regeneration/reduction per tick period
-  StatValue TickAmount = 0.5;
+  StatValue TickAmount = 0.0;
 
   /// Real total amount of regeneration/reduction kept to avoid integer rounding
   /// errors
-  StatValue RealDuration = 0.5;
+  StatValue RealDuration = 0.0;
 };
 
 struct StatsBuffComp : public AdditiveBuff, public BuffBase {
@@ -166,7 +173,8 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
 
   void add(const StatsBuffPerHitComp &Other);
   bool remove(const StatsBuffPerHitComp &Other);
-  bool tick();
+
+  State tick() override;
 
   bool addStack();
 
@@ -174,7 +182,6 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
 
   StatPoint Stacks = 0;
   StatPoint MaxStacks = 0;
-  unsigned MaxTicks = 0;
   StatsBuffComp SBC;
 
   StatsBuffComp *Applied = nullptr;

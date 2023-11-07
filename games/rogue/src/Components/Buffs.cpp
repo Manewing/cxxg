@@ -16,11 +16,14 @@ bool AdditiveBuff::remove(const AdditiveBuff &Other) {
 }
 
 TimedBuff::State TimedBuff::tick() {
+  // Check if we are still waiting for current period
   if (TicksLeft-- != 0) {
     return State::Waiting;
   }
+
+  // New period started, post decrement to match count
   if (TickPeriodsLeft-- != 0) {
-    TicksLeft = TickPeriod;
+    TicksLeft = TickPeriod ? TickPeriod - 1 : 0;
     return State::Active;
   }
   TicksLeft = 0;
@@ -45,6 +48,31 @@ float computeDiminishingReturns(float StartValue, float AdditionalValue,
 }
 
 } // namespace
+
+DiminishingReturnsValueGenBuff::DiminishingReturnsValueGenBuff() {
+  init(TickAmount, RealDuration, TickPeriod);
+}
+
+DiminishingReturnsValueGenBuff::DiminishingReturnsValueGenBuff(StatValue TA,
+                                                               StatValue RD,
+                                                               unsigned TP) {
+  init(TA, RD, TP);
+}
+
+void DiminishingReturnsValueGenBuff::init(StatValue TA, StatValue RD,
+                                          unsigned TP) {
+  TicksLeft = 0;
+  TickAmount = TA;
+  RealDuration = RD;
+  TickPeriod = TP;
+  TickPeriodsLeft = RD / TP;
+}
+
+TimedBuff::State DiminishingReturnsValueGenBuff::tick() {
+  auto St = TimedBuff::tick();
+  RealDuration = std::max(RealDuration - 1.0, 0.0);
+  return St;
+}
 
 void DiminishingReturnsValueGenBuff::add(
     const DiminishingReturnsValueGenBuff &Other) {
@@ -254,7 +282,7 @@ std::string_view StatsBuffPerHitComp::getName() const {
 
 std::string StatsBuffPerHitComp::getDescription() const {
   std::stringstream SS;
-  SS << "Upon hit: " << SBC.getDescription() << " for " << MaxTicks
+  SS << "Upon hit: " << SBC.getDescription() << " for " << TickPeriod
      << " ticks,  max stacks " << MaxStacks;
   if (Stacks) {
     SS << " (" << Stacks << ");\n    (";
@@ -278,17 +306,17 @@ bool StatsBuffPerHitComp::remove(const StatsBuffPerHitComp &) {
   return true;
 }
 
-bool StatsBuffPerHitComp::tick() {
+TimedBuff::State StatsBuffPerHitComp::tick() {
   auto St = TimedBuff::tick();
-  bool Expired = St == TimedBuff::State::Expired;
-  if (Expired) {
+  if (St == TimedBuff::State::Expired) {
     Stacks = 0;
   }
-  return Expired;
+  return St;
 }
 
 bool StatsBuffPerHitComp::addStack() {
-  TicksLeft = MaxTicks;
+  TicksLeft = TickPeriod;
+  TickPeriodsLeft = 0;
   if (Stacks < MaxStacks) {
     Stacks++;
     return true;

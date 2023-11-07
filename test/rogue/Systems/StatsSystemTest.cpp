@@ -72,20 +72,25 @@ TEST(TimedStatsSystem, TimedStatSystemStatsTimedBuff) {
   Stats.Bonus = rogue::StatPoints();
 
   auto &STBC = Reg.emplace<rogue::StatsTimedBuffComp>(Entity);
-  STBC.TicksLeft = 2;
+  // Two periods of one tick each
+  STBC.TicksLeft = 0;
+  STBC.TickPeriod = 0;
+  STBC.TickPeriodsLeft = 2;
   STBC.Bonus = StatPoints;
 
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Base, StatPoints);
   EXPECT_EQ(Stats.Bonus, StatPoints);
   ASSERT_TRUE(Reg.any_of<rogue::StatsTimedBuffComp>(Entity));
-  EXPECT_EQ(STBC.TicksLeft, 1);
+  EXPECT_EQ(STBC.TicksLeft, 0);
+  EXPECT_EQ(STBC.TickPeriodsLeft, 1);
 
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Base, StatPoints);
   EXPECT_EQ(Stats.Bonus, StatPoints);
   ASSERT_TRUE(Reg.any_of<rogue::StatsTimedBuffComp>(Entity));
   EXPECT_EQ(STBC.TicksLeft, 0);
+  EXPECT_EQ(STBC.TickPeriodsLeft, 0);
 
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Base, StatPoints);
@@ -108,8 +113,9 @@ TEST(TimedStatsSystem, TimedStatSystemStatsBuffPerHit) {
   auto &SBPHC = Reg.emplace<rogue::StatsBuffPerHitComp>(Entity);
   SBPHC.Stacks = 0;
   SBPHC.MaxStacks = 3;
-  SBPHC.MaxTicks = 2;
   SBPHC.TicksLeft = 0;
+  SBPHC.TickPeriod = 5;
+  SBPHC.TickPeriodsLeft = 0;
   SBPHC.SBC.Bonus = StatPoints;
 
   StatsSystem.update(rogue::System::UpdateType::Tick);
@@ -117,23 +123,25 @@ TEST(TimedStatsSystem, TimedStatSystemStatsBuffPerHit) {
   EXPECT_EQ(Stats.Bonus, rogue::StatPoints());
   EXPECT_FALSE(Reg.any_of<rogue::StatsBuffComp>(Entity));
   ASSERT_TRUE(Reg.any_of<rogue::StatsBuffPerHitComp>(Entity));
+  EXPECT_EQ(SBPHC.Stacks, 0);
 
   // First hit
   SBPHC.addStack();
   EXPECT_EQ(SBPHC.Stacks, 1);
-  EXPECT_EQ(SBPHC.TicksLeft, 2);
+  EXPECT_EQ(SBPHC.TicksLeft, 5);
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Base, StatPoints);
   EXPECT_EQ(Stats.Bonus, StatPoints);
   EXPECT_TRUE(Reg.any_of<rogue::StatsBuffComp>(Entity));
   ASSERT_TRUE(Reg.any_of<rogue::StatsBuffPerHitComp>(Entity));
   EXPECT_EQ(SBPHC.Stacks, 1);
-  EXPECT_EQ(SBPHC.TicksLeft, 1);
+  EXPECT_EQ(SBPHC.TicksLeft, 4);
+  EXPECT_EQ(SBPHC.TickPeriodsLeft, 0);
 
   // Second hit
   SBPHC.addStack();
   EXPECT_EQ(SBPHC.Stacks, 2);
-  EXPECT_EQ(SBPHC.TicksLeft, 2);
+  EXPECT_EQ(SBPHC.TicksLeft, 5);
   EXPECT_EQ(SBPHC.getEffectiveBuff(SBPHC.Stacks).Bonus,
             StatPoints + StatPoints);
   EXPECT_EQ(SBPHC.getEffectiveBuff(SBPHC.Stacks).SourceCount, 1);
@@ -141,34 +149,46 @@ TEST(TimedStatsSystem, TimedStatSystemStatsBuffPerHit) {
   EXPECT_EQ(Stats.Bonus, StatPoints + StatPoints);
   ASSERT_TRUE(Reg.any_of<rogue::StatsBuffPerHitComp>(Entity));
   EXPECT_EQ(SBPHC.Stacks, 2);
-  EXPECT_EQ(SBPHC.TicksLeft, 1);
+  EXPECT_EQ(SBPHC.TicksLeft, 4);
+  EXPECT_EQ(SBPHC.TickPeriodsLeft, 0);
 
   // No hit
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Bonus, StatPoints + StatPoints);
   ASSERT_TRUE(Reg.any_of<rogue::StatsBuffPerHitComp>(Entity));
   EXPECT_EQ(SBPHC.Stacks, 2);
-  EXPECT_EQ(SBPHC.TicksLeft, 0);
+  EXPECT_EQ(SBPHC.TicksLeft, 3);
+  EXPECT_EQ(SBPHC.TickPeriodsLeft, 0);
 
   // Third hit
   SBPHC.addStack();
   EXPECT_EQ(SBPHC.Stacks, 3);
-  EXPECT_EQ(SBPHC.TicksLeft, 2);
+  EXPECT_EQ(SBPHC.TicksLeft, 5);
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Bonus, StatPoints + StatPoints + StatPoints);
   ASSERT_TRUE(Reg.any_of<rogue::StatsBuffPerHitComp>(Entity));
   EXPECT_EQ(SBPHC.Stacks, 3);
-  EXPECT_EQ(SBPHC.TicksLeft, 1);
+  EXPECT_EQ(SBPHC.TicksLeft, 4);
+  EXPECT_EQ(SBPHC.TickPeriodsLeft, 0);
 
   // Fourth hit
   SBPHC.addStack();
   EXPECT_EQ(SBPHC.Stacks, 3);
-  EXPECT_EQ(SBPHC.TicksLeft, 2);
+  EXPECT_EQ(SBPHC.TicksLeft, 5);
   StatsSystem.update(rogue::System::UpdateType::Tick);
+  EXPECT_EQ(SBPHC.Stacks, 3);
+  EXPECT_EQ(SBPHC.TicksLeft, 4);
+  EXPECT_EQ(SBPHC.TickPeriodsLeft, 0);
 
-  // Nothing x 2
+  // Nothing x 5
   StatsSystem.update(rogue::System::UpdateType::Tick);
   StatsSystem.update(rogue::System::UpdateType::Tick);
+  StatsSystem.update(rogue::System::UpdateType::Tick);
+  StatsSystem.update(rogue::System::UpdateType::Tick);
+  StatsSystem.update(rogue::System::UpdateType::Tick);
+  EXPECT_EQ(SBPHC.Stacks, 0);
+  EXPECT_EQ(SBPHC.TicksLeft, 0);
+  EXPECT_EQ(SBPHC.TickPeriodsLeft, 0);
 
   EXPECT_FALSE(Reg.any_of<rogue::StatsBuffComp>(Entity));
   ASSERT_TRUE(Reg.any_of<rogue::StatsBuffPerHitComp>(Entity));
@@ -182,12 +202,12 @@ TEST(TimedStatsSystem, TimedStatSystemStatsBuffPerHit) {
   // Fifth hit
   SBPHC.addStack();
   EXPECT_EQ(SBPHC.Stacks, 1);
-  EXPECT_EQ(SBPHC.TicksLeft, 2);
+  EXPECT_EQ(SBPHC.TicksLeft, 5);
   StatsSystem.update(rogue::System::UpdateType::Tick);
   EXPECT_EQ(Stats.Bonus, StatPoints + StatPoints);
   ASSERT_TRUE(Reg.any_of<rogue::StatsBuffPerHitComp>(Entity));
   EXPECT_EQ(SBPHC.Stacks, 1);
-  EXPECT_EQ(SBPHC.TicksLeft, 1);
+  EXPECT_EQ(SBPHC.TicksLeft, 4);
 
   // Nothing x 2
   StatsSystem.update(rogue::System::UpdateType::Tick);
