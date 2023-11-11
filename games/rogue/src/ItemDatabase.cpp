@@ -38,7 +38,7 @@ template <typename T>
 void parseReductionBuff(const rapidjson::Value &V, T &Buff) {
   auto TickAmount = V["reduce_amount"].GetDouble();
   auto TickPeriod = V["tick_period"].GetUint();
-  auto RealDuration = Buff.TickPeriod * V["ticks"].GetUint();
+  auto RealDuration = TickPeriod * V["ticks"].GetUint();
   Buff.init(TickAmount, RealDuration, TickPeriod);
 }
 
@@ -46,7 +46,7 @@ template <typename T>
 void parseRegenerationBuff(const rapidjson::Value &V, T &Buff) {
   auto TickAmount = V["regen_amount"].GetDouble();
   auto TickPeriod = V["tick_period"].GetUint();
-  auto RealDuration = Buff.TickPeriod * V["ticks"].GetUint();
+  auto RealDuration = TickPeriod * V["ticks"].GetUint();
   Buff.init(TickAmount, RealDuration, TickPeriod);
 }
 
