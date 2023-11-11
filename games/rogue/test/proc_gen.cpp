@@ -156,7 +156,6 @@ public:
   void loadChunk(ymir::Point2d<int> ChunkPos) {
     auto It = ChunkMap.lower_bound(ChunkPos);
     if (It == ChunkMap.end() || It->first != ChunkPos) {
-      std::cerr << "load chunk: " << ChunkPos << std::endl;
       auto Chunk = generateChunk(ChunkMap.size(), {ChunkPos, ChunkSize});
       ChunkMap.insert(It, {ChunkPos, Chunk});
     }
