@@ -10,7 +10,9 @@ void AdditiveBuff::add(const AdditiveBuff &Other) {
 }
 
 bool AdditiveBuff::remove(const AdditiveBuff &Other) {
-  assert(SourceCount >= Other.SourceCount);
+  if (SourceCount < Other.SourceCount) {
+    throw std::runtime_error("AdditiveBuff: SourceCount underflow");
+  }
   SourceCount -= Other.SourceCount;
   return SourceCount == 0;
 }
@@ -198,17 +200,17 @@ std::string ManaRegenBuffComp::getDescription() const {
   return getParamDescription("Mana increased by ", "", "MP");
 }
 
-std::string_view ArmorBuffComp::getName() const { return "Armor buff"; }
+std::string_view ArmorBuffComp::getName() const { return "Armor Buff"; }
 
 std::string ArmorBuffComp::getDescription() const {
   std::stringstream SS;
   const char *Pred = "";
   if (PhysArmor > 0) {
-    SS << Pred << PhysArmor << " armor";
+    SS << Pred << PhysArmor << " Armor";
     Pred = ", ";
   }
   if (MagicArmor > 0) {
-    SS << Pred << MagicArmor << " magic Armor";
+    SS << Pred << MagicArmor << " Magic Armor";
     Pred = ", ";
   }
   auto Str = SS.str();
@@ -225,9 +227,14 @@ void ArmorBuffComp::add(const ArmorBuffComp &Other) {
 }
 
 bool ArmorBuffComp::remove(const ArmorBuffComp &Other) {
+  if (AdditiveBuff::remove(Other)) {
+    PhysArmor = 0;
+    MagicArmor = 0;
+    return true;
+  }
   PhysArmor -= Other.PhysArmor;
   MagicArmor -= Other.MagicArmor;
-  return AdditiveBuff::remove(Other);
+  return false;
 }
 
 StatValue ArmorBuffComp::getPhysEffectiveArmor(StatPoints DstStats) const {
@@ -272,8 +279,12 @@ void BlockBuffComp::add(const BlockBuffComp &Other) {
 }
 
 bool BlockBuffComp::remove(const BlockBuffComp &Other) {
+  if (AdditiveBuff::remove(Other)) {
+    BlockChance = 0;
+    return true;
+  }
   BlockChance -= Other.BlockChance;
-  return AdditiveBuff::remove(Other);
+  return false;
 }
 
 std::string_view StatsBuffPerHitComp::getName() const {
