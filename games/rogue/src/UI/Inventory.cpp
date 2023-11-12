@@ -146,6 +146,7 @@ bool InventoryController::handleInput(int Char) {
     const auto &Pos = Reg.get<PositionComp>(Entity).Pos;
     DropInv.addItem(Inv.takeItem(List->getSelectedElement()));
     createDropEntity(Reg, Pos, DropInv);
+    updateElements();
   } break;
   case Controls::Dismantle.Char: {
     auto ItOrNone =
