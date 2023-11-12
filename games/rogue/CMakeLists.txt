@@ -54,6 +54,7 @@ set(HEADER_FILES
   include/rogue/UI/Equipment.h
   include/rogue/UI/Frame.h
   include/rogue/UI/History.h
+  include/rogue/UI/Interact.h
   include/rogue/UI/Inventory.h
   include/rogue/UI/ItemSelect.h
   include/rogue/UI/ListSelect.h
@@ -75,6 +76,7 @@ set(SOURCE_FILES
   src/Components/Player.cpp
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
+  src/Components/Visual.cpp
   src/CreatureDatabase.cpp
   src/Equipment.cpp
   src/Event.cpp
@@ -112,6 +114,7 @@ set(SOURCE_FILES
   src/UI/Equipment.cpp
   src/UI/Frame.cpp
   src/UI/History.cpp
+  src/UI/Interact.cpp
   src/UI/Inventory.cpp
   src/UI/ItemSelect.cpp
   src/UI/ListSelect.cpp

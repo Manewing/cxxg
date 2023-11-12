@@ -93,11 +93,7 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
 TargetUI::TargetUI(Controller &Ctrl, entt::entity SrcEt,
                    ymir::Point2d<int> StartPos, Level &Lvl)
     : Widget({0, 0}), Ctrl(Ctrl), Lvl(Lvl), StartPos(StartPos), SrcEt(SrcEt) {
-  CursorEt = Lvl.Reg.create();
-  Lvl.Reg.emplace<PositionComp>(CursorEt, StartPos);
-  Lvl.Reg.emplace<TileComp>(
-      CursorEt, Tile{{'X', cxxg::types::RgbColor{255, 0, 0}}}, 3000);
-  Lvl.Reg.emplace<CursorComp>(CursorEt);
+  CursorEt = createCursor(Lvl.Reg, StartPos);
 }
 
 bool TargetUI::handleInput(int Char) {

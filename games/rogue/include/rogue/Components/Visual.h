@@ -1,7 +1,9 @@
 #ifndef ROGUE_COMPONENTS_VISUAL_H
 #define ROGUE_COMPONENTS_VISUAL_H
 
+#include <entt/entt.hpp>
 #include <rogue/Tile.h>
+#include <ymir/Types.hpp>
 
 namespace rogue {
 
@@ -17,6 +19,8 @@ struct NameComp {
 };
 
 struct CursorComp {};
+
+entt::entity createCursor(entt::registry &Reg, ymir::Point2d<int> Pos);
 
 } // namespace rogue
 

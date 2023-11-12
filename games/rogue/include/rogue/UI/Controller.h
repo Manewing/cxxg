@@ -85,6 +85,14 @@ public:
   bool hasTargetUI() const;
   void closeTargetUI();
 
+  void setInteractUI(entt::entity SrcEt, ymir::Point2d<int> StartPos,
+                     Level &Lvl);
+  bool hasInteractUI() const;
+  void closeInteractUI();
+
+  /// Closes all windows
+  void closeAll();
+
 private:
   cxxg::Screen &Scr;
   WindowContainer WdwContainer;

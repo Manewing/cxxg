@@ -29,8 +29,13 @@
         "layer": "entities"
       },
       "r": {
-        "color": "#b8ad74",
+        "color": "#5C5F55",
         "key": "r",
+        "layer": "entities"
+      },
+      "s": {
+        "color": "#b8ad74",
+        "key": "s",
         "layer": "entities"
       }
     }

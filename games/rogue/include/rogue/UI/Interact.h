@@ -1,5 +1,5 @@
-#ifndef ROGUE_TARGET_UI_H
-#define ROGUE_TARGET_UI_H
+#ifndef ROGUE_UI_INTERACT_UI_H
+#define ROGUE_UI_INTERACT_UI_H
 
 #include <entt/entt.hpp>
 #include <rogue/UI/Decorator.h>
@@ -11,33 +11,27 @@ class Level;
 } // namespace rogue
 
 namespace rogue::ui {
+class ListSelect;
 class Controller;
 } // namespace rogue::ui
 
 namespace rogue::ui {
 
-class TargetInfo : public BaseRectDecorator {
+class Interact : public BaseRectDecorator {
 public:
-  TargetInfo(Controller &Ctrl, entt::entity TargetEt, entt::registry &Reg);
-  bool handleInput(int) override;
-  void draw(cxxg::Screen &Scr) const override;
-
-private:
-  Controller &Ctrl;
-  entt::entity TargetEt;
-  entt::registry &Reg;
-};
-
-class TargetUI : public Widget {
-public:
-  TargetUI(Controller &Ctrl, entt::entity SrcEt, ymir::Point2d<int> StartPos,
+  Interact(Controller &Ctrl, entt::entity SrcEt, ymir::Point2d<int> StartPos,
            Level &Lvl);
+
   bool handleInput(int) override;
   std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
   void destroyCursor();
-  void showInfoForTarget(entt::entity TargetEt, entt::registry &Reg);
+
+private:
+  void updateElements() const;
+	void updateCursor();
+	void handleInteraction();
 
 private:
   Controller &Ctrl;
@@ -45,9 +39,10 @@ private:
   ymir::Point2d<int> StartPos;
   entt::entity SrcEt = entt::null;
   entt::entity CursorEt = entt::null;
-  entt::entity TargetEt = entt::null;
+	std::vector<entt::entity> InteractablesEts;
+  std::shared_ptr<ListSelect> List;
 };
 
 } // namespace rogue::ui
 
-#endif // #ifndef ROGUE_TARGET_UI_H
+#endif // #ifndef ROGUE_INTERACT_UI_H

@@ -5,6 +5,7 @@
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/History.h>
+#include <rogue/UI/Interact.h>
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/Stats.h>
 #include <rogue/UI/TargetUI.h>
@@ -204,8 +205,34 @@ bool Controller::hasTargetUI() const {
 
 void Controller::closeTargetUI() {
   auto *TUI = WdwContainer.getWindowOfType<TargetUI>();
-  TUI->destroyCursor();
-  WdwContainer.closeWindow(TUI);
+  if (TUI) {
+    TUI->destroyCursor();
+    WdwContainer.closeWindow(TUI);
+  }
+}
+
+void Controller::setInteractUI(entt::entity SrcEt, ymir::Point2d<int> StartPos,
+                               Level &Lvl) {
+  WdwContainer.addWindow<Interact>(*this, SrcEt, StartPos, Lvl);
+  WdwContainer.autoLayoutWindows();
+}
+
+bool Controller::hasInteractUI() const {
+  return WdwContainer.hasWindowOfType<Interact>();
+}
+
+void Controller::closeInteractUI() {
+  auto *Wdw = WdwContainer.getWindowOfType<Interact>();
+  if (Wdw) {
+    Wdw->destroyCursor();
+    WdwContainer.closeWindow(Wdw);
+  }
+}
+
+void Controller::closeAll() {
+  while (WdwContainer.hasActiveWindow()) {
+    WdwContainer.closeWindow(&WdwContainer.getActiveWindow());
+  }
 }
 
 } // namespace rogue::ui

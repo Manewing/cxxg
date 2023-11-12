@@ -328,12 +328,33 @@ void Game::movePlayer(ymir::Dir2d Dir) {
 
 // FIXME move to player system?
 void Game::tryInteract() {
-  if (auto *Interact = getAvailableInteraction()) {
+  auto Player = getPlayer();
+  auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
+
+  const auto &CurrentLevel = World->getCurrentLevelOrFail();
+  auto InteractableEntities = CurrentLevel.getInteractables(PlayerPos);
+
+  // If there are no interactions we are done
+  if (InteractableEntities.empty()) {
+    return;
+  }
+
+  // If there is only one action execute it
+  if (InteractableEntities.size() == 1) {
+    auto &InteractableEntity = InteractableEntities.at(0);
+    auto &Interactable = getLvlReg().get<InteractableComp>(InteractableEntity);
     auto Player = getPlayer();
     auto &PC = getLvlReg().get<PlayerComp>(Player);
-    Interact->Execute(World->getCurrentLevelOrFail(), Player, getLvlReg());
-    PC.CurrentInteraction = *Interact;
+    Interactable.Action.Execute(World->getCurrentLevelOrFail(), Player,
+                                getLvlReg());
+    PC.CurrentInteraction = Interactable.Action;
+    return;
   }
+
+  // Multiple interactions, this show UI to select interaction
+  UICtrl.closeInteractUI();
+  UICtrl.setInteractUI(getPlayer(), getLvlReg().get<PositionComp>(getPlayer()),
+                       World->getCurrentLevelOrFail());
 }
 
 entt::registry &Game::getLvlReg() { return World->getCurrentLevelOrFail().Reg; }
@@ -413,7 +434,7 @@ ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
   PI.MaxHealth = Health.MaxValue;
   PI.AP = AGC.AP;
   if (Interact) {
-    PI.InteractStr = "[E] " + Interact->Msg;
+    PI.InteractStr = "[e] " + Interact->Msg;
   }
 
   return PI;
