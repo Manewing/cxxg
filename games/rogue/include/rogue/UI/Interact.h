@@ -19,8 +19,7 @@ namespace rogue::ui {
 
 class Interact : public BaseRectDecorator {
 public:
-  Interact(Controller &Ctrl, entt::entity SrcEt, ymir::Point2d<int> StartPos,
-           Level &Lvl);
+  Interact(entt::entity SrcEt, ymir::Point2d<int> StartPos, Level &Lvl);
 
   bool handleInput(int) override;
   std::string getInteractMsg() const override;
@@ -30,16 +29,15 @@ public:
 
 private:
   void updateElements() const;
-	void updateCursor();
-	void handleInteraction();
+  void updateCursor();
+  void handleInteraction();
 
 private:
-  Controller &Ctrl;
   Level &Lvl;
   ymir::Point2d<int> StartPos;
   entt::entity SrcEt = entt::null;
   entt::entity CursorEt = entt::null;
-	std::vector<entt::entity> InteractablesEts;
+  std::vector<entt::entity> InteractablesEts;
   std::shared_ptr<ListSelect> List;
 };
 

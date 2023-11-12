@@ -213,7 +213,7 @@ void Controller::closeTargetUI() {
 
 void Controller::setInteractUI(entt::entity SrcEt, ymir::Point2d<int> StartPos,
                                Level &Lvl) {
-  WdwContainer.addWindow<Interact>(*this, SrcEt, StartPos, Lvl);
+  WdwContainer.addWindow<Interact>(SrcEt, StartPos, Lvl);
   WdwContainer.autoLayoutWindows();
 }
 

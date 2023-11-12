@@ -9,10 +9,9 @@
 
 namespace rogue::ui {
 
-Interact::Interact(Controller &Ctrl, entt::entity SrcEt,
-                   ymir::Point2d<int> StartPos, Level &Lvl)
-    : BaseRectDecorator({2, 2}, {20, 8}, nullptr), Ctrl(Ctrl), Lvl(Lvl),
-      StartPos(StartPos), SrcEt(SrcEt) {
+Interact::Interact(entt::entity SrcEt, ymir::Point2d<int> StartPos, Level &Lvl)
+    : BaseRectDecorator({2, 2}, {20, 8}, nullptr), Lvl(Lvl), StartPos(StartPos),
+      SrcEt(SrcEt) {
   InteractablesEts = Lvl.getInteractables(StartPos);
   List = std::make_shared<ListSelect>(Pos, getSize());
   Comp = std::make_shared<Frame>(List, Pos, getSize(), "Interact");
