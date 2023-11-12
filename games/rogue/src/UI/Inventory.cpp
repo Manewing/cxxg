@@ -1,6 +1,8 @@
 #include <cxxg/Utils.h>
 #include <iomanip>
+#include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
@@ -138,9 +140,12 @@ bool InventoryController::handleInput(int Char) {
     }
     updateElements();
   } break;
-  case Controls::Drop.Char:
-    // Inv.dropItem(List.getSelectedElement());
-    break;
+  case Controls::Drop.Char: {
+    Inventory DropInv;
+    const auto &Pos = Reg.get<PositionComp>(Entity).Pos;
+    DropInv.addItem(Inv.takeItem(List->getSelectedElement()));
+    createDropEntity(Reg, Pos, DropInv);
+  } break;
   case Controls::Dismantle.Char: {
     auto ItOrNone =
         Inv.applyItemTo(ItemIdx, CapabilityFlags::Dismantle, Entity, Reg);
