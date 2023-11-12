@@ -2,8 +2,8 @@
 #define ROGUE_GAME_CONFIG_H
 
 #include <filesystem>
-#include <vector>
 #include <iosfwd>
+#include <vector>
 
 namespace rogue {
 

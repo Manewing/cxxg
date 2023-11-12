@@ -2,8 +2,8 @@
 #define ROGUE_EVENT_H
 
 #include <entt/entt.hpp>
-#include <sstream>
 #include <optional>
+#include <sstream>
 
 namespace rogue {
 struct BuffBase;

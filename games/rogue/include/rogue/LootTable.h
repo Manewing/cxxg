@@ -1,8 +1,8 @@
 #ifndef ROGUE_LOOT_TABLE_H
 #define ROGUE_LOOT_TABLE_H
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace rogue {
 

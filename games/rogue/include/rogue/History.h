@@ -39,6 +39,7 @@ private:
 
 class History {
   friend class HistoryMessageAssembler;
+
 public:
   struct Message {
     // FIXME refactor to decouple from cxxg

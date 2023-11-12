@@ -1,8 +1,8 @@
+#include <algorithm>
 #include <cassert>
 #include <random>
 #include <rogue/LootTable.h>
 #include <stdexcept>
-#include <algorithm>
 
 namespace rogue {
 

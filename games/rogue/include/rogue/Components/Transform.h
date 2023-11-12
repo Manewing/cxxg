@@ -32,7 +32,6 @@ struct MovementComp {
   operator const ymir::Dir2d &() const { return Dir; }
 };
 
-
 struct VectorMovementComp {
   /// Target vector position
   ymir::Point2d<float> Vector;

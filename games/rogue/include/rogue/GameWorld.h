@@ -3,8 +3,8 @@
 
 #include <entt/entt.hpp>
 #include <memory>
-#include <ymir/Types.hpp>
 #include <rogue/EventHub.h>
+#include <ymir/Types.hpp>
 
 namespace rogue {
 class Level;

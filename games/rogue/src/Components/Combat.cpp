@@ -46,8 +46,7 @@ static constexpr auto ProjectileTile =
     Tile{{'*', cxxg::types::RgbColor{255, 65, 0}}};
 
 void createProjectile(entt::registry &Reg, const DamageComp &DC,
-                      ymir::Point2d<int> Pos,
-                      ymir::Point2d<int> TargetPos,
+                      ymir::Point2d<int> Pos, ymir::Point2d<int> TargetPos,
                       StatValue Agility) {
   auto E = Reg.create();
   Reg.emplace<DamageComp>(E, DC);
