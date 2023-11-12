@@ -125,7 +125,6 @@ public:
 
 private:
   LevelGenerator &LevelGen;
-  std::size_t CurrentLevelIdx = 0;
   std::shared_ptr<Level> Lvl;
   std::shared_ptr<LevelGenerator> CurrSubLvlGen = nullptr;
   std::unique_ptr<GameWorld> CurrSubWorld = nullptr;
