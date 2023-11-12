@@ -26,15 +26,23 @@ public:
     std::string LootTableName;
   };
 
+  struct WorldEntry {
+    std::string WorldType;
+    std::filesystem::path LevelConfig;
+  };
+
 public:
   std::map<char, Creature> Creatures;
   std::map<char, Chest> Chests;
+  std::map<char, WorldEntry> Dungeons;
 };
 
 /// Base class for all level generators
 class LevelGenerator {
 public:
   explicit LevelGenerator(const GameContext &Ctx);
+
+  const GameContext &getCtx() const { return Ctx; }
 
   virtual ~LevelGenerator() = default;
   virtual std::shared_ptr<Level> generateLevel(int LevelId) const = 0;
@@ -141,6 +149,18 @@ public:
 private:
   std::vector<LevelRange> Generators;
 };
+
+// class SweeperLevelGenerator : public LevelGenerator {
+// public:
+//   struct Config {
+//     std::map<char, std::filesystem::path> MapInfos;
+//   };
+//
+// public:
+//   SweeperLevelGenerator(const GameContext &Ctx);
+//
+//   std::shared_ptr<Level> generateLevel(int LevelId) const final;
+// };
 
 /// Helper class for loading level generation configurations and creating
 /// level generators

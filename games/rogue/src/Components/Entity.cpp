@@ -66,6 +66,21 @@ void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<InventoryComp>(Entity).Inv = I;
 }
 
+void createWorldEntry(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                      const std::string &WorldType,
+                      const std::filesystem::path &LevelConfig) {
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<InteractableComp>(
+      Entity,
+      Interaction{
+          "Enter dungeon", [WorldType, LevelConfig](auto &EHC, auto, auto &) {
+            EHC.publish(SwitchGameWorldEvent{{}, WorldType, LevelConfig});
+          }});
+  Reg.emplace<CollisionComp>(Entity);
+}
+
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                           bool IsExit, int LevelId) {
   auto Entity = Reg.create();

@@ -21,6 +21,7 @@ struct Interaction;
 struct GameConfig;
 struct EntityDiedEvent;
 struct SwitchLevelEvent;
+struct SwitchGameWorldEvent;
 struct LootEvent;
 struct EntityAttackEvent;
 struct DetectTargetEvent;
@@ -76,6 +77,7 @@ private:
 
   void onEntityDiedEvent(const EntityDiedEvent &E);
   void onSwitchLevelEvent(const SwitchLevelEvent &E);
+  void onSwitchGameWorldEvent(const SwitchGameWorldEvent &E);
   void onLootEvent(const LootEvent &E);
 
   void handleDrawLevel(bool UpdateScreen);
@@ -89,8 +91,10 @@ private:
   ItemDatabase ItemDb;
   CreatureDatabase CreatureDb;
   GameContext Ctx;
+
   std::shared_ptr<LevelGenerator> LvlGen;
-  MultiLevelDungeon MLD;
+  std::unique_ptr<GameWorld> World;
+
   RenderEventCollector REC;
   ui::Controller UICtrl;
   long unsigned GameTicks = 0;

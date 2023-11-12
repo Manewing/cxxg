@@ -2,7 +2,6 @@
 #define ROGUE_CONTEXT_H
 
 namespace rogue {
-class Game;
 class ItemDatabase;
 class CreatureDatabase;
 } // namespace rogue

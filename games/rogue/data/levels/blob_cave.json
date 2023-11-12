@@ -1,19 +1,20 @@
 {
-    "map": {
-        "type": "generated",
-        "config": "blob_cave.cfg"
-    },
-    "creatures":  [
-        {
-            "key": "b",
-            "name": "Blob",
-            "loot": "common_blob"
-        }
-    ],
-    "chests": [
-        {
-            "key": "C",
-            "loot": "common_chest"
-        }
-    ]
+  "map": {
+    "type": "generated",
+    "config": "blob_cave.cfg"
+  },
+  "creatures": [
+    {
+      "key": "b",
+      "name": "Blob",
+      "loot": "common_blob"
+    }
+  ],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "common_chest"
+    }
+  ],
+  "dungeons": []
 }

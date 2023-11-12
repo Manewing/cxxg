@@ -6,6 +6,7 @@
 #include <rogue/Tile.h>
 #include <string>
 #include <ymir/Types.hpp>
+#include <filesystem>
 
 namespace rogue {
 class Inventory;
@@ -21,6 +22,10 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
 void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                            const std::string &Name, const Inventory &Inv,
                            const StatPoints &Stats);
+
+void createWorldEntry(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                      const std::string &WorldType,
+                      const std::filesystem::path &LevelConfig);
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                           bool IsExit, int LevelId);

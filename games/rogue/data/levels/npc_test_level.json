@@ -1,40 +1,41 @@
 {
-    "map": {
-        "type": "designed",
-        "map_file": "npc_test_level.map",
-        "char_info": {
-            " ": {
-                "color": "#000000",
-                "bg_color": "#645032",
-                "key": " ",
-                "layer": "ground"
-            },
-            "#": {
-                "color": "#3c3c3c",
-                "bg_color": "#2d2d2d",
-                "key": "#",
-                "layer": "walls"
-            },
-            "~": {
-                "color": "#2885bf",
-                "bg_color": "#1e6e96",
-                "key": "~",
-                "layer": "objects"
-            },
-            "A": {
-                "color": "#0a320f",
-                "bg_color": "#645032",
-                "key": "A",
-                "layer": "objects"
-            },
-            "B": {
-                "color": "#8c0a32",
-                "bg_color": "#0a320f",
-                "key": "#",
-                "layer": "objects"
-            }
-        }
-    },
-    "creatures": [],
-    "chests": []
+  "map": {
+    "type": "designed",
+    "map_file": "npc_test_level.map",
+    "char_info": {
+      " ": {
+        "color": "#000000",
+        "bg_color": "#645032",
+        "key": " ",
+        "layer": "ground"
+      },
+      "#": {
+        "color": "#3c3c3c",
+        "bg_color": "#2d2d2d",
+        "key": "#",
+        "layer": "walls"
+      },
+      "~": {
+        "color": "#2885bf",
+        "bg_color": "#1e6e96",
+        "key": "~",
+        "layer": "objects"
+      },
+      "A": {
+        "color": "#0a320f",
+        "bg_color": "#645032",
+        "key": "A",
+        "layer": "objects"
+      },
+      "B": {
+        "color": "#8c0a32",
+        "bg_color": "#0a320f",
+        "key": "#",
+        "layer": "objects"
+      }
+    }
+  },
+  "creatures": [],
+  "chests": [],
+  "dungeons": []
 }

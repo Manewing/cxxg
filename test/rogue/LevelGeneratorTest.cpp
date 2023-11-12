@@ -91,17 +91,16 @@ TEST_F(LevelGeneratorTest, DesignedMapLevelGeneratorSimpleMapWithEntities) {
   Cfg.CharInfoMap['T'].Layer = "entities";
   Cfg.CharInfoMap['C'].T = rogue::Tile{{'C'}};
   Cfg.CharInfoMap['C'].Layer = "entities";
-  Cfg.EntityConfig = {
-      .Creatures =
-          {
-              {'s', {"dummy_s", "loot_tb"}},
-              {'T', {"dummy_t", "loot_tb"}},
-          },
-      .Chests =
-          {
-              {'C', {"loot_tb"}},
-          },
-  };
+  Cfg.EntityConfig = {.Creatures =
+                          {
+                              {'s', {"dummy_s", "loot_tb"}},
+                              {'T', {"dummy_t", "loot_tb"}},
+                          },
+                      .Chests =
+                          {
+                              {'C', {"loot_tb"}},
+                          },
+                      .Dungeons = {}};
 
   ItemDb.addLootTable("loot_tb");
   CreatureDb.addCreature(rogue::CreatureInfo{.Name = "dummy_s"});

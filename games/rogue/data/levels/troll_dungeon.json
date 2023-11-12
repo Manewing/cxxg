@@ -1,24 +1,25 @@
 {
-    "map": {
-        "type": "generated",
-        "config": "troll_dungeon.cfg"
+  "map": {
+    "type": "generated",
+    "config": "troll_dungeon.cfg"
+  },
+  "creatures": [
+    {
+      "key": "s",
+      "name": "Skeleton",
+      "loot": "common_enemy"
     },
-    "creatures": [
-        {
-            "key": "s",
-            "name": "Skeleton",
-            "loot": "common_enemy"
-        },
-        {
-            "key": "t",
-            "name": "Troll",
-            "loot": "rare_enemy"
-        }
-    ],
-    "chests": [
-        {
-            "key": "C",
-            "loot": "common_chest"
-        }
-    ]
+    {
+      "key": "t",
+      "name": "Troll",
+      "loot": "rare_enemy"
+    }
+  ],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "common_chest"
+    }
+  ],
+  "dungeons": []
 }

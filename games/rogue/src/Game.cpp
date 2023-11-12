@@ -88,7 +88,7 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
       CreatureDb(CreatureDatabase::load(Cfg.CreatureDbConfig)),
       Ctx({ItemDb, CreatureDb}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
-      MLD(*LvlGen), UICtrl(Scr) {}
+      World(GameWorld::create(*LvlGen, Cfg.InitialGameWorld)), UICtrl(Scr) {}
 
 namespace {
 
@@ -123,14 +123,16 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.setEventHub(&EvHub);
   EHW.subscribe(*this, &Game::onEntityDiedEvent);
   EHW.subscribe(*this, &Game::onSwitchLevelEvent);
+  EHW.subscribe(*this, &Game::onSwitchGameWorldEvent);
   EHW.subscribe(*this, &Game::onLootEvent);
   REC.setEventHub(&EvHub);
-  MLD.setEventHub(&EvHub);
+  World->setEventHub(&EvHub);
   UICtrl.setEventHub(&EvHub);
 
   switchLevel(0, /*ToEntry=*/true);
 
   // Fill player inventory
+  World->getCurrentLevelOrFail().createPlayer();
   fillPlayerInventory(getLvlReg(), getPlayer(), Cfg, ItemDb);
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
@@ -149,12 +151,10 @@ void Game::switchLevel(int Level, bool ToEntry) {
 
   REC.clear();
 
-  auto *CurrLvl = MLD.getCurrentLevel();
-  auto &Nextlvl = MLD.switchLevel(Level);
+  auto *CurrLvl = World->getCurrentLevel();
+  auto &Nextlvl = World->switchLevel(Level);
 
-  if (!CurrLvl) {
-    Nextlvl.createPlayer();
-  } else if (CurrLvl != &Nextlvl) {
+  if (CurrLvl && CurrLvl != &Nextlvl) {
     auto ToPos =
         ToEntry ? Nextlvl.getPlayerStartPos() : Nextlvl.getPlayerEndPos();
     Nextlvl.update(false);
@@ -220,12 +220,12 @@ bool Game::handleInput(int Char) {
     } else {
       UICtrl.setTargetUI(getPlayer(),
                          getLvlReg().get<PositionComp>(getPlayer()),
-                         MLD.getCurrentLevelOrFail());
+                         World->getCurrentLevelOrFail());
     }
     return true;
   }
   case 'l':
-    switchLevel(MLD.getCurrentLevelIdx() + 1, true);
+    switchLevel(World->getCurrentLevelIdx() + 1, true);
     break;
 
   // TODO show controls
@@ -277,7 +277,7 @@ bool Game::handleInput(int Char) {
 
 bool Game::handleUpdates(bool IsTick) {
   if (!IsTick) {
-    MLD.getCurrentLevelOrFail().update(IsTick);
+    World->getCurrentLevelOrFail().update(IsTick);
     return true;
   }
 
@@ -285,7 +285,7 @@ bool Game::handleUpdates(bool IsTick) {
   // We will perform ticks until enough ticks have passed for the player to have
   // gained enough AP to take an action.
   while (GameRunning) {
-    MLD.getCurrentLevelOrFail().update(true);
+    World->getCurrentLevelOrFail().update(true);
     GameTicks++;
 
     if (!GameRunning) {
@@ -331,15 +331,15 @@ void Game::tryInteract() {
   if (auto *Interact = getAvailableInteraction()) {
     auto Player = getPlayer();
     auto &PC = getLvlReg().get<PlayerComp>(Player);
-    Interact->Execute(MLD.getCurrentLevelOrFail(), Player, getLvlReg());
+    Interact->Execute(World->getCurrentLevelOrFail(), Player, getLvlReg());
     PC.CurrentInteraction = *Interact;
   }
 }
 
-entt::registry &Game::getLvlReg() { return MLD.getCurrentLevelOrFail().Reg; }
+entt::registry &Game::getLvlReg() { return World->getCurrentLevelOrFail().Reg; }
 
 entt::entity Game::getPlayerOrNull() const {
-  const auto *CurrentLevel = MLD.getCurrentLevel();
+  const auto *CurrentLevel = World->getCurrentLevel();
   if (!CurrentLevel) {
     return entt::null;
   }
@@ -356,7 +356,7 @@ Interaction *Game::getAvailableInteraction() {
   auto Player = getPlayer();
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
 
-  const auto &CurrentLevel = MLD.getCurrentLevelOrFail();
+  const auto &CurrentLevel = World->getCurrentLevelOrFail();
   auto InteractableEntities = CurrentLevel.getInteractables(PlayerPos);
   if (InteractableEntities.empty()) {
     return nullptr;
@@ -374,6 +374,23 @@ void Game::onEntityDiedEvent(const EntityDiedEvent &E) {
 
 void Game::onSwitchLevelEvent(const SwitchLevelEvent &E) {
   switchLevel(E.Level, E.ToEntry);
+}
+
+void Game::onSwitchGameWorldEvent(const SwitchGameWorldEvent &E) {
+  REC.clear();
+
+  auto *CurrLvl = World->getCurrentLevel();
+  World->switchWorld(Cfg.Seed, E.GameWorldType, E.LevelConfig);
+  auto &Nextlvl = World->switchLevel(0);
+
+  if (CurrLvl && CurrLvl != &Nextlvl) {
+    auto ToPos = Nextlvl.getPlayerStartPos();
+    Nextlvl.update(false);
+    Nextlvl.movePlayer(*CurrLvl, ToPos);
+  }
+
+  // We could update the level here, but we want to draw the initial state.
+  handleUpdates(/*IsTick=*/false);
 }
 
 void Game::onLootEvent(const LootEvent &E) {
@@ -429,7 +446,7 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
   const auto &LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
 
-  auto &CurrentLevel = MLD.getCurrentLevelOrFail();
+  auto &CurrentLevel = World->getCurrentLevelOrFail();
   Renderer Render(RenderSize, CurrentLevel, PlayerPos);
   Render.renderShadow(/*Darkness=*/30);
   Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
@@ -443,7 +460,7 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   // Draw UI overlay
   auto PI = getUIPlayerInfo(Player, getLvlReg(), getAvailableInteraction());
   auto TI = getUITargetInfo(PC.Target, getLvlReg());
-  UICtrl.draw(MLD.getCurrentLevelIdx(), PI, TI);
+  UICtrl.draw(World->getCurrentLevelIdx(), PI, TI);
 
   if (UpdateScreen) {
     handleShowNotifications(false);

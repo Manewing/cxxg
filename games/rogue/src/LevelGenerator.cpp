@@ -55,6 +55,8 @@ Inventory generateLootInventory(const ItemDatabase &ItemDb,
 
 void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
                                  ymir::Point2d<int> Pos) const {
+
+  // Deal with creating creatures
   if (auto It = Cfg.Creatures.find(T.kind()); It != Cfg.Creatures.end()) {
     auto CId = Ctx.CreatureDb.getCreatureId(It->second.Name);
     const auto &CInfo = Ctx.CreatureDb.getCreature(CId);
@@ -70,11 +72,19 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
     }
     return;
   }
+
+  // Deal with creating chests
   if (auto It = Cfg.Chests.find(T.kind()); It != Cfg.Chests.end()) {
     createChestEntity(
         L.Reg, Pos, T,
         generateLootInventory(Ctx.ItemDb, It->second.LootTableName));
     return;
+  }
+
+  // Deal with creating dungeon entries
+  if (auto It = Cfg.Dungeons.find(T.kind()); It != Cfg.Dungeons.end()) {
+    return createWorldEntry(L.Reg, Pos, T, It->second.WorldType,
+                            It->second.LevelConfig);
   }
 
   switch (T.kind()) {
@@ -270,7 +280,9 @@ parseCharInfo(const rapidjson::Value &V) {
   return DesignedMapLevelGenerator::Config::CharInfo{T, Layer};
 }
 
-LevelEntityConfig loadLevelEntityConfigFromJSON(const rapidjson::Value &V) {
+LevelEntityConfig
+loadLevelEntityConfigFromJSON(const std::filesystem::path &BasePath,
+                              const rapidjson::Value &V) {
   LevelEntityConfig Cfg;
 
   // Load level specific creature configuration
@@ -291,6 +303,17 @@ LevelEntityConfig loadLevelEntityConfigFromJSON(const rapidjson::Value &V) {
     ChestCfg.LootTableName = C["loot"].GetString();
     Cfg.Chests[Key[0]] = ChestCfg;
   }
+
+  // Load level specific dungeon configuration
+  for (const auto &C : V["dungeons"].GetArray()) {
+    auto Key = std::string(C["key"].GetString());
+    assert(Key.size() == 1);
+    LevelEntityConfig::WorldEntry WE;
+    WE.WorldType = C["world_type"].GetString();
+    WE.LevelConfig = BasePath / C["level_config"].GetString();
+    Cfg.Dungeons[Key[0]] = WE;
+  }
+
   return Cfg;
 }
 
@@ -314,7 +337,7 @@ DesignedMapLevelGenerator::Config
 loadDesignedMapLevelGeneratorConfig(const std::filesystem::path &BasePath,
                                     const rapidjson::Value &Doc) {
   DesignedMapLevelGenerator::Config MapCfg;
-  MapCfg.EntityConfig = loadLevelEntityConfigFromJSON(Doc);
+  MapCfg.EntityConfig = loadLevelEntityConfigFromJSON(BasePath, Doc);
 
   auto MapJson = Doc["map"].GetObject();
   MapCfg.MapFile = BasePath / MapJson["map_file"].GetString();
@@ -333,7 +356,7 @@ GeneratedMapLevelGenerator::Config
 loadGeneratedMapLevelGeneratorConfig(const std::filesystem::path &BasePath,
                                      const rapidjson::Value &Doc) {
   GeneratedMapLevelGenerator::Config MapCfg;
-  MapCfg.EntityConfig = loadLevelEntityConfigFromJSON(Doc);
+  MapCfg.EntityConfig = loadLevelEntityConfigFromJSON(BasePath, Doc);
 
   auto MapJson = Doc["map"].GetObject();
   MapCfg.MapConfig = BasePath / MapJson["config"].GetString();

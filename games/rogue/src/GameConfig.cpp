@@ -19,6 +19,8 @@ GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
   auto CreatureDbConfig = Doc["creature_db_config"].GetString();
   Config.CreatureDbConfig = ConfigDir / CreatureDbConfig;
 
+  Config.InitialGameWorld = Doc["initial_game_world"].GetString();
+
   auto InitialLevelConfig = Doc["initial_level_config"].GetString();
   Config.InitialLevelConfig = ConfigDir / InitialLevelConfig;
 
@@ -38,9 +40,10 @@ std::ostream &operator<<(std::ostream &Out, const GameConfig &Cfg) {
   Out << "  ItemDbConfig: " << Cfg.ItemDbConfig << "\n";
   Out << "  CreatureDbConfig: " << Cfg.CreatureDbConfig << "\n";
   Out << "  Level: " << Cfg.InitialLevelConfig << "\n";
+  Out << "  GameWorld: " << Cfg.InitialGameWorld << "\n";
   Out << "  InitialItems:\n";
   for (const auto &Item : Cfg.InitialItems) {
-    Out << "  InitialItem: " << Item.Name << " x" << Item.Count << "\n";
+    Out << "    -> " << Item.Name << " x" << Item.Count << "\n";
   }
   return Out;
 }

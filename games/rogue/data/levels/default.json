@@ -1,7 +1,7 @@
 {
   "map": {
     "type": "designed",
-    "map_file": "chest_room.map",
+    "map_file": "default.map",
     "default_char": {
       "color": "#222222",
       "key": " ",
@@ -18,11 +18,6 @@
         "key": "#",
         "layer": "walls"
       },
-      "C": {
-        "color": "#fac43c",
-        "key": "C",
-        "layer": "entities"
-      },
       "H": {
         "color": "#489dcf",
         "key": "H",
@@ -33,25 +28,25 @@
         "key": "<",
         "layer": "entities"
       },
-      "s": {
+      "r": {
         "color": "#b8ad74",
-        "key": "s",
+        "key": "r",
         "layer": "entities"
       }
     }
   },
-  "creatures": [
+  "creatures": [],
+  "chests": [],
+  "dungeons": [
+    {
+      "key": "r",
+      "world_type": "multi_level_dungeon",
+      "level_config": "initial_level.json"
+    },
     {
       "key": "s",
-      "name": "Skeleton",
-      "loot": "rare_enemy"
+      "world_type": "multi_level_dungeon",
+      "level_config": "skeleton_dungeon.json"
     }
-  ],
-  "chests": [
-    {
-      "key": "C",
-      "loot": "mixed_chest"
-    }
-  ],
-  "dungeons": []
+  ]
 }

@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <optional>
 #include <sstream>
+#include <filesystem>
 
 namespace rogue {
 struct BuffBase;
@@ -56,6 +57,11 @@ struct BuffExpiredEvent : public BaseEvent {
 struct SwitchLevelEvent : public BaseEvent {
   int Level = 0;
   bool ToEntry = false;
+};
+
+struct SwitchGameWorldEvent : public BaseEvent {
+  std::string GameWorldType;
+  std::filesystem::path LevelConfig;
 };
 
 struct LootEvent : public BaseEvent {
