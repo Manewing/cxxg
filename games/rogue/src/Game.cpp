@@ -425,8 +425,8 @@ ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
   return PI;
 }
 
-ui::Controller::TargetInfo getUITargetInfo(entt::entity Target,
-                                           entt::registry &Reg) {
+std::optional<ui::Controller::TargetInfo> getUITargetInfo(entt::entity Target,
+                                                          entt::registry &Reg) {
   if (Target == entt::null || !Reg.valid(Target)) {
     return {};
   }
