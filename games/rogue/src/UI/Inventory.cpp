@@ -97,30 +97,31 @@ bool InventoryController::handleInput(int Char) {
   const auto ItemIdx = List->getSelectedElement();
   switch (Char) {
   case Controls::Equip.Char: {
-    const auto &It = Inv.getItem(ItemIdx);
+    // Copy item we may change the inventory and invalidate the reference
+    const auto ItCopy = Inv.getItem(ItemIdx);
     auto Equip = Reg.try_get<EquipmentComp>(Entity);
     if (!Equip) {
-      Ctrl.publish(ErrorMessageEvent() << "Can not equip " + It.getName() +
+      Ctrl.publish(ErrorMessageEvent() << "Can not equip " + ItCopy.getName() +
                                               " on " +
                                               Reg.get<NameComp>(Entity).Name);
       break;
     }
 
     if (auto EquipItOrNone =
-            Equip->Equip.tryUnequip(It.getType(), Entity, Reg)) {
+            Equip->Equip.tryUnequip(ItCopy.getType(), Entity, Reg)) {
       Inv.addItem(*EquipItOrNone);
     }
 
-    assert(Equip->Equip.isEquipped(It.getType()) == false);
-    if (!Equip->Equip.canEquip(It, Entity, Reg)) {
+    assert(Equip->Equip.isEquipped(ItCopy.getType()) == false);
+    if (!Equip->Equip.canEquip(ItCopy, Entity, Reg)) {
       Ctrl.publish(PlayerInfoMessageEvent()
-                   << "Can not equip " + It.getName() + " on " +
+                   << "Can not equip " + ItCopy.getName() + " on " +
                           Reg.get<NameComp>(Entity).Name);
       break;
     }
 
     Ctrl.publish(PlayerInfoMessageEvent()
-                 << "Equip " + It.getName() + " on " +
+                 << "Equip " + ItCopy.getName() + " on " +
                         Reg.get<NameComp>(Entity).Name);
     Equip->Equip.equip(Inv.takeItem(ItemIdx, /*Count=*/1), Entity, Reg);
     updateElements();
