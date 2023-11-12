@@ -33,7 +33,11 @@ public:
 
   /// Switches to the level with the selected index \p LevelIdx
   /// \param LevelIdx The level index to switch to
-  void switchLevel(std::size_t LevelIdx);
+  /// \return The level that was switched to
+  Level &switchLevel(std::size_t LevelIdx);
+
+  /// Return the index of the currently active level
+  std::size_t getCurrentLevelIdx() const;
 
   /// Return the currently active level
   Level *getCurrentLevel() override;

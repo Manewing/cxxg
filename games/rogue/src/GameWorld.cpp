@@ -7,7 +7,7 @@ namespace rogue {
 MultiLevelDungeon::MultiLevelDungeon(LevelGenerator &LvlGen)
     : LevelGen(LvlGen) {}
 
-void MultiLevelDungeon::switchLevel(std::size_t LevelIdx) {
+Level &MultiLevelDungeon::switchLevel(std::size_t LevelIdx) {
   if (LevelIdx >= Levels.size() + 1) {
     throw std::runtime_error("MultiLevelDungeon: LevelId out of range");
   }
@@ -17,6 +17,11 @@ void MultiLevelDungeon::switchLevel(std::size_t LevelIdx) {
   }
 
   CurrentLevelIdx = LevelIdx;
+  return getCurrentLevelOrFail();
+}
+
+std::size_t MultiLevelDungeon::getCurrentLevelIdx() const {
+  return CurrentLevelIdx;
 }
 
 Level *MultiLevelDungeon::getCurrentLevel() {
@@ -25,7 +30,7 @@ Level *MultiLevelDungeon::getCurrentLevel() {
 }
 
 const Level *MultiLevelDungeon::getCurrentLevel() const {
-  if (Levels.empty()) {
+  if (Levels.empty() || CurrentLevelIdx >= Levels.size()) {
     return nullptr;
   }
 

@@ -6,6 +6,7 @@
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
 #include <rogue/EventHub.h>
+#include <rogue/GameWorld.h>
 #include <rogue/History.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/Level.h>
@@ -89,10 +90,8 @@ private:
   CreatureDatabase CreatureDb;
   GameContext Ctx;
   std::shared_ptr<LevelGenerator> LvlGen;
-  int CurrentLevelIdx = 0;
-  std::shared_ptr<Level> CurrentLevel;
+  MultiLevelDungeon MLD;
   RenderEventCollector REC;
-  std::vector<std::shared_ptr<Level>> Levels;
   ui::Controller UICtrl;
   long unsigned GameTicks = 0;
 };
