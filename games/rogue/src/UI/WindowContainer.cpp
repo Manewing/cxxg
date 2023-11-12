@@ -56,8 +56,9 @@ bool WindowContainer::handleInput(int Char) {
   }
 
   if (hasActiveWindow()) {
-    if (!getActiveWindow().handleInput(Char)) {
-      return closeActiveWindow();
+    auto &Wdw = getActiveWindow();
+    if (!Wdw.handleInput(Char)) {
+      return closeWindow(&Wdw);
     }
   }
   return false;

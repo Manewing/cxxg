@@ -149,6 +149,7 @@ void Game::switchLevel(int Level, bool ToEntry) {
     return;
   }
 
+  UICtrl.closeAll();
   REC.clear();
   World->switchLevel(Level, ToEntry);
 }
@@ -336,9 +337,9 @@ void Game::tryInteract() {
     auto &Interactable = getLvlReg().get<InteractableComp>(InteractableEntity);
     auto Player = getPlayer();
     auto &PC = getLvlReg().get<PlayerComp>(Player);
+    PC.CurrentInteraction = Interactable.Action;
     Interactable.Action.Execute(World->getCurrentLevelOrFail(), Player,
                                 getLvlReg());
-    PC.CurrentInteraction = Interactable.Action;
     return;
   }
 
@@ -389,6 +390,7 @@ void Game::onSwitchLevelEvent(const SwitchLevelEvent &E) {
 }
 
 void Game::onSwitchGameWorldEvent(const SwitchGameWorldEvent &E) {
+  UICtrl.closeAll();
   REC.clear();
 
   World->switchWorld(Cfg.Seed, E.GameWorldType, E.LevelConfig, E.SwitchEt);

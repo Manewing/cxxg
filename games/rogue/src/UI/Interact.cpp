@@ -24,10 +24,9 @@ bool Interact::handleInput(int Char) {
   bool KeepWindow = true;
   switch (Char) {
   case 'e':
+    destroyCursor();
     handleInteraction();
-    Ctrl.closeAll();
-    KeepWindow = false;
-    break;
+    return false;
   default:
     KeepWindow = List->handleInput(Char);
     updateCursor();
@@ -77,8 +76,10 @@ void Interact::handleInteraction() {
   auto SelIdx = List->getSelectedElement();
   const auto InteractableEntity = InteractablesEts.at(SelIdx);
   auto &Interactable = Lvl.Reg.get<InteractableComp>(InteractableEntity);
-  Interactable.Action.Execute(Lvl, SrcEt, Lvl.Reg);
   PC.CurrentInteraction = Interactable.Action;
+
+  // This may switch level so needs to be last thing that is done
+  Interactable.Action.Execute(Lvl, SrcEt, Lvl.Reg);
 }
 
 } // namespace rogue::ui
