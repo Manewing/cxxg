@@ -383,6 +383,41 @@ void Game::onLootEvent(const LootEvent &E) {
   UICtrl.setLootUI(E.Entity, E.LootedEntity, *E.Registry);
 }
 
+namespace {
+
+ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
+                                           entt::registry &Reg,
+                                           Interaction *Interact) {
+  const auto &Health = Reg.get<HealthComp>(Player);
+  const auto &AGC = Reg.get<AgilityComp>(Player);
+
+  ui::Controller::PlayerInfo PI;
+  PI.Health = Health.Value;
+  PI.MaxHealth = Health.MaxValue;
+  PI.AP = AGC.AP;
+  if (Interact) {
+    PI.InteractStr = "[E] " + Interact->Msg;
+  }
+
+  return PI;
+}
+
+ui::Controller::TargetInfo getUITargetInfo(entt::entity Target,
+                                           entt::registry &Reg) {
+  if (Target == entt::null || !Reg.valid(Target)) {
+    return {};
+  }
+  ui::Controller::TargetInfo TI;
+  auto *TNC = Reg.try_get<NameComp>(Target);
+  auto *THC = Reg.try_get<HealthComp>(Target);
+  TI.Name = TNC ? TNC->Name : "<NameCompMissing>";
+  TI.Health = THC ? THC->Value : 0;
+  TI.MaxHealth = THC ? THC->MaxValue : 0;
+  return TI;
+}
+
+} // namespace
+
 void Game::handleDrawLevel(bool UpdateScreen) {
   // Render the current map
   const auto RenderSize = ymir::Size2d<int>{static_cast<int>(Scr.getSize().X),
@@ -393,26 +428,6 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   const auto &PC = getLvlReg().get<PlayerComp>(Player);
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
   const auto &LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
-  const auto &Health = getLvlReg().get<HealthComp>(Player);
-  const auto &AGC = getLvlReg().get<AgilityComp>(Player);
-
-  ui::Controller::PlayerInfo PI;
-  PI.Health = Health.Value;
-  PI.MaxHealth = Health.MaxValue;
-  PI.AP = AGC.AP;
-  if (auto *Interact = getAvailableInteraction()) {
-    PI.InteractStr = "[E] " + Interact->Msg;
-  }
-
-  std::optional<ui::Controller::TargetInfo> TI;
-  if (PC.Target != entt::null && getLvlReg().valid(PC.Target)) {
-    TI = ui::Controller::TargetInfo();
-    auto *TNC = getLvlReg().try_get<NameComp>(PC.Target);
-    auto *THC = getLvlReg().try_get<HealthComp>(PC.Target);
-    TI->Name = TNC ? TNC->Name : "<NameCompMissing>";
-    TI->Health = THC ? THC->Value : 0;
-    TI->MaxHealth = THC ? THC->MaxValue : 0;
-  }
 
   auto &CurrentLevel = MLD.getCurrentLevelOrFail();
   Renderer Render(RenderSize, CurrentLevel, PlayerPos);
@@ -426,6 +441,8 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   Scr << Render.get();
 
   // Draw UI overlay
+  auto PI = getUIPlayerInfo(Player, getLvlReg(), getAvailableInteraction());
+  auto TI = getUITargetInfo(PC.Target, getLvlReg());
   UICtrl.draw(MLD.getCurrentLevelIdx(), PI, TI);
 
   if (UpdateScreen) {
