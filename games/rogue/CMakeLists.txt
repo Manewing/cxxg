@@ -22,6 +22,7 @@ set(HEADER_FILES
   include/rogue/Event.h
   include/rogue/EventHub.h
   include/rogue/Game.h
+  include/rogue/GameWorld.h
   include/rogue/History.h
   include/rogue/Inventory.h
   include/rogue/Item.h
@@ -32,16 +33,16 @@ set(HEADER_FILES
   include/rogue/ItemType.h
   include/rogue/JSON.h
   include/rogue/Level.h
-  include/rogue/LootTable.h
   include/rogue/LevelGenerator.h
+  include/rogue/LootTable.h
   include/rogue/Parser.h
   include/rogue/Renderer.h
   include/rogue/Systems/AttackAISystem.h
   include/rogue/Systems/CombatSystem.h
   include/rogue/Systems/DeathSystem.h
   include/rogue/Systems/MovementSystem.h
-  include/rogue/Systems/PlayerSystem.h
   include/rogue/Systems/NPCSystem.h
+  include/rogue/Systems/PlayerSystem.h
   include/rogue/Systems/RegenSystem.h
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
@@ -79,6 +80,7 @@ set(SOURCE_FILES
   src/Event.cpp
   src/Game.cpp
   src/GameConfig.cpp
+  src/GameWorld.cpp
   src/History.cpp
   src/Inventory.cpp
   src/Item.cpp
@@ -89,8 +91,8 @@ set(SOURCE_FILES
   src/ItemType.cpp
   src/JSON.cpp
   src/Level.cpp
-  src/LootTable.cpp
   src/LevelGenerator.cpp
+  src/LootTable.cpp
   src/Parser.cpp
   src/Renderer.cpp
   src/Systems/AgilitySystem.cpp

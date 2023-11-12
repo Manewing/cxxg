@@ -1,8 +1,11 @@
 set(SOURCES
-  Components/HelpersTest.cpp
   Components/BuffsTest.cpp
+  Components/HelpersTest.cpp
   CreatureDatabaseTest.cpp
   EventHubTest.cpp
+  GameWorldTest.cpp
+  ItemDatabaseTest.cpp
+  LevelGeneratorTest.cpp
   LootTableTest.cpp
   Systems/StatsSystemTest.cpp
 )

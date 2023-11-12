@@ -59,12 +59,17 @@ TEST(LootTableTest, GuaranteedRewards) {
   EXPECT_EQ(Loot.size(), 0);
 }
 
+TEST(LootTableTest, Empty) {
+  rogue::LootTable LTB;
+  auto Loot = LTB.generateLoot();
+  EXPECT_TRUE(Loot.empty());
+}
+
 TEST(LootTableTest, NullLoot) {
   rogue::LootTable LTB(1, {
                               {nullptr, 20},
                               {nullptr, -1},
                           });
-  std::vector<rogue::LootContainer::LootReward> LootRef;
   auto Loot = LTB.generateLoot();
   EXPECT_TRUE(Loot.empty());
 }

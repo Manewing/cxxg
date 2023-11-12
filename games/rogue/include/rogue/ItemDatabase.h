@@ -24,6 +24,7 @@ public:
 
   int getRandomItemId() const;
 
+  LootTable &addLootTable(const std::string &Name);
   const std::shared_ptr<LootTable> &getLootTable(const std::string &Name) const;
 
 private:

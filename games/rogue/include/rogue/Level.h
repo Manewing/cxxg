@@ -41,11 +41,13 @@ public:
   // Returns false if game over
   bool update(bool IsTick);
 
+  // FIXME decouple player from level
   void createPlayer();
   void movePlayer(Level &From, ymir::Point2d<int> AtPos);
   void removePlayer();
   const entt::entity &getPlayer() const;
 
+  // FIXME rename to getLevelStart/EndPos
   ymir::Point2d<int> getPlayerStartPos() const;
   ymir::Point2d<int> getPlayerEndPos() const;
 
@@ -68,7 +70,9 @@ public:
   std::pair<ymir::Map<int, int>, std::vector<ymir::Point2d<int>>>
   getDijkstraMap(Tile Target, std::size_t Layer) const;
 
+  // FIXME remove unused
   const ymir::Map<int, int> &getPlayerDijkstraMap() const;
+
   const ymir::Map<bool, int> &getPlayerSeenMap() const;
 
   const entt::entity &getEntityAt(ymir::Point2d<int> AtPos) const;
@@ -90,6 +94,7 @@ private:
   int LevelId;
   std::vector<std::shared_ptr<System>> Systems;
 
+  // FIXME decouple player from level
   entt::entity Player = entt::null;
 
   ymir::Map<entt::entity, int> EntityPosCache;

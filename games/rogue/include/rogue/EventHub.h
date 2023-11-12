@@ -73,7 +73,7 @@ public:
     Hub->publish(E);
   }
 
-private:
+protected:
   EventHub *Hub = nullptr;
 };
 

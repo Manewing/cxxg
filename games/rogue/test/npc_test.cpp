@@ -10,6 +10,9 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Context.h>
+#include <rogue/CreatureDatabase.h>
+#include <rogue/ItemDatabase.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/Renderer.h>
 #include <ymir/LayeredMap.hpp>
@@ -68,8 +71,13 @@ int main(int Argc, char *Argv[]) {
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
-  LevelGenerator LG;
-  auto Level = LG.generateLevel(0, 0, Argv[1]);
+  rogue::ItemDatabase ItemDb;
+  rogue::CreatureDatabase CreatureDb;
+  rogue::GameContext Ctx{ItemDb, CreatureDb};
+
+  LevelGeneratorLoader LvlGenLoader(Ctx);
+  auto LG = LvlGenLoader.load(0, Argv[1]);
+  auto Level = LG->generateLevel(0);
   auto NPCEntity =
       createNPCEntity(Level->Reg, {4, 4}, StatPoints{10, 10, 10, 10});
 

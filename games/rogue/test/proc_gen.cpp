@@ -110,9 +110,9 @@ std::shared_ptr<Level> generateChunk(int LevelId, ymir::Rect2d<int> ChunkRect) {
   return NewChunk;
 }
 
-class GameWorld {
+class GameWorldProcGen {
 public:
-  virtual ~GameWorld() = default;
+  virtual ~GameWorldProcGen() = default;
   virtual void initialize(ymir::Point2d<int> InitPos = {0, 0}) = 0;
   virtual bool update(ymir::Point2d<int> Pos = {0, 0}) = 0;
 
@@ -127,7 +127,7 @@ public:
   }
 };
 
-class OverWorld : public GameWorld {
+class OverWorld : public GameWorldProcGen {
 public:
   explicit OverWorld(ymir::Size2d<int> ChunkSize) : ChunkSize(ChunkSize) {}
 
@@ -219,7 +219,7 @@ public:
 };
 
 ymir::Map<cxxg::types::ColoredChar> renderWorldMap(ymir::Size2d<int> Size,
-                                                   const GameWorld &GW,
+                                                   const GameWorldProcGen &GW,
                                                    ymir::Point2d<int> Center) {
   ymir::Map<cxxg::types::ColoredChar> VisibleMap(Size);
   ymir::Point2d<int> Offset;
@@ -306,7 +306,7 @@ private:
   int Speed = 1;
 
   const ymir::Size2d<int> ChunkSize = {256, 64};
-  std::shared_ptr<GameWorld> CurrentGameWorld;
+  std::shared_ptr<GameWorldProcGen> CurrentGameWorld;
 };
 
 int main(int Argc, char *Argv[]) {

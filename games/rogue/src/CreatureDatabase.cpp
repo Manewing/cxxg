@@ -39,7 +39,11 @@ CreatureDatabase::load(const std::filesystem::path &CreatureDbConfig) {
 
 CreatureId
 CreatureDatabase::getCreatureId(const std::string &CreatureName) const {
-  return CreatureIdsByName.at(CreatureName);
+  auto It = CreatureIdsByName.find(CreatureName);
+  if (It == CreatureIdsByName.end()) {
+    throw std::out_of_range("Unknown creature name: " + CreatureName);
+  }
+  return It->second;
 }
 
 void CreatureDatabase::addCreature(CreatureInfo CreatureInfo) {

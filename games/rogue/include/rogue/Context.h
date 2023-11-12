@@ -10,7 +10,6 @@ class CreatureDatabase;
 namespace rogue {
 
 struct GameContext {
-  Game &G;
   const ItemDatabase &ItemDb;
   const CreatureDatabase &CreatureDb;
 };

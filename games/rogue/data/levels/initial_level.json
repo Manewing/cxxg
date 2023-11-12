@@ -1,0 +1,40 @@
+{
+  "map": {
+    "type": "composite",
+    "levels": [
+      {
+        "end": 2,
+        "config": "sewers.json"
+      },
+      {
+        "end": 3,
+        "config": "blob_cave.json"
+      },
+      {
+        "end": 6,
+        "config": "troll_dungeon.json"
+      },
+      {
+        "end": 8,
+        "config": "skeleton_dungeon.json"
+      },
+      {
+        "end": 9,
+        "config": "chest_room.json"
+      }
+    ]
+  },
+  "creatures": [
+    {
+      "key": "b",
+      "name": "Blob",
+      "loot": "common_blob"
+    }
+  ],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "common_chest"
+    }
+  ]
+}

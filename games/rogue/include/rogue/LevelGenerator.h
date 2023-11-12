@@ -11,11 +11,11 @@
 
 namespace rogue {
 struct GameContext;
-}
+} // namespace rogue
 
 namespace rogue {
 
-struct LevelConfig {
+struct LevelEntityConfig {
 public:
   struct Creature {
     std::string Name;
@@ -26,11 +26,47 @@ public:
     std::string LootTableName;
   };
 
-  struct GeneratedMap {
-    std::filesystem::path Config;
+public:
+  std::map<char, Creature> Creatures;
+  std::map<char, Chest> Chests;
+};
+
+/// Base class for all level generators
+class LevelGenerator {
+public:
+  explicit LevelGenerator(const GameContext &Ctx);
+
+  virtual ~LevelGenerator() = default;
+  virtual std::shared_ptr<Level> generateLevel(int LevelId) const = 0;
+
+protected:
+  void spawnEntities(const LevelEntityConfig &Cfg, Level &L) const;
+  void spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
+                   ymir::Point2d<int> Pos) const;
+
+protected:
+  const GameContext &Ctx;
+};
+
+/// Level generator that generates an empty level with the given size
+class EmptyLevelGenerator : public LevelGenerator {
+public:
+  struct Config {
+    ymir::Size2d<int> Size;
   };
 
-  struct DesignedMap {
+public:
+  EmptyLevelGenerator(const GameContext &Ctx, const Config &Cfg);
+  std::shared_ptr<Level> generateLevel(int LevelId) const final;
+
+private:
+  Config Cfg;
+};
+
+/// Level generator that generates a level from a designed map
+class DesignedMapLevelGenerator : public LevelGenerator {
+public:
+  struct Config {
     struct CharInfo {
       Tile T;
       std::string Layer;
@@ -39,33 +75,94 @@ public:
     std::filesystem::path MapFile;
     CharInfo DefaultChar;
     std::map<char, CharInfo> CharInfoMap;
+    LevelEntityConfig EntityConfig;
   };
 
-  using MapConfig = std::variant<GeneratedMap, DesignedMap>;
-
 public:
-  MapConfig Map;
-  std::map<char, Creature> Creatures;
-  std::map<char, Chest> Chests;
+  DesignedMapLevelGenerator(const GameContext &Ctx, const Config &Cfg);
+
+  std::shared_ptr<Level> generateLevel(int LevelId) const final;
+
+protected:
+  std::shared_ptr<Level> createNewLevel(int LevelId) const;
+
+private:
+  Config Cfg;
 };
 
-class LevelGenerator {
+/// Level generator that generates a level from a procedurally generated map
+class GeneratedMapLevelGenerator : public LevelGenerator {
 public:
-  explicit LevelGenerator(GameContext *Ctx = nullptr);
+  struct Config {
+    unsigned Seed = 0;
+    std::filesystem::path MapConfig;
+    LevelEntityConfig EntityConfig;
+  };
 
-  std::shared_ptr<Level> generateLevel(unsigned Seed, int LevelId,
+public:
+  GeneratedMapLevelGenerator(const GameContext &Ctx, const Config &Cfg);
+
+  std::shared_ptr<Level> generateLevel(int LevelId) const final;
+
+protected:
+  std::shared_ptr<Level> createNewLevel(int LevelId) const;
+
+private:
+  Config Cfg;
+};
+
+/// A level generator that is build up from multiple level generators and can
+/// use different generators for different level ranges
+class CompositeMultiLevelGenerator : public LevelGenerator {
+public:
+  struct Config {
+    struct LevelRange {
+      std::size_t LevelEndIdx = 0;
+      std::filesystem::path Config;
+    };
+    std::vector<LevelRange> Levels;
+  };
+
+  struct LevelRange {
+    std::size_t LevelEndIdx = 0;
+    std::shared_ptr<LevelGenerator> Generator;
+  };
+
+public:
+  CompositeMultiLevelGenerator(const GameContext &Ctx);
+
+  const LevelGenerator &getGeneratorForLevel(std::size_t LevelIdx) const;
+
+  void addGenerator(std::shared_ptr<LevelGenerator> Generator,
+                    std::size_t LevelEndIdx);
+
+  std::shared_ptr<Level> generateLevel(int LevelId) const final;
+
+private:
+  std::vector<LevelRange> Generators;
+};
+
+/// Helper class for loading level generation configurations and creating
+/// level generators
+class LevelGeneratorLoader {
+public:
+  using LevelConfig = std::variant<
+      EmptyLevelGenerator::Config, DesignedMapLevelGenerator::Config,
+      GeneratedMapLevelGenerator::Config, CompositeMultiLevelGenerator::Config>;
+
+public:
+  static LevelConfig loadCfg(unsigned Seed,
+                             const std::filesystem::path &CfgFile);
+
+public:
+  explicit LevelGeneratorLoader(const GameContext &Ctx);
+
+  std::shared_ptr<LevelGenerator> create(unsigned Seed, const LevelConfig &Cfg);
+  std::shared_ptr<LevelGenerator> load(unsigned Seed,
                                        const std::filesystem::path &CfgFile);
 
-  std::shared_ptr<Level> generateLevel(unsigned Seed, int LevelId,
-                                       const LevelConfig &Cfg);
-
-protected:
-  void spawnEntities(const LevelConfig &Cfg, Level &L);
-  void spawnEntity(const LevelConfig &Cfg, Level &L, ymir::Point2d<int> Pos,
-                   Tile T);
-
-protected:
-  GameContext *Ctx = nullptr;
+private:
+  const GameContext &Ctx;
 };
 
 } // namespace rogue

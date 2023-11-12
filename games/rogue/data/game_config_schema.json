@@ -4,32 +4,12 @@
   "description": "JSON Schema the game config",
   "type": "object",
   "required": [
-    "levels",
+    "creature_db_config",
     "item_db_config",
+    "initial_level_config",
     "initial_items"
   ],
   "properties": {
-    "level_config": {
-      "type": "array",
-      "description": "Level ranges in the game and their respective config",
-      "items": {
-        "type": "object",
-        "required": [
-          "end",
-          "config"
-        ],
-        "properties": {
-          "end": {
-            "type": "integer",
-            "description": "The level at which this config ends"
-          },
-          "config": {
-            "type": "string",
-            "description": "Path to the level config file"
-          }
-        }
-      }
-    },
     "item_db_config": {
       "type": "string",
       "description": "Relative (to the config) path to the item DB config file"
@@ -38,15 +18,16 @@
       "type": "string",
       "description": "Relative (to the config) path to the creature DB config file"
     },
+    "initial_level_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the initial level configuration file"
+    },
     "initial_items": {
       "type": "array",
       "description": "Items the player starts with",
       "items": {
         "type": "object",
-        "required": [
-          "name",
-          "count"
-        ],
+        "required": ["name", "count"],
         "properties": {
           "name": {
             "type": "string",

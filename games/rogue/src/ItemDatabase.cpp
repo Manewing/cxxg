@@ -299,14 +299,11 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   for (const auto &[K, V] : LootTablesJson) {
     const auto Name = std::string(K.GetString());
     // Check if already registered
-    if (DB.LootTables.count(Name) != 0) {
-      throw std::runtime_error("Duplicate loot table: " + Name);
-    }
-    DB.LootTables.emplace(Name, std::make_shared<LootTable>());
+    DB.addLootTable(Name);
   }
   for (const auto &[K, V] : LootTablesJson) {
     const auto Name = std::string(K.GetString());
-    auto &LootTb = DB.LootTables.at(Name);
+    auto &LootTb = DB.getLootTable(Name);
     fillLootTable(DB, V, *LootTb);
   }
 
@@ -345,9 +342,21 @@ Item ItemDatabase::createItem(int ItemId, int StackSize) const {
 }
 
 int ItemDatabase::getRandomItemId() const {
+  if (ItemProtos.empty()) {
+    throw std::out_of_range("No item prototypes");
+  }
   const auto Idx = rand() % ItemProtos.size();
   const auto It = std::next(ItemProtos.begin(), Idx);
   return It->first;
+}
+
+LootTable &ItemDatabase::addLootTable(const std::string &Name) {
+  auto [It, Inserted] = LootTables.emplace(Name, std::make_shared<LootTable>());
+  if (!Inserted) {
+    throw std::out_of_range("Loot table with name '" + Name +
+                            "' already exists");
+  }
+  return *It->second;
 }
 
 const std::shared_ptr<LootTable> &

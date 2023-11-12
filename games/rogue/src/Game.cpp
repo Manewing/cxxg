@@ -86,22 +86,14 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
       ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)),
       CreatureDb(CreatureDatabase::load(Cfg.CreatureDbConfig)),
-      Ctx({*this, ItemDb, CreatureDb}), LevelGen(&Ctx), CurrentLevel(nullptr),
-      UICtrl(Scr) {}
+      Ctx({ItemDb, CreatureDb}),
+      LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
+      CurrentLevel(nullptr), UICtrl(Scr) {}
 
-void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
-  EHW.setEventHub(&EvHub);
-  EHW.subscribe(*this, &Game::onEntityDiedEvent);
-  EHW.subscribe(*this, &Game::onSwitchLevelEvent);
-  EHW.subscribe(*this, &Game::onLootEvent);
-  REC.setEventHub(&EvHub);
-  UICtrl.setEventHub(&EvHub);
+namespace {
 
-  switchLevel(0, /*ToEntry=*/true);
-
-  // Fill player inventory
-  auto Player = CurrentLevel->getPlayer();
-  auto &Reg = CurrentLevel->Reg;
+void fillPlayerInventory(entt::registry &Reg, entt::entity Player,
+                         const GameConfig &Cfg, const ItemDatabase &ItemDb) {
   auto &InvComp = Reg.get<InventoryComp>(Player);
   auto &EquipComp = Reg.get<EquipmentComp>(Player);
   auto &Inv = InvComp.Inv;
@@ -123,6 +115,22 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
       Idx -= 1;
     }
   }
+}
+
+} // namespace
+
+void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
+  EHW.setEventHub(&EvHub);
+  EHW.subscribe(*this, &Game::onEntityDiedEvent);
+  EHW.subscribe(*this, &Game::onSwitchLevelEvent);
+  EHW.subscribe(*this, &Game::onLootEvent);
+  REC.setEventHub(&EvHub);
+  UICtrl.setEventHub(&EvHub);
+
+  switchLevel(0, /*ToEntry=*/true);
+
+  // Fill player inventory
+  fillPlayerInventory(getLvlReg(), getPlayer(), Cfg, ItemDb);
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
 
@@ -140,11 +148,10 @@ void Game::switchLevel(int Level, bool ToEntry) {
 
   REC.clear();
 
+  // GW.switchLevel(Level);
   if (Level >= static_cast<int>(Levels.size())) {
     assert((Level - 1) < static_cast<int>(Levels.size()));
-    const auto &LvlCfg = Cfg.getLevelRangeConfig(Level);
-    Levels.push_back(
-        LevelGen.generateLevel(Cfg.Seed + Level, Level, LvlCfg.Config));
+    Levels.push_back(LvlGen->generateLevel(Level));
     Levels.back()->setEventHub(&EvHub);
   }
 

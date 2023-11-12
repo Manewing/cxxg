@@ -88,7 +88,7 @@ private:
   ItemDatabase ItemDb;
   CreatureDatabase CreatureDb;
   GameContext Ctx;
-  LevelGenerator LevelGen;
+  std::shared_ptr<LevelGenerator> LvlGen;
   int CurrentLevelIdx = 0;
   std::shared_ptr<Level> CurrentLevel;
   RenderEventCollector REC;

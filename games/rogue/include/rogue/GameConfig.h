@@ -7,11 +7,6 @@
 
 namespace rogue {
 
-struct LevelRangeConfig {
-  int LevelEndIdx = 0;
-  std::filesystem::path Config;
-};
-
 struct PlayerInitialItemConfig {
   std::string Name;
   unsigned Count = 1;
@@ -21,12 +16,10 @@ struct GameConfig {
   unsigned Seed = 0;
   std::filesystem::path CreatureDbConfig;
   std::filesystem::path ItemDbConfig;
-  std::vector<LevelRangeConfig> Levels;
+  std::filesystem::path InitialLevelConfig;
   std::vector<PlayerInitialItemConfig> InitialItems;
 
   static GameConfig load(const std::filesystem::path &ConfigFile);
-
-  const LevelRangeConfig &getLevelRangeConfig(int LevelIdx) const;
 };
 
 std::ostream &operator<<(std::ostream &Out, const GameConfig &Cfg);
