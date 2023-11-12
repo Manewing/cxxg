@@ -241,7 +241,7 @@ CompositeMultiLevelGenerator::getGeneratorForLevel(std::size_t LevelIdx) const {
       return *Generator;
     }
   }
-  throw std::out_of_range("No level config for level " +
+  throw std::out_of_range("No level config for level index " +
                           std::to_string(LevelIdx));
 }
 
@@ -257,6 +257,13 @@ std::shared_ptr<Level>
 CompositeMultiLevelGenerator::generateLevel(int LevelId) const {
   const auto &Generator = getGeneratorForLevel(LevelId);
   return Generator.generateLevel(LevelId);
+}
+
+std::size_t CompositeMultiLevelGenerator::getMaxLevelIdx() const {
+  if (Generators.empty()) {
+    return 0;
+  }
+  return Generators.back().LevelEndIdx + 1;
 }
 
 namespace {

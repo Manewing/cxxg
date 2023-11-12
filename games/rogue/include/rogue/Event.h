@@ -57,11 +57,15 @@ struct BuffExpiredEvent : public BaseEvent {
 struct SwitchLevelEvent : public BaseEvent {
   int Level = 0;
   bool ToEntry = false;
+  entt::entity TriggerEt = entt::null;
+  entt::entity SwitchEt = entt::null;
 };
 
 struct SwitchGameWorldEvent : public BaseEvent {
   std::string GameWorldType;
   std::filesystem::path LevelConfig;
+  entt::entity TriggerEt = entt::null;
+  entt::entity SwitchEt = entt::null;
 };
 
 struct LootEvent : public BaseEvent {

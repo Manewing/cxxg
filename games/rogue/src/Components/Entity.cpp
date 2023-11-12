@@ -73,11 +73,11 @@ void createWorldEntry(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
   Reg.emplace<InteractableComp>(
-      Entity,
-      Interaction{
-          "Enter dungeon", [WorldType, LevelConfig](auto &EHC, auto, auto &) {
-            EHC.publish(SwitchGameWorldEvent{{}, WorldType, LevelConfig});
-          }});
+      Entity, Interaction{"Enter dungeon", [WorldType, LevelConfig, Entity](
+                                               auto &EHC, auto SrcEt, auto &) {
+                            EHC.publish(SwitchGameWorldEvent{
+                                {}, WorldType, LevelConfig, SrcEt, Entity});
+                          }});
   Reg.emplace<CollisionComp>(Entity);
 }
 
@@ -88,11 +88,11 @@ void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<TileComp>(Entity, T);
   Reg.emplace<InteractableComp>(
       Entity,
-      Interaction{
-          IsExit ? "Previous Level" : "Next level",
-          [LevelId, IsExit](auto &EHC, auto, auto &) {
-            EHC.publish(SwitchLevelEvent{{}, LevelId, /*ToEntry=*/!IsExit});
-          }});
+      Interaction{IsExit ? "Previous Level" : "Next level",
+                  [LevelId, IsExit, Entity](auto &EHC, auto SrcEt, auto &) {
+                    EHC.publish(SwitchLevelEvent{
+                        {}, LevelId, /*ToEntry=*/!IsExit, SrcEt, Entity});
+                  }});
   Reg.emplace<CollisionComp>(Entity);
   if (IsExit) {
     Reg.emplace<LevelStartComp>(Entity, LevelId);

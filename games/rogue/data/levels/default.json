@@ -46,12 +46,12 @@
     {
       "key": "r",
       "world_type": "multi_level_dungeon",
-      "level_config": "initial_level.json"
+      "level_config": "sewers.json"
     },
     {
       "key": "s",
       "world_type": "multi_level_dungeon",
-      "level_config": "skeleton_dungeon.json"
+      "level_config": "initial_level.json"
     }
   ]
 }

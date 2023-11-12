@@ -150,16 +150,7 @@ void Game::switchLevel(int Level, bool ToEntry) {
   }
 
   REC.clear();
-
-  auto *CurrLvl = World->getCurrentLevel();
-  auto &Nextlvl = World->switchLevel(Level);
-
-  if (CurrLvl && CurrLvl != &Nextlvl) {
-    auto ToPos =
-        ToEntry ? Nextlvl.getPlayerStartPos() : Nextlvl.getPlayerEndPos();
-    Nextlvl.update(false);
-    Nextlvl.movePlayer(*CurrLvl, ToPos);
-  }
+  World->switchLevel(Level, ToEntry);
 }
 
 bool Game::handleInput(int Char) {
@@ -400,15 +391,7 @@ void Game::onSwitchLevelEvent(const SwitchLevelEvent &E) {
 void Game::onSwitchGameWorldEvent(const SwitchGameWorldEvent &E) {
   REC.clear();
 
-  auto *CurrLvl = World->getCurrentLevel();
-  World->switchWorld(Cfg.Seed, E.GameWorldType, E.LevelConfig);
-  auto &Nextlvl = World->switchLevel(0);
-
-  if (CurrLvl && CurrLvl != &Nextlvl) {
-    auto ToPos = Nextlvl.getPlayerStartPos();
-    Nextlvl.update(false);
-    Nextlvl.movePlayer(*CurrLvl, ToPos);
-  }
+  World->switchWorld(Cfg.Seed, E.GameWorldType, E.LevelConfig, E.SwitchEt);
 
   // We could update the level here, but we want to draw the initial state.
   handleUpdates(/*IsTick=*/false);

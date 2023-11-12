@@ -65,7 +65,6 @@ void Level::createPlayer() {
 
 void Level::movePlayer(Level &From, ymir::Point2d<int> ToPos) {
   Player = PlayerComp::movePlayer(From.Reg, Reg);
-  From.Player = entt::null;
   From.removePlayer();
   auto &PC = Reg.get<PositionComp>(Player);
   PC.Pos = ToPos;
@@ -73,6 +72,7 @@ void Level::movePlayer(Level &From, ymir::Point2d<int> ToPos) {
 }
 
 void Level::removePlayer() {
+  Player = entt::null;
   PlayerComp::removePlayer(Reg);
   updateEntityPosCache();
 }

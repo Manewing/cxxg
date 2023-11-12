@@ -26,10 +26,11 @@ public:
   /// Switches to the level with the selected index \p LevelIdx
   /// \param LevelIdx The level index to switch to
   /// \return The level that was switched to
-  virtual Level &switchLevel(std::size_t LevelIdx) = 0;
+  virtual Level &switchLevel(std::size_t LevelIdx, bool ToEntry) = 0;
 
   virtual void switchWorld(unsigned Seed, std::string_view Type,
-                           std::filesystem::path Config) = 0;
+                           std::filesystem::path Config,
+                           entt::entity SwitchEt) = 0;
 
   /// Return the index of the currently active level
   virtual std::size_t getCurrentLevelIdx() const = 0;
@@ -53,11 +54,12 @@ public:
   /// Switches to the level with the selected index \p LevelIdx
   /// \param LevelIdx The level index to switch to
   /// \return The level that was switched to
-  Level &switchLevel(std::size_t LevelIdx) override;
+  Level &switchLevel(std::size_t LevelIdx, bool ToEntry) override;
 
   // FIXME
   void switchWorld(unsigned Seed, std::string_view Type,
-                   std::filesystem::path Config) override;
+                   std::filesystem::path Config,
+                   entt::entity SwitchEt) override;
 
   /// Return the index of the currently active level
   std::size_t getCurrentLevelIdx() const override;
@@ -104,11 +106,12 @@ public:
   // FIXME
   // LevelIdx == 0 -> top level selection
   // LevelIdx > 1 -> individual levels
-  Level &switchLevel(std::size_t LevelIdx) override;
+  Level &switchLevel(std::size_t LevelIdx, bool ToEntry) override;
 
   // FIXME
   void switchWorld(unsigned Seed, std::string_view Type,
-                   std::filesystem::path Config) override;
+                   std::filesystem::path Config,
+                   entt::entity SwitchEt) override;
 
   // FIXME
   /// Return the index of the currently active level
@@ -126,6 +129,8 @@ private:
   std::shared_ptr<Level> Lvl;
   std::shared_ptr<LevelGenerator> CurrSubLvlGen = nullptr;
   std::unique_ptr<GameWorld> CurrSubWorld = nullptr;
+  std::size_t CurrMaxLevel = 0;
+  entt::entity CurrSwitchEntity = entt::null;
 };
 
 /// A chunk based procedurally generated infinite world

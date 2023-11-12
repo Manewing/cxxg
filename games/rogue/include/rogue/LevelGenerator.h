@@ -146,6 +146,8 @@ public:
 
   std::shared_ptr<Level> generateLevel(int LevelId) const final;
 
+  std::size_t getMaxLevelIdx() const;
+
 private:
   std::vector<LevelRange> Generators;
 };
