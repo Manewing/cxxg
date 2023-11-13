@@ -1,7 +1,7 @@
 {
   "map": {
     "type": "designed",
-    "map_file": "areana.map",
+    "map_file": "arena.map",
     "default_char": {
       "color": "#222222",
       "key": " ",
