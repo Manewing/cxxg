@@ -12,7 +12,7 @@ cmake_parse_arguments(
   ${ARGN}
 )
 
-set(TARGET test_${ARGS_NAME})
+set(TARGET unittest_${ARGS_NAME})
 
 add_executable(${TARGET}
   ${ARGS_SOURCES}

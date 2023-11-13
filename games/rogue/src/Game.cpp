@@ -338,6 +338,8 @@ void Game::tryInteract() {
     auto Player = getPlayer();
     auto &PC = getLvlReg().get<PlayerComp>(Player);
     PC.CurrentInteraction = Interactable.Action;
+
+    // This may switch level so needs to be last thing that is done
     Interactable.Action.Execute(World->getCurrentLevelOrFail(), Player,
                                 getLvlReg());
     return;

@@ -1,12 +1,8 @@
 {
 	"item_db_config": "item_db.json",
 	"creature_db_config": "creature_db.json",
-	"levels": [
-		{
-			"end": 1,
-			"config": "levels/areana.json"
-		}
-	],
+	"initial_game_world": "multi_level_dungeon",
+	"initial_level_config": "levels/areana.json",
 	"initial_items": [
 		{
 			"name": "Small Sword",
