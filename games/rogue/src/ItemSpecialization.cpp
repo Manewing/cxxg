@@ -8,14 +8,14 @@ namespace rogue {
 std::shared_ptr<ItemEffect> StatsBuffSpecialization::createEffect() const {
   // Compute points to spent
   assert(MinPoints <= MaxPoints);
-  StatPoint Points = rand() % (MaxPoints - MinPoints + 1) + MinPoints;
+  StatPoint Points = std::rand() % (MaxPoints - MinPoints + 1) + MinPoints;
 
   StatPoints Stats;
   auto AllStats = Stats.all();
 
   // Distribute points
   while (Points-- > 0) {
-    auto *Stat = AllStats[rand() % AllStats.size()];
+    auto *Stat = AllStats[std::rand() % AllStats.size()];
     *Stat += 1;
   }
 

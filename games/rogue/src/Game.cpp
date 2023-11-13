@@ -120,6 +120,9 @@ void fillPlayerInventory(entt::registry &Reg, entt::entity Player,
 } // namespace
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
+  // Set seed for random number generator
+  std::srand(Cfg.Seed);
+
   EHW.setEventHub(&EvHub);
   EHW.subscribe(*this, &Game::onEntityDiedEvent);
   EHW.subscribe(*this, &Game::onSwitchLevelEvent);
