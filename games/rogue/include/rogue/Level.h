@@ -70,9 +70,6 @@ public:
   std::pair<ymir::Map<int, int>, std::vector<ymir::Point2d<int>>>
   getDijkstraMap(Tile Target, std::size_t Layer) const;
 
-  // FIXME remove unused
-  const ymir::Map<int, int> &getPlayerDijkstraMap() const;
-
   const ymir::Map<bool, int> &getPlayerSeenMap() const;
 
   const entt::entity &getEntityAt(ymir::Point2d<int> AtPos) const;
@@ -80,7 +77,6 @@ public:
                             ymir::Point2d<int> NextPos);
 
 protected:
-  void updatePlayerDijkstraMap();
   void updatePlayerSeenMap();
 
   /// Updates entity positions based on entities with position and collision
@@ -98,7 +94,6 @@ private:
   entt::entity Player = entt::null;
 
   ymir::Map<entt::entity, int> EntityPosCache;
-  ymir::Map<int, int> PlayerDijkstraMap;
   ymir::Map<bool, int> PlayerSeenMap;
 };
 

@@ -23,8 +23,7 @@ const std::vector<std::string> Level::LayerNames = {
     "ground", "ground_deco", "walls", "walls_deco", "entities", "objects"};
 
 Level::Level(int LevelId, ymir::Size2d<int> Size)
-    : Map(LayerNames, Size), LevelId(LevelId), PlayerDijkstraMap(Size),
-      PlayerSeenMap(Size) {
+    : Map(LayerNames, Size), LevelId(LevelId), PlayerSeenMap(Size) {
   Systems = {
       std::make_shared<StatsSystem>(Reg),
       std::make_shared<AgilitySystem>(Reg),
@@ -48,7 +47,6 @@ void Level::setEventHub(EventHub *Hub) {
 }
 
 bool Level::update(bool IsTick) {
-  updatePlayerDijkstraMap();
   updatePlayerSeenMap();
   updateEntityPosCache();
 
@@ -196,10 +194,6 @@ Level::getDijkstraMap(Tile Target, std::size_t Layer) const {
   return {DM, TilePos};
 }
 
-const ymir::Map<int, int> &Level::getPlayerDijkstraMap() const {
-  return PlayerDijkstraMap;
-}
-
 const ymir::Map<bool, int> &Level::getPlayerSeenMap() const {
   return PlayerSeenMap;
 }
@@ -226,18 +220,6 @@ void Level::updateEntityPosition(const entt::entity &Entity,
     EntityPosCache.setTile(PosComp, entt::null);
   }
   PosComp.Pos = NextPos;
-}
-
-void Level::updatePlayerDijkstraMap() {
-  if (Player == entt::null) {
-    PlayerDijkstraMap.fill(-1);
-    return;
-  }
-
-  PlayerDijkstraMap = ymir::Algorithm::getDijkstraMap(
-      Map.getSize(), Reg.get<PositionComp>(Player).Pos,
-      [this](auto Pos) { return isBodyBlocked(Pos); },
-      ymir::FourTileDirections<int>());
 }
 
 void Level::updatePlayerSeenMap() {
