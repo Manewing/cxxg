@@ -47,9 +47,13 @@ public:
   void removePlayer();
   const entt::entity &getPlayer() const;
 
-  // FIXME rename to getLevelStart/EndPos
-  ymir::Point2d<int> getPlayerStartPos() const;
-  ymir::Point2d<int> getPlayerEndPos() const;
+  /// Returns the entry position for the level
+  /// \throws std::runtime_error if there is no entry
+  ymir::Point2d<int> getLevelStartPos() const;
+
+  /// Returns the exit position for the level
+  /// \throws std::runtime_error if there is no exit
+  ymir::Point2d<int> getLevelEndPos() const;
 
   std::vector<ymir::Point2d<int>>
   getAllNonBodyBlockedPosNextTo(ymir::Point2d<int> AtPos) const;

@@ -58,7 +58,7 @@ bool Level::update(bool IsTick) {
 }
 
 void Level::createPlayer() {
-  Player = PlayerComp::createPlayer(Reg, "Player", getPlayerStartPos());
+  Player = PlayerComp::createPlayer(Reg, "Player", getLevelStartPos());
 }
 
 void Level::movePlayer(Level &From, ymir::Point2d<int> ToPos) {
@@ -80,7 +80,7 @@ const entt::entity &Level::getPlayer() const { return Player; }
 namespace {
 
 template <typename LevelComp>
-ymir::Point2d<int> getPlayerStartEndPos(const Level &L) {
+ymir::Point2d<int> getLevelStartEndPos(const Level &L) {
   std::optional<ymir::Point2d<int>> FoundPos;
   auto View = L.Reg.view<const PositionComp, const LevelComp>();
   View.each([&FoundPos](const auto &Pos, const auto &) { FoundPos = Pos; });
@@ -100,12 +100,12 @@ ymir::Point2d<int> getPlayerStartEndPos(const Level &L) {
 
 } // namespace
 
-ymir::Point2d<int> Level::getPlayerStartPos() const {
-  return getPlayerStartEndPos<LevelStartComp>(*this);
+ymir::Point2d<int> Level::getLevelStartPos() const {
+  return getLevelStartEndPos<LevelStartComp>(*this);
 }
 
-ymir::Point2d<int> Level::getPlayerEndPos() const {
-  return getPlayerStartEndPos<LevelEndComp>(*this);
+ymir::Point2d<int> Level::getLevelEndPos() const {
+  return getLevelStartEndPos<LevelEndComp>(*this);
 }
 
 std::vector<ymir::Point2d<int>>

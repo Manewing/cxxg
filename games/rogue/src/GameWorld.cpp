@@ -35,7 +35,7 @@ Level &MultiLevelDungeon::switchLevel(std::size_t LevelIdx, bool ToEntry) {
 
   if (CurrLvl && CurrLvl != &Nextlvl && CurrLvl->getPlayer() != entt::null) {
     auto ToPos =
-        ToEntry ? Nextlvl.getPlayerStartPos() : Nextlvl.getPlayerEndPos();
+        ToEntry ? Nextlvl.getLevelStartPos() : Nextlvl.getLevelEndPos();
     Nextlvl.update(false);
     Nextlvl.movePlayer(*CurrLvl, ToPos);
   }
@@ -125,7 +125,7 @@ void DungeonSweeper::switchWorld(unsigned Seed, std::string_view Type,
   if (CurrSubWorld) {
     auto *CurrLvl = getCurrentLevel();
     // FIXME move to position of original entry
-    auto ToPos = Lvl->getPlayerStartPos();
+    auto ToPos = Lvl->getLevelStartPos();
     Lvl->update(false);
     Lvl->movePlayer(*CurrLvl, ToPos);
   }
@@ -145,7 +145,7 @@ void DungeonSweeper::switchWorld(unsigned Seed, std::string_view Type,
 
   // Move player to the new sub-world
   auto &NextLvl = CurrSubWorld->switchLevel(0, true);
-  auto ToPos = NextLvl.getPlayerStartPos();
+  auto ToPos = NextLvl.getLevelStartPos();
   NextLvl.update(false);
   NextLvl.movePlayer(*Lvl, ToPos);
 }
