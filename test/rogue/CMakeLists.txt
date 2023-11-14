@@ -5,6 +5,7 @@ set(SOURCES
   EventHubTest.cpp
   GameWorldTest.cpp
   InventoryTest.cpp
+  InventoryHandlerTest.cpp
   ItemDatabaseTest.cpp
   LevelGeneratorTest.cpp
   LootTableTest.cpp

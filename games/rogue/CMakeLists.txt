@@ -25,6 +25,7 @@ set(HEADER_FILES
   include/rogue/GameWorld.h
   include/rogue/History.h
   include/rogue/Inventory.h
+  include/rogue/InventoryHandler.h
   include/rogue/Item.h
   include/rogue/ItemDatabase.h
   include/rogue/ItemEffect.h
@@ -85,6 +86,7 @@ set(SOURCE_FILES
   src/GameWorld.cpp
   src/History.cpp
   src/Inventory.cpp
+  src/InventoryHandler.cpp
   src/Item.cpp
   src/ItemDatabase.cpp
   src/ItemEffect.cpp
