@@ -2,10 +2,11 @@ set(SOURCES
   Components/BuffsTest.cpp
   Components/HelpersTest.cpp
   CreatureDatabaseTest.cpp
+  EquipmentTest.cpp
   EventHubTest.cpp
   GameWorldTest.cpp
-  InventoryTest.cpp
   InventoryHandlerTest.cpp
+  InventoryTest.cpp
   ItemDatabaseTest.cpp
   LevelGeneratorTest.cpp
   LootTableTest.cpp

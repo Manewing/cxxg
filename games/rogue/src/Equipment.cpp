@@ -14,7 +14,9 @@ void EquipmentSlot::equip(Item I) {
 }
 
 Item EquipmentSlot::unequip() {
-  assert(It != std::nullopt);
+  if (It == std::nullopt) {
+    throw std::runtime_error("Can not unequip empty slot");
+  }
   Item I = std::move(*It);
   It = std::nullopt;
   return I;
@@ -26,29 +28,35 @@ EquipmentSlot &Equipment::getSlot(ItemType It) {
 }
 
 const EquipmentSlot &Equipment::getSlot(ItemType It) const {
-  switch (It & ItemType::EquipmentMask) {
-  case ItemType::Ring:
-    return Ring;
-  case ItemType::Amulet:
-    return Amulet;
-  case ItemType::Helmet:
-    return Helmet;
-  case ItemType::ChestPlate:
-    return ChestPlate;
-  case ItemType::Pants:
-    return Pants;
-  case ItemType::Boots:
-    return Boots;
-  case ItemType::Weapon:
-    return Weapon;
-  case ItemType::Ranged:
-    return OffHand;
-  case ItemType::Shield:
-    return OffHand;
-  default:
-    break;
+  if ((It & ItemType::EquipmentMask) == ItemType::None) {
+    throw std::runtime_error("Invalid item type: " + getItemTypeLabel(It));
   }
-  assert(false);
+  if ((It & ItemType::Ring) == ItemType::Ring) {
+    return Ring;
+  }
+  if ((It & ItemType::Amulet) == ItemType::Amulet) {
+    return Amulet;
+  }
+  if ((It & ItemType::Helmet) == ItemType::Helmet) {
+    return Helmet;
+  }
+  if ((It & ItemType::ChestPlate) == ItemType::ChestPlate) {
+    return ChestPlate;
+  }
+  if ((It & ItemType::Pants) == ItemType::Pants) {
+    return Pants;
+  }
+  if ((It & ItemType::Boots) == ItemType::Boots) {
+    return Boots;
+  }
+  if ((It & ItemType::Weapon) == ItemType::Weapon) {
+    return Weapon;
+  }
+  if ((It & ItemType::Ranged) == ItemType::Ranged ||
+      (It & ItemType::Shield) == ItemType::Shield) {
+    return OffHand;
+  }
+  throw std::runtime_error("Invalid item type: " + getItemTypeLabel(It));
   return OffHand;
 }
 

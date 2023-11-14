@@ -30,7 +30,7 @@ const rogue::ItemPrototype
                {{rogue::CapabilityFlags::EquipOn, NullEffect}});
 
 const rogue::ItemPrototype
-    DummyConsumable(5, "consumable", "desc", rogue::ItemType::Consumable, 5,
+    DummyConsumable(6, "consumable", "desc", rogue::ItemType::Consumable, 5,
                     {{rogue::CapabilityFlags::UseOn, NullEffect}});
 
 class EventListener {
