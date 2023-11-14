@@ -81,7 +81,7 @@ public:
   /// Create target UI
   /// \param TargetPos The position to target
   /// \param Lvl The level
-  void setTargetUI(entt::entity SrcEt, ymir::Point2d<int> TargetPos, Level &Lvl,
+  void setTargetUI(ymir::Point2d<int> TargetPos, Level &Lvl,
                    const TargetUI::SelectTargetCb &Callback);
   bool hasTargetUI() const;
   void closeTargetUI();

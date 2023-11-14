@@ -207,7 +207,7 @@ bool Game::handleInput(int Char) {
     } else {
       auto &Lvl = World->getCurrentLevelOrFail();
       auto SrcEt = getPlayer();
-      UICtrl.setTargetUI(SrcEt, getLvlReg().get<PositionComp>(getPlayer()), Lvl,
+      UICtrl.setTargetUI(getLvlReg().get<PositionComp>(getPlayer()), Lvl,
                          [&Lvl, SrcEt](auto TgEt, auto TPos) {
                            CombatActionComp CC;
                            CC.Target = TgEt;
@@ -386,7 +386,9 @@ Interaction *Game::getAvailableInteraction() {
 }
 
 void Game::onEntityDiedEvent(const EntityDiedEvent &E) {
-  GameRunning = !E.isPlayerAffected();
+  if (E.isPlayerAffected()) {
+    GameRunning = false;
+  }
 }
 
 void Game::onSwitchLevelEvent(const SwitchLevelEvent &E) {

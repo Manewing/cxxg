@@ -78,11 +78,9 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
   }
 }
 
-TargetUI::TargetUI(Controller &Ctrl, entt::entity SrcEt,
-                   ymir::Point2d<int> StartPos, Level &Lvl,
+TargetUI::TargetUI(Controller &Ctrl, ymir::Point2d<int> StartPos, Level &Lvl,
                    const SelectTargetCb &Cb)
-    : Widget({0, 0}), Ctrl(Ctrl), SrcEt(SrcEt), StartPos(StartPos), Lvl(Lvl),
-      SelectCb(Cb) {
+    : Widget({0, 0}), Ctrl(Ctrl), StartPos(StartPos), Lvl(Lvl), SelectCb(Cb) {
   CursorEt = createCursor(Lvl.Reg, StartPos);
   TargetEt = Lvl.getEntityAt(StartPos);
 }

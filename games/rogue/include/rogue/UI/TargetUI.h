@@ -35,8 +35,8 @@ public:
   using SelectTargetCb = std::function<void(entt::entity, ymir::Point2d<int>)>;
 
 public:
-  TargetUI(Controller &Ctrl, entt::entity SrcEt, ymir::Point2d<int> StartPos,
-           Level &Lvl, const SelectTargetCb &Callback);
+  TargetUI(Controller &Ctrl, ymir::Point2d<int> StartPos, Level &Lvl,
+           const SelectTargetCb &Callback);
   bool handleInput(int) override;
   std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
@@ -46,7 +46,6 @@ public:
 
 private:
   Controller &Ctrl;
-  entt::entity SrcEt = entt::null;
   ymir::Point2d<int> StartPos;
   Level &Lvl;
   SelectTargetCb SelectCb;

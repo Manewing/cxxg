@@ -75,7 +75,10 @@ void Level::removePlayer() {
   updateEntityPosCache();
 }
 
-const entt::entity &Level::getPlayer() const { return Player; }
+const entt::entity &Level::getPlayer() const {
+  assert(Reg.valid(Player));
+  return Player;
+}
 
 namespace {
 
