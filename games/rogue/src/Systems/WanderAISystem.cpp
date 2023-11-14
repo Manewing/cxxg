@@ -189,6 +189,9 @@ ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
 std::optional<ymir::Point2d<int>> WanderAISystem::findPathToPoint(
     const ymir::Point2d<int> ToPos, const ymir::Point2d<int> FutureToPos,
     const ymir::Point2d<int> AtPos, const unsigned LOSRange) {
+  if (static_cast<unsigned>((ToPos - AtPos).length()) > LOSRange) {
+    return std::nullopt;
+  }
   ymir::Size2d<int> DMSize(LOSRange * 2 + 1, LOSRange * 2 + 1);
   ymir::Point2d<int> DMMidPos(LOSRange + 1, LOSRange + 1);
 

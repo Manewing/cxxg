@@ -30,7 +30,11 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
                                     const entt::entity Target,
                                     HealthComp &THealth, const DamageComp &DC) {
   if (auto *BC = Reg.try_get<BlockBuffComp>(Target)) {
-    std::uniform_real_distribution<StatValue> Chance(0, 100.0);
+    // Increase the block chance if the attacker is blinded
+    StatValue MaxChance =
+        Reg.any_of<BlindedDebuffComp>(DC.Source) ? 100.0 : 50.0;
+
+    std::uniform_real_distribution<StatValue> Chance(0, MaxChance);
     if (Chance(RandomEngine) <= BC->BlockChance) {
       return std::nullopt;
     }

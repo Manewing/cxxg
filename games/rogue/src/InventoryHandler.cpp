@@ -11,6 +11,15 @@
 
 namespace rogue {
 
+namespace {
+std::string getNameOrNone(const entt::registry &Reg, entt::entity Entity) {
+  if (Reg.any_of<NameComp>(Entity)) {
+    return Reg.get<NameComp>(Entity).Name;
+  }
+  return "<none>";
+}
+} // namespace
+
 InventoryHandler::InventoryHandler(entt::entity Entity, entt::registry &Reg)
     : Entity(Entity), Reg(Reg) {
   refresh();
@@ -42,7 +51,7 @@ bool InventoryHandler::tryUnequip(ItemType Type) {
     if (IsPlayer) {
       publish(PlayerInfoMessageEvent()
               << "Unequip " + Equip->getSlot(Type).It->getName() + " from " +
-                     Reg.get<NameComp>(Entity).Name);
+                     getNameOrNone(Reg, Entity));
     }
     Inv->addItem(*EquipItOrNone);
     return true;
@@ -51,7 +60,7 @@ bool InventoryHandler::tryUnequip(ItemType Type) {
   if (IsPlayer) {
     publish(PlayerInfoMessageEvent()
             << "Can not unequip " + Equip->getSlot(Type).It->getName() +
-                   " from " + Reg.get<NameComp>(Entity).Name);
+                   " from " + getNameOrNone(Reg, Entity));
   }
 
   return false;
@@ -75,14 +84,14 @@ bool InventoryHandler::tryEquipItem(std::size_t InvItemIdx) {
     if (IsPlayer) {
       publish(PlayerInfoMessageEvent() << "Can not equip " + ItCopy.getName() +
                                               " on " +
-                                              Reg.get<NameComp>(Entity).Name);
+                                              getNameOrNone(Reg, Entity));
     }
     return false;
   }
 
   if (IsPlayer) {
     publish(PlayerInfoMessageEvent() << "Equip " + ItCopy.getName() + " on " +
-                                            Reg.get<NameComp>(Entity).Name);
+                                            getNameOrNone(Reg, Entity));
   }
 
   Equip->equip(Inv->takeItem(InvItemIdx, /*Count=*/1), Entity, Reg);
@@ -106,7 +115,7 @@ bool InventoryHandler::tryDropItem(std::size_t InvItemIdx) {
   auto It = Inv->takeItem(InvItemIdx);
   if (IsPlayer) {
     publish(PlayerInfoMessageEvent()
-            << Reg.get<NameComp>(Entity).Name << " dropped " + It.getName());
+            << getNameOrNone(Reg, Entity) << " dropped " + It.getName());
   }
   Inventory DropInv;
   DropInv.addItem(std::move(It));
@@ -127,7 +136,7 @@ bool InventoryHandler::tryDismantleItem(std::size_t InvItemIdx) {
     if (IsPlayer) {
       publish(PlayerInfoMessageEvent() << "Dismantled " + ItOrNone->getName() +
                                               " for " +
-                                              Reg.get<NameComp>(Entity).Name);
+                                              getNameOrNone(Reg, Entity));
     }
     return true;
   }
@@ -135,7 +144,7 @@ bool InventoryHandler::tryDismantleItem(std::size_t InvItemIdx) {
   if (IsPlayer) {
     publish(PlayerInfoMessageEvent()
             << "Cannot dismantle " + Inv->getItem(InvItemIdx).getName() +
-                   " for " + Reg.get<NameComp>(Entity).Name);
+                   " for " + getNameOrNone(Reg, Entity));
   }
 
   return false;
@@ -148,9 +157,10 @@ bool InventoryHandler::tryUseItem(std::size_t InvItemIdx) {
 bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
                                           entt::entity TargetEt) {
   // Nothing can be used if there is no inventory
-  if (!Inv) {
+  if (!Inv || !Reg.valid(TargetEt)) {
     return false;
   }
+
   auto ItOrNone =
       Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, TargetEt, Reg);
   if (ItOrNone) {
@@ -161,18 +171,18 @@ bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
     }
 
     // FIXME add information on result of use
-    if (IsPlayer) {
+    if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
       publish(PlayerInfoMessageEvent() << "Used " + ItOrNone->getName() +
                                               " on " +
-                                              Reg.get<NameComp>(TargetEt).Name);
+                                              getNameOrNone(Reg, TargetEt));
     }
     return true;
   }
 
-  if (IsPlayer) {
+  if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
     publish(PlayerInfoMessageEvent()
             << "Can not use " + Inv->getItem(InvItemIdx).getName() + " on " +
-                   Reg.get<NameComp>(TargetEt).Name);
+                   getNameOrNone(Reg, TargetEt));
   }
 
   return false;

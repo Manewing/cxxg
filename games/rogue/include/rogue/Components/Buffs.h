@@ -131,6 +131,17 @@ public:
   std::string getDescription() const override;
 };
 
+struct BlindedDebuffComp : public TimedBuff, public BuffBase {
+public:
+  /// Factor by which the line of sight range is reduced
+  static constexpr const StatValue Factor = 0.1;
+
+public:
+  std::string_view getName() const override;
+  std::string getDescription() const override;
+  void add(const BlindedDebuffComp &Other);
+};
+
 struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
   StatValue PhysArmor = 0;
   StatValue MagicArmor = 0;
@@ -191,7 +202,8 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
 using BuffTypeList =
     ComponentList<StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
                   BleedingDebuffComp, HealthRegenBuffComp, ManaRegenBuffComp,
-                  ArmorBuffComp, BlockBuffComp, StatsBuffPerHitComp>;
+                  BlindedDebuffComp, ArmorBuffComp, BlockBuffComp,
+                  StatsBuffPerHitComp>;
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);

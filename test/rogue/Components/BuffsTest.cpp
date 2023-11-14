@@ -319,4 +319,26 @@ TEST(BuffsTest, BlockBuffCompAddRemove) {
   EXPECT_THROW(A.remove(B), std::runtime_error);
 }
 
+TEST(BuffsTest, BlindedDebuffCompText) {
+  rogue::BlindedDebuffComp A;
+  A.TicksLeft = 100;
+  EXPECT_EQ(A.getName(), "Blinded");
+  EXPECT_EQ(A.getDescription(), "Blinded for 100 ticks");
+}
+
+TEST(BuffsTest, BlindedDebuffCompAddRemove) {
+  rogue::BlindedDebuffComp A, B;
+
+  A.TicksLeft = 3;
+  B.TicksLeft = 5;
+
+  A.add(B);
+  EXPECT_EQ(A.TicksLeft, 5);
+  EXPECT_EQ(B.TicksLeft, 5);
+
+  EXPECT_FALSE(A.remove(B));
+  EXPECT_EQ(A.TicksLeft, 5);
+  EXPECT_EQ(B.TicksLeft, 5);
+}
+
 } // namespace

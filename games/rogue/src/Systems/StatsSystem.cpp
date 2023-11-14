@@ -1,3 +1,4 @@
+#include <rogue/Components/AI.h>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Systems/StatsSystem.h>
@@ -18,6 +19,16 @@ static constexpr float AgilityPerDexLogOffset = 1.0f;
 
 void resetStats(entt::registry &Reg) {
   Reg.view<StatsComp>().each([](auto &S) { S.reset(); });
+  Reg.view<LineOfSightComp>().each([](auto &LOS) { LOS.reset(); });
+}
+
+void applyStaticDebuffs(entt::registry &Reg, bool Tick) {
+  Reg.view<LineOfSightComp, BlindedDebuffComp>().each(
+      [Tick](auto &LOS, auto &DB) {
+        if (!Tick || DB.tick() != TimedBuff::State::Expired) {
+          LOS.LOSRange = LOS.LOSRange * DB.Factor;
+        }
+      });
 }
 
 void updateStatsTimedBuffComp(entt::entity Entity, entt::registry &Reg,
@@ -121,6 +132,9 @@ void applyStatEffects(entt::registry &Reg) {
 
 void StatsSystem::update(UpdateType Type) {
   resetStats(Reg);
+
+  // Apply static de-buffs
+  applyStaticDebuffs(Reg, UpdateType::Tick == Type);
 
   // Update stats buff per hit comp
   applyStatsBuffPerHitComp(Reg, UpdateType::Tick == Type);

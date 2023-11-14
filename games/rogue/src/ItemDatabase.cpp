@@ -106,6 +106,12 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              BC.BlockChance = V["block_chance"].GetDouble();
              return makeApplyBuffItemEffect<BlockBuffComp, HealthComp>(BC);
            }},
+          {"blinded_debuff_comp",
+           [](const auto &, const auto &V) {
+             BlindedDebuffComp BDC;
+             BDC.TicksLeft = V["ticks"].GetUint();
+             return makeApplyBuffItemEffect<BlindedDebuffComp>(BDC);
+           }},
           {"melee_attack_comp",
            [](const auto &, const auto &V) {
              MeleeAttackComp MAC;

@@ -200,6 +200,18 @@ std::string ManaRegenBuffComp::getDescription() const {
   return getParamDescription("Mana increased by ", "", "MP");
 }
 
+std::string_view BlindedDebuffComp::getName() const { return "Blinded"; }
+
+std::string BlindedDebuffComp::getDescription() const {
+  std::stringstream SS;
+  SS << "Blinded for " << TicksLeft << " ticks";
+  return SS.str();
+}
+
+void BlindedDebuffComp::add(const BlindedDebuffComp &Other) {
+  TicksLeft = std::max(TicksLeft, Other.TicksLeft);
+}
+
 std::string_view ArmorBuffComp::getName() const { return "Armor Buff"; }
 
 std::string ArmorBuffComp::getDescription() const {

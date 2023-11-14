@@ -28,6 +28,9 @@ const char *getWanderAIStateStr(WanderAIState State);
 
 struct LineOfSightComp {
   unsigned LOSRange = 14;
+  unsigned MaxLOSRange = 14;
+
+  void reset() { LOSRange = MaxLOSRange; }
 };
 
 struct AttackAIComp {};

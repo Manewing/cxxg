@@ -80,6 +80,10 @@
       "type": "block_comp",
       "block_chance": 10
     },
+    "blinded_debuff_comp": {
+      "type": "blinded_debuff_comp",
+      "ticks": 600
+    },
     "melee_2": {
       "type": "melee_attack_comp",
       "phys_damage": 2,
@@ -333,6 +337,18 @@
         {
           "type": "ranged_use",
           "effect": "damage_effect_10"
+        }
+      ]
+    },
+    {
+      "name": "Scroll of blinding",
+      "description": "A scroll that blinds the target",
+      "max_stack_size": 1,
+      "types": ["consumable"],
+      "capabilities": [
+        {
+          "type": "ranged_use",
+          "effect": "blinded_debuff_comp"
         }
       ]
     },
