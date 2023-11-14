@@ -2,14 +2,15 @@
 #define ROGUE_UI_INVENTORY_H
 
 #include <entt/entt.hpp>
-#include <rogue/ItemType.h>
 #include <rogue/InventoryHandler.h>
+#include <rogue/ItemType.h>
 #include <rogue/UI/Decorator.h>
 #include <rogue/UI/Widget.h>
 #include <string_view>
 
 namespace rogue {
 class Inventory;
+class Level;
 } // namespace rogue
 
 namespace rogue::ui {
@@ -28,10 +29,10 @@ public:
   /// @param Ctrl The parent UI controller
   /// @param Inv The inventory that is acccessed
   /// @param Entity The entity accessing the inventory
-  /// @param Reg The registry the entity belongs to
+  /// @param Lvl The level the entity belongs to
   /// @param Header The header to display for the inventory
   InventoryControllerBase(Controller &Ctrl, Inventory &Inv, entt::entity Entity,
-                          entt::registry &Reg, const std::string &Header);
+                          Level &Lvl, const std::string &Header);
   bool handleInput(int Char) override;
   void draw(cxxg::Screen &Scr) const final;
 
@@ -42,7 +43,7 @@ protected:
   Controller &Ctrl;
   Inventory &Inv;
   entt::entity Entity;
-  entt::registry &Reg;
+  Level &Lvl;
   std::shared_ptr<ListSelect> List;
   InventoryHandler InvHandler;
 };
@@ -50,7 +51,7 @@ protected:
 class InventoryController : public InventoryControllerBase {
 public:
   InventoryController(Controller &Ctrl, Inventory &Inv, entt::entity Entity,
-                      entt::registry &Reg);
+                      Level &Lvl);
   bool handleInput(int Char) final;
   std::string getInteractMsg() const final;
 };
@@ -58,7 +59,8 @@ public:
 class LootController : public InventoryControllerBase {
 public:
   LootController(Controller &Ctrl, Inventory &Inv, entt::entity Entity,
-                 entt::registry &Reg);
+
+                 Level &Lvl);
   bool handleInput(int Char) final;
   std::string getInteractMsg() const final;
 };

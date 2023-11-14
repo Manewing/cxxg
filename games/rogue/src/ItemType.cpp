@@ -107,6 +107,12 @@ CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr) {
   if (CapabilityFlagStr == "dismantle") {
     return CapabilityFlags::Dismantle;
   }
+  if (CapabilityFlagStr == "ranged") {
+    return CapabilityFlags::Ranged;
+  }
+  if (CapabilityFlagStr == "ranged_use") {
+    return CapabilityFlags::Ranged | CapabilityFlags::UseOn;
+  }
   throw std::out_of_range("Unknown capability: " + CapabilityFlagStr);
   return CapabilityFlags::None;
 }
@@ -123,6 +129,10 @@ const char *getCapabilityFlagLabel(CapabilityFlags Flags) {
     return "Unequip";
   case CapabilityFlags::Equipment:
     return "Equipment";
+  case CapabilityFlags::Dismantle:
+    return "Dismantle";
+  case CapabilityFlags::Ranged:
+    return "Ranged";
   default:
     break;
   }

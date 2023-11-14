@@ -16,23 +16,23 @@
 
 namespace rogue::ui {
 
-TargetInfo::TargetInfo(Controller &C, entt::entity TEt, entt::registry &R)
+TargetInfo::TargetInfo(Controller &C, entt::entity TEt, Level &L)
     : BaseRectDecorator({2, 2}, {25, 10}, nullptr), Ctrl(C), TargetEt(TEt),
-      Reg(R) {
-  auto *NC = Reg.try_get<NameComp>(TargetEt);
+      Lvl(L) {
+  auto *NC = Lvl.Reg.try_get<NameComp>(TargetEt);
   std::string Hdr = NC ? NC->Name : "Unknown";
 
   auto ItSel = std::make_shared<ItemSelect>(Pos);
   int Count = 2;
-  if (Reg.try_get<EquipmentComp>(TargetEt)) {
+  if (Lvl.Reg.try_get<EquipmentComp>(TargetEt)) {
     ItSel->addSelect<Select>(
         "Equip", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
   }
-  if (Reg.try_get<InventoryComp>(TargetEt)) {
+  if (Lvl.Reg.try_get<InventoryComp>(TargetEt)) {
     ItSel->addSelect<Select>(
         "Inventory", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
   }
-  if (Reg.try_get<StatsComp>(TargetEt)) {
+  if (Lvl.Reg.try_get<StatsComp>(TargetEt)) {
     ItSel->addSelect<Select>(
         "Stats", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
   }
@@ -41,29 +41,20 @@ TargetInfo::TargetInfo(Controller &C, entt::entity TEt, entt::registry &R)
 
   ItSel->registerOnSelectCallback([this](const auto &Sel) {
     if (Sel.getValue() == "Equip") {
-      Ctrl.setEquipmentUI(TargetEt, Reg);
+      Ctrl.setEquipmentUI(TargetEt, Lvl.Reg);
     }
     if (Sel.getValue() == "Buffs") {
-      Ctrl.setBuffUI(TargetEt, Reg);
+      Ctrl.setBuffUI(TargetEt, Lvl.Reg);
     }
     if (Sel.getValue() == "Inventory") {
-      Ctrl.setInventoryUI(TargetEt, Reg);
+      Ctrl.setInventoryUI(TargetEt, Lvl);
     }
     if (Sel.getValue() == "Stats") {
-      Ctrl.setStatsUI(TargetEt, Reg);
+      Ctrl.setStatsUI(TargetEt, Lvl.Reg);
     }
   });
 
   Comp = std::make_shared<Frame>(ItSel, Pos, getSize(), Hdr);
-}
-
-bool TargetInfo::handleInput(int Char) {
-  (void)TargetEt;
-  (void)Reg;
-  switch (Char) {
-  default:
-    return Comp->handleInput(Char);
-  }
 }
 
 void TargetInfo::draw(cxxg::Screen &Scr) const {
@@ -72,16 +63,16 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
   cxxg::types::Position DrawPos = Pos + cxxg::types::Position{2, 1};
 
   // FIXME move this to general stats?
-  if (auto *HC = Reg.try_get<HealthComp>(TargetEt)) {
+  if (auto *HC = Lvl.Reg.try_get<HealthComp>(TargetEt)) {
     Scr[DrawPos.Y][DrawPos.X + 1] << "Health: " << HC->Value << "/"
                                   << HC->MaxValue;
     DrawPos += cxxg::types::Position{0, 1};
   }
-  if (auto *AG = Reg.try_get<AgilityComp>(TargetEt)) {
+  if (auto *AG = Lvl.Reg.try_get<AgilityComp>(TargetEt)) {
     Scr[DrawPos.Y][DrawPos.X + 1] << "AP: " << AG->AP << " AG: " << AG->Agility;
     DrawPos += cxxg::types::Position{0, 1};
   }
-  if (auto *AI = Reg.try_get<WanderAIComp>(TargetEt)) {
+  if (auto *AI = Lvl.Reg.try_get<WanderAIComp>(TargetEt)) {
     Scr[DrawPos.Y][DrawPos.X + 1] << "AI: " << getWanderAIStateStr(AI->State);
     DrawPos += cxxg::types::Position{0, 1};
   }
@@ -124,11 +115,11 @@ bool TargetUI::handleInput(int Char) {
     break;
   case Controls::Info.Char:
     if (TargetEt != entt::null) {
-      showInfoForTarget(TargetEt, Lvl.Reg);
+      showInfoForTarget(TargetEt);
     }
     break;
   case ' ': {
-    SelectCb(Lvl, SrcEt, TargetEt, TargetPos);
+    SelectCb(TargetEt, TargetPos);
     destroyCursor();
     return false;
   }
@@ -159,8 +150,8 @@ void TargetUI::destroyCursor() {
   }
 }
 
-void TargetUI::showInfoForTarget(entt::entity TargetEt, entt::registry &Reg) {
-  Ctrl.addWindow(std::make_shared<TargetInfo>(Ctrl, TargetEt, Reg));
+void TargetUI::showInfoForTarget(entt::entity TargetEt) {
+  Ctrl.addWindow(std::make_shared<TargetInfo>(Ctrl, TargetEt, Lvl));
 }
 
 } // namespace rogue::ui

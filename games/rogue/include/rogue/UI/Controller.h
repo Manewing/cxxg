@@ -52,7 +52,7 @@ public:
   bool hasEquipmentUI() const;
   void closeEquipmentUI();
 
-  void setInventoryUI(entt::entity Entity, entt::registry &Reg);
+  void setInventoryUI(entt::entity Entity, Level &Lvl);
   bool hasInventoryUI() const;
   void closeInventoryUI();
 
@@ -70,7 +70,7 @@ public:
   /// \param Entity The entity that is looting
   /// \param InvEt The entity that is being looted
   /// \param Reg The registry
-  void setLootUI(entt::entity Entity, entt::entity InvEt, entt::registry &Reg);
+  void setLootUI(entt::entity Entity, entt::entity InvEt, Level &Lvl);
   bool hasLootUI() const;
   void closeLootUI();
 

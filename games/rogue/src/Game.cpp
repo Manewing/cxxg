@@ -160,7 +160,7 @@ bool Game::handleInput(int Char) {
       UICtrl.closeInventoryUI();
       handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
     } else {
-      UICtrl.setInventoryUI(getPlayerOrNull(), getLvlReg());
+      UICtrl.setInventoryUI(getPlayerOrNull(), World->getCurrentLevelOrFail());
     }
     return true;
   }
@@ -205,15 +205,16 @@ bool Game::handleInput(int Char) {
     if (UICtrl.hasTargetUI()) {
       UICtrl.closeTargetUI();
     } else {
-      UICtrl.setTargetUI(
-          getPlayer(), getLvlReg().get<PositionComp>(getPlayer()),
-          World->getCurrentLevelOrFail(),
-          [](auto &Lvl, auto SrcEt, auto TgEt, auto TPos) {
-            CombatActionComp CC;
-            CC.Target = TgEt;
-            CC.RangedPos = TPos;
-            Lvl.Reg.template emplace<CombatActionComp>(SrcEt, CC);
-          });
+      auto &Lvl = World->getCurrentLevelOrFail();
+      auto SrcEt = getPlayer();
+      UICtrl.setTargetUI(SrcEt, getLvlReg().get<PositionComp>(getPlayer()), Lvl,
+                         [&Lvl, SrcEt](auto TgEt, auto TPos) {
+                           CombatActionComp CC;
+                           CC.Target = TgEt;
+                           CC.RangedPos = TPos;
+                           Lvl.Reg.template emplace<CombatActionComp>(SrcEt,
+                                                                      CC);
+                         });
     }
     return true;
   }
@@ -403,10 +404,11 @@ void Game::onSwitchGameWorldEvent(const SwitchGameWorldEvent &E) {
 }
 
 void Game::onLootEvent(const LootEvent &E) {
-  if (!E.isPlayerAffected() || !E.Registry) {
+  if (!E.isPlayerAffected() ||
+      &World->getCurrentLevelOrFail().Reg != E.Registry) {
     return;
   }
-  UICtrl.setLootUI(E.Entity, E.LootedEntity, *E.Registry);
+  UICtrl.setLootUI(E.Entity, E.LootedEntity, World->getCurrentLevelOrFail());
 }
 
 namespace {

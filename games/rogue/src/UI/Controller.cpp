@@ -12,6 +12,7 @@
 
 // FIXME get rid of dep
 #include <rogue/Components/Items.h>
+#include <rogue/Level.h>
 
 namespace rogue::ui {
 
@@ -113,12 +114,12 @@ void Controller::closeEquipmentUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<EquipmentController>());
 }
 
-void Controller::setInventoryUI(entt::entity Entity, entt::registry &Reg) {
+void Controller::setInventoryUI(entt::entity Entity, Level &Lvl) {
   if (Entity == entt::null) {
     return;
   }
-  auto &InvComp = Reg.get<InventoryComp>(Entity);
-  WdwContainer.addWindow<InventoryController>(*this, InvComp.Inv, Entity, Reg);
+  auto &InvComp = Lvl.Reg.get<InventoryComp>(Entity);
+  WdwContainer.addWindow<InventoryController>(*this, InvComp.Inv, Entity, Lvl);
   WdwContainer.autoLayoutWindows();
 }
 
@@ -164,9 +165,9 @@ void Controller::closeBuffUI() {
 }
 
 void Controller::setLootUI(entt::entity Entity, entt::entity InvEt,
-                           entt::registry &Reg) {
-  auto &InvComp = Reg.get<InventoryComp>(InvEt);
-  WdwContainer.addWindow<LootController>(*this, InvComp.Inv, Entity, Reg);
+                           Level &Lvl) {
+  auto &InvComp = Lvl.Reg.get<InventoryComp>(InvEt);
+  WdwContainer.addWindow<LootController>(*this, InvComp.Inv, Entity, Lvl);
   WdwContainer.autoLayoutWindows();
 }
 

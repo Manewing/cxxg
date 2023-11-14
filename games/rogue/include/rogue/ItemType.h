@@ -47,6 +47,10 @@ enum class CapabilityFlags {
 
   // Dismantle item
   Dismantle = 0x8,
+
+  // Ranged, indicates that the item can be used from a distance on an entity
+  // different than the entity using the item
+  Ranged = 0x10,
 };
 
 CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr);

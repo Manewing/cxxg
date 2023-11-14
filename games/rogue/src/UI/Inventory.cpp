@@ -6,6 +6,7 @@
 #include <rogue/Components/Visual.h>
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
+#include <rogue/Level.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
@@ -38,10 +39,10 @@ InventoryControllerBase::getColorForItemType(ItemType Type) {
 InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  Inventory &Inv,
                                                  entt::entity Entity,
-                                                 entt::registry &Reg,
+                                                 Level &Lvl,
                                                  const std::string &Header)
     : BaseRectDecorator({2, 2}, {40, 18}, nullptr), Ctrl(Ctrl), Inv(Inv),
-      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg) {
+      Entity(Entity), Lvl(Lvl), InvHandler(Entity, Lvl.Reg) {
   InvHandler.setEventHub(Ctrl.getEventHub());
   List = std::make_shared<ListSelect>(Pos, getSize());
   Comp = std::make_shared<Frame>(List, Pos, getSize(), Header);
@@ -86,9 +87,8 @@ void InventoryControllerBase::updateElements() const {
 }
 
 InventoryController::InventoryController(Controller &Ctrl, Inventory &Inv,
-                                         entt::entity Entity,
-                                         entt::registry &Reg)
-    : InventoryControllerBase(Ctrl, Inv, Entity, Reg, "Inventory") {}
+                                         entt::entity Entity, Level &Lvl)
+    : InventoryControllerBase(Ctrl, Inv, Entity, Lvl, "Inventory") {}
 
 bool InventoryController::handleInput(int Char) {
   if (Inv.empty()) {
@@ -99,23 +99,28 @@ bool InventoryController::handleInput(int Char) {
   switch (Char) {
   case Controls::Equip.Char: {
     InvHandler.tryEquipItem(ItemIdx);
-    updateElements();
   } break;
   case Controls::Use.Char: {
+    if ((Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) !=
+        CapabilityFlags::None) {
+      auto &PC = Lvl.Reg.get<PositionComp>(Entity);
+      Ctrl.setTargetUI(Entity, PC.Pos, Lvl, [this, ItemIdx](auto TgEt, auto) {
+        InvHandler.tryUseItemOnTarget(ItemIdx, TgEt);
+      });
+      break;
+    }
     InvHandler.tryUseItem(ItemIdx);
-    updateElements();
   } break;
   case Controls::Drop.Char: {
     InvHandler.tryDropItem(ItemIdx);
-    updateElements();
   } break;
   case Controls::Dismantle.Char: {
     InvHandler.tryDismantleItem(ItemIdx);
-    updateElements();
   } break;
   default:
     return InventoryControllerBase::handleInput(Char);
   }
+  updateElements();
   return true;
 }
 
@@ -143,8 +148,8 @@ std::string InventoryController::getInteractMsg() const {
 }
 
 LootController::LootController(Controller &Ctrl, Inventory &Inv,
-                               entt::entity Entity, entt::registry &Reg)
-    : InventoryControllerBase(Ctrl, Inv, Entity, Reg, "Loot") {}
+                               entt::entity Entity, Level &Lvl)
+    : InventoryControllerBase(Ctrl, Inv, Entity, Lvl, "Loot") {}
 
 bool LootController::handleInput(int Char) {
   switch (Char) {
@@ -152,7 +157,7 @@ bool LootController::handleInput(int Char) {
     if (Inv.empty()) {
       break;
     }
-    auto &EtInv = Reg.get<InventoryComp>(Entity).Inv;
+    auto &EtInv = Lvl.Reg.get<InventoryComp>(Entity).Inv;
     EtInv.addItem(Inv.takeItem(List->getSelectedElement()));
     updateElements();
   } break;

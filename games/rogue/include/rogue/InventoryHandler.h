@@ -43,6 +43,12 @@ public:
   /// @return True if the item was used, false otherwise
   bool tryUseItem(std::size_t InvItemIdx);
 
+  /// Try using item from inventory on target entity
+  /// @param InvItemIdx The index of the item in the inventory
+  /// @param TargetEt The target entity to use the item on
+  /// @return True if the item was used, false otherwise
+  bool tryUseItemOnTarget(std::size_t InvItemIdx, entt::entity TargetEt);
+
   /// Auto equip items from inventory
   void autoEquipItems();
 

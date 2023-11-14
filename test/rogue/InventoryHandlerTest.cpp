@@ -268,6 +268,41 @@ TEST(InventoryHandlerTest, TryUseItem) {
   EXPECT_EQ(Listener.Messages, RefMessages);
 }
 
+TEST(InventoryHandlerTest, TryUseItemOnTarget) {
+  entt::registry Reg;
+  entt::entity Entity = Reg.create();
+  entt::entity TargetEntity = Reg.create();
+  Reg.emplace<rogue::NameComp>(Entity, "Entity");
+  Reg.emplace<rogue::NameComp>(TargetEntity, "Target");
+  Reg.emplace<rogue::PlayerComp>(Entity);
+  rogue::InventoryHandler InvHandler(Entity, Reg);
+  rogue::EventHub Hub;
+  EventListener Listener;
+  Hub.subscribe(Listener, &EventListener::onPlayerInfoMessageEvent);
+  InvHandler.setEventHub(&Hub);
+
+  EXPECT_FALSE(InvHandler.tryUseItemOnTarget(0, TargetEntity))
+      << "Expect not to be able to use if there is not inventory or position";
+  auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
+  InvHandler.refresh();
+
+  EXPECT_THROW(InvHandler.tryUseItem(0), std::out_of_range)
+      << "Expect to throw if trying to use item index out of range";
+
+  Inv.addItem(rogue::Item(DummyConsumable));
+  EXPECT_TRUE(InvHandler.tryUseItemOnTarget(0, TargetEntity))
+      << "Expect to be able to use item if there is inventory and position";
+  ASSERT_EQ(Inv.size(), 0);
+
+  Inv.addItem(rogue::Item(DummyHelmetA));
+  EXPECT_FALSE(InvHandler.tryUseItemOnTarget(0, TargetEntity))
+      << "Expect not to be able to use item if it can not be used";
+
+  std::vector<std::string> RefMessages = {"Used consumable on Target",
+                                          "Can not use helmet_a on Target"};
+  EXPECT_EQ(Listener.Messages, RefMessages);
+}
+
 TEST(InventoryHandlerTest, AutoEquipItems) {
   entt::registry Reg;
   entt::entity Entity = Reg.create();

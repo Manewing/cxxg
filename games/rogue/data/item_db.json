@@ -325,6 +325,18 @@
       ]
     },
     {
+      "name": "Scroll of pain",
+      "description": "A scroll that deals minor damage to the target",
+      "max_stack_size": 1,
+      "types": ["consumable"],
+      "capabilities": [
+        {
+          "type": "ranged_use",
+          "effect": "damage_effect_10"
+        }
+      ]
+    },
+    {
       "name": "Wooden Shield",
       "description": "A shield of wood",
       "max_stack_size": 1,

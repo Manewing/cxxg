@@ -1,3 +1,4 @@
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Player.h>
@@ -141,18 +142,29 @@ bool InventoryHandler::tryDismantleItem(std::size_t InvItemIdx) {
 }
 
 bool InventoryHandler::tryUseItem(std::size_t InvItemIdx) {
+  return tryUseItemOnTarget(InvItemIdx, Entity);
+}
+
+bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
+                                          entt::entity TargetEt) {
   // Nothing can be used if there is no inventory
   if (!Inv) {
     return false;
   }
   auto ItOrNone =
-      Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, Entity, Reg);
+      Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, TargetEt, Reg);
   if (ItOrNone) {
+    if (Entity != TargetEt) {
+      // FIXME check if it is actually an attack
+      Reg.get_or_emplace<CombatAttackComp>(Entity).Target = TargetEt;
+      Reg.get_or_emplace<CombatTargetComp>(TargetEt).Attacker = Entity;
+    }
+
     // FIXME add information on result of use
     if (IsPlayer) {
       publish(PlayerInfoMessageEvent() << "Used " + ItOrNone->getName() +
                                               " on " +
-                                              Reg.get<NameComp>(Entity).Name);
+                                              Reg.get<NameComp>(TargetEt).Name);
     }
     return true;
   }
@@ -160,7 +172,7 @@ bool InventoryHandler::tryUseItem(std::size_t InvItemIdx) {
   if (IsPlayer) {
     publish(PlayerInfoMessageEvent()
             << "Can not use " + Inv->getItem(InvItemIdx).getName() + " on " +
-                   Reg.get<NameComp>(Entity).Name);
+                   Reg.get<NameComp>(TargetEt).Name);
   }
 
   return false;
