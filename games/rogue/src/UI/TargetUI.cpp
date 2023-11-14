@@ -84,6 +84,7 @@ TargetUI::TargetUI(Controller &Ctrl, entt::entity SrcEt,
     : Widget({0, 0}), Ctrl(Ctrl), SrcEt(SrcEt), StartPos(StartPos), Lvl(Lvl),
       SelectCb(Cb) {
   CursorEt = createCursor(Lvl.Reg, StartPos);
+  TargetEt = Lvl.getEntityAt(StartPos);
 }
 
 bool TargetUI::handleInput(int Char) {
