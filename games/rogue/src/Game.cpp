@@ -4,6 +4,7 @@
 #include <cxxg/Utils.h>
 #include <memory>
 #include <rogue/Components/AI.h>
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
@@ -215,7 +216,13 @@ bool Game::handleInput(int Char) {
     } else {
       UICtrl.setTargetUI(getPlayer(),
                          getLvlReg().get<PositionComp>(getPlayer()),
-                         World->getCurrentLevelOrFail());
+                         World->getCurrentLevelOrFail(),
+                         [](auto &Lvl, auto SrcEt, auto TgEt, auto TPos) {
+                           CombatComp CC;
+                           CC.Target = TgEt;
+                           CC.RangedPos = TPos;
+                           Lvl.Reg.template emplace<CombatComp>(SrcEt, CC);
+                         });
     }
     return true;
   }

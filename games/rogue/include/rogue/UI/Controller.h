@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <memory>
 #include <rogue/EventHub.h>
+#include <rogue/UI/TargetUI.h>
 #include <rogue/UI/Widget.h>
 #include <rogue/UI/WindowContainer.h>
 #include <string_view>
@@ -80,8 +81,8 @@ public:
   /// Create target UI
   /// \param TargetPos The position to target
   /// \param Lvl The level
-  void setTargetUI(entt::entity SrcEt, ymir::Point2d<int> TargetPos,
-                   Level &Lvl);
+  void setTargetUI(entt::entity SrcEt, ymir::Point2d<int> TargetPos, Level &Lvl,
+                   const TargetUI::SelectTargetCb &Callback);
   bool hasTargetUI() const;
   void closeTargetUI();
 

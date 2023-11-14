@@ -14,9 +14,6 @@
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/TargetUI.h>
 
-#include <rogue/Components/Combat.h>
-#include <rogue/Event.h>
-
 namespace rogue::ui {
 
 TargetInfo::TargetInfo(Controller &C, entt::entity TEt, entt::registry &R)
@@ -91,8 +88,10 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
 }
 
 TargetUI::TargetUI(Controller &Ctrl, entt::entity SrcEt,
-                   ymir::Point2d<int> StartPos, Level &Lvl)
-    : Widget({0, 0}), Ctrl(Ctrl), Lvl(Lvl), StartPos(StartPos), SrcEt(SrcEt) {
+                   ymir::Point2d<int> StartPos, Level &Lvl,
+                   const SelectTargetCb &Cb)
+    : Widget({0, 0}), Ctrl(Ctrl), SrcEt(SrcEt), StartPos(StartPos), Lvl(Lvl),
+      SelectCb(Cb) {
   CursorEt = createCursor(Lvl.Reg, StartPos);
 }
 
@@ -129,7 +128,7 @@ bool TargetUI::handleInput(int Char) {
     }
     break;
   case ' ': {
-    Lvl.Reg.emplace<CombatComp>(SrcEt, CombatComp{.RangedPos = TargetPos});
+    SelectCb(Lvl, SrcEt, TargetEt, TargetPos);
     destroyCursor();
     return false;
   }

@@ -30,8 +30,17 @@ private:
 
 class TargetUI : public Widget {
 public:
+  /// Callback called when a target has been selected
+  /// \param Lvl The level the target was selected in
+  /// \param SrcEt The entity that selected the target
+  /// \param TargetEt The entity that was selected or null
+  /// \param TargetPos The position that was selected
+  using SelectTargetCb = std::function<void(Level &, entt::entity, entt::entity,
+                                            ymir::Point2d<int>)>;
+
+public:
   TargetUI(Controller &Ctrl, entt::entity SrcEt, ymir::Point2d<int> StartPos,
-           Level &Lvl);
+           Level &Lvl, const SelectTargetCb &Callback);
   bool handleInput(int) override;
   std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
@@ -41,9 +50,10 @@ public:
 
 private:
   Controller &Ctrl;
-  Level &Lvl;
-  ymir::Point2d<int> StartPos;
   entt::entity SrcEt = entt::null;
+  ymir::Point2d<int> StartPos;
+  Level &Lvl;
+  SelectTargetCb SelectCb;
   entt::entity CursorEt = entt::null;
   entt::entity TargetEt = entt::null;
 };
