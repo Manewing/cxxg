@@ -41,7 +41,8 @@ InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  entt::registry &Reg,
                                                  const std::string &Header)
     : BaseRectDecorator({2, 2}, {40, 18}, nullptr), Ctrl(Ctrl), Inv(Inv),
-      Entity(Entity), Reg(Reg) {
+      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg) {
+  InvHandler.setEventHub(Ctrl.getEventHub());
   List = std::make_shared<ListSelect>(Pos, getSize());
   Comp = std::make_shared<Frame>(List, Pos, getSize(), Header);
   updateElements();
@@ -97,70 +98,19 @@ bool InventoryController::handleInput(int Char) {
   const auto ItemIdx = List->getSelectedElement();
   switch (Char) {
   case Controls::Equip.Char: {
-    // Copy item we may change the inventory and invalidate the reference
-    const auto ItCopy = Inv.getItem(ItemIdx);
-    auto Equip = Reg.try_get<EquipmentComp>(Entity);
-    if (!Equip) {
-      Ctrl.publish(ErrorMessageEvent() << "Can not equip " + ItCopy.getName() +
-                                              " on " +
-                                              Reg.get<NameComp>(Entity).Name);
-      break;
-    }
-
-    if (auto EquipItOrNone =
-            Equip->Equip.tryUnequip(ItCopy.getType(), Entity, Reg)) {
-      Inv.addItem(*EquipItOrNone);
-    }
-
-    assert(Equip->Equip.isEquipped(ItCopy.getType()) == false);
-    if (!Equip->Equip.canEquip(ItCopy, Entity, Reg)) {
-      Ctrl.publish(PlayerInfoMessageEvent()
-                   << "Can not equip " + ItCopy.getName() + " on " +
-                          Reg.get<NameComp>(Entity).Name);
-      break;
-    }
-
-    Ctrl.publish(PlayerInfoMessageEvent()
-                 << "Equip " + ItCopy.getName() + " on " +
-                        Reg.get<NameComp>(Entity).Name);
-    Equip->Equip.equip(Inv.takeItem(ItemIdx, /*Count=*/1), Entity, Reg);
+    InvHandler.tryEquipItem(ItemIdx);
     updateElements();
   } break;
   case Controls::Use.Char: {
-    auto ItOrNone =
-        Inv.applyItemTo(ItemIdx, CapabilityFlags::UseOn, Entity, Reg);
-    if (ItOrNone) {
-      // FIXME add information on result of use
-      Ctrl.publish(PlayerInfoMessageEvent()
-                   << "Used " + ItOrNone->getName() + " on " +
-                          Reg.get<NameComp>(Entity).Name);
-    } else {
-      Ctrl.publish(PlayerInfoMessageEvent()
-                   << "Can not use " + Inv.getItem(ItemIdx).getName() + " on " +
-                          Reg.get<NameComp>(Entity).Name);
-    }
+    InvHandler.tryUseItem(ItemIdx);
     updateElements();
   } break;
   case Controls::Drop.Char: {
-    Inventory DropInv;
-    const auto &Pos = Reg.get<PositionComp>(Entity).Pos;
-    DropInv.addItem(Inv.takeItem(List->getSelectedElement()));
-    createDropEntity(Reg, Pos, DropInv);
+    InvHandler.tryDropItem(ItemIdx);
     updateElements();
   } break;
   case Controls::Dismantle.Char: {
-    auto ItOrNone =
-        Inv.applyItemTo(ItemIdx, CapabilityFlags::Dismantle, Entity, Reg);
-    if (ItOrNone) {
-      // FIXME add information on result of dismantle
-      Ctrl.publish(PlayerInfoMessageEvent()
-                   << "Dismantled " + ItOrNone->getName() + " for " +
-                          Reg.get<NameComp>(Entity).Name);
-    } else {
-      Ctrl.publish(PlayerInfoMessageEvent()
-                   << "Cannot dismantle " + Inv.getItem(ItemIdx).getName() +
-                          " for " + Reg.get<NameComp>(Entity).Name);
-    }
+    InvHandler.tryDismantleItem(ItemIdx);
     updateElements();
   } break;
   default:

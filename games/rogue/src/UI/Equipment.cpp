@@ -19,7 +19,8 @@ EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
     : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip),
-      Entity(Entity), Reg(Reg) {
+      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg) {
+  InvHandler.setEventHub(Ctrl.getEventHub());
   ItSel = std::make_shared<ItemSelect>(Pos);
   Comp = std::make_shared<Frame>(ItSel, Pos, getSize(), "Equipment");
 
@@ -44,20 +45,9 @@ bool EquipmentController::handleInput(int Char) {
     }
   } break;
   case Controls::Unequip.Char: {
-    auto InvComp = Reg.try_get<InventoryComp>(Entity);
-    if (!InvComp) {
-      // FIXME message
-      break;
-    }
-    auto SelIdx = ItSel->getSelectedIdx();
-    auto *ES = Equip.all().at(SelIdx);
-    if (!ES->It ||
-        !ES->It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
-      // FIXME message
-      break;
-    }
-    ES->It->removeFrom(Entity, Reg, CapabilityFlags::UnequipFrom);
-    InvComp->Inv.addItem(ES->unequip());
+    const auto SelIdx = ItSel->getSelectedIdx();
+    const auto *ES = Equip.all().at(SelIdx);
+    InvHandler.tryUnequip(ES->BaseTypeFilter);
     updateSelectValues();
   } break;
 

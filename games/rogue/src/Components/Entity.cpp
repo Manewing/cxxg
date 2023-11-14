@@ -11,6 +11,7 @@
 #include <rogue/Context.h>
 #include <rogue/Event.h>
 #include <rogue/EventHub.h>
+#include <rogue/InventoryHandler.h>
 
 namespace rogue {
 
@@ -35,17 +36,9 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<StatsComp>(Entity).Base = Stats;
   Reg.emplace<EquipmentComp>(Entity);
 
-  // FIXME this should be part of an enemy/NPC AI system
   // Try equipping items
-  auto &Inv = Reg.get<InventoryComp>(Entity).Inv;
-  auto &Equip = Reg.get<EquipmentComp>(Entity).Equip;
-  for (std::size_t Idx = 0; Idx < Inv.size(); Idx++) {
-    const auto &It = Inv.getItem(Idx);
-    if (Equip.canEquip(It, Entity, Reg)) {
-      Equip.equip(Inv.takeItem(Idx), Entity, Reg);
-      Idx -= 1;
-    }
-  }
+  InventoryHandler InvHandler(Entity, Reg);
+  InvHandler.autoEquipItems();
 }
 
 void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,

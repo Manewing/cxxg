@@ -3,6 +3,7 @@
 
 #include <entt/entt.hpp>
 #include <rogue/ItemType.h>
+#include <rogue/InventoryHandler.h>
 #include <rogue/UI/Decorator.h>
 #include <rogue/UI/Widget.h>
 #include <string_view>
@@ -43,6 +44,7 @@ protected:
   entt::entity Entity;
   entt::registry &Reg;
   std::shared_ptr<ListSelect> List;
+  InventoryHandler InvHandler;
 };
 
 class InventoryController : public InventoryControllerBase {

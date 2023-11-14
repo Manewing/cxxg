@@ -5,6 +5,7 @@
 #include <optional>
 #include <rogue/UI/Decorator.h>
 #include <rogue/UI/ItemSelect.h>
+#include <rogue/InventoryHandler.h>
 #include <rogue/UI/Widget.h>
 #include <string_view>
 
@@ -34,6 +35,7 @@ protected:
   entt::entity Entity;
   entt::registry &Reg;
   std::shared_ptr<ItemSelect> ItSel;
+  InventoryHandler InvHandler;
 };
 
 } // namespace rogue::ui

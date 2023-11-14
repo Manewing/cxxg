@@ -57,6 +57,8 @@ public:
     this->Hub = Hub;
   }
 
+  EventHub *getEventHub() const { return Hub; }
+
   template <class SubscriberType, typename EventType>
   void subscribe(SubscriberType &Subscriber,
                  void (SubscriberType::*CallbackFunc)(const EventType &)) {

@@ -12,6 +12,7 @@
 #include <rogue/Event.h>
 #include <rogue/Game.h>
 #include <rogue/GameConfig.h>
+#include <rogue/InventoryHandler.h>
 #include <rogue/Renderer.h>
 #include <rogue/UI/Controls.h>
 
@@ -95,27 +96,17 @@ namespace {
 
 void fillPlayerInventory(entt::registry &Reg, entt::entity Player,
                          const GameConfig &Cfg, const ItemDatabase &ItemDb) {
-  auto &InvComp = Reg.get<InventoryComp>(Player);
-  auto &EquipComp = Reg.get<EquipmentComp>(Player);
-  auto &Inv = InvComp.Inv;
-  auto &Equip = EquipComp.Equip;
-
   // FIXME this should be part of an enemy/NPC AI system
+  auto &Inv = Reg.get<InventoryComp>(Player).Inv;
   for (const auto &ItCfg : Cfg.InitialItems) {
     auto ItId = ItemDb.getItemId(ItCfg.Name);
     auto It = ItemDb.createItem(ItId, ItCfg.Count);
     Inv.addItem(It);
   }
 
-  // FIXME this should be part of an enemy/NPC AI system
   // Try equipping items
-  for (std::size_t Idx = 0; Idx < Inv.size(); Idx++) {
-    const auto &It = Inv.getItem(Idx);
-    if (Equip.canEquip(It, Player, Reg)) {
-      Equip.equip(Inv.takeItem(Idx), Player, Reg);
-      Idx -= 1;
-    }
-  }
+  InventoryHandler InvHandler(Player, Reg);
+  InvHandler.autoEquipItems();
 }
 
 } // namespace
@@ -214,15 +205,15 @@ bool Game::handleInput(int Char) {
     if (UICtrl.hasTargetUI()) {
       UICtrl.closeTargetUI();
     } else {
-      UICtrl.setTargetUI(getPlayer(),
-                         getLvlReg().get<PositionComp>(getPlayer()),
-                         World->getCurrentLevelOrFail(),
-                         [](auto &Lvl, auto SrcEt, auto TgEt, auto TPos) {
-                           CombatActionComp CC;
-                           CC.Target = TgEt;
-                           CC.RangedPos = TPos;
-                           Lvl.Reg.template emplace<CombatActionComp>(SrcEt, CC);
-                         });
+      UICtrl.setTargetUI(
+          getPlayer(), getLvlReg().get<PositionComp>(getPlayer()),
+          World->getCurrentLevelOrFail(),
+          [](auto &Lvl, auto SrcEt, auto TgEt, auto TPos) {
+            CombatActionComp CC;
+            CC.Target = TgEt;
+            CC.RangedPos = TPos;
+            Lvl.Reg.template emplace<CombatActionComp>(SrcEt, CC);
+          });
     }
     return true;
   }
