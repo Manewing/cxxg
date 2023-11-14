@@ -2,20 +2,32 @@
 
 namespace rogue {
 
-// FIXME move in and we "consume"?
-void Inventory::addItem(const Item &It) {
+bool Inventory::applyItemTo(const Item &It, CapabilityFlags Flags,
+                            entt::entity Entity, entt::registry &Reg) {
+  if (!It.canApplyTo(Entity, Reg, Flags)) {
+    return false;
+  }
+  It.applyTo(Entity, Reg, Flags);
+  return true;
+}
+
+void Inventory::addItem(Item It) {
   for (auto &InvIt : Items) {
-    if (InvIt.isSameKind(It)) {
-      // FIXME respespect max stack size
-      InvIt.StackSize += It.StackSize;
-      return;
+    if (InvIt.isSameKind(It) && InvIt.StackSize < It.getMaxStackSize()) {
+      auto Stacks =
+          std::min(It.getMaxStackSize() - InvIt.StackSize, It.StackSize);
+      InvIt.StackSize += Stacks;
+      It.StackSize -= Stacks;
+
+      if (It.StackSize == 0) {
+        return;
+      }
     }
   }
   Items.push_back(It);
 }
 
 Item Inventory::takeItem(std::size_t ItemIdx) {
-  // FIXME move item out?
   Item It = Items.at(ItemIdx);
   Items.erase(Items.begin() + ItemIdx);
   return It;
@@ -37,13 +49,10 @@ std::optional<Item> Inventory::applyItemTo(std::size_t ItemIdx,
                                            CapabilityFlags Flags,
                                            entt::entity Entity,
                                            entt::registry &Reg) {
-  if (!getItem(ItemIdx).canApplyTo(Entity, Reg, Flags)) {
-    // FIXME message
-    return {};
+  if (applyItemTo(getItem(ItemIdx), Flags, Entity, Reg)) {
+    return takeItem(ItemIdx, /*Count=*/1);
   }
-  auto It = takeItem(ItemIdx, /*Count=*/1);
-  It.applyTo(Entity, Reg, Flags);
-  return It;
+  return {};
 }
 
 std::size_t Inventory::size() const { return Items.size(); }

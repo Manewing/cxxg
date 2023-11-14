@@ -4,11 +4,12 @@ set(SOURCES
   CreatureDatabaseTest.cpp
   EventHubTest.cpp
   GameWorldTest.cpp
+  InventoryTest.cpp
   ItemDatabaseTest.cpp
   LevelGeneratorTest.cpp
   LootTableTest.cpp
-  Systems/StatsSystemTest.cpp
   Systems/DeathSystemTest.cpp
+  Systems/StatsSystemTest.cpp
 )
 
 add_cxxg_unittest(
