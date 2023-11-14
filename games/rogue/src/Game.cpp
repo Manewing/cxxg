@@ -437,14 +437,15 @@ ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
   return PI;
 }
 
-std::optional<ui::Controller::TargetInfo> getUITargetInfo(entt::entity Target,
+std::optional<ui::Controller::TargetInfo> getUITargetInfo(entt::entity Player,
                                                           entt::registry &Reg) {
-  if (Target == entt::null || !Reg.valid(Target)) {
+  const auto *CC = Reg.try_get<CombatAttackComp>(Player);
+  if (!CC || CC->Target == entt::null || !Reg.valid(CC->Target)) {
     return {};
   }
   ui::Controller::TargetInfo TI;
-  auto *TNC = Reg.try_get<NameComp>(Target);
-  auto *THC = Reg.try_get<HealthComp>(Target);
+  auto *TNC = Reg.try_get<NameComp>(CC->Target);
+  auto *THC = Reg.try_get<HealthComp>(CC->Target);
   TI.Name = TNC ? TNC->Name : "<NameCompMissing>";
   TI.Health = THC ? THC->Value : 0;
   TI.MaxHealth = THC ? THC->MaxValue : 0;
@@ -460,7 +461,6 @@ void Game::handleDrawLevel(bool UpdateScreen) {
 
   // Get components for drawing from the current player
   auto Player = getPlayer();
-  const auto &PC = getLvlReg().get<PlayerComp>(Player);
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
   const auto &LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
 
@@ -477,7 +477,7 @@ void Game::handleDrawLevel(bool UpdateScreen) {
 
   // Draw UI overlay
   auto PI = getUIPlayerInfo(Player, getLvlReg(), getAvailableInteraction());
-  auto TI = getUITargetInfo(PC.Target, getLvlReg());
+  auto TI = getUITargetInfo(Player, getLvlReg());
   UICtrl.draw(World->getCurrentLevelIdx(), PI, TI);
 
   if (UpdateScreen) {

@@ -1,4 +1,5 @@
 #include <entt/entt.hpp>
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Player.h>
@@ -13,6 +14,7 @@ namespace rogue {
 
 namespace {
 
+// FIXME have another component for just storing extra to be dropped items?
 void addRaceDrops(RaceKind Race, Inventory &Inv, entt::registry &Reg) {
   // FIXME load this from config
   struct DropInfo {
@@ -62,16 +64,25 @@ Inventory getDropInventoryFromEntity(entt::entity Entity, entt::registry &Reg) {
 }
 
 void reapDeadEntities(entt::registry &Reg, EventHubConnector &EHC,
-                      const entt::entity Entity, const HealthComp &HC,
-                      const PositionComp &PC) {
+                      const entt::entity Entity, const HealthComp &HC) {
   if (HC.Value != 0) {
     return;
   }
   EHC.publish(EntityDiedEvent{{}, Entity, &Reg});
 
   // Create loot from entity
-  if (auto Inv = getDropInventoryFromEntity(Entity, Reg); !Inv.empty()) {
-    createDropEntity(Reg, PC.Pos, Inv);
+  if (auto *PC = Reg.try_get<PositionComp>(Entity)) {
+    if (auto Inv = getDropInventoryFromEntity(Entity, Reg); !Inv.empty()) {
+      createDropEntity(Reg, PC->Pos, Inv);
+    }
+  }
+
+  // Clear combat components, check if target is currently being attacked
+  if (auto *CTC = Reg.try_get<CombatTargetComp>(Entity)) {
+    if (Reg.valid(CTC->Attacker) &&
+        Reg.any_of<CombatAttackComp>(CTC->Attacker)) {
+      Reg.erase<CombatAttackComp>(CTC->Attacker);
+    }
   }
 
   Reg.destroy(Entity);
@@ -93,9 +104,9 @@ void removeEmptyContainers(entt::registry &Reg, const entt::entity Entity,
 void DeathSystem::update(UpdateType Type) {
   (void)Type; // Always run
 
-  auto View = Reg.view<const HealthComp, const PositionComp>();
-  View.each([this](const auto &Entity, const auto &HC, const auto &PC) {
-    reapDeadEntities(Reg, *this, Entity, HC, PC);
+  auto View = Reg.view<const HealthComp>();
+  View.each([this](const auto &Entity, const auto &HC) {
+    reapDeadEntities(Reg, *this, Entity, HC);
   });
 
   // FIXME should this be done somewhere else?

@@ -8,6 +8,7 @@ set(SOURCES
   LevelGeneratorTest.cpp
   LootTableTest.cpp
   Systems/StatsSystemTest.cpp
+  Systems/DeathSystemTest.cpp
 )
 
 add_cxxg_unittest(

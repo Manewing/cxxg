@@ -16,6 +16,18 @@ struct CombatActionComp {
   std::optional<ymir::Point2d<int>> RangedPos = std::nullopt;
 };
 
+/// Indicates that the entity is attacking another entity
+struct CombatAttackComp {
+  /// The entity that is currently targeted by the attack
+  entt::entity Target = entt::null;
+};
+
+/// Indicates that the entity is the target of an attack
+struct CombatTargetComp {
+  /// The entity that is currently attacking this entity
+  entt::entity Attacker = entt::null;
+};
+
 struct RangedAttackComp {
   StatValue PhysDamage = 10;
   StatValue MagicDamage = 0;

@@ -15,6 +15,17 @@ namespace {
 // FIXME move this, also should this be based on the level seed?
 static std::random_device RandomEngine;
 
+/// Applies combat components to entities either being the target of an attack
+/// or the attacker.
+/// Always keep the last attacker and target in the combat component
+void applyCombatComps(entt::registry &Reg, entt::entity Attacker,
+                      entt::entity Target) {
+  Reg.get_or_emplace<CombatAttackComp>(Attacker).Target = Target;
+  if (Target != entt::null) {
+    Reg.get_or_emplace<CombatTargetComp>(Target).Attacker = Attacker;
+  }
+}
+
 std::optional<unsigned> applyDamage(entt::registry &Reg,
                                     const entt::entity Target,
                                     HealthComp &THealth, const DamageComp &DC) {
@@ -88,7 +99,9 @@ bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
   return true;
 }
 
-/// Returns true if the combat component can be removed
+/// Performs a range attack by creating a projectile based on the computed
+/// damage for the attacker
+/// \return true if the combat component can be removed
 bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
                          ymir::Point2d<int> TargetPos) {
   auto *AttackerPC = Reg.try_get<PositionComp>(Attacker);
@@ -138,6 +151,7 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
   }
   if (CanRemove) {
     Reg.erase<CombatActionComp>(Attacker);
+    applyCombatComps(Reg, Attacker, CC.Target);
   }
 }
 
@@ -153,6 +167,9 @@ void applyDamage(entt::registry &Reg, entt::entity DmgEt, DamageComp &DC,
           return;
         }
         auto Damage = applyDamage(Reg, TEt, THC, DC);
+
+        // Applying damage may cause update attack/target components
+        applyCombatComps(Reg, DC.Source, TEt);
 
         // publish
         EntityAttackEvent EAE;

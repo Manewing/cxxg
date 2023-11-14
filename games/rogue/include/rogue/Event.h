@@ -2,9 +2,9 @@
 #define ROGUE_EVENT_H
 
 #include <entt/entt.hpp>
+#include <filesystem>
 #include <optional>
 #include <sstream>
-#include <filesystem>
 
 namespace rogue {
 struct BuffBase;
@@ -48,6 +48,9 @@ struct EntityDiedEvent : public BaseEvent {
   entt::registry *Registry = nullptr;
   bool isPlayerAffected() const;
 };
+inline bool operator==(const EntityDiedEvent &Lhs, const EntityDiedEvent &Rhs) {
+  return Lhs.Entity == Rhs.Entity && Lhs.Registry == Rhs.Registry;
+}
 
 struct BuffExpiredEvent : public BaseEvent {
   entt::entity Entity = entt::null;
