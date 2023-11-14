@@ -128,7 +128,7 @@ bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
 }
 
 void performAttack(entt::registry &Reg, entt::entity Attacker,
-                   const CombatComp &CC, EventHubConnector &EHC) {
+                   const CombatActionComp &CC, EventHubConnector &EHC) {
   assert(CC.Target != entt::null || CC.RangedPos.has_value());
   bool CanRemove = false;
   if (CC.RangedPos) {
@@ -137,7 +137,7 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
     CanRemove = performMeleeAttack(Reg, Attacker, CC.Target, EHC);
   }
   if (CanRemove) {
-    Reg.erase<CombatComp>(Attacker);
+    Reg.erase<CombatActionComp>(Attacker);
   }
 }
 
@@ -176,7 +176,7 @@ void CombatSystem::update(UpdateType Type) {
   }
 
   // Deal with melee attacks
-  Reg.view<CombatComp>().each([this](const auto &AttackerEt, auto &CC) {
+  Reg.view<CombatActionComp>().each([this](const auto &AttackerEt, auto &CC) {
     performAttack(Reg, AttackerEt, CC, *this);
   });
 

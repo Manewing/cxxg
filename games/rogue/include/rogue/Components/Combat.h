@@ -7,8 +7,9 @@
 
 namespace rogue {
 
-struct CombatComp {
-  /// If set, indicates an attack twoards the given entity
+/// Component that indicates the entity wants to execute a combat action
+struct CombatActionComp {
+  /// If set, indicates an attack towards the given entity
   entt::entity Target = entt::null;
 
   /// If set, indicates a ranged attack towards the given position

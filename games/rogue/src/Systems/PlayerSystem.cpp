@@ -19,7 +19,7 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
   // FIXME this does not count in combat
   // -> check instead of an action was successfully performed
   PC.IsReady = AG.hasEnoughAP(MovementComp::MoveAPCost) &&
-               !Reg.any_of<CombatComp>(PlayerEt);
+               !Reg.any_of<CombatActionComp>(PlayerEt);
   PC.CurrentInteraction = std::nullopt;
 
   if (!PC.IsReady) {
@@ -36,7 +36,7 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
   if (auto Et = L.getEntityAt(NewPos);
       Et != entt::null && Reg.all_of<HealthComp, FactionComp>(Et)) {
     PC.Target = Et;
-    Reg.emplace<CombatComp>(PlayerEt, Et);
+    Reg.emplace<CombatActionComp>(PlayerEt, Et);
     return;
   }
 

@@ -218,10 +218,10 @@ bool Game::handleInput(int Char) {
                          getLvlReg().get<PositionComp>(getPlayer()),
                          World->getCurrentLevelOrFail(),
                          [](auto &Lvl, auto SrcEt, auto TgEt, auto TPos) {
-                           CombatComp CC;
+                           CombatActionComp CC;
                            CC.Target = TgEt;
                            CC.RangedPos = TPos;
-                           Lvl.Reg.template emplace<CombatComp>(SrcEt, CC);
+                           Lvl.Reg.template emplace<CombatActionComp>(SrcEt, CC);
                          });
     }
     return true;
