@@ -61,6 +61,8 @@ void Level::createPlayer() {
   Player = PlayerComp::createPlayer(Reg, "Player", getLevelStartPos());
 }
 
+bool Level::hasPlayer() const { return Reg.valid(Player); }
+
 void Level::movePlayer(Level &From, ymir::Point2d<int> ToPos) {
   Player = PlayerComp::movePlayer(From.Reg, Reg);
   From.removePlayer();

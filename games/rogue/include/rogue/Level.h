@@ -43,6 +43,7 @@ public:
 
   // FIXME decouple player from level
   void createPlayer();
+  bool hasPlayer() const;
   void movePlayer(Level &From, ymir::Point2d<int> AtPos);
   void removePlayer();
   const entt::entity &getPlayer() const;

@@ -1,7 +1,7 @@
+#include <rogue/Components/Transform.h>
 #include <rogue/GameWorld.h>
 #include <rogue/Level.h>
 #include <rogue/LevelGenerator.h>
-#include <rogue/Components/Transform.h>
 
 namespace rogue {
 
@@ -33,7 +33,7 @@ Level &MultiLevelDungeon::switchLevel(std::size_t LevelIdx, bool ToEntry) {
   }
   auto &Nextlvl = *Levels.at(LevelIdx);
 
-  if (CurrLvl && CurrLvl != &Nextlvl && CurrLvl->getPlayer() != entt::null) {
+  if (CurrLvl && CurrLvl != &Nextlvl && CurrLvl->hasPlayer()) {
     auto ToPos =
         ToEntry ? Nextlvl.getLevelStartPos() : Nextlvl.getLevelEndPos();
     Nextlvl.update(false);
@@ -91,11 +91,13 @@ Level &DungeonSweeper::switchLevel(std::size_t LevelIdx, bool ToEntry) {
     auto *CurrLvl = getCurrentLevel();
     auto ToPos = Lvl->Reg.get<PositionComp>(CurrSwitchEntity).Pos;
     Lvl->update(false);
-    Lvl->movePlayer(*CurrLvl, ToPos);
-    Lvl->Reg.destroy(CurrSwitchEntity);
-    CurrSubWorld = nullptr;
-    CurrSubLvlGen = nullptr;
-    LevelIdx = 0;
+    if (Lvl->hasPlayer()) {
+      Lvl->movePlayer(*CurrLvl, ToPos);
+      Lvl->Reg.destroy(CurrSwitchEntity);
+      CurrSubWorld = nullptr;
+      CurrSubLvlGen = nullptr;
+      LevelIdx = 0;
+    }
   }
 
   if (LevelIdx != 0) {
