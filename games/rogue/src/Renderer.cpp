@@ -87,6 +87,9 @@ void Renderer::renderEntities() {
   L.Reg.sort<PositionComp, TileComp>();
   auto View = L.Reg.view<const PositionComp, const TileComp>();
   View.each([this](const auto &Pos, const auto &T) {
+    if (!RenderedLevelMap.contains(Pos)) {
+      return;
+    }
     RenderedLevelMap.getTile(Pos) = T.T;
   });
 }
