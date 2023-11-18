@@ -112,6 +112,13 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              BDC.TicksLeft = V["ticks"].GetUint();
              return makeApplyBuffItemEffect<BlindedDebuffComp>(BDC);
            }},
+          {"mind_vision_comp",
+           [](const auto &, const auto &V) {
+             MindVisionBuffComp MVBC;
+             MVBC.TicksLeft = V["ticks"].GetUint();
+             MVBC.Range = V["range"].GetUint();
+             return makeApplyBuffItemEffect<MindVisionBuffComp>(MVBC);
+           }},
           {"melee_attack_comp",
            [](const auto &, const auto &V) {
              MeleeAttackComp MAC;

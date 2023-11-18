@@ -7,6 +7,7 @@
 #include <rogue/Systems/AttackAISystem.h>
 #include <rogue/Systems/CombatSystem.h>
 #include <rogue/Systems/DeathSystem.h>
+#include <rogue/Systems/LOSSystem.h>
 #include <rogue/Systems/MovementSystem.h>
 #include <rogue/Systems/NPCSystem.h>
 #include <rogue/Systems/PlayerSystem.h>
@@ -26,6 +27,7 @@ Level::Level(int LevelId, ymir::Size2d<int> Size)
     : Map(LayerNames, Size), LevelId(LevelId), PlayerSeenMap(Size) {
   Systems = {
       std::make_shared<StatsSystem>(Reg),
+      std::make_shared<LOSSystem>(Reg),
       std::make_shared<AgilitySystem>(Reg),
       std::make_shared<RegenSystem>(Reg),
       std::make_shared<PlayerSystem>(*this),
@@ -228,19 +230,18 @@ void Level::updateEntityPosition(const entt::entity &Entity,
 }
 
 void Level::updatePlayerSeenMap() {
-  if (Player == entt::null) {
-    return;
-  }
-  ymir::Algorithm::traverseLOS(
-      [this](auto Pos) -> bool {
-        if (!PlayerSeenMap.contains(Pos)) {
-          return false;
-        }
-        PlayerSeenMap.getTile(Pos) = true;
-        return !isLOSBlocked(Pos);
-      },
-      Reg.get<PositionComp>(Player).Pos,
-      Reg.get<LineOfSightComp>(Player).LOSRange, 0.3, 0.01);
+  Reg.view<LineOfSightComp, VisibleLOSComp, PositionComp>().each(
+      [this](const auto &LC, const auto &, const auto &PC) {
+        ymir::Algorithm::traverseLOS(
+            [this](auto Pos) -> bool {
+              if (!PlayerSeenMap.contains(Pos)) {
+                return false;
+              }
+              PlayerSeenMap.getTile(Pos) = true;
+              return !isLOSBlocked(Pos);
+            },
+            PC.Pos, LC.LOSRange, 0.3, 0.01);
+      });
 }
 
 void Level::updateEntityPosCache() {

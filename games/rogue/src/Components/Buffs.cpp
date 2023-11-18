@@ -212,6 +212,20 @@ void BlindedDebuffComp::add(const BlindedDebuffComp &Other) {
   TicksLeft = std::max(TicksLeft, Other.TicksLeft);
 }
 
+std::string_view MindVisionBuffComp::getName() const { return "Mind Vision"; }
+
+std::string MindVisionBuffComp::getDescription() const {
+  std::stringstream SS;
+  SS << "Can see minds of entities in a 100 tile radius for " << TicksLeft
+     << " ticks";
+  return SS.str();
+}
+
+void MindVisionBuffComp::add(const MindVisionBuffComp &Other) {
+  TicksLeft = Other.TicksLeft;
+  Range = Other.Range;
+}
+
 std::string_view ArmorBuffComp::getName() const { return "Armor Buff"; }
 
 std::string ArmorBuffComp::getDescription() const {

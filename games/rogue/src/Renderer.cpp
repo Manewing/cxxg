@@ -48,7 +48,7 @@ void Renderer::renderFogOfWar(const ymir::Map<bool, int> &SeenMap) {
 void Renderer::renderAllLineOfSight() {
   auto View = L.Reg.view<const PositionComp, const LineOfSightComp,
                          const VisibleLOSComp>();
-  View.each([this](const auto &Pos, const auto &LOS) {
+  View.each([this](const auto &Pos, const auto &LOS, const auto&) {
     renderLineOfSight(Pos, LOS.LOSRange);
   });
 }

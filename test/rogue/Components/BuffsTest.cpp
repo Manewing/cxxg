@@ -341,4 +341,31 @@ TEST(BuffsTest, BlindedDebuffCompAddRemove) {
   EXPECT_EQ(B.TicksLeft, 5);
 }
 
+TEST(BuffsTest, MindVisionBuffCompText) {
+  rogue::MindVisionBuffComp A;
+  A.Range = 100;
+  A.TicksLeft = 10;
+  EXPECT_EQ(A.getName(), "Mind Vision");
+  EXPECT_EQ(A.getDescription(),
+            "Can see minds of entities in a 100 tile radius for 10 ticks");
+}
+
+TEST(BuffsTest, MindVisionBuffCompAddRemove) {
+  rogue::MindVisionBuffComp A, B;
+
+  A.TicksLeft = 1;
+  A.Range = 2;
+  B.TicksLeft = 3;
+  B.Range = 4;
+
+  // Adding causes replacement of current buff
+  A.add(B);
+  EXPECT_EQ(A.TicksLeft, 3);
+  EXPECT_EQ(A.Range, 4);
+  EXPECT_EQ(B.TicksLeft, 3);
+  EXPECT_EQ(B.Range, 4);
+
+  EXPECT_FALSE(A.remove(B));
+}
+
 } // namespace

@@ -142,6 +142,15 @@ public:
   void add(const BlindedDebuffComp &Other);
 };
 
+struct MindVisionBuffComp : public TimedBuff, public BuffBase {
+public:
+  std::string_view getName() const override;
+  std::string getDescription() const override;
+  void add(const MindVisionBuffComp &Other);
+public:
+  unsigned Range = 100;
+};
+
 struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
   StatValue PhysArmor = 0;
   StatValue MagicArmor = 0;

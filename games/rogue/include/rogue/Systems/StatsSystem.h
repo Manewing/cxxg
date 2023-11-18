@@ -13,4 +13,4 @@ public:
 
 } // namespace rogue
 
-#endif // #ifndef ROGUE_SYSTEMS_REGEN_SYSTEM_H
+#endif // #ifndef ROGUE_SYSTEMS_STATS_SYSTEM_H

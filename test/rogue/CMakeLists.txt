@@ -11,6 +11,7 @@ set(SOURCES
   LevelGeneratorTest.cpp
   LootTableTest.cpp
   Systems/DeathSystemTest.cpp
+  Systems/LOSSystemTest.cpp
   Systems/StatsSystemTest.cpp
 )
 

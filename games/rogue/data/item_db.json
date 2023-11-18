@@ -84,6 +84,11 @@
       "type": "blinded_debuff_comp",
       "ticks": 600
     },
+    "mind_vision_comp": {
+      "type": "mind_vision_comp",
+      "ticks": 200,
+      "range": 100
+    },
     "melee_2": {
       "type": "melee_attack_comp",
       "phys_damage": 2,
@@ -349,6 +354,18 @@
         {
           "type": "ranged_use",
           "effect": "blinded_debuff_comp"
+        }
+      ]
+    },
+    {
+      "name": "Scroll of mind vision",
+      "description": "A scroll that allows mind vision for a short period of time",
+      "max_stack_size": 1,
+      "types": ["consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "mind_vision_comp"
         }
       ]
     },

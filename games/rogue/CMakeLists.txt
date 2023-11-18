@@ -42,6 +42,7 @@ set(HEADER_FILES
   include/rogue/Systems/AttackAISystem.h
   include/rogue/Systems/CombatSystem.h
   include/rogue/Systems/DeathSystem.h
+  include/rogue/Systems/LOSSystem.h
   include/rogue/Systems/MovementSystem.h
   include/rogue/Systems/NPCSystem.h
   include/rogue/Systems/PlayerSystem.h
@@ -104,6 +105,7 @@ set(SOURCE_FILES
   src/Systems/AttackAISystem.cpp
   src/Systems/CombatSystem.cpp
   src/Systems/DeathSystem.cpp
+  src/Systems/LOSSystem.cpp
   src/Systems/MovementSystem.cpp
   src/Systems/NPCSystem.cpp
   src/Systems/PlayerSystem.cpp

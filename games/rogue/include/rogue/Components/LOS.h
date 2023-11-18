@@ -10,7 +10,9 @@ struct LineOfSightComp {
   void reset() { LOSRange = MaxLOSRange; }
 };
 
-struct VisibleLOSComp {};
+struct VisibleLOSComp {
+  bool Temporary = false;
+};
 
 } // namespace rogue
 
