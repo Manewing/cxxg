@@ -208,6 +208,8 @@ std::optional<ymir::Point2d<int>> WanderAISystem::findPathToPoint(
       ymir::FourTileDirections<int>());
 
   std::uniform_int_distribution<int> OneZero(0, 1);
+  // FIXME only consider this if the path is not significantly longer than one
+  // taken if the entity was not body blocked
   auto PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
       DM, DMMidPos, AtPos - FutureToPos + DMMidPos,
       ymir::FourTileDirections<int>(), 1, OneZero(RandomEngine));

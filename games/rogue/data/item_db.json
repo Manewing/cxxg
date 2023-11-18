@@ -12,19 +12,19 @@
       "type": "poison_debuff_comp",
       "reduce_amount": 0.5,
       "ticks": 5,
-      "tick_period": 10
+      "tick_period": 20
     },
     "minor_quick_health_regen_effect": {
       "type": "health_regen_buff_comp",
       "regen_amount": 1.0,
-      "ticks": 2,
-      "tick_period": 4
+      "ticks": 4,
+      "tick_period": 10
     },
     "minor_health_regen_effect": {
       "type": "health_regen_buff_comp",
       "regen_amount": 0.5,
-      "ticks": 5,
-      "tick_period": 10
+      "ticks": 10,
+      "tick_period": 20
     },
     "bleeding_debuff_effect": {
       "type": "bleeding_debuff_comp",
@@ -769,6 +769,25 @@
         }
       ]
     },
+    "common_scroll": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Scroll of pain",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of blinding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        }
+      ]
+    },
     "common_chest": {
       "rolls": 4,
       "slots": [
@@ -792,6 +811,11 @@
         {
           "type": "table",
           "ref": "rare_equip",
+          "weight": 1
+        },
+        {
+          "type": "table",
+          "ref": "common_scroll",
           "weight": 1
         },
         {
