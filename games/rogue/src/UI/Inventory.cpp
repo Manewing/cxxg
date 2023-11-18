@@ -104,10 +104,13 @@ bool InventoryController::handleInput(int Char) {
     if ((Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) !=
         CapabilityFlags::None) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
-      Ctrl.setTargetUI(PC.Pos, Lvl, [this, ItemIdx](auto TgEt, auto) {
-        InvHandler.tryUseItemOnTarget(ItemIdx, TgEt);
-      });
-      break;
+      Ctrl.setTargetUI(
+          PC.Pos, Lvl,
+          [&R = Lvl.Reg, E = Entity, ItemIdx](auto TgEt, auto) -> void {
+            InventoryHandler IH(E, R);
+            IH.tryUseItemOnTarget(ItemIdx, TgEt);
+          });
+      return false;
     }
     InvHandler.tryUseItem(ItemIdx);
   } break;
