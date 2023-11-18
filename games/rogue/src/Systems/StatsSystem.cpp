@@ -1,5 +1,5 @@
-#include <rogue/Components/LOS.h>
 #include <rogue/Components/Buffs.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Systems/StatsSystem.h>
 

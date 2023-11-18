@@ -17,7 +17,7 @@ namespace rogue {
 class Item {
 public:
   explicit Item(const ItemPrototype &Proto, int StackSize = 1,
-       const std::shared_ptr<ItemPrototype> &Specialization = nullptr);
+                const std::shared_ptr<ItemPrototype> &Specialization = nullptr);
   virtual ~Item() = default;
 
   std::string getName() const;

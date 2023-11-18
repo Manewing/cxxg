@@ -48,7 +48,7 @@ void Renderer::renderFogOfWar(const ymir::Map<bool, int> &SeenMap) {
 void Renderer::renderAllLineOfSight() {
   auto View = L.Reg.view<const PositionComp, const LineOfSightComp,
                          const VisibleLOSComp>();
-  View.each([this](const auto &Pos, const auto &LOS, const auto&) {
+  View.each([this](const auto &Pos, const auto &LOS, const auto &) {
     renderLineOfSight(Pos, LOS.LOSRange);
   });
 }
@@ -94,7 +94,8 @@ void Renderer::renderEntities() {
   L.Reg.sort<TileComp>(
       [](const auto &Lhs, const auto &Rhs) { return Lhs.ZIndex < Rhs.ZIndex; });
   L.Reg.sort<PositionComp, TileComp>();
-  auto View = L.Reg.view<const PositionComp, const TileComp, const VisibleComp>();
+  auto View =
+      L.Reg.view<const PositionComp, const TileComp, const VisibleComp>();
   View.each([this](const auto &Pos, const auto &T, const auto &VC) {
     if (!VC.IsVisible && !VC.Partially) {
       return;

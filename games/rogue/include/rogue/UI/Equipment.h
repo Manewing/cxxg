@@ -3,9 +3,9 @@
 
 #include <entt/entt.hpp>
 #include <optional>
+#include <rogue/InventoryHandler.h>
 #include <rogue/UI/Decorator.h>
 #include <rogue/UI/ItemSelect.h>
-#include <rogue/InventoryHandler.h>
 #include <rogue/UI/Widget.h>
 #include <string_view>
 

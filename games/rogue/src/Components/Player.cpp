@@ -15,8 +15,9 @@ namespace {
 
 using PlayerCompList =
     ComponentList<TileComp, FactionComp, PlayerComp, PositionComp, StatsComp,
-                  HealthComp, NameComp, LineOfSightComp, VisibleLOSComp, VisibleComp,
-                  AgilityComp, InventoryComp, EquipmentComp, CollisionComp>;
+                  HealthComp, NameComp, LineOfSightComp, VisibleLOSComp,
+                  VisibleComp, AgilityComp, InventoryComp, EquipmentComp,
+                  CollisionComp>;
 using PlayerCompListOpt = ComponentList<MeleeAttackComp, RangedAttackComp>;
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,

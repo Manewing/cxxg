@@ -226,7 +226,9 @@ void MindVisionBuffComp::add(const MindVisionBuffComp &Other) {
   Range = Other.Range;
 }
 
-std::string_view InvisibilityBuffComp::getName() const { return "Invisibility"; }
+std::string_view InvisibilityBuffComp::getName() const {
+  return "Invisibility";
+}
 
 std::string InvisibilityBuffComp::getDescription() const {
   std::stringstream SS;

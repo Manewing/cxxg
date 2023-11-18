@@ -48,8 +48,7 @@ public:
 
   void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false);
 
-  template <typename T>
-  const T *getWindowOfType() const {
+  template <typename T> const T *getWindowOfType() const {
     return WdwContainer.getWindowOfType<T>();
   }
 
