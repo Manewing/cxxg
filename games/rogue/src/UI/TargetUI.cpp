@@ -142,6 +142,13 @@ std::string TargetUI::getInteractMsg() const {
 
 void TargetUI::draw(cxxg::Screen &Scr) const { (void)Scr; }
 
+ymir::Point2d<int> TargetUI::getCursorPos() const {
+  if (CursorEt == entt::null) {
+    return StartPos;
+  }
+  return Lvl.Reg.get<PositionComp>(CursorEt).Pos;
+}
+
 void TargetUI::destroyCursor() {
   if (CursorEt != entt::null) {
     Lvl.Reg.destroy(CursorEt);

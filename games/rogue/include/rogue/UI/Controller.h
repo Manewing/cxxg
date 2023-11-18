@@ -48,6 +48,11 @@ public:
 
   void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false);
 
+  template <typename T>
+  const T *getWindowOfType() const {
+    return WdwContainer.getWindowOfType<T>();
+  }
+
   void setEquipmentUI(entt::entity Entity, entt::registry &Reg);
   bool hasEquipmentUI() const;
   void closeEquipmentUI();

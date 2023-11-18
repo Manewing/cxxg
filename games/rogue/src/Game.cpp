@@ -15,6 +15,7 @@
 #include <rogue/InventoryHandler.h>
 #include <rogue/Renderer.h>
 #include <rogue/UI/Controls.h>
+#include <rogue/UI/TargetUI.h>
 
 namespace rogue {
 
@@ -457,10 +458,14 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   // Get components for drawing from the current player
   auto Player = getPlayer();
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
+  auto CenterPos = PlayerPos;
+  if (auto *TUI = UICtrl.getWindowOfType<ui::TargetUI>()) {
+    CenterPos = TUI->getCursorPos();
+  }
   const auto &LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
 
   auto &CurrentLevel = World->getCurrentLevelOrFail();
-  Renderer Render(RenderSize, CurrentLevel, PlayerPos);
+  Renderer Render(RenderSize, CurrentLevel, CenterPos);
   Render.renderShadow(/*Darkness=*/30);
   Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
   Render.renderLineOfSight(PlayerPos, /*Range=*/LOSRange);

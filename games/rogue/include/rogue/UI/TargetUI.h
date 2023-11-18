@@ -41,6 +41,9 @@ public:
   std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
+  entt::entity getTarget() const { return TargetEt; }
+  ymir::Point2d<int> getCursorPos() const;
+
   void destroyCursor();
   void showInfoForTarget(entt::entity TargetEt);
 
