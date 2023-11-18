@@ -91,12 +91,12 @@ Level &DungeonSweeper::switchLevel(std::size_t LevelIdx, bool ToEntry) {
     auto *CurrLvl = getCurrentLevel();
     auto ToPos = Lvl->Reg.get<PositionComp>(CurrSwitchEntity).Pos;
     Lvl->update(false);
-    if (Lvl->hasPlayer()) {
+    LevelIdx = 0;
+    if (CurrLvl->hasPlayer()) {
       Lvl->movePlayer(*CurrLvl, ToPos);
       Lvl->Reg.destroy(CurrSwitchEntity);
       CurrSubWorld = nullptr;
       CurrSubLvlGen = nullptr;
-      LevelIdx = 0;
     }
   }
 
