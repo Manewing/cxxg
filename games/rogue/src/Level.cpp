@@ -1,4 +1,4 @@
-#include <rogue/Components/AI.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Level.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>

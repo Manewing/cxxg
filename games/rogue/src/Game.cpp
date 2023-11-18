@@ -3,9 +3,9 @@
 #include <cxxg/Types.h>
 #include <cxxg/Utils.h>
 #include <memory>
-#include <rogue/Components/AI.h>
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
@@ -462,13 +462,12 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   if (auto *TUI = UICtrl.getWindowOfType<ui::TargetUI>()) {
     CenterPos = TUI->getCursorPos();
   }
-  const auto &LOSRange = getLvlReg().get<LineOfSightComp>(Player).LOSRange;
 
   auto &CurrentLevel = World->getCurrentLevelOrFail();
   Renderer Render(RenderSize, CurrentLevel, CenterPos);
   Render.renderShadow(/*Darkness=*/30);
   Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
-  Render.renderLineOfSight(PlayerPos, /*Range=*/LOSRange);
+  Render.renderAllLineOfSight();
   REC.apply(Render);
   REC.clear();
 

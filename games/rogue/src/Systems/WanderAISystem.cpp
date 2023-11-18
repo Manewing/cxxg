@@ -1,4 +1,5 @@
 #include <rogue/Components/AI.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>

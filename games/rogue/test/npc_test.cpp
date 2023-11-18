@@ -6,6 +6,7 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Helpers.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>

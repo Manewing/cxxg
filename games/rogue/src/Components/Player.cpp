@@ -1,8 +1,8 @@
-#include <rogue/Components/AI.h>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Helpers.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Level.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/RaceFaction.h>
@@ -15,8 +15,8 @@ namespace {
 
 using PlayerCompList =
     ComponentList<TileComp, FactionComp, PlayerComp, PositionComp, StatsComp,
-                  HealthComp, NameComp, LineOfSightComp, AgilityComp,
-                  InventoryComp, EquipmentComp, CollisionComp>;
+                  HealthComp, NameComp, LineOfSightComp, VisibleLOSComp,
+                  AgilityComp, InventoryComp, EquipmentComp, CollisionComp>;
 using PlayerCompListOpt = ComponentList<MeleeAttackComp, RangedAttackComp>;
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
@@ -44,6 +44,7 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   Reg.emplace<InventoryComp>(Entity, InvComp);
   Reg.emplace<EquipmentComp>(Entity, EquipComp);
   Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleLOSComp>(Entity);
 
   assert(PlayerCompList::validate(Reg, Entity) && "Player entity is invalid");
 

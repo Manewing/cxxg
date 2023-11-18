@@ -1,3 +1,4 @@
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/Level.h>
@@ -42,6 +43,14 @@ void Renderer::renderFogOfWar(const ymir::Map<bool, int> &SeenMap) {
     }
   });
   (void)FogTile;
+}
+
+void Renderer::renderAllLineOfSight() {
+  auto View = L.Reg.view<const PositionComp, const LineOfSightComp,
+                         const VisibleLOSComp>();
+  View.each([this](const auto &Pos, const auto &LOS) {
+    renderLineOfSight(Pos, LOS.LOSRange);
+  });
 }
 
 void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {

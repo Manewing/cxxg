@@ -2,6 +2,7 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Level.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/RaceFaction.h>
