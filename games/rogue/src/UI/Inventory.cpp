@@ -104,12 +104,13 @@ bool InventoryController::handleInput(int Char) {
     if ((Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) !=
         CapabilityFlags::None) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
-      Ctrl.setTargetUI(
-          PC.Pos, Lvl,
-          [&R = Lvl.Reg, E = Entity, ItemIdx](auto TgEt, auto) -> void {
-            InventoryHandler IH(E, R);
-            IH.tryUseItemOnTarget(ItemIdx, TgEt);
-          });
+      Ctrl.setTargetUI(PC.Pos, Lvl,
+                       [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
+                        ItemIdx](auto TgEt, auto) -> void {
+                         InventoryHandler IH(E, R);
+                         IH.setEventHub(Hub);
+                         IH.tryUseItemOnTarget(ItemIdx, TgEt);
+                       });
       return false;
     }
     InvHandler.tryUseItem(ItemIdx);
