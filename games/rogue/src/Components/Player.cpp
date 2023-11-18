@@ -15,7 +15,7 @@ namespace {
 
 using PlayerCompList =
     ComponentList<TileComp, FactionComp, PlayerComp, PositionComp, StatsComp,
-                  HealthComp, NameComp, LineOfSightComp, VisibleLOSComp,
+                  HealthComp, NameComp, LineOfSightComp, VisibleLOSComp, VisibleComp,
                   AgilityComp, InventoryComp, EquipmentComp, CollisionComp>;
 using PlayerCompListOpt = ComponentList<MeleeAttackComp, RangedAttackComp>;
 
@@ -45,6 +45,7 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   Reg.emplace<EquipmentComp>(Entity, EquipComp);
   Reg.emplace<CollisionComp>(Entity);
   Reg.emplace<VisibleLOSComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity).Partially = true;
 
   assert(PlayerCompList::validate(Reg, Entity) && "Player entity is invalid");
 

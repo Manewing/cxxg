@@ -1,6 +1,7 @@
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/LOS.h>
 #include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
 #include <rogue/Systems/LOSSystem.h>
 
 namespace rogue {
@@ -9,6 +10,7 @@ namespace {
 
 void resetLOSComps(entt::registry &Reg) {
   Reg.view<LineOfSightComp>().each([](auto &LOS) { LOS.reset(); });
+  Reg.view<VisibleComp>().each([](auto &VC) { VC.IsVisible = true; });
   Reg.view<VisibleLOSComp>().each([&Reg](auto Et, auto &VLOS) {
     if (VLOS.Temporary) {
       Reg.erase<VisibleLOSComp>(Et);
@@ -25,6 +27,14 @@ void applyStaticDebuffs(entt::registry &Reg, bool Tick) {
         }
         LOS.LOSRange = LOS.LOSRange * DB.Factor;
       });
+
+  Reg.view<InvisibilityBuffComp>().each([&Reg, Tick](auto Et, auto &IBC) {
+    if (Tick && IBC.tick() == TimedBuff::State::Expired) {
+      Reg.erase<InvisibilityBuffComp>(Et);
+      return;
+    }
+    Reg.get_or_emplace<VisibleComp>(Et).IsVisible = false;
+  });
 
   Reg.view<MindVisionBuffComp, PositionComp>().each([&Reg, Tick](auto Et,
                                                                  auto &MVB,

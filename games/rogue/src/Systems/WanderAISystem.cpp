@@ -162,13 +162,18 @@ WanderAISystem::findTarget(entt::entity Entity,
   entt::entity TargetEt = entt::null;
   ymir::Algorithm::traverseLOS(
       [this, &TargetEt, &FacComp](auto Pos) {
-        if (auto T = L.getEntityAt(Pos); T != entt::null) {
-          if (auto TFac = Reg.try_get<FactionComp>(T);
-              TFac && FacComp->Faction != TFac->Faction) {
-            TargetEt = T;
-            // Target blocks LOS
-            return true;
-          }
+        auto T = L.getEntityAt(Pos);
+        if (T == entt::null) {
+          return !L.isLOSBlocked(Pos);
+        }
+        if (auto *VC = Reg.try_get<VisibleComp>(T); !VC || !VC->IsVisible) {
+          return !L.isLOSBlocked(Pos);
+        }
+        if (auto TFac = Reg.try_get<FactionComp>(T);
+            TFac && FacComp->Faction != TFac->Faction) {
+          TargetEt = T;
+          // Target blocks LOS
+          return true;
         }
         return !L.isLOSBlocked(Pos);
       },

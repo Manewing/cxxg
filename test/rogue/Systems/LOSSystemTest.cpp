@@ -88,4 +88,15 @@ TEST_F(LOSSystemTest, MindVisionBuff) {
   EXPECT_TRUE(Reg.any_of<rogue::VisibleLOSComp>(TEt3));
 }
 
+TEST_F(LOSSystemTest, InvisibilityBuff) {
+  Reg.emplace<rogue::VisibleComp>(Et).IsVisible = true;
+  Reg.emplace<rogue::InvisibilityBuffComp>(Et);
+
+  Sys->update(rogue::System::UpdateType::NoTick);
+  EXPECT_FALSE(Reg.get<rogue::VisibleComp>(Et).IsVisible);
+
+  Sys->update(rogue::System::UpdateType::Tick);
+  EXPECT_FALSE(Reg.any_of<rogue::InvisibilityBuffComp>(Et));
+}
+
 } // namespace

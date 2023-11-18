@@ -84,10 +84,14 @@
       "type": "blinded_debuff_comp",
       "ticks": 600
     },
-    "mind_vision_comp": {
-      "type": "mind_vision_comp",
+    "mind_vision_buff_comp": {
+      "type": "mind_vision_buff_comp",
       "ticks": 200,
       "range": 100
+    },
+    "invisibility_buff_comp": {
+      "type": "invisibility_buff_comp",
+      "ticks": 200
     },
     "melee_2": {
       "type": "melee_attack_comp",
@@ -365,7 +369,19 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "mind_vision_comp"
+          "effect": "mind_vision_buff_comp"
+        }
+      ]
+    },
+    {
+      "name": "Scroll of invisibility",
+      "description": "A scroll that makes the caster invisible for a short period of time",
+      "max_stack_size": 1,
+      "types": ["consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "invisibility_buff_comp"
         }
       ]
     },
@@ -799,6 +815,20 @@
         {
           "type": "item",
           "name": "Scroll of blinding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of invisibility",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of mind vision",
           "min_count": 1,
           "max_count": 1,
           "weight": 5

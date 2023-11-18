@@ -14,6 +14,11 @@ struct VisibleLOSComp {
   bool Temporary = false;
 };
 
+struct VisibleComp {
+  bool IsVisible = true;
+  bool Partially = false;
+};
+
 } // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_LOS_H

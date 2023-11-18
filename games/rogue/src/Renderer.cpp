@@ -94,12 +94,19 @@ void Renderer::renderEntities() {
   L.Reg.sort<TileComp>(
       [](const auto &Lhs, const auto &Rhs) { return Lhs.ZIndex < Rhs.ZIndex; });
   L.Reg.sort<PositionComp, TileComp>();
-  auto View = L.Reg.view<const PositionComp, const TileComp>();
-  View.each([this](const auto &Pos, const auto &T) {
+  auto View = L.Reg.view<const PositionComp, const TileComp, const VisibleComp>();
+  View.each([this](const auto &Pos, const auto &T, const auto &VC) {
+    if (!VC.IsVisible && !VC.Partially) {
+      return;
+    }
     if (!RenderedLevelMap.contains(Pos)) {
       return;
     }
-    RenderedLevelMap.getTile(Pos) = T.T;
+    if (!VC.IsVisible && VC.Partially) {
+      RenderedLevelMap.getTile(Pos).T.Char = T.T.T.Char;
+    } else {
+      RenderedLevelMap.getTile(Pos) = T.T;
+    }
   });
 }
 

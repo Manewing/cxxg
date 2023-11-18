@@ -30,12 +30,14 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<FactionComp>(Entity, Faction);
   Reg.emplace<RaceComp>(Entity, Race);
   Reg.emplace<AgilityComp>(Entity);
-  Reg.emplace<CollisionComp>(Entity);
 
   // FIXME make this optional depending on enemy kind
   Reg.emplace<InventoryComp>(Entity).Inv = I;
   Reg.emplace<StatsComp>(Entity).Base = Stats;
   Reg.emplace<EquipmentComp>(Entity);
+
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
 
   // Try equipping items
   InventoryHandler InvHandler(Entity, Reg);
@@ -55,9 +57,11 @@ void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<AttackAIComp>(Entity);
   Reg.emplace<FactionComp>(Entity, FactionKind::Nature);
   Reg.emplace<AgilityComp>(Entity);
-  Reg.emplace<CollisionComp>(Entity);
   Reg.emplace<StatsComp>(Entity).Base = Stats;
   Reg.emplace<InventoryComp>(Entity).Inv = I;
+
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
 }
 
 void createWorldEntry(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
@@ -72,7 +76,9 @@ void createWorldEntry(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                             EHC.publish(SwitchGameWorldEvent{
                                 {}, WorldType, LevelConfig, SrcEt, Entity});
                           }});
+
   Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
 }
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
@@ -87,12 +93,14 @@ void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                     EHC.publish(SwitchLevelEvent{
                         {}, LevelId, /*ToEntry=*/!IsExit, SrcEt, Entity});
                   }});
-  Reg.emplace<CollisionComp>(Entity);
   if (IsExit) {
     Reg.emplace<LevelStartComp>(Entity, LevelId);
   } else {
     Reg.emplace<LevelEndComp>(Entity, LevelId);
   }
+
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
 }
 
 void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
@@ -100,7 +108,6 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
-  Reg.emplace<CollisionComp>(Entity);
 
   // Copy inventory
   auto &Inv = Reg.emplace<InventoryComp>(Entity).Inv;
@@ -111,6 +118,9 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
       Interaction{"Open Chest", [Entity](auto &EHC, auto Et, auto &Reg) {
                     EHC.publish(LootEvent{{}, Et, Entity, &Reg});
                   }});
+
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
 }
 
 void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
@@ -127,6 +137,8 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
       Entity, Interaction{"Loot", [Entity](auto &EHC, auto Et, auto &Reg) {
                             EHC.publish(LootEvent{{}, Et, Entity, &Reg});
                           }});
+
+  Reg.emplace<VisibleComp>(Entity);
 }
 
 } // namespace rogue

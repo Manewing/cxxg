@@ -112,12 +112,18 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              BDC.TicksLeft = V["ticks"].GetUint();
              return makeApplyBuffItemEffect<BlindedDebuffComp>(BDC);
            }},
-          {"mind_vision_comp",
+          {"mind_vision_buff_comp",
            [](const auto &, const auto &V) {
              MindVisionBuffComp MVBC;
              MVBC.TicksLeft = V["ticks"].GetUint();
              MVBC.Range = V["range"].GetUint();
              return makeApplyBuffItemEffect<MindVisionBuffComp>(MVBC);
+           }},
+          {"invisibility_buff_comp",
+           [](const auto &, const auto &V) {
+             InvisibilityBuffComp IBC;
+             IBC.TicksLeft = V["ticks"].GetUint();
+             return makeApplyBuffItemEffect<InvisibilityBuffComp>(IBC);
            }},
           {"melee_attack_comp",
            [](const auto &, const auto &V) {

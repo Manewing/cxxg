@@ -147,8 +147,16 @@ public:
   std::string_view getName() const override;
   std::string getDescription() const override;
   void add(const MindVisionBuffComp &Other);
+
 public:
   unsigned Range = 100;
+};
+
+struct InvisibilityBuffComp : public TimedBuff, public BuffBase {
+public:
+  std::string_view getName() const override;
+  std::string getDescription() const override;
+  void add(const InvisibilityBuffComp &Other);
 };
 
 struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
@@ -211,8 +219,8 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
 using BuffTypeList =
     ComponentList<StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
                   BleedingDebuffComp, HealthRegenBuffComp, ManaRegenBuffComp,
-                  BlindedDebuffComp, ArmorBuffComp, BlockBuffComp,
-                  StatsBuffPerHitComp>;
+                  BlindedDebuffComp, MindVisionBuffComp, InvisibilityBuffComp,
+                  ArmorBuffComp, BlockBuffComp, StatsBuffPerHitComp>;
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);

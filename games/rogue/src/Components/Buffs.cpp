@@ -226,6 +226,18 @@ void MindVisionBuffComp::add(const MindVisionBuffComp &Other) {
   Range = Other.Range;
 }
 
+std::string_view InvisibilityBuffComp::getName() const { return "Invisibility"; }
+
+std::string InvisibilityBuffComp::getDescription() const {
+  std::stringstream SS;
+  SS << "Invisible for " << TicksLeft << " ticks";
+  return SS.str();
+}
+
+void InvisibilityBuffComp::add(const InvisibilityBuffComp &Other) {
+  TicksLeft = std::max(TicksLeft, Other.TicksLeft);
+}
+
 std::string_view ArmorBuffComp::getName() const { return "Armor Buff"; }
 
 std::string ArmorBuffComp::getDescription() const {

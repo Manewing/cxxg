@@ -368,4 +368,26 @@ TEST(BuffsTest, MindVisionBuffCompAddRemove) {
   EXPECT_FALSE(A.remove(B));
 }
 
+TEST(BuffsTest, InvisibilityBuffCompText) {
+  rogue::InvisibilityBuffComp A;
+  A.TicksLeft = 100;
+  EXPECT_EQ(A.getName(), "Invisibility");
+  EXPECT_EQ(A.getDescription(), "Invisible for 100 ticks");
+}
+
+TEST(BuffsTest, InvisibilityBuffCompAddRemove) {
+  rogue::InvisibilityBuffComp A, B;
+
+  A.TicksLeft = 3;
+  B.TicksLeft = 5;
+
+  A.add(B);
+  EXPECT_EQ(A.TicksLeft, 5);
+  EXPECT_EQ(B.TicksLeft, 5);
+
+  EXPECT_FALSE(A.remove(B));
+  EXPECT_EQ(A.TicksLeft, 5);
+  EXPECT_EQ(B.TicksLeft, 5);
+}
+
 } // namespace
