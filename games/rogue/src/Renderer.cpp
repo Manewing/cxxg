@@ -65,7 +65,8 @@ void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
 }
 
 void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
-  if (!VisibleMap.contains(AtPos + Offset)) {
+  if (!VisibleMap.contains(AtPos + Offset) ||
+      !RenderedLevelMap.contains(AtPos)) {
     return;
   }
   auto &Tile = VisibleMap.getTile(AtPos + Offset);

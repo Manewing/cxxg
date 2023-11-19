@@ -152,18 +152,6 @@ private:
   std::vector<LevelRange> Generators;
 };
 
-// class SweeperLevelGenerator : public LevelGenerator {
-// public:
-//   struct Config {
-//     std::map<char, std::filesystem::path> MapInfos;
-//   };
-//
-// public:
-//   SweeperLevelGenerator(const GameContext &Ctx);
-//
-//   std::shared_ptr<Level> generateLevel(int LevelId) const final;
-// };
-
 /// Helper class for loading level generation configurations and creating
 /// level generators
 class LevelGeneratorLoader {
