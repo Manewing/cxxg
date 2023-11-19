@@ -30,6 +30,7 @@ set(HEADER_FILES
   include/rogue/Item.h
   include/rogue/ItemDatabase.h
   include/rogue/ItemEffect.h
+  include/rogue/LevelDatabase.h
   include/rogue/ItemPrototype.h
   include/rogue/ItemSpecialization.h
   include/rogue/ItemType.h
@@ -93,6 +94,7 @@ set(SOURCE_FILES
   src/ItemDatabase.cpp
   src/ItemEffect.cpp
   src/ItemPrototype.cpp
+  src/LevelDatabase.cpp
   src/ItemSpecialization.cpp
   src/ItemType.cpp
   src/JSON.cpp

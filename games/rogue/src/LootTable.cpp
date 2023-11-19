@@ -66,7 +66,7 @@ void LootTable::reset(unsigned NR, const std::vector<LootSlot> &Sls) {
   }
   NumRolls = Slots.empty() ? 0 : NumRolls;
 
-  std::sort(Slots.begin(), Slots.end(),
+  std::stable_sort(Slots.begin(), Slots.end(),
             [](const auto &A, const auto &B) { return A.Weight < B.Weight; });
 }
 

@@ -8,6 +8,7 @@ set(SOURCES
   InventoryHandlerTest.cpp
   InventoryTest.cpp
   ItemDatabaseTest.cpp
+  LevelDatabaseTest.cpp
   LevelGeneratorTest.cpp
   LootTableTest.cpp
   Systems/DeathSystemTest.cpp
@@ -46,6 +47,14 @@ add_cxxg_test(
     ${SCHEMA_VALIDATOR}
       --json ${DATA_DIR}/creature_db.json
       --schema ${DATA_DIR}/creature_db_schema.json
+)
+
+add_cxxg_test(
+  NAME rogue_json_schema_level_db
+  COMMAND
+    ${SCHEMA_VALIDATOR}
+      --json ${DATA_DIR}/level_db.json
+      --schema ${DATA_DIR}/level_db_schema.json
 )
 
 file(GLOB LEVEL_FILES ${DATA_DIR}/levels/*.json)
