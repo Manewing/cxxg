@@ -24,8 +24,7 @@ void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                            const StatPoints &Stats);
 
 void createWorldEntry(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
-                      const std::string &WorldType,
-                      const std::filesystem::path &LevelConfig);
+                      const std::string &LevelName);
 
 void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                           bool IsExit, int LevelId);

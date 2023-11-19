@@ -9,6 +9,7 @@
 #include <rogue/GameWorld.h>
 #include <rogue/History.h>
 #include <rogue/ItemDatabase.h>
+#include <rogue/LevelDatabase.h>
 #include <rogue/Level.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/UI/Controller.h>
@@ -88,8 +89,11 @@ private:
   EventHub EvHub;
   History Hist;
   EventHistoryWriter EHW;
+
   ItemDatabase ItemDb;
   CreatureDatabase CreatureDb;
+  LevelDatabase LevelDb;
+
   GameContext Ctx;
 
   std::shared_ptr<LevelGenerator> LvlGen;

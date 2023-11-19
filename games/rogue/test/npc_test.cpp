@@ -14,6 +14,7 @@
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
 #include <rogue/ItemDatabase.h>
+#include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/Renderer.h>
 #include <ymir/LayeredMap.hpp>
@@ -74,7 +75,8 @@ int main(int Argc, char *Argv[]) {
 
   rogue::ItemDatabase ItemDb;
   rogue::CreatureDatabase CreatureDb;
-  rogue::GameContext Ctx{ItemDb, CreatureDb};
+  rogue::LevelDatabase LevelDb;
+  rogue::GameContext Ctx{ItemDb, CreatureDb, LevelDb};
 
   LevelGeneratorLoader LvlGenLoader(Ctx);
   auto LG = LvlGenLoader.load(0, Argv[1]);

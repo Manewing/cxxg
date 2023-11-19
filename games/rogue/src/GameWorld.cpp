@@ -1,18 +1,20 @@
 #include <rogue/Components/Transform.h>
 #include <rogue/GameWorld.h>
 #include <rogue/Level.h>
+#include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
 
 namespace rogue {
 
-std::unique_ptr<GameWorld> GameWorld::create(LevelGenerator &LvlGen,
+std::unique_ptr<GameWorld> GameWorld::create(LevelDatabase &LevelDb,
+                                             LevelGenerator &LvlGen,
                                              std::string_view Type) {
   if (Type == MultiLevelDungeon::Type) {
     return std::make_unique<MultiLevelDungeon>(LvlGen);
   }
 
   if (Type == DungeonSweeper::Type) {
-    return std::make_unique<DungeonSweeper>(LvlGen);
+    return std::make_unique<DungeonSweeper>(LevelDb, LvlGen);
   }
 
   throw std::runtime_error("GameWorld: Unknown type: " + std::string(Type));
@@ -44,11 +46,10 @@ Level &MultiLevelDungeon::switchLevel(std::size_t LevelIdx, bool ToEntry) {
   return getCurrentLevelOrFail();
 }
 
-void MultiLevelDungeon::switchWorld(unsigned, std::string_view Type,
-                                    std::filesystem::path Config,
+void MultiLevelDungeon::switchWorld(unsigned, const std::string &LevelName,
                                     entt::entity) {
   throw std::runtime_error("MultiLevelDungeon: switchWorld not implemented: " +
-                           std::string(Type) + " -> " + Config.string());
+                           std::string(LevelName));
 }
 
 std::size_t MultiLevelDungeon::getCurrentLevelIdx() const {
@@ -81,7 +82,8 @@ const Level &MultiLevelDungeon::getCurrentLevelOrFail() const {
   return *Lvl;
 }
 
-DungeonSweeper::DungeonSweeper(LevelGenerator &LevelGen) : LevelGen(LevelGen) {}
+DungeonSweeper::DungeonSweeper(LevelDatabase &LevelDb, LevelGenerator &LevelGen)
+    : LevelDb(LevelDb), LevelGen(LevelGen) {}
 
 Level &DungeonSweeper::switchLevel(std::size_t LevelIdx, bool ToEntry) {
   if (CurrSubWorld && LevelIdx < CurrMaxLevel) {
@@ -113,6 +115,12 @@ Level &DungeonSweeper::switchLevel(std::size_t LevelIdx, bool ToEntry) {
   return *Lvl;
 }
 
+void DungeonSweeper::switchWorld(unsigned Seed, const std::string &LevelName,
+                                 entt::entity SwitchEt) {
+  auto LI = LevelDb.getLevelInfo(LevelName);
+  switchWorld(Seed, LI.WorldType, LI.LevelConfig, SwitchEt);
+}
+
 void DungeonSweeper::switchWorld(unsigned Seed, std::string_view Type,
                                  std::filesystem::path Config,
                                  entt::entity SwitchEt) {
@@ -136,7 +144,7 @@ void DungeonSweeper::switchWorld(unsigned Seed, std::string_view Type,
   Seed ^= Seed << 12 ^ SwitchPos.X ^ SwitchPos.Y << 8;
 
   CurrSubLvlGen = LevelGeneratorLoader(LevelGen.getCtx()).load(Seed, Config);
-  CurrSubWorld = GameWorld::create(*CurrSubLvlGen, Type);
+  CurrSubWorld = GameWorld::create(LevelDb, *CurrSubLvlGen, Type);
   CurrSubWorld->setEventHub(Hub);
   CurrMaxLevel = 1;
   if (auto *CMLG =

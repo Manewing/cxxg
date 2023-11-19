@@ -5,6 +5,7 @@
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
 #include <rogue/ItemDatabase.h>
+#include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
 
 namespace {
@@ -35,7 +36,8 @@ public:
 
   rogue::ItemDatabase ItemDb;
   rogue::CreatureDatabase CreatureDb;
-  rogue::GameContext Ctx{ItemDb, CreatureDb};
+  rogue::LevelDatabase LevelDb;
+  rogue::GameContext Ctx{ItemDb, CreatureDb, LevelDb};
 };
 
 TEST_F(LevelGeneratorTest, EmptyLevelGenerator) {

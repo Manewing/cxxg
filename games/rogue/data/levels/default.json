@@ -92,18 +92,15 @@
   "dungeons": [
     {
       "key": "1",
-      "world_type": "multi_level_dungeon",
-      "level_config": "sewers.json"
+      "level_name": "level_1"
     },
     {
       "key": "2",
-      "world_type": "multi_level_dungeon",
-      "level_config": "rat_pit.json"
+      "level_name": "level_2"
     },
     {
       "key": "3",
-      "world_type": "multi_level_dungeon",
-      "level_config": "initial_level.json"
+      "level_name": "level_2"
     }
   ]
 }

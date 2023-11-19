@@ -6,6 +6,7 @@
   "required": [
     "creature_db_config",
     "item_db_config",
+    "level_db_config",
     "initial_game_world",
     "initial_level_config",
     "initial_items"
@@ -18,6 +19,10 @@
     "creature_db_config": {
       "type": "string",
       "description": "Relative (to the config) path to the creature DB config file"
+    },
+    "level_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the level DB config file"
     },
     "initial_game_world": {
       "type": "string",

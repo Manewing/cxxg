@@ -83,8 +83,7 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
 
   // Deal with creating dungeon entries
   if (auto It = Cfg.Dungeons.find(T.kind()); It != Cfg.Dungeons.end()) {
-    return createWorldEntry(L.Reg, Pos, T, It->second.WorldType,
-                            It->second.LevelConfig);
+    return createWorldEntry(L.Reg, Pos, T, It->second.LevelName);
   }
 
   switch (T.kind()) {
@@ -287,9 +286,7 @@ parseCharInfo(const rapidjson::Value &V) {
   return DesignedMapLevelGenerator::Config::CharInfo{T, Layer};
 }
 
-LevelEntityConfig
-loadLevelEntityConfigFromJSON(const std::filesystem::path &BasePath,
-                              const rapidjson::Value &V) {
+LevelEntityConfig loadLevelEntityConfigFromJSON(const rapidjson::Value &V) {
   LevelEntityConfig Cfg;
 
   // Load level specific creature configuration
@@ -316,8 +313,7 @@ loadLevelEntityConfigFromJSON(const std::filesystem::path &BasePath,
     auto Key = std::string(C["key"].GetString());
     assert(Key.size() == 1);
     LevelEntityConfig::WorldEntry WE;
-    WE.WorldType = C["world_type"].GetString();
-    WE.LevelConfig = BasePath / C["level_config"].GetString();
+    WE.LevelName = C["level_name"].GetString();
     Cfg.Dungeons[Key[0]] = WE;
   }
 
@@ -344,7 +340,7 @@ DesignedMapLevelGenerator::Config
 loadDesignedMapLevelGeneratorConfig(const std::filesystem::path &BasePath,
                                     const rapidjson::Value &Doc) {
   DesignedMapLevelGenerator::Config MapCfg;
-  MapCfg.EntityConfig = loadLevelEntityConfigFromJSON(BasePath, Doc);
+  MapCfg.EntityConfig = loadLevelEntityConfigFromJSON(Doc);
 
   auto MapJson = Doc["map"].GetObject();
   MapCfg.MapFile = BasePath / MapJson["map_file"].GetString();
@@ -363,7 +359,7 @@ GeneratedMapLevelGenerator::Config
 loadGeneratedMapLevelGeneratorConfig(const std::filesystem::path &BasePath,
                                      const rapidjson::Value &Doc) {
   GeneratedMapLevelGenerator::Config MapCfg;
-  MapCfg.EntityConfig = loadLevelEntityConfigFromJSON(BasePath, Doc);
+  MapCfg.EntityConfig = loadLevelEntityConfigFromJSON(Doc);
 
   auto MapJson = Doc["map"].GetObject();
   MapCfg.MapConfig = BasePath / MapJson["config"].GetString();

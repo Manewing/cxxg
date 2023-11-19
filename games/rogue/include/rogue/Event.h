@@ -65,8 +65,7 @@ struct SwitchLevelEvent : public BaseEvent {
 };
 
 struct SwitchGameWorldEvent : public BaseEvent {
-  std::string GameWorldType;
-  std::filesystem::path LevelConfig;
+  std::string LevelName;
   entt::entity TriggerEt = entt::null;
   entt::entity SwitchEt = entt::null;
 };

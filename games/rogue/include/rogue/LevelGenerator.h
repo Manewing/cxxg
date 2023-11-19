@@ -27,8 +27,7 @@ public:
   };
 
   struct WorldEntry {
-    std::string WorldType;
-    std::filesystem::path LevelConfig;
+    std::string LevelName;
   };
 
 public:

@@ -11,14 +11,15 @@ namespace rogue {
 class Level;
 struct Interaction;
 class LevelGenerator;
+class LevelDatabase;
 } // namespace rogue
 
 namespace rogue {
 
 class GameWorld : public EventHubConnector {
 public:
-  static std::unique_ptr<GameWorld> create(LevelGenerator &LvlGen,
-                                           std::string_view Type);
+  static std::unique_ptr<GameWorld>
+  create(LevelDatabase &LevelDb, LevelGenerator &LvlGen, std::string_view Type);
 
 public:
   virtual ~GameWorld() = default;
@@ -28,8 +29,7 @@ public:
   /// \return The level that was switched to
   virtual Level &switchLevel(std::size_t LevelIdx, bool ToEntry) = 0;
 
-  virtual void switchWorld(unsigned Seed, std::string_view Type,
-                           std::filesystem::path Config,
+  virtual void switchWorld(unsigned Seed, const std::string &LevelName,
                            entt::entity SwitchEt) = 0;
 
   /// Return the index of the currently active level
@@ -40,8 +40,6 @@ public:
   virtual const Level *getCurrentLevel() const = 0;
   virtual Level &getCurrentLevelOrFail() = 0;
   virtual const Level &getCurrentLevelOrFail() const = 0;
-
-protected:
 };
 
 class MultiLevelDungeon : public GameWorld {
@@ -57,8 +55,7 @@ public:
   Level &switchLevel(std::size_t LevelIdx, bool ToEntry) override;
 
   // FIXME
-  void switchWorld(unsigned Seed, std::string_view Type,
-                   std::filesystem::path Config,
+  void switchWorld(unsigned Seed, const std::string &LevelName,
                    entt::entity SwitchEt) override;
 
   /// Return the index of the currently active level
@@ -70,10 +67,6 @@ public:
   Level &getCurrentLevelOrFail() override;
   const Level &getCurrentLevelOrFail() const override;
 
-  // void moveEntity(entt::entity Entity, ymir::Point2d<int> ToPos);
-  // void tryInteract(entt::entity Entity, ymir::Point2d<int> AtPos);
-  // Interaction *getInteraction(ymir::Point2d<int> AtPos);
-
 private:
   LevelGenerator &LevelGen;
   std::size_t CurrentLevelIdx = 0;
@@ -83,22 +76,16 @@ private:
 /// Arena to allow watching NPC vs NPC fights
 class ArenaView : public GameWorld {
 public:
+  // TODO
 };
 
 /// Single map level that allows to switch between multi-level dungeons
-//
-// ?????
-// ?xxy?
-// ?x@y?
-// ?zzy?
-// ?????
-//
 class DungeonSweeper : public GameWorld {
 public:
   static constexpr const char *Type = "dungeon_sweeper";
 
 public:
-  explicit DungeonSweeper(LevelGenerator &LvlGen);
+  explicit DungeonSweeper(LevelDatabase &LevelDb, LevelGenerator &LvlGen);
 
   /// Switches to the level with the selected index \p LevelIdx
   /// \param LevelIdx The level index to switch to
@@ -109,8 +96,7 @@ public:
   Level &switchLevel(std::size_t LevelIdx, bool ToEntry) override;
 
   // FIXME
-  void switchWorld(unsigned Seed, std::string_view Type,
-                   std::filesystem::path Config,
+  void switchWorld(unsigned Seed, const std::string &LevelName,
                    entt::entity SwitchEt) override;
 
   // FIXME
@@ -123,7 +109,12 @@ public:
   Level &getCurrentLevelOrFail() override;
   const Level &getCurrentLevelOrFail() const override;
 
+protected:
+  void switchWorld(unsigned Seed, std::string_view Type,
+                   std::filesystem::path Config, entt::entity SwitchEt);
+
 private:
+  LevelDatabase &LevelDb;
   LevelGenerator &LevelGen;
   std::shared_ptr<Level> Lvl;
   std::shared_ptr<LevelGenerator> CurrSubLvlGen = nullptr;
@@ -133,7 +124,10 @@ private:
 };
 
 /// A chunk based procedurally generated infinite world
-class OverWorld : public GameWorld {};
+class OverWorld : public GameWorld {
+public:
+  // TODO
+};
 
 } // namespace rogue
 

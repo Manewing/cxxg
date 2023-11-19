@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
+#include <rogue/LevelDatabase.h>
 #include <rogue/GameWorld.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/Level.h>
@@ -17,7 +18,8 @@ public:
 
   rogue::ItemDatabase ItemDb;
   rogue::CreatureDatabase CreatureDb;
-  rogue::GameContext Ctx{ItemDb, CreatureDb};
+  rogue::LevelDatabase LevelDb;
+  rogue::GameContext Ctx{ItemDb, CreatureDb, LevelDb};
 };
 
 TEST_F(GameWorldTest, MultiLevelDungeonEmpty) {

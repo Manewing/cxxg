@@ -89,9 +89,10 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
       ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)),
       CreatureDb(CreatureDatabase::load(Cfg.CreatureDbConfig)),
-      Ctx({ItemDb, CreatureDb}),
+      LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)),
+      Ctx({ItemDb, CreatureDb, LevelDb}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
-      World(GameWorld::create(*LvlGen, Cfg.InitialGameWorld)), UICtrl(Scr) {}
+      World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)), UICtrl(Scr) {}
 
 namespace {
 
@@ -400,7 +401,7 @@ void Game::onSwitchGameWorldEvent(const SwitchGameWorldEvent &E) {
   UICtrl.closeAll();
   REC.clear();
 
-  World->switchWorld(Cfg.Seed, E.GameWorldType, E.LevelConfig, E.SwitchEt);
+  World->switchWorld(Cfg.Seed, E.LevelName, E.SwitchEt);
 
   // We could update the level here, but we want to draw the initial state.
   handleUpdates(/*IsTick=*/false);
