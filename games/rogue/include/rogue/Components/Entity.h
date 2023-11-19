@@ -35,6 +35,9 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
 void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
                       const Inventory &Inv);
 
+void createHealerEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
+                        Tile T);
+
 } // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_ENTITY_H

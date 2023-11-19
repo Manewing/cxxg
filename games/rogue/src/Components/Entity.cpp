@@ -141,4 +141,21 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   Reg.emplace<VisibleComp>(Entity);
 }
 
+void createHealerEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  Reg.emplace<TileComp>(Entity, T);
+
+  Reg.emplace<InteractableComp>(
+      Entity,
+      Interaction{"Heal", [](auto &EHC, auto Et, auto &Reg) {
+                    auto &HC = Reg.template get<HealthComp>(Et);
+                    HC.Value = HC.MaxValue;
+                    EHC.publish(PlayerInfoMessageEvent() << "You feel better.");
+                  }});
+
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
+}
+
 } // namespace rogue

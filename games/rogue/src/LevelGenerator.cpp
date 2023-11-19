@@ -86,6 +86,7 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
     return createWorldEntry(L.Reg, Pos, T, It->second.LevelName);
   }
 
+  // FIXME also have those in the config
   switch (T.kind()) {
   case 'H': {
     int PrevLevelId = L.getLevelId() - 1;
@@ -94,6 +95,9 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
   case '<': {
     int NextLevelId = L.getLevelId() + 1;
     createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false, NextLevelId);
+  } break;
+  case 'h': {
+    createHealerEntity(L.Reg, Pos, T);
   } break;
   default:
     throw std::runtime_error("Invalid entity kind: " +

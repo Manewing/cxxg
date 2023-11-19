@@ -44,7 +44,7 @@
         "layer": "entities"
       },
       "h": {
-        "color": "#fac43c",
+        "color": "#278716",
         "key": "h",
         "layer": "entities"
       },
@@ -82,10 +82,6 @@
     },
     {
       "key": "S",
-      "loot": "common_chest"
-    },
-    {
-      "key": "h",
       "loot": "common_chest"
     }
   ],
