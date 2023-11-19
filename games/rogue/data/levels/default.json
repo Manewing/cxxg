@@ -28,38 +28,80 @@
         "key": "<",
         "layer": "entities"
       },
-      "r": {
+      "C": {
+        "color": "#fac43c",
+        "key": "C",
+        "layer": "entities"
+      },
+      "w": {
+        "color": "#fac43c",
+        "key": "w",
+        "layer": "entities"
+      },
+      "S": {
+        "color": "#fac43c",
+        "key": "S",
+        "layer": "entities"
+      },
+      "h": {
+        "color": "#fac43c",
+        "key": "h",
+        "layer": "entities"
+      },
+      "1": {
         "color": "#5C5F55",
-        "key": "r",
+        "key": "1",
         "layer": "entities"
       },
-      "R": {
+      "2": {
         "color": "#363832",
-        "key": "R",
+        "key": "2",
         "layer": "entities"
       },
-      "s": {
+      "3": {
         "color": "#b8ad74",
-        "key": "s",
+        "key": "3",
         "layer": "entities"
+      },
+      "'": {
+        "color": "#ed3424",
+        "key": "'",
+        "layer": "walls_deco"
       }
     }
   },
   "creatures": [],
-  "chests": [],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "common_chest"
+    },
+    {
+      "key": "w",
+      "loot": "common_chest"
+    },
+    {
+      "key": "S",
+      "loot": "common_chest"
+    },
+    {
+      "key": "h",
+      "loot": "common_chest"
+    }
+  ],
   "dungeons": [
     {
-      "key": "r",
+      "key": "1",
       "world_type": "multi_level_dungeon",
       "level_config": "sewers.json"
     },
     {
-      "key": "R",
+      "key": "2",
       "world_type": "multi_level_dungeon",
       "level_config": "rat_pit.json"
     },
     {
-      "key": "s",
+      "key": "3",
       "world_type": "multi_level_dungeon",
       "level_config": "initial_level.json"
     }
