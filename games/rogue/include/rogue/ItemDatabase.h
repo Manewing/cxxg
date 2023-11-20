@@ -15,7 +15,11 @@ public:
   static ItemDatabase load(const std::filesystem::path &ItemDbConfig);
 
 public:
+  int getNewItemId();
   int getItemId(const std::string &ItemName) const;
+
+  const ItemPrototype &getItemProto(int ItemId) const;
+  const ItemSpecializations *getItemSpec(int ItemId) const;
 
   void addItemProto(const ItemPrototype &ItemProto,
                     const ItemSpecializations *ItemSpec = nullptr);
@@ -28,6 +32,7 @@ public:
   const std::shared_ptr<LootTable> &getLootTable(const std::string &Name) const;
 
 private:
+  int MaxItemId = 0;
   std::map<std::string, int> ItemIdsByName;
   // FIXME make this a vector Id is index
   std::map<int, ItemPrototype> ItemProtos;

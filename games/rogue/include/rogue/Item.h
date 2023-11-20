@@ -20,6 +20,7 @@ public:
                 const std::shared_ptr<ItemPrototype> &Specialization = nullptr);
   virtual ~Item() = default;
 
+  int getId() const;
   std::string getName() const;
   std::string getDescription() const;
   ItemType getType() const;

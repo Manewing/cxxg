@@ -45,6 +45,15 @@ Item Inventory::takeItem(std::size_t ItemIdx, unsigned Count) {
   return takeItem(ItemIdx);
 }
 
+std::optional<std::size_t> Inventory::getItemIndexForId(int Id) const {
+  for (std::size_t Idx = 0; Idx < Items.size(); ++Idx) {
+    if (Items.at(Idx).getId() == Id) {
+      return Idx;
+    }
+  }
+  return {};
+}
+
 std::optional<Item> Inventory::applyItemTo(std::size_t ItemIdx,
                                            CapabilityFlags Flags,
                                            entt::entity Entity,

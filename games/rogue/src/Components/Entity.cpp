@@ -72,8 +72,7 @@ void createWorldEntry(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<InteractableComp>(
       Entity,
       Interaction{
-          "Enter dungeon",
-          [LevelName, Entity](auto &EHC, auto SrcEt, auto &) {
+          "Enter dungeon", [LevelName, Entity](auto &EHC, auto SrcEt, auto &) {
             EHC.publish(SwitchGameWorldEvent{{}, LevelName, SrcEt, Entity});
           }});
 
@@ -137,9 +136,10 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   IC.Inv = I;
 
   Reg.emplace<InteractableComp>(
-      Entity, Interaction{"Loot", [Entity](auto &EHC, auto Et, auto &Reg) {
-                            EHC.publish(LootEvent{{}, "Loot", Et, Entity, &Reg});
-                          }});
+      Entity,
+      Interaction{"Loot", [Entity](auto &EHC, auto Et, auto &Reg) {
+                    EHC.publish(LootEvent{{}, "Loot", Et, Entity, &Reg});
+                  }});
 
   Reg.emplace<VisibleComp>(Entity);
 }
@@ -150,12 +150,12 @@ void createHealerEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
   Reg.emplace<TileComp>(Entity, T);
 
   Reg.emplace<InteractableComp>(
-      Entity,
-      Interaction{"Heal", [](auto &EHC, auto Et, auto &Reg) {
-                    auto &HC = Reg.template get<HealthComp>(Et);
-                    HC.Value = HC.MaxValue;
-                    EHC.publish(PlayerInfoMessageEvent() << "You feel better.");
-                  }});
+      Entity, Interaction{"Heal", [](auto &EHC, auto Et, auto &Reg) {
+                            auto &HC = Reg.template get<HealthComp>(Et);
+                            HC.Value = HC.MaxValue;
+                            EHC.publish(PlayerInfoMessageEvent()
+                                        << "You feel better.");
+                          }});
 
   Reg.emplace<CollisionComp>(Entity);
   Reg.emplace<VisibleComp>(Entity);
@@ -167,34 +167,134 @@ void createShopEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
   Reg.emplace<TileComp>(Entity, T);
 
   Reg.emplace<InteractableComp>(
-      Entity,
-      Interaction{"Shop", [](auto &EHC, auto Et, auto &Reg) {
-                    EHC.publish(PlayerInfoMessageEvent() << "Shop not implemented yet.");
-                    (void)Et;
-                    (void)Reg;
-                    //EHC.publish(ShopOpenEvent{{}, Et, Entity, &Reg});
-                  }});
+      Entity, Interaction{"Shop", [](auto &EHC, auto Et, auto &Reg) {
+                            EHC.publish(PlayerInfoMessageEvent()
+                                        << "Shop not implemented yet.");
+                            (void)Et;
+                            (void)Reg;
+                            // EHC.publish(ShopOpenEvent{{}, Et, Entity, &Reg});
+                          }});
 
   Reg.emplace<CollisionComp>(Entity);
   Reg.emplace<VisibleComp>(Entity);
 }
 
-void createWorkbenchEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
+void createWorkbenchEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
+                           Tile T) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
 
   Reg.emplace<InteractableComp>(
-      Entity,
-      Interaction{"Workbench", [](auto &EHC, auto Et, auto &Reg) {
-                    EHC.publish(PlayerInfoMessageEvent() << "Workbench not implemented yet.");
-                    //EHC.publish(WorkbenchUseEvent{{}, Et, Entity, &Reg});
-                    (void)Et;
-                    (void)Reg;
-                  }});
+      Entity, Interaction{"Workbench", [](auto &EHC, auto Et, auto &Reg) {
+                            EHC.publish(PlayerInfoMessageEvent()
+                                        << "Workbench not implemented yet.");
+                            // EHC.publish(WorkbenchUseEvent{{}, Et, Entity,
+                            // &Reg});
+                            (void)Et;
+                            (void)Reg;
+                          }});
 
   Reg.emplace<CollisionComp>(Entity);
   Reg.emplace<VisibleComp>(Entity);
+}
+
+namespace {
+
+bool unlockDoor(entt::registry &Reg, const entt::entity &DoorEt,
+                const entt::entity &ActEt) {
+  auto *IC = Reg.try_get<InventoryComp>(ActEt);
+  if (!IC) {
+    return false;
+  }
+
+  auto &DC = Reg.get<DoorComp>(DoorEt);
+  if (!DC.hasLock()) {
+    return false;
+  }
+
+  auto KeyIdx = IC->Inv.getItemIndexForId(DC.KeyId.value());
+  if (!KeyIdx) {
+    return false;
+  }
+  (void)IC->Inv.takeItem(KeyIdx.value());
+  DC.KeyId = {};
+
+  Reg.get<InteractableComp>(DoorEt).Action.Msg = "Open door";
+
+  return true;
+}
+
+void openDoor(entt::registry &Reg, const entt::entity &Entity) {
+  Reg.get<DoorComp>(Entity).IsOpen = true;
+  Reg.erase<CollisionComp>(Entity);
+  Reg.erase<BlocksLOS>(Entity);
+  Reg.get<InteractableComp>(Entity).Action.Msg = "Close door";
+
+  auto &T = Reg.get<TileComp>(Entity);
+  T.ZIndex = -2;
+  T.T.T.Char = '/';
+}
+
+void closeDoor(entt::registry &Reg, const entt::entity &Entity) {
+  Reg.get<DoorComp>(Entity).IsOpen = false;
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<BlocksLOS>(Entity);
+  Reg.get<InteractableComp>(Entity).Action.Msg = "Open door";
+
+  auto &T = Reg.get<TileComp>(Entity);
+  T.ZIndex = 0;
+  T.T.T.Char = '+';
+}
+
+} // namespace
+
+void createDoorEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                      bool IsOpen, std::optional<int> KeyId) {
+  assert((!KeyId || !IsOpen) && "Locked doors must be closed");
+
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  auto &TC = Reg.emplace<TileComp>(Entity, T);
+
+  auto &DC = Reg.emplace<DoorComp>(Entity);
+  DC.IsOpen = IsOpen;
+  DC.KeyId = KeyId;
+
+  const char *InteractMsg =
+      DC.isLocked() ? "Unlock door" : (IsOpen ? "Close door" : "XOpen door");
+  Reg.emplace<InteractableComp>(
+      Entity,
+      Interaction{
+          InteractMsg, [Entity, &DC](auto &EHC, auto Et, auto &Reg) {
+            if (DC.isLocked()) {
+              if (unlockDoor(Reg, Entity, Et)) {
+                EHC.publish(PlayerInfoMessageEvent() << "You unlock the door.");
+              } else {
+                EHC.publish(PlayerInfoMessageEvent()
+                            << "You fail to unlock the door.");
+              }
+            } else if (DC.IsOpen) {
+              closeDoor(Reg, Entity);
+              EHC.publish(PlayerInfoMessageEvent() << "You open the door.");
+            } else {
+              openDoor(Reg, Entity);
+              EHC.publish(PlayerInfoMessageEvent() << "You close the door.");
+            }
+            (void)Et;
+          }});
+
+  Reg.emplace<VisibleComp>(Entity);
+
+  if (!IsOpen) {
+    TC.T.T.Char = '+';
+    TC.ZIndex = 0;
+    Reg.emplace<CollisionComp>(Entity);
+    Reg.emplace<BlocksLOS>(Entity);
+  } else {
+    TC.T.T.Char = '/';
+    TC.ZIndex = -2;
+  }
 }
 
 } // namespace rogue

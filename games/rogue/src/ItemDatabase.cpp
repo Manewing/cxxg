@@ -275,7 +275,6 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   }
 
   // Create item prototypes
-  int ItemId = 0;
   const auto &ItemProtosJson = Doc["item_prototypes"].GetArray();
   for (const auto &ItemProtoJson : ItemProtosJson) {
     const auto Name = std::string(ItemProtoJson["name"].GetString());
@@ -308,7 +307,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       }
     }
 
-    ItemPrototype Proto(ItemId++, Name, Description, ItType, MaxStackSize,
+    ItemPrototype Proto(DB.getNewItemId(), Name, Description, ItType, MaxStackSize,
                         std::move(EffectInfos));
     DB.addItemProto(Proto, Specialization.get());
   }
@@ -329,12 +328,32 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   return DB;
 }
 
+int ItemDatabase::getNewItemId() {
+  return MaxItemId++;
+}
+
 int ItemDatabase::getItemId(const std::string &ItemName) const {
   const auto It = ItemIdsByName.find(ItemName);
   if (It == ItemIdsByName.end()) {
     throw std::out_of_range("Unknown item name: " + ItemName);
   }
   return It->second;
+}
+
+const ItemPrototype &ItemDatabase::getItemProto(int ItemId) const {
+  const auto It = ItemProtos.find(ItemId);
+  if (It == ItemProtos.end()) {
+    throw std::out_of_range("Unknown item id: " + std::to_string(ItemId));
+  }
+  return It->second;
+}
+
+const ItemSpecializations *ItemDatabase::getItemSpec(int ItemId) const {
+  const auto It = ItemSpecs.find(ItemId);
+  if (It == ItemSpecs.end()) {
+    return nullptr;
+  }
+  return &It->second;
 }
 
 void ItemDatabase::addItemProto(const ItemPrototype &ItemProto,

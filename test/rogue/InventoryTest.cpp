@@ -14,6 +14,8 @@ TEST(InventoryTest, Empty) {
   EXPECT_EQ(Inv.size(), 0);
   EXPECT_TRUE(Inv.empty());
   EXPECT_THROW(Inv.getItem(0), std::out_of_range);
+  EXPECT_THROW(Inv.takeItem(0), std::out_of_range);
+  EXPECT_EQ(Inv.getItemIndexForId(0), std::nullopt);
 }
 
 TEST(InventoryTest, AddItem) {
@@ -23,13 +25,16 @@ TEST(InventoryTest, AddItem) {
   ASSERT_EQ(Inv.size(), 1);
   EXPECT_EQ(Inv.getItem(0).StackSize, 2);
   EXPECT_EQ(Inv.getItem(0).getName(), "consumable");
+  EXPECT_EQ(Inv.getItemIndexForId(1), 0);
   Inv.addItem(It);
   ASSERT_EQ(Inv.size(), 1);
   EXPECT_EQ(Inv.getItem(0).StackSize, 4);
+  EXPECT_EQ(Inv.getItemIndexForId(1), 0);
   Inv.addItem(It);
   ASSERT_EQ(Inv.size(), 2);
   EXPECT_EQ(Inv.getItem(0).StackSize, 5);
   EXPECT_EQ(Inv.getItem(1).StackSize, 1);
+  EXPECT_EQ(Inv.getItemIndexForId(1), 0);
   Inv.addItem(It);
   Inv.addItem(It);
   Inv.addItem(It);
@@ -37,6 +42,7 @@ TEST(InventoryTest, AddItem) {
   EXPECT_EQ(Inv.getItem(0).StackSize, 5);
   EXPECT_EQ(Inv.getItem(1).StackSize, 5);
   EXPECT_EQ(Inv.getItem(2).StackSize, 2);
+  EXPECT_EQ(Inv.getItemIndexForId(1), 0);
 }
 
 TEST(InventoryTest, TakeItem) {

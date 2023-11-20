@@ -30,10 +30,15 @@ public:
     std::string LevelName;
   };
 
+  struct LockedDoor {
+    std::string KeyName;
+  };
+
 public:
   std::map<char, Creature> Creatures;
   std::map<char, Chest> Chests;
   std::map<char, WorldEntry> Dungeons;
+  std::map<char, LockedDoor> LockedDoors;
 };
 
 /// Base class for all level generators

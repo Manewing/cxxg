@@ -51,6 +51,15 @@ Inventory generateLootInventory(const ItemDatabase &ItemDb,
   return Inv;
 }
 
+int createNewKey(ItemDatabase &ItemDb) {
+  auto KeyTemplateId = ItemDb.getItemId("Key");
+  auto KeyTemplate = ItemDb.getItemProto(KeyTemplateId);
+  KeyTemplate.ItemId = ItemDb.getNewItemId();
+  KeyTemplate.Name = "Key " + std::to_string(KeyTemplate.ItemId);
+  ItemDb.addItemProto(KeyTemplate);
+  return KeyTemplate.ItemId;
+}
+
 } // namespace
 
 void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
@@ -86,6 +95,15 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
     return createWorldEntry(L.Reg, Pos, T, It->second.LevelName);
   }
 
+  // Deal with creating locked doors
+  if (auto It = Cfg.LockedDoors.find(T.kind()); It != Cfg.LockedDoors.end()) {
+    auto KeyId = Ctx.ItemDb.getItemId(It->second.KeyName);
+    createDoorEntity(L.Reg, Pos, T, /*IsOpen=*/false, KeyId);
+    return;
+  }
+  // FIXME allow creating keys on the fly
+  (void)createNewKey;
+
   // FIXME also have those in the config
   switch (T.kind()) {
   case 'H': {
@@ -104,6 +122,12 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
   } break;
   case 'w': {
     createWorkbenchEntity(L.Reg, Pos, T);
+  } break;
+  case '+': {
+    createDoorEntity(L.Reg, Pos, T, /*IsOpen=*/false, {});
+  } break;
+  case '/': {
+    createDoorEntity(L.Reg, Pos, T, /*IsOpen=*/true, {});
   } break;
   default:
     throw std::runtime_error("Invalid entity kind: " +
@@ -325,6 +349,15 @@ LevelEntityConfig loadLevelEntityConfigFromJSON(const rapidjson::Value &V) {
     LevelEntityConfig::WorldEntry WE;
     WE.LevelName = C["level_name"].GetString();
     Cfg.Dungeons[Key[0]] = WE;
+  }
+
+  // Load level specific locked door configuration
+  for (const auto &C : V["locked_doors"].GetArray()) {
+    auto Key = std::string(C["key"].GetString());
+    assert(Key.size() == 1);
+    LevelEntityConfig::LockedDoor LD;
+    LD.KeyName = C["key_name"].GetString();
+    Cfg.LockedDoors[Key[0]] = LD;
   }
 
   return Cfg;

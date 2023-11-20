@@ -16,5 +16,6 @@
       "loot": "rare_chest"
     }
   ],
+  "locked_doors": [],
   "dungeons": []
 }

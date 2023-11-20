@@ -44,6 +44,9 @@ void createShopEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
 void createWorkbenchEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
                            Tile T);
 
+void createDoorEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                      bool IsOpen, std::optional<int> KeyId);
+
 } // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_ENTITY_H

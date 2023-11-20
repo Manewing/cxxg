@@ -16,5 +16,6 @@
       "loot": "common_chest"
     }
   ],
+  "locked_doors": [],
   "dungeons": []
 }

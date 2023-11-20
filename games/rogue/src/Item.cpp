@@ -55,6 +55,8 @@ std::string getQualifierName(const Item &It) {
 
 } // namespace
 
+int Item::getId() const { return getProto().ItemId; }
+
 std::string Item::getName() const {
   if ((getType() & ItemType::EquipmentMask) != ItemType::None) {
     return getQualifierName(*this) + getProto().Name;

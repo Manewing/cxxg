@@ -188,7 +188,9 @@
       "name": "Blueberry",
       "description": "A blue berry that can be eaten",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": [
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -200,7 +202,9 @@
       "name": "Green Goo",
       "description": "It may not win any culinary awards for taste, but it holds a unique restorative power.",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": [
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -216,7 +220,9 @@
       "name": "Sewer Meat",
       "description": "Obtained from the unsavory denizens of the sewers, this dubious food source offers a double-edged benefit.",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": [
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -232,7 +238,10 @@
       "name": "Poison Berry",
       "description": "A berry, better not to eat it. It looks poisonous",
       "max_stack_size": 99,
-      "types": ["consumable", "crafting"],
+      "types": [
+        "consumable",
+        "crafting"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -244,14 +253,20 @@
       "name": "Wooden Log",
       "description": "A log of wood",
       "max_stack_size": 99,
-      "types": ["crafting"],
+      "types": [
+        "crafting"
+      ],
       "capabilities": []
     },
     {
       "name": "Stone",
       "description": "A stone better not to drop it on your foot",
       "max_stack_size": 99,
-      "types": ["crafting", "weapon", "consumable"],
+      "types": [
+        "crafting",
+        "weapon",
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -275,7 +290,9 @@
       "name": "Small Sword",
       "description": "A small sword",
       "max_stack_size": 1,
-      "types": ["weapon"],
+      "types": [
+        "weapon"
+      ],
       "capabilities": [
         {
           "type": "dismantle",
@@ -297,7 +314,9 @@
       "name": "Fire Wand",
       "description": "A wand casting fire balls",
       "max_stack_size": 1,
-      "types": ["ranged"],
+      "types": [
+        "ranged"
+      ],
       "capabilities": [
         {
           "type": "dismantle",
@@ -319,7 +338,9 @@
       "name": "Wooden Bow",
       "description": "A wooden bow",
       "max_stack_size": 1,
-      "types": ["ranged"],
+      "types": [
+        "ranged"
+      ],
       "capabilities": [
         {
           "type": "dismantle",
@@ -341,7 +362,9 @@
       "name": "Scroll of pain",
       "description": "A scroll that deals minor damage to the target",
       "max_stack_size": 1,
-      "types": ["consumable"],
+      "types": [
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "ranged_use",
@@ -353,7 +376,9 @@
       "name": "Scroll of blinding",
       "description": "A scroll that blinds the target",
       "max_stack_size": 1,
-      "types": ["consumable"],
+      "types": [
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "ranged_use",
@@ -365,7 +390,9 @@
       "name": "Scroll of mind vision",
       "description": "A scroll that allows mind vision for a short period of time",
       "max_stack_size": 1,
-      "types": ["consumable"],
+      "types": [
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -377,7 +404,9 @@
       "name": "Scroll of invisibility",
       "description": "A scroll that makes the caster invisible for a short period of time",
       "max_stack_size": 1,
-      "types": ["consumable"],
+      "types": [
+        "consumable"
+      ],
       "capabilities": [
         {
           "type": "use_on",
@@ -389,7 +418,9 @@
       "name": "Wooden Shield",
       "description": "A shield of wood",
       "max_stack_size": 1,
-      "types": ["shield"],
+      "types": [
+        "shield"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -415,7 +446,9 @@
       "name": "Leather Tunic",
       "description": "A worn down leather tunic",
       "max_stack_size": 1,
-      "types": ["chest_plate"],
+      "types": [
+        "chest_plate"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -437,7 +470,9 @@
       "name": "Leather Boots",
       "description": "Worn down leather boots",
       "max_stack_size": 1,
-      "types": ["boots"],
+      "types": [
+        "boots"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -459,7 +494,9 @@
       "name": "Leather Pants",
       "description": "Worn down leather pants",
       "max_stack_size": 1,
-      "types": ["pants"],
+      "types": [
+        "pants"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -481,7 +518,9 @@
       "name": "Leather Helmet",
       "description": "Worn down leather helmet",
       "max_stack_size": 1,
-      "types": ["helmet"],
+      "types": [
+        "helmet"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -503,7 +542,9 @@
       "name": "Iron Ring",
       "description": "A ring made of iron",
       "max_stack_size": 1,
-      "types": ["ring"],
+      "types": [
+        "ring"
+      ],
       "capabilities": [
         {
           "type": "dismantle",
@@ -525,7 +566,9 @@
       "name": "Iron Sword",
       "description": "A sword made of iron",
       "max_stack_size": 1,
-      "types": ["weapon"],
+      "types": [
+        "weapon"
+      ],
       "capabilities": [
         {
           "type": "dismantle",
@@ -547,7 +590,9 @@
       "name": "Chain Mail",
       "description": "A chain mail",
       "max_stack_size": 1,
-      "types": ["chest_plate"],
+      "types": [
+        "chest_plate"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -569,7 +614,9 @@
       "name": "Plate Boots",
       "description": "A pair of heavily armored boots",
       "max_stack_size": 1,
-      "types": ["boots"],
+      "types": [
+        "boots"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -591,7 +638,9 @@
       "name": "Great Helm",
       "description": "A medieval knight's iconic headgear with a distinctive pointed top for defense, small vision slits, and ventilation. While formidable in battle, it's often taken off after the initial clash due to limited sight and breathability. A classic Crusader-era symbol of medieval valor.",
       "max_stack_size": 1,
-      "types": ["helmet"],
+      "types": [
+        "helmet"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -613,7 +662,9 @@
       "name": "Plate Greaves",
       "description": "These protective leg armor pieces are constructed from durable metal plates, offering superior defense to the wearer's lower legs.",
       "max_stack_size": 1,
-      "types": ["pants"],
+      "types": [
+        "pants"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -635,7 +686,9 @@
       "name": "Sword of the Slayer",
       "description": "A blade that will drive the wielder to new strength",
       "max_stack_size": 1,
-      "types": ["weapon"],
+      "types": [
+        "weapon"
+      ],
       "capabilities": [
         {
           "type": "equipment",
@@ -661,35 +714,90 @@
       "name": "Bone",
       "description": "A bone from a dead creature",
       "max_stack_size": 99,
-      "types": ["crafting"],
+      "types": [
+        "crafting"
+      ],
       "capabilities": []
     },
     {
       "name": "Troll Tooth",
       "description": "A troll tooth from a troll",
       "max_stack_size": 99,
-      "types": ["crafting"],
+      "types": [
+        "crafting"
+      ],
       "capabilities": []
     },
     {
       "name": "Iron Scrap",
       "description": "A scrap of iron",
       "max_stack_size": 99,
-      "types": ["crafting"],
+      "types": [
+        "crafting"
+      ],
       "capabilities": []
     },
     {
       "name": "Leather Scrap",
       "description": "A scrap of leather",
       "max_stack_size": 99,
-      "types": ["crafting"],
+      "types": [
+        "crafting"
+      ],
       "capabilities": []
     },
     {
       "name": "Rune Dust",
       "description": "A dust of rune",
       "max_stack_size": 99,
-      "types": ["crafting"],
+      "types": [
+        "crafting"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Key",
+      "description": "A key for a lock. Who knows what it opens...",
+      "max_stack_size": 1,
+      "types": [
+        "quest"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "L1 Key",
+      "description": "The key that unlocks the first level",
+      "max_stack_size": 1,
+      "types": [
+        "quest"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "L2 Key",
+      "description": "The key that unlocks the second level",
+      "max_stack_size": 1,
+      "types": [
+        "quest"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "L3 Key",
+      "description": "The key that unlocks the third level",
+      "max_stack_size": 1,
+      "types": [
+        "quest"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Final Key",
+      "description": "It unlocks the final door",
+      "max_stack_size": 1,
+      "types": [
+        "quest"
+      ],
       "capabilities": []
     }
   ],
@@ -835,6 +943,54 @@
         }
       ]
     },
+    "l1_key": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "L1 Key",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        }
+      ]
+    },
+    "l2_key": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "L2 Key",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        }
+      ]
+    },
+    "l3_key": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "L3 Key",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        }
+      ]
+    },
+    "final_key": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Final Key",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        }
+      ]
+    },
     "common_chest": {
       "rolls": 4,
       "slots": [
@@ -851,6 +1007,23 @@
           "weight": 20
         },
         {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "l2_key",
+          "weight": 10
+        },
+        {
           "type": "table",
           "ref": "common_equip",
           "weight": 5
@@ -864,18 +1037,6 @@
           "type": "table",
           "ref": "common_scroll",
           "weight": 1
-        },
-        {
-          "type": "null",
-          "weight": 20
-        },
-        {
-          "type": "null",
-          "weight": 20
-        },
-        {
-          "type": "null",
-          "weight": 20
         }
       ]
     },
@@ -895,8 +1056,25 @@
           "weight": 20
         },
         {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
           "type": "table",
           "ref": "rare_equip",
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "l3_key",
           "weight": 10
         },
         {
@@ -915,18 +1093,6 @@
           "min_count": 3,
           "max_count": 3,
           "weight": -1
-        },
-        {
-          "type": "null",
-          "weight": 20
-        },
-        {
-          "type": "null",
-          "weight": 20
-        },
-        {
-          "type": "null",
-          "weight": 20
         }
       ]
     },

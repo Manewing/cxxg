@@ -67,6 +67,36 @@
         "color": "#ed3424",
         "key": "'",
         "layer": "walls_deco"
+      },
+      "x": {
+        "color": "#524c3c",
+        "key": "x",
+        "layer": "entities"
+      },
+      "y": {
+        "color": "#524c3c",
+        "key": "y",
+        "layer": "entities"
+      },
+      "z": {
+        "color": "#524c3c",
+        "key": "z",
+        "layer": "entities"
+      },
+      "u": {
+        "color": "#524c3c",
+        "key": "u",
+        "layer": "entities"
+      },
+      "+": {
+        "color": "#524c3c",
+        "key": "+",
+        "layer": "entities"
+      },
+      "/": {
+        "color": "#524c3c",
+        "key": "/",
+        "layer": "entities"
       }
     }
   },
@@ -74,7 +104,25 @@
   "chests": [
     {
       "key": "C",
-      "loot": "common_chest"
+      "loot": "l1_key"
+    }
+  ],
+  "locked_doors": [
+    {
+      "key": "x",
+      "key_name": "L1 Key"
+    },
+    {
+      "key": "y",
+      "key_name": "L2 Key"
+    },
+    {
+      "key": "z",
+      "key_name": "L3 Key"
+    },
+    {
+      "key": "u",
+      "key_name": "Final Key"
     }
   ],
   "dungeons": [

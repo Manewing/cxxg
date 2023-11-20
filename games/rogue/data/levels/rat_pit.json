@@ -53,5 +53,6 @@
       "loot": "mixed_chest"
     }
   ],
+  "locked_doors": [],
   "dungeons": []
 }

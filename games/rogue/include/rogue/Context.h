@@ -10,9 +10,9 @@ class LevelDatabase;
 namespace rogue {
 
 struct GameContext {
-  const ItemDatabase &ItemDb;
-  const CreatureDatabase &CreatureDb;
-  const LevelDatabase &LevelDb;
+  ItemDatabase &ItemDb;
+  CreatureDatabase &CreatureDb;
+  LevelDatabase &LevelDb;
 };
 
 } // namespace rogue
