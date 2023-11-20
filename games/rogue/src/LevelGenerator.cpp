@@ -248,6 +248,21 @@ GeneratedMapLevelGenerator::createNewLevel(int LevelId) const {
   Pass.init(Ctx);
   try {
     Pass.run(Ctx);
+    constexpr bool DebugRooms = false;
+    if (DebugRooms) {
+      auto &M = NewLevel->Map.get(Level::LayerWallsDecoIdx);
+      Tile DbgTile{{'0', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
+      M.getTile({0, 0}).T.Char = 'A' + Ctx.Hallways.size();
+      for (const auto &Room : Ctx.Rooms) {
+        M.getTile(Room.Pos) = DbgTile;
+        DbgTile.T.Char++;
+      }
+      DbgTile.T.Char = 'a';
+      for (const auto &Hallway : Ctx.Hallways) {
+        M.fillRect(DbgTile, Hallway.Rect);
+        DbgTile.T.Char++;
+      }
+    }
   } catch (const std::exception &E) {
     auto RenderedLevelMap = NewLevel->Map.render();
     ymir::Map<cxxg::types::ColoredChar, int> Map(RenderedLevelMap.getSize());
