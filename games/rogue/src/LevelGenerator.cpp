@@ -99,6 +99,12 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
   case 'h': {
     createHealerEntity(L.Reg, Pos, T);
   } break;
+  case 'S': {
+    createShopEntity(L.Reg, Pos, T);
+  } break;
+  case 'w': {
+    createWorkbenchEntity(L.Reg, Pos, T);
+  } break;
   default:
     throw std::runtime_error("Invalid entity kind: " +
                              std::string(1, T.kind()));

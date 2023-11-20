@@ -34,12 +34,12 @@
         "layer": "entities"
       },
       "w": {
-        "color": "#fac43c",
+        "color": "#735740",
         "key": "w",
         "layer": "entities"
       },
       "S": {
-        "color": "#fac43c",
+        "color": "#a68733",
         "key": "S",
         "layer": "entities"
       },
@@ -74,14 +74,6 @@
   "chests": [
     {
       "key": "C",
-      "loot": "common_chest"
-    },
-    {
-      "key": "w",
-      "loot": "common_chest"
-    },
-    {
-      "key": "S",
       "loot": "common_chest"
     }
   ],

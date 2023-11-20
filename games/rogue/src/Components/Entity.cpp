@@ -158,4 +158,40 @@ void createHealerEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
   Reg.emplace<VisibleComp>(Entity);
 }
 
+void createShopEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  Reg.emplace<TileComp>(Entity, T);
+
+  Reg.emplace<InteractableComp>(
+      Entity,
+      Interaction{"Shop", [](auto &EHC, auto Et, auto &Reg) {
+                    EHC.publish(PlayerInfoMessageEvent() << "Shop not implemented yet.");
+                    (void)Et;
+                    (void)Reg;
+                    //EHC.publish(ShopOpenEvent{{}, Et, Entity, &Reg});
+                  }});
+
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
+}
+
+void createWorkbenchEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  Reg.emplace<TileComp>(Entity, T);
+
+  Reg.emplace<InteractableComp>(
+      Entity,
+      Interaction{"Workbench", [](auto &EHC, auto Et, auto &Reg) {
+                    EHC.publish(PlayerInfoMessageEvent() << "Workbench not implemented yet.");
+                    //EHC.publish(WorkbenchUseEvent{{}, Et, Entity, &Reg});
+                    (void)Et;
+                    (void)Reg;
+                  }});
+
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
+}
+
 } // namespace rogue

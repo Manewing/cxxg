@@ -38,6 +38,12 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
 void createHealerEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
                         Tile T);
 
+void createShopEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
+                      Tile T);
+
+void createWorkbenchEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
+                           Tile T);
+
 } // namespace rogue
 
 #endif // #ifndef ROGUE_COMPONENTS_ENTITY_H
