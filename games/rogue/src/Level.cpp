@@ -175,6 +175,9 @@ bool Level::isWallBlocked(ymir::Point2d<int> Pos) const {
 }
 
 bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
+  if (EntityPosCache.contains(Pos) && EntityPosCache.getTile(Pos) != entt::null) {
+    return Reg.any_of<BlocksLOS>(EntityPosCache.getTile(Pos));
+  }
   return isWallBlocked(Pos);
 }
 

@@ -10,6 +10,8 @@ struct LineOfSightComp {
   void reset() { LOSRange = MaxLOSRange; }
 };
 
+struct BlocksLOS {};
+
 struct VisibleLOSComp {
   bool Temporary = false;
 };
