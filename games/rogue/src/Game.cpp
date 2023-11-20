@@ -261,8 +261,10 @@ bool Game::handleInput(int Char) {
     Hist.info() << "Resting...";
     break;
   case 'e':
-    tryInteract();
-    // Does not count as a tick
+    if (tryInteract()) {
+      break;
+    }
+    // No interaction, no tick
     return true;
   default:
     // Not a valid input do not update
@@ -324,7 +326,7 @@ void Game::movePlayer(ymir::Dir2d Dir) {
 }
 
 // FIXME move to player system?
-void Game::tryInteract() {
+bool Game::tryInteract() {
   auto Player = getPlayer();
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
 
@@ -333,7 +335,7 @@ void Game::tryInteract() {
 
   // If there are no interactions we are done
   if (InteractableEntities.empty()) {
-    return;
+    return false;
   }
 
   // If there is only one action execute it
@@ -347,13 +349,15 @@ void Game::tryInteract() {
     // This may switch level so needs to be last thing that is done
     Interactable.Action.Execute(World->getCurrentLevelOrFail(), Player,
                                 getLvlReg());
-    return;
+    return true;
   }
 
   // Multiple interactions, this show UI to select interaction
   UICtrl.closeInteractUI();
   UICtrl.setInteractUI(getPlayer(), getLvlReg().get<PositionComp>(getPlayer()),
                        World->getCurrentLevelOrFail());
+  
+  return true;
 }
 
 entt::registry &Game::getLvlReg() { return World->getCurrentLevelOrFail().Reg; }

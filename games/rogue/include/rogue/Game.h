@@ -66,7 +66,7 @@ public:
   void handleDraw() final;
 
   void movePlayer(ymir::Dir2d Dir);
-  void tryInteract();
+  bool tryInteract();
 
 private:
   entt::registry &getLvlReg();
