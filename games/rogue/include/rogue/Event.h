@@ -71,6 +71,7 @@ struct SwitchGameWorldEvent : public BaseEvent {
 };
 
 struct LootEvent : public BaseEvent {
+  std::string LootName;
   entt::entity Entity = entt::null;
   entt::entity LootedEntity = entt::null;
   entt::registry *Registry = nullptr;

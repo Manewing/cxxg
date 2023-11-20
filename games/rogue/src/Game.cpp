@@ -92,7 +92,8 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
       LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)),
       Ctx({ItemDb, CreatureDb, LevelDb}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
-      World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)), UICtrl(Scr) {}
+      World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
+      UICtrl(Scr) {}
 
 namespace {
 
@@ -412,7 +413,8 @@ void Game::onLootEvent(const LootEvent &E) {
       &World->getCurrentLevelOrFail().Reg != E.Registry) {
     return;
   }
-  UICtrl.setLootUI(E.Entity, E.LootedEntity, World->getCurrentLevelOrFail());
+  UICtrl.setLootUI(E.Entity, E.LootedEntity, World->getCurrentLevelOrFail(),
+                   E.LootName);
 }
 
 namespace {

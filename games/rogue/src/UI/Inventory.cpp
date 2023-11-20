@@ -69,6 +69,10 @@ void InventoryControllerBase::draw(cxxg::Screen &Scr) const {
   BaseRectDecorator::draw(Scr);
 }
 
+Inventory &InventoryControllerBase::getInventory() { return Inv; }
+
+const Inventory &InventoryControllerBase::getInventory() const { return Inv; }
+
 void InventoryControllerBase::updateElements() const {
   std::vector<ListSelect::Element> Elements;
   Elements.reserve(Inv.getItems().size());
@@ -121,6 +125,11 @@ bool InventoryController::handleInput(int Char) {
   case Controls::Dismantle.Char: {
     InvHandler.tryDismantleItem(ItemIdx);
   } break;
+  case Controls::Store.Char:
+    if (auto *LUI = Ctrl.getWindowOfType<LootController>()) {
+      LUI->getInventory().addItem(Inv.takeItem(ItemIdx));
+    }
+    break;
   default:
     return InventoryControllerBase::handleInput(Char);
   }
@@ -148,12 +157,15 @@ std::string InventoryController::getInteractMsg() const {
       CapabilityFlags::None) {
     Options.push_back(Controls::Dismantle);
   }
+  if (Ctrl.hasLootUI()) {
+    Options.push_back(Controls::Store);
+  }
   return KeyOption::getInteractMsg(Options);
 }
 
 LootController::LootController(Controller &Ctrl, Inventory &Inv,
-                               entt::entity Entity, Level &Lvl)
-    : InventoryControllerBase(Ctrl, Inv, Entity, Lvl, "Loot") {}
+                               entt::entity Entity, Level &Lvl, const std::string &Header)
+    : InventoryControllerBase(Ctrl, Inv, Entity, Lvl, Header) {}
 
 bool LootController::handleInput(int Char) {
   switch (Char) {

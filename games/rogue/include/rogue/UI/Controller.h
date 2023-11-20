@@ -48,6 +48,10 @@ public:
 
   void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false);
 
+  template <typename T> T *getWindowOfType() {
+    return WdwContainer.getWindowOfType<T>();
+  }
+
   template <typename T> const T *getWindowOfType() const {
     return WdwContainer.getWindowOfType<T>();
   }
@@ -74,7 +78,9 @@ public:
   /// \param Entity The entity that is looting
   /// \param InvEt The entity that is being looted
   /// \param Reg The registry
-  void setLootUI(entt::entity Entity, entt::entity InvEt, Level &Lvl);
+  /// \param Header The header to display for window
+  void setLootUI(entt::entity Entity, entt::entity InvEt, Level &Lvl,
+                 const std::string &Header);
   bool hasLootUI() const;
   void closeLootUI();
 

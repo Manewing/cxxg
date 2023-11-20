@@ -12,6 +12,7 @@ struct EquipmentComp {
 
 struct InventoryComp {
   Inventory Inv;
+  bool IsPersistent = true;
 };
 
 } // namespace rogue

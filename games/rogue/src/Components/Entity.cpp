@@ -116,7 +116,7 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<InteractableComp>(
       Entity,
       Interaction{"Open Chest", [Entity](auto &EHC, auto Et, auto &Reg) {
-                    EHC.publish(LootEvent{{}, Et, Entity, &Reg});
+                    EHC.publish(LootEvent{{}, "Chest", Et, Entity, &Reg});
                   }});
 
   Reg.emplace<CollisionComp>(Entity);
@@ -130,12 +130,15 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, DropTile, -1);
-  auto &Inv = Reg.emplace<InventoryComp>(Entity).Inv;
-  Inv = I;
+
+  // Copy inventory
+  auto &IC = Reg.emplace<InventoryComp>(Entity);
+  IC.IsPersistent = false;
+  IC.Inv = I;
 
   Reg.emplace<InteractableComp>(
       Entity, Interaction{"Loot", [Entity](auto &EHC, auto Et, auto &Reg) {
-                            EHC.publish(LootEvent{{}, Et, Entity, &Reg});
+                            EHC.publish(LootEvent{{}, "Loot", Et, Entity, &Reg});
                           }});
 
   Reg.emplace<VisibleComp>(Entity);

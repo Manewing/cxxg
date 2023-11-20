@@ -165,9 +165,9 @@ void Controller::closeBuffUI() {
 }
 
 void Controller::setLootUI(entt::entity Entity, entt::entity InvEt,
-                           Level &Lvl) {
+                           Level &Lvl, const std::string &Header) {
   auto &InvComp = Lvl.Reg.get<InventoryComp>(InvEt);
-  WdwContainer.addWindow<LootController>(*this, InvComp.Inv, Entity, Lvl);
+  WdwContainer.addWindow<LootController>(*this, InvComp.Inv, Entity, Lvl, Header);
   WdwContainer.autoLayoutWindows();
 }
 

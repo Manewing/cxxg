@@ -94,7 +94,7 @@ void removeEmptyContainers(entt::registry &Reg, const entt::entity Entity,
   if (Reg.any_of<HealthComp>(Entity)) {
     return;
   }
-  if (IC.Inv.empty()) {
+  if (IC.Inv.empty() && !IC.IsPersistent) {
     Reg.destroy(Entity);
   }
 }

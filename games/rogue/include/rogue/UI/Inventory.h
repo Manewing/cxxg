@@ -36,6 +36,9 @@ public:
   bool handleInput(int Char) override;
   void draw(cxxg::Screen &Scr) const final;
 
+  Inventory &getInventory();
+  const Inventory &getInventory() const;
+
 protected:
   void updateElements() const;
 
@@ -59,8 +62,7 @@ public:
 class LootController : public InventoryControllerBase {
 public:
   LootController(Controller &Ctrl, Inventory &Inv, entt::entity Entity,
-
-                 Level &Lvl);
+                 Level &Lvl, const std::string &Header);
   bool handleInput(int Char) final;
   std::string getInteractMsg() const final;
 };
