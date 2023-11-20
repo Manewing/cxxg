@@ -1,5 +1,6 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Helpers.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 
@@ -59,6 +60,7 @@ void createProjectile(entt::registry &Reg, const DamageComp &DC,
   VMC.Vector = (TargetPos - Pos).to<float>();
   VMC.LastPos = Pos.to<float>();
   Reg.emplace<VectorMovementComp>(E, VMC);
+  Reg.emplace<VisibleComp>(E);
 }
 
 } // namespace rogue
