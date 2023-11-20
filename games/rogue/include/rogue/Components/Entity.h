@@ -19,6 +19,10 @@ void createEnemy(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                  const std::string &Name, const Inventory &Inv,
                  const StatPoints &Stats, FactionKind Faction, RaceKind Race);
 
+void createDummyCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
+                         const std::string &Name, const Inventory &Inv,
+                         const StatPoints &Stats);
+
 void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                            const std::string &Name, const Inventory &Inv,
                            const StatPoints &Stats);
@@ -35,14 +39,11 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
 void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
                       const Inventory &Inv);
 
-void createHealerEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
-                        Tile T);
+void createHealerEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T);
 
-void createShopEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
-                      Tile T);
+void createShopEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T);
 
-void createWorkbenchEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
-                           Tile T);
+void createWorkbenchEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T);
 
 void createDoorEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                       bool IsOpen, std::optional<int> KeyId);

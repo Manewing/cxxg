@@ -1,0 +1,31 @@
+{
+  "map": {
+    "type": "generated",
+    "config": "spider_lair.cfg"
+  },
+  "creatures": [
+    {
+      "key": "0",
+      "name": "Silk Cocoon",
+      "loot": "common_silk_coccon"
+    },
+    {
+      "key": "h",
+      "name": "Arachnoth Hatchling",
+      "loot": "common_spider"
+    },
+    {
+      "key": "b",
+      "name": "Arachnoth Burrower",
+      "loot": "common_spider"
+    },
+    {
+      "key": "B",
+      "name": "Arachnoth Broodguard",
+      "loot": "common_spider"
+    }
+  ],
+  "chests": [],
+  "locked_doors": [],
+  "dungeons": []
+}

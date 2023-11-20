@@ -22,7 +22,8 @@ enum class RaceKind {
   Troll = 0x10,
   Goblin = 0x20,
   Undead = 0x40,
-  Creature = 0x80
+  Creature = 0x80,
+  Dummy = 0x100
 };
 
 RaceKind getRace(std::string_view Name);

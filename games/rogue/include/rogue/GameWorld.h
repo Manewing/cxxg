@@ -121,6 +121,7 @@ private:
   std::unique_ptr<GameWorld> CurrSubWorld = nullptr;
   std::size_t CurrMaxLevel = 0;
   entt::entity CurrSwitchEntity = entt::null;
+  int SwitchedWorldCount = 0;
 };
 
 /// A chunk based procedurally generated infinite world

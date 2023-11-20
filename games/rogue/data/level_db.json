@@ -7,6 +7,12 @@
           "game_world": "multi_level_dungeon",
           "level_config": "levels/sewers.json",
           "weight": 5
+        },
+        {
+          "type": "level",
+          "game_world": "multi_level_dungeon",
+          "level_config": "levels/spider_nest.json",
+          "weight": 5
         }
       ]
     },
@@ -21,6 +27,12 @@
           "type": "level",
           "game_world": "multi_level_dungeon",
           "level_config": "levels/rat_pit.json",
+          "weight": 5
+        },
+        {
+          "type": "level",
+          "game_world": "multi_level_dungeon",
+          "level_config": "levels/spider_lair.json",
           "weight": 5
         }
       ]

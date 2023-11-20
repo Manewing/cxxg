@@ -3,7 +3,7 @@
 	"creature_db_config": "creature_db.json",
 	"level_db_config": "level_db.json",
 	"initial_game_world": "multi_level_dungeon",
-	"initial_level_config": "levels/arena.json",
+	"initial_level_config": "levels/spider_nest.json",
 	"initial_items": [
 		{
 			"name": "Small Sword",

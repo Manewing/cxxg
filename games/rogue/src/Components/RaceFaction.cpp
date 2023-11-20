@@ -40,7 +40,9 @@ RaceKind getRace(std::string_view Name) {
   if (Name == "creature") {
     return RaceKind::Creature;
   }
-
+  if (Name == "dummy") {
+    return RaceKind::Dummy;
+  }
   return RaceKind::None;
 }
 

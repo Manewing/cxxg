@@ -25,6 +25,54 @@
             "race": "creature"
         },
         {
+            "name": "Silk Cocoon",
+            "description": "Suspended cocoon containing captured prey.",
+            "stats": {
+                "str": 0,
+                "dex": 0,
+                "int": 0,
+                "vit": 1
+            },
+            "faction": "nature",
+            "race": "dummy"
+        },
+        {
+            "name": "Arachnoth Hatchling",
+            "description": "Agile spiderlings that scuttle around the lair.",
+            "stats": {
+                "str": 1,
+                "dex": 10,
+                "int": 0,
+                "vit": 1
+            },
+            "faction": "nature",
+            "race": "creature"
+        },
+        {
+            "name": "Arachnoth Burrower",
+            "description": "Spider with razor-sharp claws that emerges from hidden tunnels to ambush intruders.",
+            "stats": {
+                "str": 1,
+                "dex": 20,
+                "int": 0,
+                "vit": 2
+            },
+            "faction": "nature",
+            "race": "creature"
+        },
+        {
+            "name": "Arachnoth Broodguard",
+            "description": "Large more aggressive spider that protects key areas of the lair.",
+            "stats": {
+                "str": 4,
+                "dex": 10,
+                "int": 0,
+                "vit": 3
+            },
+            "faction": "nature",
+            "race": "creature"
+        },
+        {
             "name": "Blob",
             "description": "A blob TODO",
             "stats": {

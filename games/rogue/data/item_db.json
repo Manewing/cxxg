@@ -756,6 +756,58 @@
       "capabilities": []
     },
     {
+      "name": "Silk Thread",
+      "description": "Lightweight crafting material spun from spider silk, known for its incredible strength.",
+      "max_stack_size": 99,
+      "types": [
+        "crafting"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Arachnid Chitin Shard",
+      "description": "Razor-sharp chitin fragments that can be used in crafting.",
+      "max_stack_size": 99,
+      "types": [
+        "crafting"
+      ],
+      "capabilities": []
+    },
+    {
+      "name": "Venomous Fang",
+      "description": "A large, venom-drenched fang",
+      "max_stack_size": 99,
+      "types": [
+        "consumable",
+        "crafting"
+      ],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "damage_effect_10"
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_poison_effect"
+        }
+      ]
+    },
+    {
+      "name": "Spiderling Venom Sac",
+      "description": "A sac filled with venom harvested from spiderlings, useful for crafting potent poisons.",
+      "max_stack_size": 99,
+      "types": [
+        "consumable",
+        "crafting"
+      ],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "minor_poison_effect"
+        }
+      ]
+    },
+    {
       "name": "Key",
       "description": "A key for a lock. Who knows what it opens...",
       "max_stack_size": 1,
@@ -1187,6 +1239,110 @@
         {
           "type": "null",
           "weight": 70
+        }
+      ]
+    },
+    "common_spider": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 70
+        },
+        {
+          "type": "null",
+          "weight": 70
+        },
+        {
+          "type": "item",
+          "name": "Silk Thread",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Silk Thread",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Arachnid Chitin Shard",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Venomous Fang",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Spiderling Venom Sac",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        }
+      ]
+    },
+    "common_silk_cocoon": {
+      "rolls": 6,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Silk Thread",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Silk Thread",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "l2_key",
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_equip",
+          "weight": 5
+        },
+        {
+          "type": "table",
+          "ref": "rare_equip",
+          "weight": 1
+        },
+        {
+          "type": "table",
+          "ref": "common_scroll",
+          "weight": 1
         }
       ]
     }
