@@ -91,12 +91,16 @@ Level &DungeonSweeper::switchLevel(std::size_t LevelIdx, bool ToEntry) {
   } else if (CurrSubWorld) {
     // Reached max level of dungeon that means exit level
     auto *CurrLvl = getCurrentLevel();
-    auto ToPos = Lvl->Reg.get<PositionComp>(CurrSwitchEntity).Pos;
     Lvl->update(false);
     LevelIdx = 0;
     if (CurrLvl->hasPlayer()) {
-      Lvl->movePlayer(*CurrLvl, ToPos);
-      Lvl->Reg.destroy(CurrSwitchEntity);
+      auto AtPos = Lvl->Reg.get<PositionComp>(CurrSwitchEntity).Pos;
+      auto ToPos = Lvl->getNonBodyBlockedPosNextTo(AtPos);
+      if (!ToPos) {
+        throw std::runtime_error(
+            "DungeonSweeper: No free position next to switch entity");
+      }
+      Lvl->movePlayer(*CurrLvl, *ToPos);
       CurrSubWorld = nullptr;
       CurrSubLvlGen = nullptr;
     }
