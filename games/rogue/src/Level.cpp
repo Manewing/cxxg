@@ -204,6 +204,10 @@ Level::getDijkstraMap(Tile Target, std::size_t Layer) const {
   return {DM, TilePos};
 }
 
+void Level::revealMap() {
+  PlayerSeenMap.fill(true);
+}
+
 const ymir::Map<bool, int> &Level::getPlayerSeenMap() const {
   return PlayerSeenMap;
 }

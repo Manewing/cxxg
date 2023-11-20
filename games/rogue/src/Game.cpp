@@ -224,6 +224,9 @@ bool Game::handleInput(int Char) {
   case 'l':
     switchLevel(World->getCurrentLevelIdx() + 1, true);
     break;
+  case 'k':
+    World->getCurrentLevel()->revealMap();
+    break;
 
   // TODO show controls
   default:

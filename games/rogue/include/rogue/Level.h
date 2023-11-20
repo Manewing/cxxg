@@ -75,6 +75,7 @@ public:
   std::pair<ymir::Map<int, int>, std::vector<ymir::Point2d<int>>>
   getDijkstraMap(Tile Target, std::size_t Layer) const;
 
+  void revealMap();
   const ymir::Map<bool, int> &getPlayerSeenMap() const;
 
   const entt::entity &getEntityAt(ymir::Point2d<int> AtPos) const;
