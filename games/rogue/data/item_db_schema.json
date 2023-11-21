@@ -62,7 +62,8 @@
                     "unequip_from",
                     "equipment",
                     "dismantle",
-                    "ranged_use"
+                    "ranged_use",
+                    "adjacent_use"
                   ]
                 },
                 "effect": {

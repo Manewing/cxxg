@@ -14,6 +14,12 @@
       "ticks": 5,
       "tick_period": 20
     },
+    "major_poison_effect": {
+      "type": "poison_debuff_comp",
+      "reduce_amount": 5.0,
+      "ticks": 5,
+      "tick_period": 10
+    },
     "minor_quick_health_regen_effect": {
       "type": "health_regen_buff_comp",
       "regen_amount": 1.0,
@@ -60,6 +66,11 @@
       },
       "max_stacks": 5,
       "ticks": 20
+    },
+    "armor_2": {
+      "type": "armor_buff_comp",
+      "phys_armor": 2,
+      "magic_armor": 0
     },
     "armor_5": {
       "type": "armor_buff_comp",
@@ -172,6 +183,11 @@
     }
   },
   "item_specializations": {
+    "minor_stats_buff_effect": {
+      "type": "stats_buff_comp_spec",
+      "min_points": 1,
+      "max_points": 1
+    },
     "common_stats_buff_effect": {
       "type": "stats_buff_comp_spec",
       "min_points": 1,
@@ -443,6 +459,30 @@
       ]
     },
     {
+      "name": "Linen Shirt",
+      "description": "A lightweight and comfortable shirt, offering a modest layer of protection.",
+      "max_stack_size": 1,
+      "types": [
+        "chest_plate"
+      ],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_2"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_leather_equip"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "minor_stats_buff_effect"
+        }
+      ]
+    },
+    {
       "name": "Leather Tunic",
       "description": "A worn down leather tunic",
       "max_stack_size": 1,
@@ -511,6 +551,30 @@
         {
           "type": "equipment",
           "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Linen Pants",
+      "description": "Light and breathable linen pants, providing basic leg protection.",
+      "max_stack_size": 1,
+      "types": [
+        "pants"
+      ],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_2"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_leather_equip"
+        }
+      ],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "minor_stats_buff_effect"
         }
       ]
     },
@@ -783,12 +847,12 @@
       ],
       "capabilities": [
         {
-          "type": "use_on",
+          "type": "adjacent_use",
           "effect": "damage_effect_10"
         },
         {
-          "type": "use_on",
-          "effect": "minor_poison_effect"
+          "type": "adjacent_use",
+          "effect": "major_poison_effect"
         }
       ]
     },
@@ -803,7 +867,7 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "minor_poison_effect"
+          "effect": "major_poison_effect"
         }
       ]
     },
@@ -1072,23 +1136,23 @@
         },
         {
           "type": "table",
-          "ref": "l2_key",
+          "ref": "common_equip",
           "weight": 10
         },
         {
           "type": "table",
-          "ref": "common_equip",
+          "ref": "rare_equip",
           "weight": 5
         },
         {
           "type": "table",
-          "ref": "rare_equip",
-          "weight": 1
+          "ref": "common_scroll",
+          "weight": 5
         },
         {
           "type": "table",
-          "ref": "common_scroll",
-          "weight": 1
+          "ref": "l2_key",
+          "weight": 2
         }
       ]
     },
@@ -1291,58 +1355,17 @@
       ]
     },
     "common_silk_cocoon": {
-      "rolls": 6,
+      "rolls": 2,
       "slots": [
         {
-          "type": "item",
-          "name": "Silk Thread",
-          "min_count": 1,
-          "max_count": 2,
-          "weight": 30
-        },
-        {
-          "type": "item",
-          "name": "Silk Thread",
-          "min_count": 1,
-          "max_count": 2,
-          "weight": 30
+          "type": "table",
+          "ref": "common_spider",
+          "weight": -1
         },
         {
           "type": "table",
-          "ref": "common_equip",
-          "weight": 20
-        },
-        {
-          "type": "null",
-          "weight": 20
-        },
-        {
-          "type": "null",
-          "weight": 20
-        },
-        {
-          "type": "null",
-          "weight": 20
-        },
-        {
-          "type": "table",
-          "ref": "l2_key",
-          "weight": 10
-        },
-        {
-          "type": "table",
-          "ref": "common_equip",
-          "weight": 5
-        },
-        {
-          "type": "table",
-          "ref": "rare_equip",
-          "weight": 1
-        },
-        {
-          "type": "table",
-          "ref": "common_scroll",
-          "weight": 1
+          "ref": "common_chest",
+          "weight": -1
         }
       ]
     }
