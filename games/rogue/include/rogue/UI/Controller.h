@@ -91,8 +91,8 @@ public:
   /// Create target UI
   /// \param TargetPos The position to target
   /// \param Lvl The level
-  void setTargetUI(ymir::Point2d<int> TargetPos, Level &Lvl,
-                   const TargetUI::SelectTargetCb &Callback);
+  void setTargetUI(ymir::Point2d<int> TargetPos, std::optional<unsigned> Range,
+                   Level &Lvl, const TargetUI::SelectTargetCb &Callback);
   bool hasTargetUI() const;
   void closeTargetUI();
 

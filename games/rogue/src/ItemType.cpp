@@ -113,6 +113,9 @@ CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr) {
   if (CapabilityFlagStr == "ranged_use") {
     return CapabilityFlags::Ranged | CapabilityFlags::UseOn;
   }
+  if (CapabilityFlagStr == "adjacent_use") {
+    return CapabilityFlags::Adjacent | CapabilityFlags::UseOn;
+  }
   throw std::out_of_range("Unknown capability: " + CapabilityFlagStr);
   return CapabilityFlags::None;
 }

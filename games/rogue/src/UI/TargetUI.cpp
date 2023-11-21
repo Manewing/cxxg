@@ -78,9 +78,11 @@ void TargetInfo::draw(cxxg::Screen &Scr) const {
   }
 }
 
-TargetUI::TargetUI(Controller &Ctrl, ymir::Point2d<int> StartPos, Level &Lvl,
+TargetUI::TargetUI(Controller &Ctrl, ymir::Point2d<int> StartPos,
+                   std::optional<unsigned> Range, Level &Lvl,
                    const SelectTargetCb &Cb)
-    : Widget({0, 0}), Ctrl(Ctrl), StartPos(StartPos), Lvl(Lvl), SelectCb(Cb) {
+    : Widget({0, 0}), Ctrl(Ctrl), StartPos(StartPos), Range(Range), Lvl(Lvl),
+      SelectCb(Cb) {
   CursorEt = createCursor(Lvl.Reg, StartPos);
   TargetEt = Lvl.getEntityAt(StartPos);
 }
@@ -98,19 +100,39 @@ bool TargetUI::handleInput(int Char) {
     return false;
   case Controls::MoveDown.Char:
   case cxxg::utils::KEY_DOWN:
-    TargetPos.Y++;
+    if (!Range ||
+        static_cast<unsigned>(
+            (TargetPos - StartPos + ymir::Point2d<int>{0, 1}).length()) <
+            *Range) {
+      TargetPos.Y++;
+    }
     break;
   case Controls::MoveUp.Char:
   case cxxg::utils::KEY_UP:
-    TargetPos.Y--;
+    if (!Range ||
+        static_cast<unsigned>(
+            (TargetPos - StartPos + ymir::Point2d<int>{0, -1}).length()) <
+            *Range) {
+      TargetPos.Y--;
+    }
     break;
   case Controls::MoveLeft.Char:
   case cxxg::utils::KEY_LEFT:
-    TargetPos.X--;
+    if (!Range ||
+        static_cast<unsigned>(
+            (TargetPos - StartPos + ymir::Point2d<int>{-1, 0}).length()) <
+            *Range) {
+      TargetPos.X--;
+    }
     break;
   case Controls::MoveRight.Char:
   case cxxg::utils::KEY_RIGHT:
-    TargetPos.X++;
+    if (!Range ||
+        static_cast<unsigned>(
+            (TargetPos - StartPos + ymir::Point2d<int>{1, 0}).length()) <
+            *Range) {
+      TargetPos.X++;
+    }
     break;
   case Controls::Info.Char:
     if (TargetEt != entt::null) {

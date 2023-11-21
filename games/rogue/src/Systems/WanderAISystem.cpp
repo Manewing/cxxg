@@ -239,6 +239,9 @@ std::optional<ymir::Point2d<int>> WanderAISystem::findPathToPoint(
         ymir::FourTileDirections<int>(), 1, OneZero(RandomEngine));
   }
   if (PathToTarget.empty()) {
+    // FIXME this can happen when the targeted entity moves out of range of the
+    // LOS, this means that the dijkstra map is too small to be able to find a path
+    // to the target. Could be avoided by switching to an A* algorithm.
     publish(ErrorMessageEvent()
             << "can't find path from " << AtPos << " to " << FutureToPos);
     return AtPos;

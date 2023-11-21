@@ -51,6 +51,10 @@ enum class CapabilityFlags {
   // Ranged, indicates that the item can be used from a distance on an entity
   // different than the entity using the item
   Ranged = 0x10,
+
+  // Adjacent, indicates that the item can be used from an adjacent tile on an
+  // entity different than the entity using the item
+  Adjacent = 0x20,
 };
 
 CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr);

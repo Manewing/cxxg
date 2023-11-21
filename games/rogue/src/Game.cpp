@@ -210,7 +210,9 @@ bool Game::handleInput(int Char) {
     } else {
       auto &Lvl = World->getCurrentLevelOrFail();
       auto SrcEt = getPlayer();
-      UICtrl.setTargetUI(getLvlReg().get<PositionComp>(getPlayer()), Lvl,
+      const auto &PC = getLvlReg().get<PositionComp>(getPlayer());
+      const auto &LC = getLvlReg().get<LineOfSightComp>(getPlayer());
+      UICtrl.setTargetUI(PC, LC.LOSRange, Lvl,
                          [&Lvl, SrcEt](auto TgEt, auto TPos) {
                            CombatActionComp CC;
                            CC.Target = TgEt;

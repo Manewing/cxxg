@@ -4,6 +4,7 @@
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
 #include <rogue/Level.h>
@@ -108,7 +109,23 @@ bool InventoryController::handleInput(int Char) {
     if ((Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) !=
         CapabilityFlags::None) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
-      Ctrl.setTargetUI(PC.Pos, Lvl,
+      std::optional<unsigned> Range;
+      if (auto *LOSComp = Lvl.Reg.try_get<LineOfSightComp>(Entity)) {
+        Range = LOSComp->LOSRange;
+      }
+      Ctrl.setTargetUI(PC.Pos, Range, Lvl,
+                       [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
+                        ItemIdx](auto TgEt, auto) -> void {
+                         InventoryHandler IH(E, R);
+                         IH.setEventHub(Hub);
+                         IH.tryUseItemOnTarget(ItemIdx, TgEt);
+                       });
+      return false;
+    }
+    if ((Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Adjacent) !=
+        CapabilityFlags::None) { 
+      auto &PC = Lvl.Reg.get<PositionComp>(Entity);
+      Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
                        [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
                         ItemIdx](auto TgEt, auto) -> void {
                          InventoryHandler IH(E, R);
