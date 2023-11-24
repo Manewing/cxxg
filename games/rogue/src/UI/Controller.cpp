@@ -9,6 +9,7 @@
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/Stats.h>
 #include <rogue/UI/TargetUI.h>
+#include <rogue/UI/Menu.h>
 
 // FIXME get rid of dep
 #include <rogue/Components/Items.h>
@@ -93,6 +94,18 @@ void Controller::addWindow(std::shared_ptr<Widget> Wdw,
   if (AutoLayoutWindows) {
     WdwContainer.autoLayoutWindows();
   }
+}
+
+void Controller::setMenuUI() {
+  WdwContainer.addWindow<MenuController>(*this);
+}
+
+bool Controller::hasMenuUI() const {
+  return WdwContainer.hasWindowOfType<MenuController>();
+}
+
+void Controller::closeMenuUI() {
+  WdwContainer.closeWindow(WdwContainer.getWindowOfType<MenuController>());
 }
 
 void Controller::setEquipmentUI(entt::entity Entity, entt::registry &Reg) {

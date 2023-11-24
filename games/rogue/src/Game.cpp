@@ -225,6 +225,13 @@ bool Game::handleInput(int Char) {
     }
     return true;
   }
+  case ui::Controls::CloseWindow.Char: {
+    if (!UICtrl.isUIActive()) {
+      UICtrl.setMenuUI();
+      return true;
+    }
+    break;
+  }
   case 'l':
     switchLevel(World->getCurrentLevelIdx() + 1, true);
     break;

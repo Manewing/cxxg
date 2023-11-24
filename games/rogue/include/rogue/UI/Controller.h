@@ -56,6 +56,10 @@ public:
     return WdwContainer.getWindowOfType<T>();
   }
 
+  void setMenuUI();
+  bool hasMenuUI() const;
+  void closeMenuUI();
+
   void setEquipmentUI(entt::entity Entity, entt::registry &Reg);
   bool hasEquipmentUI() const;
   void closeEquipmentUI();

@@ -21,11 +21,11 @@ const char *getCharRepr(int Value) {
 
   if (Value < 33) {
     static const char *AsciiRepr[33] = {
-        "NULL",  "SOH",   "STX",   "ETX",   "EOT",   "ENQ",   "ACK",
-        "'\\a'", "'\\b'", "'\\t'", "'\\n'", "'\\v'", "'\\f'", "'\\r'",
-        "SO",    "SI",    "DLE",   "DC1",   "DC2",   "DC3",   "DC4",
-        "NAK",   "SYN",   "ETB",   "CAN",   "EM",    "SUB",   "ESC",
-        "FS",    "GS",    "RS",    "US",    "''"};
+        "NULL",  "SOH",   "STX", "ETX",   "EOT",   "ENQ",   "ACK",
+        "'\\a'", "'\\b'", "TAB", "ENTER", "'\\v'", "'\\f'", "'\\r'",
+        "SO",    "SI",    "DLE", "DC1",   "DC2",   "DC3",   "DC4",
+        "NAK",   "SYN",   "ETB", "CAN",   "EM",    "SUB",   "ESC",
+        "FS",    "GS",    "RS",  "US",    " "};
     return AsciiRepr[Value];
   }
   if (Value < 127) {
@@ -65,8 +65,6 @@ int Controls::getRemappedChar(int Char) {
   switch (Char) {
   case cxxg::utils::KEY_ENTER:
     return 'e';
-  case cxxg::utils::KEY_TAB:
-    return Controls::NextWindow.Char;
   default:
     break;
   }

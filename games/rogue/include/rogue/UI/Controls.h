@@ -24,11 +24,12 @@ struct Controls {
   static constexpr KeyOption HistoryUI = {'h', "History", "Open history"};
   static constexpr KeyOption BuffsUI = {'b', "Buffs", "Open buffs"};
   static constexpr KeyOption TargetUI = {'t', "Target",
-                                         "Target object for info/attack"};
+                                         "Target object for info or attack"};
 
   // Window controls
   static constexpr KeyOption MoveWindow = {'m', "Move", "Move the window"};
-  static constexpr KeyOption NextWindow = {'C', "Next", "Select next window"};
+  static constexpr KeyOption NextWindow = {cxxg::utils::KEY_TAB, "Next",
+                                           "Select next window"};
   static constexpr KeyOption PrevWindow = {'V', "Prev", "Select prev window"};
   static constexpr KeyOption AutoLayout = {'X', "Auto", "Auto layout windows"};
   static constexpr KeyOption CloseWindow = {cxxg::utils::KEY_ESC, "Close",

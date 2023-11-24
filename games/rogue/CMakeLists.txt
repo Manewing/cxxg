@@ -62,6 +62,7 @@ set(HEADER_FILES
   include/rogue/UI/Inventory.h
   include/rogue/UI/ItemSelect.h
   include/rogue/UI/ListSelect.h
+  include/rogue/UI/Menu.h
   include/rogue/UI/SelectBox.h
   include/rogue/UI/Stats.h
   include/rogue/UI/TargetUI.h
@@ -125,6 +126,7 @@ set(SOURCE_FILES
   src/UI/Inventory.cpp
   src/UI/ItemSelect.cpp
   src/UI/ListSelect.cpp
+  src/UI/Menu.cpp
   src/UI/SelectBox.cpp
   src/UI/Stats.cpp
   src/UI/TargetUI.cpp
