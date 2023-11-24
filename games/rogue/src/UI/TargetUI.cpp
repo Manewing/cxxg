@@ -36,8 +36,10 @@ TargetInfo::TargetInfo(Controller &C, entt::entity TEt, Level &L)
     ItSel->addSelect<Select>(
         "Stats", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
   }
-  ItSel->addSelect<Select>(
-      "Buffs", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 25);
+  if (BuffTypeList::anyOf(Lvl.Reg, TargetEt)) {
+    ItSel->addSelect<Select>(
+        "Buffs", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 25);
+  }
 
   ItSel->registerOnSelectCallback([this](const auto &Sel) {
     if (Sel.getValue() == "Equip") {
