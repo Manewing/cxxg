@@ -56,9 +56,13 @@ public:
     return WdwContainer.getWindowOfType<T>();
   }
 
-  void setMenuUI();
+  void setMenuUI(Level &Lvl);
   bool hasMenuUI() const;
   void closeMenuUI();
+
+  void setCommandLineUI(Level &Lvl);
+  bool hasCommandLineUI() const;
+  void closeCommandLineUI();
 
   void setEquipmentUI(entt::entity Entity, entt::registry &Reg);
   bool hasEquipmentUI() const;

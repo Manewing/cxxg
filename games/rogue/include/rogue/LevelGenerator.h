@@ -105,6 +105,9 @@ private:
 /// Level generator that generates a level from a procedurally generated map
 class GeneratedMapLevelGenerator : public LevelGenerator {
 public:
+  static bool DebugRooms;
+
+public:
   struct Config {
     unsigned Seed = 0;
     std::filesystem::path MapConfig;

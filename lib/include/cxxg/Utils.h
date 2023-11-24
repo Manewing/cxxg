@@ -29,6 +29,7 @@ constexpr int KEY_UP = 1001;
 constexpr int KEY_DOWN = 1002;
 constexpr int KEY_RIGHT = 1003;
 constexpr int KEY_LEFT = 1004;
+constexpr int KEY_DEL_C = 1005;
 
 /// @brief Returns a string representation of the given character, in alignment
 /// with the constants listed above

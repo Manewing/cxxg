@@ -3,9 +3,7 @@
 
 namespace rogue::ui {
 
-namespace {
-
-const char *getCharRepr(int Value) {
+const char *KeyOption::getCharStr(int Value) {
   switch (Value) {
   case cxxg::utils::KEY_UP:
     return "^";
@@ -39,14 +37,12 @@ const char *getCharRepr(int Value) {
   return ".";
 }
 
-} // namespace
-
 std::string KeyOption::getInteractMsg(const std::vector<KeyOption> &Options) {
   std::stringstream SS;
   // Assemble the key board inputs first
   const char *Pred = "[";
   for (const auto &Opt : Options) {
-    SS << Pred << getCharRepr(Opt.Char);
+    SS << Pred << getCharStr(Opt.Char);
     Pred = "/";
   }
   SS << "] ";

@@ -52,6 +52,7 @@ set(HEADER_FILES
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
   include/rogue/UI/Buffs.h
+  include/rogue/UI/CommandLine.h
   include/rogue/UI/Controller.h
   include/rogue/UI/Controls.h
   include/rogue/UI/Decorator.h
@@ -116,6 +117,7 @@ set(SOURCE_FILES
   src/Systems/StatsSystem.cpp
   src/Systems/WanderAISystem.cpp
   src/UI/Buffs.cpp
+  src/UI/CommandLine.cpp
   src/UI/Controller.cpp
   src/UI/Controls.cpp
   src/UI/Decorator.cpp

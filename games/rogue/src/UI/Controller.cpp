@@ -8,6 +8,7 @@
 #include <rogue/UI/Interact.h>
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/Stats.h>
+#include <rogue/UI/CommandLine.h>
 #include <rogue/UI/TargetUI.h>
 #include <rogue/UI/Menu.h>
 
@@ -96,8 +97,8 @@ void Controller::addWindow(std::shared_ptr<Widget> Wdw,
   }
 }
 
-void Controller::setMenuUI() {
-  WdwContainer.addWindow<MenuController>(*this);
+void Controller::setMenuUI(Level &Lvl) {
+  WdwContainer.addWindow<MenuController>(*this, Lvl);
 }
 
 bool Controller::hasMenuUI() const {
@@ -106,6 +107,20 @@ bool Controller::hasMenuUI() const {
 
 void Controller::closeMenuUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<MenuController>());
+}
+
+void Controller::setCommandLineUI(Level &Lvl) {
+  WdwContainer.addWindow<CommandLineController>(*this, Lvl);
+  WdwContainer.getWindowOfType<CommandLineController>()->setEventHub(Hub);
+}
+
+bool Controller::hasCommandLineUI() const {
+  return WdwContainer.hasWindowOfType<CommandLineController>();
+}
+
+void Controller::closeCommandLineUI() {
+  WdwContainer.closeWindow(
+      WdwContainer.getWindowOfType<CommandLineController>());
 }
 
 void Controller::setEquipmentUI(entt::entity Entity, entt::registry &Reg) {

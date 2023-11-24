@@ -14,6 +14,7 @@
 #include <rogue/GameConfig.h>
 #include <rogue/InventoryHandler.h>
 #include <rogue/Renderer.h>
+#include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/TargetUI.h>
 
@@ -153,6 +154,10 @@ void Game::switchLevel(int Level, bool ToEntry) {
 }
 
 bool Game::handleInput(int Char) {
+  if (UICtrl.hasCommandLineUI()) {
+    UICtrl.getWindowOfType<ui::CommandLineController>()->handleInput(Char);
+    return true;
+  }
   Char = ui::Controls::getRemappedChar(Char);
 
   movePlayer(ymir::Dir2d::NONE);
@@ -214,32 +219,25 @@ bool Game::handleInput(int Char) {
       auto SrcEt = getPlayer();
       const auto &PC = getLvlReg().get<PositionComp>(getPlayer());
       // No range, allow investigate entire level
-      UICtrl.setTargetUI(PC, {}, Lvl,
-                         [&Lvl, SrcEt](auto TgEt, auto TPos) {
-                           CombatActionComp CC;
-                           CC.Target = TgEt;
-                           CC.RangedPos = TPos;
-                           Lvl.Reg.template emplace<CombatActionComp>(SrcEt,
-                                                                      CC);
-                         });
+      UICtrl.setTargetUI(PC, {}, Lvl, [&Lvl, SrcEt](auto TgEt, auto TPos) {
+        CombatActionComp CC;
+        CC.Target = TgEt;
+        CC.RangedPos = TPos;
+        Lvl.Reg.template emplace<CombatActionComp>(SrcEt, CC);
+      });
     }
     return true;
   }
   case ui::Controls::CloseWindow.Char: {
     if (!UICtrl.isUIActive()) {
-      UICtrl.setMenuUI();
+      UICtrl.setMenuUI(World->getCurrentLevelOrFail());
+      return true;
+    } else if (UICtrl.hasMenuUI()) {
+      UICtrl.closeMenuUI();
       return true;
     }
     break;
   }
-  case 'l':
-    switchLevel(World->getCurrentLevelIdx() + 1, true);
-    break;
-  case 'k':
-    World->getCurrentLevel()->revealMap();
-    break;
-
-  // TODO show controls
   default:
     break;
   }
@@ -366,7 +364,7 @@ bool Game::tryInteract() {
   UICtrl.closeInteractUI();
   UICtrl.setInteractUI(getPlayer(), getLvlReg().get<PositionComp>(getPlayer()),
                        World->getCurrentLevelOrFail());
-  
+
   return true;
 }
 

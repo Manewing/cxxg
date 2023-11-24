@@ -13,42 +13,39 @@ static constexpr cxxg::types::Size DefaultSize = {60, 20};
 struct MenuItemInfo {
   cxxg::types::Position Offset = {0, 0};
   const char *Text = "<unimp. text>";
+  bool Debug = false;
 };
-static constexpr std::array<MenuItemInfo, 2> MenuItemInfos = {{
-    {{(DefaultSize.X - 6) / 2, 2}, "Resume"},
-    {{(DefaultSize.X - 8) / 2, 4}, "Controls"},
+static constexpr std::array<MenuItemInfo, 3> MenuItemInfos = {{
+    {{(DefaultSize.X - 6) / 2, 2}, "Resume", false},
+    {{(DefaultSize.X - 8) / 2, 4}, "Controls", false},
+    {{(DefaultSize.X - 12) / 2, 6}, "Command Line", true},
 }};
 
 static constexpr std::array<const rogue::ui::KeyOption *, 6> GameCtrlInfos = {
-    &rogue::ui::Controls::MoveUp,
-    &rogue::ui::Controls::MoveDown,
-    &rogue::ui::Controls::MoveLeft,
-    &rogue::ui::Controls::MoveRight,
-    &rogue::ui::Controls::Interact,
-    &rogue::ui::Controls::Rest,
+    &rogue::ui::Controls::MoveUp,   &rogue::ui::Controls::MoveDown,
+    &rogue::ui::Controls::MoveLeft, &rogue::ui::Controls::MoveRight,
+    &rogue::ui::Controls::Interact, &rogue::ui::Controls::Rest,
 };
 
-
 static constexpr std::array<const rogue::ui::KeyOption *, 10> UICtrlInfos = {
-    &rogue::ui::Controls::InventoryUI,
-    &rogue::ui::Controls::CharacterUI,
-    &rogue::ui::Controls::EquipmentUI,
-    &rogue::ui::Controls::HistoryUI,
-    &rogue::ui::Controls::BuffsUI,
-    &rogue::ui::Controls::TargetUI,
-    &rogue::ui::Controls::MoveWindow,
-    &rogue::ui::Controls::NextWindow,
-    &rogue::ui::Controls::PrevWindow,
-    &rogue::ui::Controls::CloseWindow,
+    &rogue::ui::Controls::InventoryUI, &rogue::ui::Controls::CharacterUI,
+    &rogue::ui::Controls::EquipmentUI, &rogue::ui::Controls::HistoryUI,
+    &rogue::ui::Controls::BuffsUI,     &rogue::ui::Controls::TargetUI,
+    &rogue::ui::Controls::MoveWindow,  &rogue::ui::Controls::NextWindow,
+    &rogue::ui::Controls::PrevWindow,  &rogue::ui::Controls::CloseWindow,
 };
 
 namespace rogue::ui {
 
-MenuController::MenuController(Controller &C)
-    : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Ctrl(C) {
+MenuController::MenuController(Controller &C, Level &L)
+    : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Ctrl(C), Lvl(L) {
   MenuItSel = std::make_shared<ItemSelect>(Pos);
 
+  const bool Debug = getenv("ROGUE_DEBUG") != nullptr;
   for (const auto &SI : MenuItemInfos) {
+    if (SI.Debug && !Debug) {
+      continue;
+    }
     MenuItSel->addSelect<Select>(SI.Text, SI.Offset, 8);
   }
 
@@ -71,6 +68,8 @@ MenuController::MenuController(Controller &C)
       Ctrl.closeMenuUI();
     } else if (S.getValue() == "Controls") {
       static_cast<Frame *>(Comp.get())->setComp(CtrlTB);
+    } else if (S.getValue() == "Command Line") {
+      Ctrl.setCommandLineUI(Lvl);
     }
   });
 }

@@ -5,6 +5,10 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/UI/Decorator.h>
 
+namespace rogue {
+class Level;
+} // namespace rogue
+
 namespace rogue::ui {
 class Controller;
 class ItemSelect;
@@ -16,13 +20,14 @@ namespace rogue::ui {
 class MenuController : public BaseRectDecorator {
 public:
   MenuController() = delete;
-  MenuController(Controller &Ctrl);
+  MenuController(Controller &Ctrl, Level &Lvl);
   bool handleInput(int Char) final;
   std::string getInteractMsg() const final;
   void draw(cxxg::Screen &Scr) const final;
 
 protected:
   Controller &Ctrl;
+  Level &Lvl;
   std::shared_ptr<ItemSelect> MenuItSel;
   std::shared_ptr<TextBox> CtrlTB;
 };

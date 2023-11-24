@@ -12,6 +12,7 @@ struct KeyOption {
   std::string_view Help = "<help-missing>";
   std::string_view Desc = "<description-missing>";
 
+  static const char *getCharStr(int Char);
   static std::string getInteractMsg(const std::vector<KeyOption> &Options);
   inline std::string getInteractMsg() const { return getInteractMsg({*this}); }
 };

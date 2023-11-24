@@ -195,6 +195,8 @@ DesignedMapLevelGenerator::createNewLevel(int LevelId) const {
   return NewLevel;
 }
 
+bool GeneratedMapLevelGenerator::DebugRooms = false;
+
 GeneratedMapLevelGenerator::GeneratedMapLevelGenerator(const GameContext &Ctx,
                                                        const Config &Cfg)
     : LevelGenerator(Ctx), Cfg(Cfg) {}
@@ -255,7 +257,6 @@ GeneratedMapLevelGenerator::createNewLevel(int LevelId) const {
   Pass.init(Ctx);
   try {
     Pass.run(Ctx);
-    constexpr bool DebugRooms = false;
     if (DebugRooms) {
       auto &M = NewLevel->Map.get(Level::LayerWallsDecoIdx);
       Tile DbgTile{{'0', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
