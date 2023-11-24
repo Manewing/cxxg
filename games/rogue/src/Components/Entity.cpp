@@ -85,6 +85,7 @@ void createWorldEntry(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, "Dungeon entrance");
   Reg.emplace<InteractableComp>(
       Entity,
       Interaction{
@@ -101,6 +102,7 @@ void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, IsExit ? "Exit" : "Entry");
   Reg.emplace<InteractableComp>(
       Entity,
       Interaction{IsExit ? "Previous Level" : "Next level",
@@ -143,6 +145,7 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, "Chest");
 
   // Copy inventory
   auto &IC = Reg.emplace<InventoryComp>(Entity);
@@ -167,6 +170,7 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, DropTile, -1);
+  Reg.emplace<NameComp>(Entity, "Drop");
 
   // Copy inventory
   auto &IC = Reg.emplace<InventoryComp>(Entity);
@@ -186,6 +190,7 @@ void createHealerEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, "Healer");
 
   Reg.emplace<InteractableComp>(
       Entity, Interaction{"Heal", [](auto &EHC, auto Et, auto &Reg) {
@@ -203,6 +208,7 @@ void createShopEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T) {
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, "Shop");
 
   Reg.emplace<InteractableComp>(
       Entity, Interaction{"Shop", [](auto &EHC, auto Et, auto &Reg) {
@@ -222,6 +228,7 @@ void createWorkbenchEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, "Workbench");
 
   Reg.emplace<InteractableComp>(
       Entity, Interaction{"Workbench", [](auto &EHC, auto Et, auto &Reg) {
@@ -294,6 +301,7 @@ void createDoorEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   auto &TC = Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<NameComp>(Entity, "Door");
 
   auto &DC = Reg.emplace<DoorComp>(Entity);
   DC.IsOpen = IsOpen;
