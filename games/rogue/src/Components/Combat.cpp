@@ -54,6 +54,7 @@ void createProjectile(entt::registry &Reg, const DamageComp &DC,
   Reg.emplace<PositionComp>(E, Pos);
   Reg.emplace<AgilityComp>(E, Agility);
   Reg.emplace<TileComp>(E, ProjectileTile);
+  Reg.emplace<NameComp>(E, "Projectile");
   VectorMovementComp VMC;
   VMC.Flying = true;
   VMC.KillOnWall = true;
