@@ -3,7 +3,7 @@
 	"creature_db_config": "creature_db.json",
 	"level_db_config": "level_db.json",
 	"initial_game_world": "multi_level_dungeon",
-	"initial_level_config": "levels/sewers.json",
+	"initial_level_config": "levels/initial_level.json",
 	"initial_items": [
 		{
 			"name": "Small Sword",
@@ -19,6 +19,10 @@
 		},
 		{
 			"name": "Venomous Fang",
+			"count": 10
+		},
+		{
+			"name": "Scroll of mind vision",
 			"count": 10
 		},
 		{
