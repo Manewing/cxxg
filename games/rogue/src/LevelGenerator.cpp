@@ -232,12 +232,13 @@ void registerBuilders(ymir::Dungeon::BuilderPass &Pass) {
   Pass.registerBuilder<ymir::Dungeon::FilterPlacer<T, U, RE>>();
 }
 
-} // namespace
-
 std::shared_ptr<Level>
-GeneratedMapLevelGenerator::createNewLevel(int LevelId) const {
-  auto DngCfg = loadConfigurationFile(Cfg.MapConfig);
-  DngCfg["dungeon/seed"] = Cfg.Seed + LevelId;
+createNewLevelWithGenerator(const std::filesystem::path &MapConfig,
+                            unsigned Seed, int LevelId, bool DebugRooms,
+                            unsigned Retries = 0) {
+  auto DngCfg = loadConfigurationFile(MapConfig);
+  Seed = (Seed + LevelId) ^ (Retries << 16);
+  DngCfg["dungeon/seed"] = Seed;
 
   // Create new builder pass and register builders at it
   ymir::Dungeon::BuilderPass Pass;
@@ -278,12 +279,26 @@ GeneratedMapLevelGenerator::createNewLevel(int LevelId) const {
       Tile = RenderedLevelMap.getTile(Pos).T;
     });
     std::cerr << "std::exception: " << E.what() << std::endl
-              << "Seed was: " << Cfg.Seed << std::endl
-              << Map << "\033[2J" << std::endl;
-    throw E;
+              << "Seed was: " << Seed << std::endl
+              << "LevelId was: " << LevelId << std::endl
+              << "Config was: " << MapConfig << std::endl
+              << "Retries: " << Retries << std::endl
+              << "Map: " << Map << "\033[2J" << std::endl;
+    if (Retries > 10) {
+      throw E;
+    }
+    return createNewLevelWithGenerator(MapConfig, Seed, LevelId, DebugRooms,
+                                       Retries + 1);
   }
-
   return NewLevel;
+}
+
+} // namespace
+
+std::shared_ptr<Level>
+GeneratedMapLevelGenerator::createNewLevel(int LevelId) const {
+  return createNewLevelWithGenerator(Cfg.MapConfig, Cfg.Seed, LevelId,
+                                     DebugRooms);
 }
 
 CompositeMultiLevelGenerator::CompositeMultiLevelGenerator(
