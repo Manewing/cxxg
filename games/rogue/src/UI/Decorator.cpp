@@ -1,6 +1,7 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 #include <rogue/UI/Decorator.h>
+#include <rogue/UI/Controls.h>
 
 namespace rogue::ui {
 
@@ -48,19 +49,19 @@ MoveDecorator::MoveDecorator(const std::shared_ptr<Widget> &Comp)
 
 bool MoveDecorator::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
     handleExit();
     break;
-  case cxxg::utils::KEY_LEFT:
+  case Controls::MoveLeft.Char:
     setPos(Pos + cxxg::types::Position{-1, 0});
     break;
-  case cxxg::utils::KEY_RIGHT:
+  case Controls::MoveRight.Char:
     setPos(Pos + cxxg::types::Position{1, 0});
     break;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     setPos(Pos + cxxg::types::Position{0, -1});
     break;
-  case cxxg::utils::KEY_DOWN:
+  case Controls::MoveDown.Char:
     setPos(Pos + cxxg::types::Position{0, 1});
     break;
   default:

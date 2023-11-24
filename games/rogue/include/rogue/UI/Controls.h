@@ -1,6 +1,7 @@
 #ifndef ROGUE_UI_CONTROLS_H
 #define ROGUE_UI_CONTROLS_H
 
+#include <cxxg/Utils.h>
 #include <string>
 #include <vector>
 
@@ -12,6 +13,7 @@ struct KeyOption {
   std::string_view Desc = "<description-missing>";
 
   static std::string getInteractMsg(const std::vector<KeyOption> &Options);
+  inline std::string getInteractMsg() const { return getInteractMsg({*this}); }
 };
 
 struct Controls {
@@ -29,16 +31,23 @@ struct Controls {
   static constexpr KeyOption NextWindow = {'C', "Next", "Select next window"};
   static constexpr KeyOption PrevWindow = {'V', "Prev", "Select prev window"};
   static constexpr KeyOption AutoLayout = {'X', "Auto", "Auto layout windows"};
+  static constexpr KeyOption CloseWindow = {cxxg::utils::KEY_ESC, "Close",
+                                            "Close the window"};
 
   // Game controls
-  static constexpr KeyOption MoveUp = {'w', "Move up", "Move up"};
-  static constexpr KeyOption MoveDown = {'s', "Move down", "Move down"};
-  static constexpr KeyOption MoveLeft = {'a', "Move left", "Move left"};
-  static constexpr KeyOption MoveRight = {'d', "Move right", "Move right"};
+  static constexpr KeyOption MoveUp = {cxxg::utils::KEY_UP, "Move", "Move up"};
+  static constexpr KeyOption MoveDown = {cxxg::utils::KEY_DOWN, "",
+                                         "Move down"};
+  static constexpr KeyOption MoveLeft = {cxxg::utils::KEY_LEFT, "",
+                                         "Move left"};
+  static constexpr KeyOption MoveRight = {cxxg::utils::KEY_RIGHT, "",
+                                          "Move right"};
+  static constexpr KeyOption Interact = {'e', "Interact", "Interact"};
+  static constexpr KeyOption Rest = {' ', "Rest", "Rest"};
 
   // Inventory controls
   static constexpr KeyOption Info = {'q', "Info", "Show info about the item"};
-  static constexpr KeyOption Navigate = {'^', "Navigate", "Navigate the menu"};
+  static constexpr KeyOption Navigate = {'^', "Nav.", "Navigate up/down"};
   static constexpr KeyOption Take = {'e', "Take", "Take the item"};
   static constexpr KeyOption SpendPoint = {'e', "Spend", "Spend a point"};
   static constexpr KeyOption Equip = {'e', "Equip", "Equip the selected item"};
@@ -53,10 +62,8 @@ struct Controls {
   static constexpr KeyOption Craft = {'x', "Craft",
                                       "Use the item for crafting"};
 
-
   static int getRemappedChar(int Char);
 };
-
 
 } // namespace rogue::ui
 

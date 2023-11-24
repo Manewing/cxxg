@@ -3,6 +3,7 @@
 #include <rogue/Components/Visual.h>
 #include <rogue/Level.h>
 #include <rogue/UI/Controller.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/Interact.h>
 #include <rogue/UI/ListSelect.h>
@@ -22,7 +23,7 @@ Interact::Interact(entt::entity SrcEt, ymir::Point2d<int> StartPos, Level &Lvl)
 bool Interact::handleInput(int Char) {
   bool KeepWindow = true;
   switch (Char) {
-  case 'e':
+  case Controls::Interact.Char:
     destroyCursor();
     handleInteraction();
     return false;
@@ -37,7 +38,9 @@ bool Interact::handleInput(int Char) {
   return KeepWindow;
 }
 
-std::string Interact::getInteractMsg() const { return "[e] Interact"; }
+std::string Interact::getInteractMsg() const {
+  return Controls::Interact.getInteractMsg();
+}
 
 void Interact::draw(cxxg::Screen &Scr) const { BaseRectDecorator::draw(Scr); }
 

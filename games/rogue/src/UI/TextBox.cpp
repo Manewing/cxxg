@@ -1,5 +1,6 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/TextBox.h>
 
 namespace rogue::ui {
@@ -14,15 +15,15 @@ void TextBox::setText(const std::string &Text) {
 
 bool TextBox::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
     return false;
-  case cxxg::utils::KEY_DOWN: {
+  case Controls::MoveDown.Char: {
     const auto NumRows = Size.Y - Padding.Y * 2;
     if (Wrap.getNumLines() >= NumRows && ScrollIdx < Wrap.getNumLines() - 1) {
       ScrollIdx++;
     }
   } break;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     if (ScrollIdx > 0) {
       ScrollIdx--;
     }
@@ -33,7 +34,9 @@ bool TextBox::handleInput(int Char) {
   return true;
 }
 
-std::string TextBox::getInteractMsg() const { return ""; }
+std::string TextBox::getInteractMsg() const {
+  return Controls::Navigate.getInteractMsg();
+}
 
 void TextBox::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);

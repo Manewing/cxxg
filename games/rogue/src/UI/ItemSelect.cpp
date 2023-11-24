@@ -1,5 +1,6 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/ItemSelect.h>
 
 namespace rogue::ui {
@@ -126,15 +127,15 @@ void ItemSelect::setPos(cxxg::types::Position P) {
 
 bool ItemSelect::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
     return false;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     selectPrev();
     break;
-  case cxxg::utils::KEY_DOWN:
+  case Controls::MoveDown.Char:
     selectNext();
     break;
-  case cxxg::utils::KEY_ENTER:
+  case Controls::Interact.Char:
     handleSelect();
     break;
   default:
@@ -143,7 +144,9 @@ bool ItemSelect::handleInput(int Char) {
   return true;
 }
 
-std::string ItemSelect::getInteractMsg() const { return "[^v] Nav."; }
+std::string ItemSelect::getInteractMsg() const {
+  return Controls::Navigate.getInteractMsg();
+}
 
 void ItemSelect::draw(cxxg::Screen &Scr) const {
   for (const auto &S : Selects) {

@@ -2,9 +2,9 @@
 #include <iomanip>
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
-#include <rogue/Components/LOS.h>
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
 #include <rogue/Level.h>
@@ -57,7 +57,8 @@ bool InventoryControllerBase::handleInput(int Char) {
     Ctrl.addWindow(
         std::make_shared<ItemTooltip>(Pos + TooltipOffset, TooltipSize, It));
   } break;
-  case 'i':
+  case Controls::CloseWindow.Char:
+  case Controls::InventoryUI.Char:
     return false;
   default:
     return List->handleInput(Char);
@@ -122,8 +123,8 @@ bool InventoryController::handleInput(int Char) {
                        });
       return false;
     }
-    if ((Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Adjacent) !=
-        CapabilityFlags::None) { 
+    if ((Inv.getItem(ItemIdx).getCapabilityFlags() &
+         CapabilityFlags::Adjacent) != CapabilityFlags::None) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
       Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
                        [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
@@ -181,12 +182,13 @@ std::string InventoryController::getInteractMsg() const {
 }
 
 LootController::LootController(Controller &Ctrl, Inventory &Inv,
-                               entt::entity Entity, Level &Lvl, const std::string &Header)
+                               entt::entity Entity, Level &Lvl,
+                               const std::string &Header)
     : InventoryControllerBase(Ctrl, Inv, Entity, Lvl, Header) {}
 
 bool LootController::handleInput(int Char) {
   switch (Char) {
-  case 'e': {
+  case Controls::Take.Char: {
     if (Inv.empty()) {
       break;
     }

@@ -3,6 +3,7 @@
 #include <rogue/History.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/History.h>
+#include <rogue/UI/Controls.h>
 
 namespace rogue::ui {
 
@@ -18,18 +19,18 @@ HistoryController::HistoryController(cxxg::types::Position Pos,
 
 bool HistoryController::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_DOWN:
+  case Controls::MoveDown.Char:
     if (!Hist.getMessages().empty() && Offset < Hist.getMessages().size() - 2) {
       Offset++;
     }
     break;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     if (Offset > 0) {
       Offset--;
     }
     break;
-  case cxxg::utils::KEY_ESC:
-  case 'h':
+  case Controls::CloseWindow.Char:
+  case Controls::HistoryUI.Char:
     return false;
   default:
     break;
@@ -38,7 +39,7 @@ bool HistoryController::handleInput(int Char) {
 }
 
 std::string HistoryController::getInteractMsg() const {
-  return "[^/v] Navigate";
+  return Controls::Navigate.getInteractMsg();
 }
 
 void HistoryController::draw(cxxg::Screen &Scr) const {

@@ -1,5 +1,6 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/ListSelect.h>
 
 namespace rogue::ui {
@@ -30,12 +31,12 @@ void ListSelect::selectPrev() {
 
 bool ListSelect::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
     return false;
-  case cxxg::utils::KEY_DOWN:
+  case Controls::MoveDown.Char:
     selectNext();
     break;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     selectPrev();
     break;
   default:
@@ -44,7 +45,9 @@ bool ListSelect::handleInput(int Char) {
   return true;
 }
 
-std::string ListSelect::getInteractMsg() const { return ""; }
+std::string ListSelect::getInteractMsg() const {
+  return Controls::Navigate.getInteractMsg();
+}
 
 void ListSelect::draw(cxxg::Screen &Scr) const {
   // Fill rect

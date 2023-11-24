@@ -247,27 +247,23 @@ bool Game::handleInput(int Char) {
   // FIXME add user input to context and process input in player system
   // FIXME play move and attack needs to be handled in update
   switch (Char) {
-  case 'a':
-  case cxxg::utils::KEY_LEFT:
+  case ui::Controls::MoveLeft.Char:
     movePlayer(ymir::Dir2d::LEFT);
     break;
-  case 'd':
-  case cxxg::utils::KEY_RIGHT:
+  case ui::Controls::MoveRight.Char:
     movePlayer(ymir::Dir2d::RIGHT);
     break;
-  case 's':
-  case cxxg::utils::KEY_DOWN:
+  case ui::Controls::MoveDown.Char:
     movePlayer(ymir::Dir2d::DOWN);
     break;
-  case 'w':
-  case cxxg::utils::KEY_UP:
+  case ui::Controls::MoveUp.Char:
     movePlayer(ymir::Dir2d::UP);
     break;
-  case cxxg::utils::KEY_SPACE:
+  case ui::Controls::Rest.Char:
     // Wait a turn
     Hist.info() << "Resting...";
     break;
-  case 'e':
+  case ui::Controls::Interact.Char:
     if (tryInteract()) {
       break;
     }

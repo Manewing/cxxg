@@ -95,11 +95,10 @@ bool TargetUI::handleInput(int Char) {
   // Move cursor upon input
   auto &TargetPos = Lvl.Reg.get<PositionComp>(CursorEt).Pos;
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
     destroyCursor();
     return false;
   case Controls::MoveDown.Char:
-  case cxxg::utils::KEY_DOWN:
     if (!Range ||
         static_cast<unsigned>(
             (TargetPos - StartPos + ymir::Point2d<int>{0, 1}).length()) <
@@ -108,7 +107,6 @@ bool TargetUI::handleInput(int Char) {
     }
     break;
   case Controls::MoveUp.Char:
-  case cxxg::utils::KEY_UP:
     if (!Range ||
         static_cast<unsigned>(
             (TargetPos - StartPos + ymir::Point2d<int>{0, -1}).length()) <
@@ -117,7 +115,6 @@ bool TargetUI::handleInput(int Char) {
     }
     break;
   case Controls::MoveLeft.Char:
-  case cxxg::utils::KEY_LEFT:
     if (!Range ||
         static_cast<unsigned>(
             (TargetPos - StartPos + ymir::Point2d<int>{-1, 0}).length()) <
@@ -126,7 +123,6 @@ bool TargetUI::handleInput(int Char) {
     }
     break;
   case Controls::MoveRight.Char:
-  case cxxg::utils::KEY_RIGHT:
     if (!Range ||
         static_cast<unsigned>(
             (TargetPos - StartPos + ymir::Point2d<int>{1, 0}).length()) <
@@ -139,7 +135,7 @@ bool TargetUI::handleInput(int Char) {
       showInfoForTarget(TargetEt);
     }
     break;
-  case ' ': {
+  case Controls::Rest.Char: {
     SelectCb(TargetEt, TargetPos);
     destroyCursor();
     return false;

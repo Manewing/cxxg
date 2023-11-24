@@ -51,7 +51,7 @@ bool SelectBox::handleInput(int Char) {
   return ItSel->handleInput(Char);
 }
 
-std::string SelectBox::getInteractMsg() const { return "FIXME"; }
+std::string SelectBox::getInteractMsg() const { return ItSel->getInteractMsg(); }
 
 void SelectBox::draw(cxxg::Screen &Scr) const { Decorated->draw(Scr); }
 

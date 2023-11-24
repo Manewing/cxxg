@@ -32,9 +32,8 @@ EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
 
 bool EquipmentController::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
-    return false;
-  case 'o':
+  case Controls::CloseWindow.Char:
+  case Controls::EquipmentUI.Char:
     return false;
   case Controls::Info.Char: {
     auto SelIdx = ItSel->getSelectedIdx();
