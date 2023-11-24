@@ -118,6 +118,26 @@ void createLevelEntryExit(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<VisibleComp>(Entity);
 }
 
+namespace {
+
+void handleLootChest(entt::registry &Reg, const entt::entity &Entity,
+                     const entt::entity &ActEt, EventHubConnector &EHC) {
+  auto &TC = Reg.template get<TileComp>(Entity);
+  auto &IC = Reg.template get<InventoryComp>(Entity);
+  if (!IC.Looted) {
+    if (auto *Rgb = std::get_if<cxxg::types::RgbColor>(&TC.T.color())) {
+      Rgb->R *= 0.5;
+      Rgb->G *= 0.5;
+      Rgb->B *= 0.5;
+    }
+    IC.Looted = true;
+  }
+
+  EHC.publish(LootEvent{{}, "Chest", ActEt, Entity, &Reg});
+}
+
+} // namespace
+
 void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
                        const Inventory &I) {
   auto Entity = Reg.create();
@@ -125,13 +145,15 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<TileComp>(Entity, T);
 
   // Copy inventory
-  auto &Inv = Reg.emplace<InventoryComp>(Entity).Inv;
-  Inv = I;
+  auto &IC = Reg.emplace<InventoryComp>(Entity);
+  IC.Inv = I;
+  IC.IsPersistent = true;
+  IC.Looted = false; // FIXME allow to control this from arguments
 
   Reg.emplace<InteractableComp>(
       Entity,
       Interaction{"Open Chest", [Entity](auto &EHC, auto Et, auto &Reg) {
-                    EHC.publish(LootEvent{{}, "Chest", Et, Entity, &Reg});
+                    handleLootChest(Reg, Entity, Et, EHC);
                   }});
 
   Reg.emplace<CollisionComp>(Entity);
@@ -282,7 +304,8 @@ void createDoorEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<InteractableComp>(
       Entity,
       Interaction{
-          InteractMsg, [Entity, &DC](auto &EHC, auto Et, auto &Reg) {
+          InteractMsg, [Entity](auto &EHC, auto Et, auto &Reg) {
+            auto &DC = Reg.template get<DoorComp>(Entity);
             if (DC.isLocked()) {
               if (unlockDoor(Reg, Entity, Et)) {
                 EHC.publish(PlayerInfoMessageEvent() << "You unlock the door.");
