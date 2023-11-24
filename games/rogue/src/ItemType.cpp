@@ -93,7 +93,7 @@ std::string getItemTypeLabel(ItemType It) {
 
 CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr) {
   if (CapabilityFlagStr == "use_on") {
-    return CapabilityFlags::UseOn;
+    return CapabilityFlags::UseOn | CapabilityFlags::Self;
   }
   if (CapabilityFlagStr == "equipment") {
     return CapabilityFlags::Equipment;
@@ -121,6 +121,15 @@ CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr) {
 }
 
 const char *getCapabilityFlagLabel(CapabilityFlags Flags) {
+  if ((CapabilityFlags::UseOn | CapabilityFlags::Self) == Flags) {
+    return "Use";
+  }
+  if ((CapabilityFlags::UseOn | CapabilityFlags::Ranged)== Flags) {
+    return "Ranged use";
+  }
+  if ((CapabilityFlags::UseOn | CapabilityFlags::Adjacent)== Flags) {
+    return "Adjacent use";
+  }
   switch (Flags) {
   case CapabilityFlags::None:
     return "None";
@@ -136,6 +145,8 @@ const char *getCapabilityFlagLabel(CapabilityFlags Flags) {
     return "Dismantle";
   case CapabilityFlags::Ranged:
     return "Ranged";
+  case CapabilityFlags::Adjacent:
+    return "Adjacent";
   default:
     break;
   }

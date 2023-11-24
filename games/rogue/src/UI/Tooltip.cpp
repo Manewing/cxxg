@@ -65,7 +65,7 @@ std::string getCapabilityDescription(const std::vector<EffectInfo> &AllEffects,
   SS << getCapabilityFlagLabel(Flag) << ":\n";
   bool HasAny = false;
   for (const auto &EffInfo : AllEffects) {
-    if ((EffInfo.Flags & Flag) == CapabilityFlags::None) {
+    if ((EffInfo.Flags & Flag) != Flag) {
       continue;
     }
     HasAny = true;
@@ -81,8 +81,13 @@ std::string getCapabilityDescription(const std::vector<EffectInfo> &AllEffects,
 std::string getItemEffectDescription(const Item &It) {
   std::stringstream SS;
   const auto AllEffects = It.getAllEffects();
-  SS << getCapabilityDescription(AllEffects, CapabilityFlags::UseOn)
-     << getCapabilityDescription(AllEffects, CapabilityFlags::Equipment);
+  SS << getCapabilityDescription(
+            AllEffects, (CapabilityFlags::Self | CapabilityFlags::UseOn))
+     << getCapabilityDescription(
+            AllEffects, (CapabilityFlags::Ranged | CapabilityFlags::UseOn))
+     << getCapabilityDescription(
+            AllEffects, (CapabilityFlags::Adjacent | CapabilityFlags::UseOn))
+     << getCapabilityDescription(AllEffects, CapabilityFlags::EquipOn);
   return SS.str();
 }
 

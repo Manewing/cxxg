@@ -55,6 +55,9 @@ enum class CapabilityFlags {
   // Adjacent, indicates that the item can be used from an adjacent tile on an
   // entity different than the entity using the item
   Adjacent = 0x20,
+
+  // Self, indicates that the item can be used on the entity using the item
+  Self = 0x40,
 };
 
 CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr);
