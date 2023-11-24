@@ -102,7 +102,8 @@ TEST_F(LevelGeneratorTest, DesignedMapLevelGeneratorSimpleMapWithEntities) {
                           {
                               {'C', {"loot_tb"}},
                           },
-                      .Dungeons = {}};
+                      .Dungeons = {},
+                      .LockedDoors = {}};
 
   ItemDb.addLootTable("loot_tb");
   CreatureDb.addCreature(rogue::CreatureInfo{.Name = "dummy_s"});
