@@ -211,8 +211,8 @@ bool Game::handleInput(int Char) {
       auto &Lvl = World->getCurrentLevelOrFail();
       auto SrcEt = getPlayer();
       const auto &PC = getLvlReg().get<PositionComp>(getPlayer());
-      const auto &LC = getLvlReg().get<LineOfSightComp>(getPlayer());
-      UICtrl.setTargetUI(PC, LC.LOSRange, Lvl,
+      // No range, allow investigate entire level
+      UICtrl.setTargetUI(PC, {}, Lvl,
                          [&Lvl, SrcEt](auto TgEt, auto TPos) {
                            CombatActionComp CC;
                            CC.Target = TgEt;
