@@ -1,3 +1,4 @@
+#include <cxxg/Utils.h>
 #include <rogue/UI/Controls.h>
 #include <sstream>
 
@@ -19,6 +20,18 @@ std::string KeyOption::getInteractMsg(const std::vector<KeyOption> &Options) {
     Pred = "/";
   }
   return SS.str();
+}
+
+int Controls::getRemappedChar(int Char) {
+  switch (Char) {
+  case cxxg::utils::KEY_ENTER:
+    return 'e';
+  case cxxg::utils::KEY_TAB:
+    return Controls::NextWindow.Char;
+  default:
+    break;
+  }
+  return Char;
 }
 
 } // namespace rogue::ui

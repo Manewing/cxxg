@@ -24,6 +24,12 @@ struct Controls {
   static constexpr KeyOption TargetUI = {'t', "Target",
                                          "Target object for info/attack"};
 
+  // Window controls
+  static constexpr KeyOption MoveWindow = {'m', "Move", "Move the window"};
+  static constexpr KeyOption NextWindow = {'C', "Next", "Select next window"};
+  static constexpr KeyOption PrevWindow = {'V', "Prev", "Select prev window"};
+  static constexpr KeyOption AutoLayout = {'X', "Auto", "Auto layout windows"};
+
   // Game controls
   static constexpr KeyOption MoveUp = {'w', "Move up", "Move up"};
   static constexpr KeyOption MoveDown = {'s', "Move down", "Move down"};
@@ -46,7 +52,11 @@ struct Controls {
       'u', "Use", "Use the selected item, only works for consumables."};
   static constexpr KeyOption Craft = {'x', "Craft",
                                       "Use the item for crafting"};
+
+
+  static int getRemappedChar(int Char);
 };
+
 
 } // namespace rogue::ui
 

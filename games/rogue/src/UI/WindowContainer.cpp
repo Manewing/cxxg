@@ -5,6 +5,7 @@
 #include <rogue/UI/WindowContainer.h>
 #include <variant>
 #include <ymir/Types.hpp>
+#include <rogue/UI/Controls.h>
 
 namespace rogue::ui {
 
@@ -35,20 +36,20 @@ WindowContainer::WindowContainer(cxxg::types::Position Pos,
 
 bool WindowContainer::handleInput(int Char) {
   switch (Char) {
-  case KEY_MOVE:
+  case Controls::MoveWindow.Char:
     switchMoveActiveWindow(!MoveDeco);
     break;
-  case KEY_NEXT_WINDOW: {
+  case Controls::NextWindow.Char: {
     bool WasMoving = exitMoveActiveWindow();
     selectNextWindow();
     switchMoveActiveWindow(WasMoving);
   } break;
-  case KEY_PREV_WINDOW: {
+  case Controls::PrevWindow.Char: {
     bool WasMoving = exitMoveActiveWindow();
     selectPrevWindow();
     switchMoveActiveWindow(WasMoving);
   } break;
-  case KEY_AUTO_LAYOUT:
+  case Controls::AutoLayout.Char:
     autoLayoutWindows();
     break;
   default:

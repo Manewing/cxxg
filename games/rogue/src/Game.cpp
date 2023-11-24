@@ -153,6 +153,8 @@ void Game::switchLevel(int Level, bool ToEntry) {
 }
 
 bool Game::handleInput(int Char) {
+  Char = ui::Controls::getRemappedChar(Char);
+
   movePlayer(ymir::Dir2d::NONE);
 
   // Override keys

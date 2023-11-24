@@ -21,11 +21,6 @@ public:
   };
 
 public:
-  static constexpr int KEY_MOVE = 'm';
-  static constexpr int KEY_NEXT_WINDOW = 'C';
-  static constexpr int KEY_PREV_WINDOW = 'V';
-  static constexpr int KEY_AUTO_LAYOUT = 'X';
-
   static constexpr auto ActiveColor = cxxg::types::RgbColor{90, 130, 175};
 
 public:
