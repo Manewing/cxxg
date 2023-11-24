@@ -135,7 +135,7 @@ bool TargetUI::handleInput(int Char) {
       showInfoForTarget(TargetEt);
     }
     break;
-  case Controls::Rest.Char: {
+  case Controls::SelectTarget.Char: {
     SelectCb(TargetEt, TargetPos);
     destroyCursor();
     return false;
@@ -151,7 +151,8 @@ bool TargetUI::handleInput(int Char) {
 
 std::string TargetUI::getInteractMsg() const {
   std::vector<KeyOption> Options = {Controls::MoveUp, Controls::MoveDown,
-                                    Controls::MoveLeft, Controls::MoveRight};
+                                    Controls::MoveLeft, Controls::MoveRight,
+                                    Controls::SelectTarget};
   if (TargetEt != entt::null) {
     Options.push_back(Controls::Info);
   }
