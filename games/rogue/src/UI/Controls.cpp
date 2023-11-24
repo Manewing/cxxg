@@ -65,6 +65,8 @@ int Controls::getRemappedChar(int Char) {
   switch (Char) {
   case cxxg::utils::KEY_ENTER:
     return 'e';
+  case 'C':
+    return Controls::NextWindow.Char;
   default:
     break;
   }

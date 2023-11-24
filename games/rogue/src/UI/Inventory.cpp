@@ -54,8 +54,17 @@ bool InventoryControllerBase::handleInput(int Char) {
   switch (Char) {
   case Controls::Info.Char: {
     const auto &It = Inv.getItem(List->getSelectedElement());
-    Ctrl.addWindow(
-        std::make_shared<ItemTooltip>(Pos + TooltipOffset, TooltipSize, It));
+    Ctrl.addWindow(std::make_shared<ItemTooltip>(
+        Pos + TooltipOffset, TooltipSize, It, /*Equipped=*/false));
+
+    // If the item is equipped, show the equipped item as well
+    if (auto *EC = Lvl.Reg.try_get<EquipmentComp>(Entity)) {
+      if (auto *EqIt = EC->Equip.getEquipped(It.getType())) {
+        Ctrl.addWindow(std::make_shared<ItemTooltip>(
+            Pos + TooltipOffset + cxxg::types::Position{TooltipSize.X + 1, 0},
+            TooltipSize, *EqIt, /*Equipped=*/true));
+      }
+    }
   } break;
   case Controls::CloseWindow.Char:
   case Controls::InventoryUI.Char:

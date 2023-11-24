@@ -40,6 +40,7 @@ public:
   const EquipmentSlot &getSlot(ItemType It) const;
 
   bool isEquipped(ItemType Type) const;
+  const Item *getEquipped(ItemType Type) const;
   bool canEquip(const Item &It, entt::entity Entity, entt::registry &Reg) const;
   bool canUnequip(ItemType Type, entt::entity Entity,
                   entt::registry &Reg) const;

@@ -17,7 +17,7 @@ public:
 class ItemTooltip : public Tooltip {
 public:
   ItemTooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
-              const Item &It);
+              const Item &It, bool Equipped);
 };
 
 } // namespace rogue::ui

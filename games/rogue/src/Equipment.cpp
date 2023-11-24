@@ -67,6 +67,17 @@ bool Equipment::isEquipped(ItemType Type) const {
   return getSlot(Type).It != std::nullopt;
 }
 
+const Item *Equipment::getEquipped(ItemType Type) const {
+  if ((Type & ItemType::EquipmentMask) == ItemType::None) {
+    return nullptr;
+  }
+  auto &Slot = getSlot(Type);
+  if (Slot.It == std::nullopt) {
+    return nullptr;
+  }
+  return &*Slot.It;
+}
+
 bool Equipment::canEquip(const Item &It, entt::entity Entity,
                          entt::registry &Reg) const {
   const auto Type = It.getType();

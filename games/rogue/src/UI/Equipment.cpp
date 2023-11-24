@@ -39,8 +39,8 @@ bool EquipmentController::handleInput(int Char) {
     auto SelIdx = ItSel->getSelectedIdx();
     auto *ES = Equip.all().at(SelIdx);
     if (ES->It) {
-      Ctrl.addWindow(std::make_shared<ItemTooltip>(Pos + TooltipOffset,
-                                                   TooltipSize, *ES->It));
+      Ctrl.addWindow(std::make_shared<ItemTooltip>(
+          Pos + TooltipOffset, TooltipSize, *ES->It, /*Equipped=*/true));
     }
   } break;
   case Controls::Unequip.Char: {

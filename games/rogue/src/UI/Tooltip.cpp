@@ -97,7 +97,8 @@ std::string getItemText(const Item &It) {
 } // namespace
 
 ItemTooltip::ItemTooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
-                         const Item &It)
-    : Tooltip(Pos, Size, getItemText(It), It.getName()) {}
+                         const Item &It, bool Equipped)
+    : Tooltip(Pos, Size, getItemText(It),
+              (Equipped ? "Equip: " : "") + It.getName()) {}
 
 } // namespace rogue::ui
