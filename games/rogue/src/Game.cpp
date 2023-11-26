@@ -89,9 +89,10 @@ bool RenderEventCollector::hasEvents() const { return !RenderFns.empty(); }
 Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
       ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)),
+      EntityDb(EntityDatabase::load(ItemDb, Cfg.EntityDbConfig)),
       CreatureDb(CreatureDatabase::load(Cfg.CreatureDbConfig)),
       LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)),
-      Ctx({ItemDb, CreatureDb, LevelDb}),
+      Ctx({ItemDb, EntityDb, CreatureDb, LevelDb}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
       UICtrl(Scr) {}

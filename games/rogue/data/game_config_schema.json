@@ -20,6 +20,10 @@
       "type": "string",
       "description": "Relative (to the config) path to the creature DB config file"
     },
+    "entity_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the entity DB config file"
+    },
     "level_db_config": {
       "type": "string",
       "description": "Relative (to the config) path to the level DB config file"

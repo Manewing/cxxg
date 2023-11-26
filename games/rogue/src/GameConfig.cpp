@@ -19,6 +19,9 @@ GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
   auto CreatureDbConfig = Doc["creature_db_config"].GetString();
   Config.CreatureDbConfig = ConfigDir / CreatureDbConfig;
 
+  auto EntityDbConfig = Doc["entity_db_config"].GetString();
+  Config.EntityDbConfig = ConfigDir / EntityDbConfig;
+
   const auto LevelDbConfig = Doc["level_db_config"].GetString();
   Config.LevelDbConfig = ConfigDir / LevelDbConfig;
 
@@ -41,6 +44,7 @@ std::ostream &operator<<(std::ostream &Out, const GameConfig &Cfg) {
   Out << "GameConfig:\n"
       << "  Seed: " << Cfg.Seed << "\n"
       << "  ItemDbConfig: " << Cfg.ItemDbConfig << "\n"
+      << "  EntityDbConfig: " << Cfg.EntityDbConfig << "\n"
       << "  CreatureDbConfig: " << Cfg.CreatureDbConfig << "\n"
       << "  LevelDbConfig: " << Cfg.LevelDbConfig << "\n"
       << "  Level: " << Cfg.InitialLevelConfig << "\n"

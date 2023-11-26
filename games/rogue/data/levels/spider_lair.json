@@ -6,22 +6,22 @@
   "creatures": [
     {
       "key": "0",
-      "name": "Silk Cocoon",
+      "name": "silk_cocoon",
       "loot": "common_silk_cocoon"
     },
     {
       "key": "h",
-      "name": "Arachnoth Hatchling",
+      "name": "arachnoth_hatchling",
       "loot": "common_spider"
     },
     {
       "key": "b",
-      "name": "Arachnoth Burrower",
+      "name": "arachnoth_burrower",
       "loot": "common_spider"
     },
     {
       "key": "B",
-      "name": "Arachnoth Broodguard",
+      "name": "arachnoth_broodguard",
       "loot": "common_spider"
     }
   ],

@@ -43,7 +43,7 @@
   "creatures": [
     {
       "key": "r",
-      "name": "Sewer Rat",
+      "name": "sewer_rat",
       "loot": "common_rat"
     }
   ],

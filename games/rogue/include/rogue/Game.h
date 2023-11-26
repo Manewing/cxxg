@@ -9,6 +9,7 @@
 #include <rogue/GameWorld.h>
 #include <rogue/History.h>
 #include <rogue/ItemDatabase.h>
+#include <rogue/EntityDatabase.h>
 #include <rogue/LevelDatabase.h>
 #include <rogue/Level.h>
 #include <rogue/LevelGenerator.h>
@@ -91,6 +92,7 @@ private:
   EventHistoryWriter EHW;
 
   ItemDatabase ItemDb;
+  EntityDatabase EntityDb;
   CreatureDatabase CreatureDb;
   LevelDatabase LevelDb;
 

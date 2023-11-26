@@ -1,10 +1,11 @@
 #include <gtest/gtest.h>
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
-#include <rogue/LevelDatabase.h>
+#include <rogue/EntityDatabase.h>
 #include <rogue/GameWorld.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/Level.h>
+#include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
 
 namespace {
@@ -17,9 +18,10 @@ public:
   }
 
   rogue::ItemDatabase ItemDb;
+  rogue::EntityDatabase EntityDb;
   rogue::CreatureDatabase CreatureDb;
   rogue::LevelDatabase LevelDb;
-  rogue::GameContext Ctx{ItemDb, CreatureDb, LevelDb};
+  rogue::GameContext Ctx{ItemDb, EntityDb, CreatureDb, LevelDb};
 };
 
 TEST_F(GameWorldTest, MultiLevelDungeonEmpty) {

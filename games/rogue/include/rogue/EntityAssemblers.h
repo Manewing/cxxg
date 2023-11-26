@@ -2,9 +2,9 @@
 #define ROGUE_ENTITY_ASSEMBLERS_H
 
 #include <entt/entt.hpp>
-#include <ymir/Types.hpp>
-#include <rogue/EntityDatabase.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/EntityDatabase.h>
+#include <ymir/Types.hpp>
 
 #include <rogue/Components/AI.h>
 #include <rogue/Components/Combat.h>
@@ -16,7 +16,6 @@
 #include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
-
 
 namespace rogue {
 
@@ -30,15 +29,130 @@ public:
 
 class TileCompAssembler : public EntityAssembler {
 public:
+  explicit TileCompAssembler(Tile T);
   void assemble(entt::registry &Reg, entt::entity Entity) const override;
 
 private:
-    Tile T;
+  Tile T;
+};
+
+class FactionCompAssembler : public EntityAssembler {
+public:
+  explicit FactionCompAssembler(FactionKind F);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  FactionKind F;
+};
+
+class RaceCompAssembler : public EntityAssembler {
+public:
+  explicit RaceCompAssembler(RaceKind R);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  RaceKind R;
+};
+
+class InventoryCompAssembler : public EntityAssembler {
+public:
+  InventoryCompAssembler(const ItemDatabase &ItemDb,
+                         const std::string &LootTable, bool IsPersistent,
+                         bool IsLooted);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  const ItemDatabase &ItemDb;
+  std::string LootTable;
+  bool IsPersistent;
+  bool IsLooted;
+};
+
+class AutoEquipAssembler : public EntityAssembler {
+public:
+  bool isPostProcess() const override;
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+};
+
+class ChestInteractableCompAssembler : public EntityAssembler {
+public:
+  explicit ChestInteractableCompAssembler(Tile LootedTile);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  Tile LootedTile;
+};
+
+class DoorCompAssembler : public EntityAssembler {
+public:
+  DoorCompAssembler(bool IsOpen, Tile OpenTile, Tile ClosedTile,
+                    std::optional<int> KeyId);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  bool IsOpen;
+  Tile OpenTile;
+  Tile ClosedTile;
+  std::optional<int> KeyId;
+};
+
+class LootInteractableCompAssembler : public EntityAssembler {
+public:
+  explicit LootInteractableCompAssembler(const std::string &LootTable);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  std::string LootTable;
+};
+
+class WorldEntryInteractableCompAssembler : public EntityAssembler {
+public:
+  explicit WorldEntryInteractableCompAssembler(const std::string &LevelName);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  std::string LevelName;
+};
+
+class LevelEntryExitAssembler : public EntityAssembler {
+public:
+  LevelEntryExitAssembler(bool IsExit, int LevelId);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  bool IsExit;
+  int LevelId;
+};
+
+class HealerInteractableCompAssembler : public EntityAssembler {
+public:
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+};
+
+class ShopAssembler : public EntityAssembler {
+public:
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+};
+
+class WorkbenchAssembler : public EntityAssembler {
+public:
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+};
+
+class StatsCompAssembler : public EntityAssembler {
+public:
+  explicit StatsCompAssembler(StatPoints Stats);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  StatPoints Stats;
 };
 
 // Keep sorted
 using AttackAICompAssembler = DefaultConstructEntityAssembler<AttackAIComp>;
+using BlockLOSCompAssembler = DefaultConstructEntityAssembler<BlocksLOS>;
 using CollisionCompAssembler = DefaultConstructEntityAssembler<CollisionComp>;
+using EquipmentCompAssembler = DefaultConstructEntityAssembler<EquipmentComp>;
 using HealthCompAssembler = DefaultConstructEntityAssembler<HealthComp>;
 using PlayerCompAssembler = DefaultConstructEntityAssembler<PlayerComp>;
 using PositionCompAssembler = DefaultConstructEntityAssembler<PositionComp>;
@@ -46,9 +160,10 @@ using VisibleCompAssembler = DefaultConstructEntityAssembler<VisibleComp>;
 using WanderAICompAssembler = DefaultConstructEntityAssembler<WanderAIComp>;
 
 // TODO make configurable
-using LineOfSightCompAssembler = DefaultConstructEntityAssembler<LineOfSightComp>;
+using LineOfSightCompAssembler =
+    DefaultConstructEntityAssembler<LineOfSightComp>;
 using AgilityCompAssembler = DefaultConstructEntityAssembler<AgilityComp>;
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_ENTITY_ASSEMBLERS_H

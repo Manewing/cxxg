@@ -1,8 +1,10 @@
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/RaceFaction.h>
+#include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
+#include <rogue/EntityDatabase.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/JSON.h>
 #include <rogue/LevelGenerator.h>
@@ -60,11 +62,30 @@ int createNewKey(ItemDatabase &ItemDb) {
   return KeyTemplate.ItemId;
 }
 
+void spawnAndPlaceEntity(EntityFactory &Factory, ymir::Point2d<int> Pos,
+                         EntityTemplateId EtId) {
+  auto Entity = Factory.createEntity(EtId);
+  auto &Reg = Factory.getRegistry();
+  if (auto *PC = Reg.try_get<PositionComp>(Entity)) {
+    PC->Pos = Pos;
+  }
+}
+
 } // namespace
 
 void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
                                  ymir::Point2d<int> Pos) const {
+  EntityFactory Factory(L.Reg, Ctx.EntityDb);
 
+  if (auto It = Cfg.Creatures.find(T.kind()); It != Cfg.Creatures.end()) {
+    if (Ctx.EntityDb.hasEntityTemplate(It->second.Name)) {
+      spawnAndPlaceEntity(Factory, Pos,
+                          Ctx.EntityDb.getEntityTemplateId(It->second.Name));
+      return;
+    }
+  }
+
+  // FIXME outdated
   // Deal with creating creatures
   if (auto It = Cfg.Creatures.find(T.kind()); It != Cfg.Creatures.end()) {
     auto CId = Ctx.CreatureDb.getCreatureId(It->second.Name);
@@ -100,6 +121,9 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
   // Deal with creating dungeon entries
   if (auto It = Cfg.Dungeons.find(T.kind()); It != Cfg.Dungeons.end()) {
     return createWorldEntry(L.Reg, Pos, T, It->second.LevelName);
+    // spawnAndPlaceEntity(L.Reg, Pos,
+    //                     Ctx.EntityDb.getEntityTemplateId("world_entry"));
+    // return;
   }
 
   // Deal with creating locked doors
@@ -122,19 +146,23 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
     createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false, NextLevelId);
   } break;
   case 'h': {
-    createHealerEntity(L.Reg, Pos, T);
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId("healer"));
   } break;
   case 'S': {
-    createShopEntity(L.Reg, Pos, T);
+    spawnAndPlaceEntity(Factory, Pos, Ctx.EntityDb.getEntityTemplateId("shop"));
   } break;
   case 'w': {
-    createWorkbenchEntity(L.Reg, Pos, T);
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId("work_bench"));
   } break;
   case '+': {
-    createDoorEntity(L.Reg, Pos, T, /*IsOpen=*/false, {});
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId("closed_door"));
   } break;
   case '/': {
-    createDoorEntity(L.Reg, Pos, T, /*IsOpen=*/true, {});
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId("open_door"));
   } break;
   default:
     throw std::runtime_error("Invalid entity kind: " +

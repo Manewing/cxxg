@@ -16,6 +16,7 @@ struct GameConfig {
   unsigned Seed = 0;
   std::filesystem::path CreatureDbConfig;
   std::filesystem::path ItemDbConfig;
+  std::filesystem::path EntityDbConfig;
   std::filesystem::path LevelDbConfig;
   std::string InitialGameWorld;
   std::filesystem::path InitialLevelConfig;

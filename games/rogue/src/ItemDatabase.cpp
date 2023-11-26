@@ -7,17 +7,9 @@
 #include <rogue/ItemPrototype.h>
 #include <rogue/ItemSpecialization.h>
 #include <rogue/JSON.h>
+#include <rogue/JSONHelpers.h>
 
 namespace rogue {
-
-static StatPoints parseStatPoints(const rapidjson::Value &V) {
-  StatPoints P;
-  P.Str = V["str"].GetInt();
-  P.Dex = V["dex"].GetInt();
-  P.Int = V["int"].GetInt();
-  P.Vit = V["vit"].GetInt();
-  return P;
-}
 
 static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
   std::map<std::string, int> ItemIdsByName;
@@ -34,21 +26,6 @@ static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
   return ItemIdsByName;
 }
 
-template <typename T>
-void parseReductionBuff(const rapidjson::Value &V, T &Buff) {
-  auto TickAmount = V["reduce_amount"].GetDouble();
-  auto TickPeriod = V["tick_period"].GetUint();
-  auto RealDuration = TickPeriod * V["ticks"].GetUint();
-  Buff.init(TickAmount, RealDuration, TickPeriod);
-}
-
-template <typename T>
-void parseRegenerationBuff(const rapidjson::Value &V, T &Buff) {
-  auto TickAmount = V["regen_amount"].GetDouble();
-  auto TickPeriod = V["tick_period"].GetUint();
-  auto RealDuration = TickPeriod * V["ticks"].GetUint();
-  Buff.init(TickAmount, RealDuration, TickPeriod);
-}
 
 static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
                                                 const rapidjson::Value &V) {

@@ -13,6 +13,7 @@
 #include <rogue/Components/Visual.h>
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
+#include <rogue/EntityDatabase.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
@@ -74,9 +75,10 @@ int main(int Argc, char *Argv[]) {
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
   rogue::ItemDatabase ItemDb;
+  rogue::EntityDatabase EntityDb;
   rogue::CreatureDatabase CreatureDb;
   rogue::LevelDatabase LevelDb;
-  rogue::GameContext Ctx{ItemDb, CreatureDb, LevelDb};
+  rogue::GameContext Ctx{ItemDb, EntityDb, CreatureDb, LevelDb};
 
   LevelGeneratorLoader LvlGenLoader(Ctx);
   auto LG = LvlGenLoader.load(0, Argv[1]);

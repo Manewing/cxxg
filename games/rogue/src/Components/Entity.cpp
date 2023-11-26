@@ -50,14 +50,16 @@ void createDummyCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<HealthComp>(Entity);
-  Reg.emplace<TileComp>(Entity, T);
+  Reg.emplace<CollisionComp>(Entity);
+  Reg.emplace<VisibleComp>(Entity);
+
   Reg.emplace<NameComp>(Entity, Name);
+
+  Reg.emplace<TileComp>(Entity, T);
   Reg.emplace<FactionComp>(Entity, FactionKind::Nature);
   Reg.emplace<StatsComp>(Entity).Base = Stats;
   Reg.emplace<InventoryComp>(Entity).Inv = I;
 
-  Reg.emplace<CollisionComp>(Entity);
-  Reg.emplace<VisibleComp>(Entity);
 }
 
 void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
