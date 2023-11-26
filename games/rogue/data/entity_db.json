@@ -1,0 +1,67 @@
+{
+    "entity_templates": [
+        {
+            "name": "closed_door",
+            "display_name": "Door",
+            "description": "A door",
+            "assemblers": {
+                "door": {
+                    "open": false,
+                    "open_tile": {
+                        "char": "/",
+                        "color": "#737373"
+                    },
+                    "close_tile": {
+                        "char": "+",
+                        "color": "#737373"
+                    }
+                }
+            }
+        },
+        {
+            "name": "open_door",
+            "from": "closed_door",
+            "assemblers": {
+                "door": {
+                    "open": true
+                }
+            }
+        },
+        {
+            "name": "hostile_creature",
+            "assemblers": {
+                "collision": true,
+                "visible": true,
+                "position": true
+            }
+        },
+        {
+            "name": "base_rat",
+            "assemblers": {
+                "faction": "nature",
+                "race": "creature",
+                "inventory": "common_rat"
+            }
+        },
+        {
+            "name": "sewer_rat",
+            "from": "base_rat",
+            "display_name": "Sewer Rat",
+            "description": "A rat TODO",
+            "assemblers": {
+                "assemblers": {
+                    "tile": {
+                        "color": "#5C5F55",
+                        "key": "r"
+                    }
+                },
+                "stats": {
+                    "str": 2,
+                    "dex": 6,
+                    "int": 0,
+                    "vit": 3
+                }
+            }
+        }
+    ]
+}
