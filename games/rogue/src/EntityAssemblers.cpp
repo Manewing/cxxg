@@ -211,12 +211,17 @@ LevelEntryExitAssembler::LevelEntryExitAssembler(bool IsExit, int LevelId)
 void LevelEntryExitAssembler::assemble(entt::registry &Reg,
                                        entt::entity Entity) const {
   Reg.emplace<InteractableComp>(
-      Entity,
-      Interaction{IsExit ? "Previous Level" : "Next level",
-                  [this, Entity](auto &EHC, auto SrcEt, auto &) {
-                    EHC.publish(SwitchLevelEvent{
-                        {}, LevelId, /*ToEntry=*/!IsExit, SrcEt, Entity});
-                  }});
+      Entity, Interaction{IsExit ? "Previous Level" : "Next level",
+                          [this, &Reg, Entity](auto &EHC, auto SrcEt, auto &) {
+                            auto LId = -1;
+                            if (IsExit) {
+                              LId = Reg.get<LevelStartComp>(Entity).NextLevelId;
+                            } else {
+                              LId = Reg.get<LevelEndComp>(Entity).NextLevelId;
+                            }
+                            EHC.publish(SwitchLevelEvent{
+                                {}, LId, /*ToEntry=*/!IsExit, SrcEt, Entity});
+                          }});
   if (IsExit) {
     Reg.emplace<LevelStartComp>(Entity, LevelId);
   } else {

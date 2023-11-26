@@ -1,5 +1,6 @@
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/Level.h>
 #include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
@@ -63,11 +64,17 @@ int createNewKey(ItemDatabase &ItemDb) {
 }
 
 void spawnAndPlaceEntity(EntityFactory &Factory, ymir::Point2d<int> Pos,
-                         EntityTemplateId EtId) {
+                         EntityTemplateId EtId, int LevelId) {
   auto Entity = Factory.createEntity(EtId);
   auto &Reg = Factory.getRegistry();
   if (auto *PC = Reg.try_get<PositionComp>(Entity)) {
     PC->Pos = Pos;
+  }
+  if (auto *LSC = Reg.try_get<LevelStartComp>(Entity)) {
+    LSC->NextLevelId = LevelId - 1;
+  }
+  if (auto *LEC = Reg.try_get<LevelEndComp>(Entity)) {
+    LEC->NextLevelId = LevelId + 1;
   }
 }
 
@@ -80,7 +87,8 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
   if (auto It = Cfg.Creatures.find(T.kind()); It != Cfg.Creatures.end()) {
     if (Ctx.EntityDb.hasEntityTemplate(It->second.Name)) {
       spawnAndPlaceEntity(Factory, Pos,
-                          Ctx.EntityDb.getEntityTemplateId(It->second.Name));
+                          Ctx.EntityDb.getEntityTemplateId(It->second.Name),
+                          L.getLevelId());
       return;
     }
   }
@@ -138,31 +146,38 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
   // FIXME also have those in the config
   switch (T.kind()) {
   case 'H': {
-    int PrevLevelId = L.getLevelId() - 1;
-    createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/true, PrevLevelId);
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId("level_exit"),
+                        L.getLevelId());
   } break;
   case '<': {
-    int NextLevelId = L.getLevelId() + 1;
-    createLevelEntryExit(L.Reg, Pos, T, /*IsExit=*/false, NextLevelId);
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId("level_entry"),
+                        L.getLevelId());
   } break;
   case 'h': {
     spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("healer"));
+                        Ctx.EntityDb.getEntityTemplateId("healer"),
+                        L.getLevelId());
   } break;
   case 'S': {
-    spawnAndPlaceEntity(Factory, Pos, Ctx.EntityDb.getEntityTemplateId("shop"));
+    spawnAndPlaceEntity(Factory, Pos, Ctx.EntityDb.getEntityTemplateId("shop"),
+                        L.getLevelId());
   } break;
   case 'w': {
     spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("work_bench"));
+                        Ctx.EntityDb.getEntityTemplateId("work_bench"),
+                        L.getLevelId());
   } break;
   case '+': {
     spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("closed_door"));
+                        Ctx.EntityDb.getEntityTemplateId("closed_door"),
+                        L.getLevelId());
   } break;
   case '/': {
     spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("open_door"));
+                        Ctx.EntityDb.getEntityTemplateId("open_door"),
+                        L.getLevelId());
   } break;
   default:
     throw std::runtime_error("Invalid entity kind: " +

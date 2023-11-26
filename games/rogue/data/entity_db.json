@@ -225,6 +225,36 @@
         },
         "work_bench": true
       }
+    },
+    {
+      "name": "level_entry",
+      "from": "base_interact",
+      "display_name": "Level Entry",
+      "description": "A level entry TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#489dcf",
+          "char": "<"
+        },
+        "level_entry_exit": {
+          "is_exit": false,
+          "level_id": 0
+        }
+      }
+    },
+    {
+      "name": "level_exit",
+      "from": "level_entry",
+      "display_name": "Level Exit",
+      "description": "A level exit TODO",
+      "assemblers": {
+        "tile": {
+          "char": "H"
+        },
+        "level_entry_exit": {
+          "is_exit": true
+        }
+      }
     }
   ]
 }

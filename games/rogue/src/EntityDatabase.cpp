@@ -161,6 +161,14 @@ makeWorldEntryAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   return std::make_shared<WorldEntryInteractableCompAssembler>(LevelName);
 }
 
+std::shared_ptr<LevelEntryExitAssembler>
+makeLevelEntryExitAssembler(ItemDatabase &, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  bool IsExit = JsonObj["is_exit"].GetBool();
+  int LevelId = JsonObj["level_id"].GetInt();
+  return std::make_shared<LevelEntryExitAssembler>(IsExit, LevelId);
+}
+
 std::shared_ptr<StatsCompAssembler>
 makeStatsCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   auto SP = parseStatPoints(Json);
@@ -181,6 +189,7 @@ const auto &getEntityAssemblerFactories() {
       {"stats", makeStatsCompAssembler},
       {"tile", makeTileCompAssembler},
       {"world_entry", makeWorldEntryAssembler},
+      {"level_entry_exit", makeLevelEntryExitAssembler}
   };
   return Factories;
 }
