@@ -40,6 +40,41 @@ struct EntityTemplateInfo {
 
   const char *getDisplayName() const;
   const char *getDescription() const;
+
+  EntityAssembler &get(const std::string &Name);
+  const EntityAssembler &get(const std::string &Name) const;
+  EntityAssembler *getOrNull(const std::string &Name);
+  const EntityAssembler *getOrNull(const std::string &Name) const;
+
+  template <typename T> T &get(const std::string &Name) {
+    return const_cast<EntityAssembler &>(
+        const_cast<const EntityTemplateInfo *>(this)->get<T>(Name));
+  }
+
+  template <typename T> const T &get(std::string Name) const {
+    const auto &Asm = get(Name);
+    if (const auto *Cast = dynamic_cast<const T *>(&Asm)) {
+      return *Cast;
+    }
+    throw std::runtime_error("Failed to cast entity assembler: " +
+                             std::string(Name) + " to " + typeid(T).name());
+  }
+
+  template <typename T> T *getOrNull(const std::string &Name) {
+    return const_cast<EntityAssembler *>(
+        const_cast<const EntityTemplateInfo *>(this)->getOrNull<T>(Name));
+  }
+
+  template <typename T> const T *getOrNull(const std::string &Name) const {
+    auto *Asm = getOrNull(Name);
+    if (!Asm) {
+      return nullptr;
+    }
+    if (auto *Cast = dynamic_cast<const T *>(Asm)) {
+      return *Cast;
+    }
+    return nullptr;
+  }
 };
 
 class EntityAssemblerCache {

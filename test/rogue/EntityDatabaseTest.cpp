@@ -1,6 +1,7 @@
 #include <fstream>
 #include <gtest/gtest.h>
 #include <rogue/EntityDatabase.h>
+#include <rogue/EntityAssemblers.h>
 #include <rogue/ItemDatabase.h>
 
 namespace {
@@ -151,6 +152,64 @@ TEST_F(EntityDatabaseTest, LoadEntityWithInheritanceDefaultComps) {
   EXPECT_TRUE(GrandChild.Assemblers.count("collision"));
   EXPECT_TRUE(GrandChild.Assemblers.count("visible"));
   EXPECT_TRUE(GrandChild.Assemblers.count("position"));
+}
+
+TEST_F(EntityDatabaseTest, LoadEntityWithInheritancePartialData) {
+  loadDbJson(R"(
+  {
+    "entity_templates": [
+      {
+        "name": "parent",
+        "assemblers": {
+          "stats": {
+            "int": 1,
+            "str": 2,
+            "dex": 3,
+            "vit": 4
+          }
+        }
+      },
+      {
+        "name": "child",
+        "from": "parent",
+        "assemblers": {
+          "stats": {
+            "str": 5
+          }
+        }
+      },
+      {
+        "name": "grand_child",
+        "from": "child",
+        "assemblers": {
+          "stats": {
+            "dex": 6
+          }
+        }
+      }
+    ]
+  }
+  )");
+  const auto ParentId = Db.getEntityTemplateId("parent");
+  EXPECT_EQ(ParentId, 0);
+  const auto &Parent = Db.getEntityTemplate(ParentId);
+  EXPECT_EQ(Parent.Name, "parent");
+  rogue::StatPoints SP{1, 2, 3, 4};
+  EXPECT_EQ(Parent.get<rogue::StatsCompAssembler>("stats").getStats(), SP);
+
+  const auto ChildId = Db.getEntityTemplateId("child");
+  EXPECT_EQ(ChildId, 1);
+  const auto &Child = Db.getEntityTemplate(ChildId);
+  EXPECT_EQ(Child.Name, "child");
+  SP.Str = 5;
+  EXPECT_EQ(Child.get<rogue::StatsCompAssembler>("stats").getStats(), SP);
+
+  const auto GrandChildId = Db.getEntityTemplateId("grand_child");
+  EXPECT_EQ(GrandChildId, 2);
+  const auto &GrandChild = Db.getEntityTemplate(GrandChildId);
+  EXPECT_EQ(GrandChild.Name, "grand_child");
+  SP.Dex = 6;
+  EXPECT_EQ(GrandChild.get<rogue::StatsCompAssembler>("stats").getStats(), SP);
 }
 
 TEST_F(EntityDatabaseTest, LoadEntityWithComplexAssemblers) {

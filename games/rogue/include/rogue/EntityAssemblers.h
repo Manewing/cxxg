@@ -144,6 +144,8 @@ public:
   explicit StatsCompAssembler(StatPoints Stats);
   void assemble(entt::registry &Reg, entt::entity Entity) const override;
 
+  inline const StatPoints &getStats() const { return Stats; }
+
 private:
   StatPoints Stats;
 };

@@ -29,6 +29,33 @@ const char *EntityTemplateInfo::getDescription() const {
   return "<unimpl. description>";
 }
 
+EntityAssembler &EntityTemplateInfo::get(const std::string &Name) {
+  return const_cast<EntityAssembler &>(
+      const_cast<const EntityTemplateInfo *>(this)->get(Name));
+}
+
+const EntityAssembler &EntityTemplateInfo::get(const std::string &Name) const {
+  auto It = Assemblers.find(Name);
+  if (It == Assemblers.end()) {
+    throw std::out_of_range("Unknown entity assembler: " + std::string(Name));
+  }
+  return *It->second;
+}
+
+EntityAssembler *EntityTemplateInfo::getOrNull(const std::string &Name) {
+  return const_cast<EntityAssembler *>(
+      const_cast<const EntityTemplateInfo *>(this)->getOrNull(Name));
+}
+
+const EntityAssembler *
+EntityTemplateInfo::getOrNull(const std::string &Name) const {
+  auto It = Assemblers.find(Name);
+  if (It == Assemblers.end()) {
+    return nullptr;
+  }
+  return It->second.get();
+}
+
 void EntityAssemblerCache::add(
     const std::string &Name,
     const std::shared_ptr<EntityAssembler> &Assembler) {
@@ -135,7 +162,7 @@ makeWorldEntryAssembler(ItemDatabase &, const rapidjson::Value &Json) {
 }
 
 std::shared_ptr<StatsCompAssembler>
-makeStatsCompAssembler(ItemDatabase&, const rapidjson::Value &Json) {
+makeStatsCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   auto SP = parseStatPoints(Json);
   return std::make_shared<StatsCompAssembler>(SP);
 }
@@ -186,22 +213,56 @@ EntityTemplateInfo getEntityTemplateInfoFromJson(const rapidjson::Value &Json) {
   return Info;
 }
 
-void createEntityTemplates(EntityDatabase &Db, ItemDatabase &ItemDb,
-                           const EntityAssemblerCache &DefaultAssemblers,
-                           const EntityAssemblerFactories &AssemblerFactories,
-                           const rapidjson::Value &Json) {
+// Merge partial assembler data from parent entity template
+void mergeAssemblerData(rapidjson::Document &Doc, rapidjson::Value &Dst,
+                        const rapidjson::Value &Src) {
+  rapidjson::Value MergedData;
+  for (const auto &[AsmName, AsmData] : Src.GetObject()) {
+    auto It = Dst.FindMember(AsmName);
+    if (It == Dst.MemberEnd()) {
+      continue;
+    }
+    if (!It->value.IsObject()) {
+      continue;
+    }
 
+    // Copy any missing members
+    auto &DstObj = It->value;
+    for (const auto &Member : AsmData.GetObject()) {
+      if (DstObj.HasMember(Member.name)) {
+        continue;
+      }
+      rapidjson::Value KeyCopy;
+      KeyCopy.CopyFrom(Member.name, Doc.GetAllocator());
+      rapidjson::Value MemberCopy;
+      MemberCopy.CopyFrom(Member.value, Doc.GetAllocator());
+      DstObj.AddMember(KeyCopy, MemberCopy, Doc.GetAllocator());
+    }
+  }
+}
+
+void createEntityTemplates(EntityDatabase &Db, ItemDatabase &ItemDb,
+                           rapidjson::Document &Doc,
+                           const EntityAssemblerCache &DefaultAssemblers,
+                           const EntityAssemblerFactories &AssemblerFactories) {
+  auto &Json = Doc["entity_templates"];
+
+  std::map<std::string, rapidjson::Value> EntityAssemblerJsons;
   for (const auto &EntityJson : Json.GetArray()) {
     auto Info = getEntityTemplateInfoFromJson(EntityJson);
+    auto &AssemblersJson = EntityJson["assemblers"];
+    rapidjson::Value AssemblersMergedJson;
+    AssemblersMergedJson.CopyFrom(AssemblersJson, Doc.GetAllocator());
 
     // Handle inheritance
     if (EntityJson.HasMember("from")) {
       auto From = std::string(EntityJson["from"].GetString());
       Info.from(Db.getEntityTemplate(Db.getEntityTemplateId(From)));
+      mergeAssemblerData(Doc, AssemblersMergedJson,
+                         EntityAssemblerJsons.at(From));
     }
 
-    auto AssemblersJson = EntityJson["assemblers"].GetObject();
-    for (const auto &[Name, Data] : AssemblersJson) {
+    for (const auto &[Name, Data] : AssemblersMergedJson.GetObject()) {
       auto AsmName = std::string(Name.GetString());
 
       // Look up assembler in default assembler cache
@@ -221,6 +282,8 @@ void createEntityTemplates(EntityDatabase &Db, ItemDatabase &ItemDb,
       }
       Info.Assemblers[AsmName] = It->second(ItemDb, Data);
     }
+
+    EntityAssemblerJsons[Info.Name] = std::move(AssemblersMergedJson);
     Db.addEntityTemplate(std::move(Info));
   }
 }
@@ -239,13 +302,13 @@ EntityDatabase::load(ItemDatabase &ItemDb,
   // Create all entity templates
   const auto DefaultAssemblers = getDefaultEntityAssemblerCache();
   const auto &AssemblerFactories = getEntityAssemblerFactories();
-  createEntityTemplates(Db, ItemDb, DefaultAssemblers, AssemblerFactories,
-                        Doc["entity_templates"]);
+  createEntityTemplates(Db, ItemDb, Doc, DefaultAssemblers, AssemblerFactories);
 
   return Db;
 }
 
-bool EntityDatabase::hasEntityTemplate(const std::string &EntityTemplateName) const {
+bool EntityDatabase::hasEntityTemplate(
+    const std::string &EntityTemplateName) const {
   return EntityTemplateIdsByName.count(EntityTemplateName) > 0;
 }
 

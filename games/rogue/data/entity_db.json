@@ -29,15 +29,7 @@
         "block_los": false,
         "collision": false,
         "door": {
-          "is_open": true,
-          "open_tile": {
-            "char": "/",
-            "color": "#737373"
-          },
-          "closed_tile": {
-            "char": "+",
-            "color": "#737373"
-          }
+          "is_open": true
         }
       }
     },
@@ -85,7 +77,12 @@
         "visible": true,
         "agility": true,
         "line_of_sight": true,
-        "wander_ai": true
+        "wander_ai": true,
+        "inventory": {
+          "loot_table": "null",
+          "is_persistent": false,
+          "is_looted": false
+        }
       }
     },
     {
@@ -95,9 +92,7 @@
         "faction": "nature",
         "race": "creature",
         "inventory": {
-          "loot_table": "common_rat",
-          "is_persistent": false,
-          "is_looted": false
+          "loot_table": "common_rat"
         }
       }
     },
@@ -126,9 +121,7 @@
         "faction": "nature",
         "race": "creature",
         "inventory": {
-          "loot_table": "common_spider",
-          "is_persistent": false,
-          "is_looted": false
+          "loot_table": "common_spider"
         }
       }
     },
