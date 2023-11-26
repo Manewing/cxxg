@@ -54,15 +54,6 @@ Inventory generateLootInventory(const ItemDatabase &ItemDb,
   return Inv;
 }
 
-int createNewKey(ItemDatabase &ItemDb) {
-  auto KeyTemplateId = ItemDb.getItemId("Key");
-  auto KeyTemplate = ItemDb.getItemProto(KeyTemplateId);
-  KeyTemplate.ItemId = ItemDb.getNewItemId();
-  KeyTemplate.Name = "Key " + std::to_string(KeyTemplate.ItemId);
-  ItemDb.addItemProto(KeyTemplate);
-  return KeyTemplate.ItemId;
-}
-
 void spawnAndPlaceEntity(EntityFactory &Factory, ymir::Point2d<int> Pos,
                          EntityTemplateId EtId, int LevelId) {
   auto Entity = Factory.createEntity(EtId);
@@ -84,6 +75,7 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
                                  ymir::Point2d<int> Pos) const {
   EntityFactory Factory(L.Reg, Ctx.EntityDb);
 
+  // FIXME use entities map
   if (auto It = Cfg.Creatures.find(T.kind()); It != Cfg.Creatures.end()) {
     if (Ctx.EntityDb.hasEntityTemplate(It->second.Name)) {
       spawnAndPlaceEntity(Factory, Pos,
@@ -136,12 +128,11 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
 
   // Deal with creating locked doors
   if (auto It = Cfg.LockedDoors.find(T.kind()); It != Cfg.LockedDoors.end()) {
-    auto KeyId = Ctx.ItemDb.getItemId(It->second.KeyName);
-    createDoorEntity(L.Reg, Pos, T, /*IsOpen=*/false, KeyId);
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId(It->second.KeyName),
+                        L.getLevelId());
     return;
   }
-  // FIXME allow creating keys on the fly
-  (void)createNewKey;
 
   // FIXME also have those in the config
   switch (T.kind()) {

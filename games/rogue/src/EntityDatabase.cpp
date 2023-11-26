@@ -1,5 +1,6 @@
 #include <rogue/EntityAssemblers.h>
 #include <rogue/EntityDatabase.h>
+#include <rogue/ItemDatabase.h>
 #include <rogue/JSON.h>
 #include <rogue/JSONHelpers.h>
 
@@ -142,6 +143,15 @@ makeChestInteractableCompAssembler(ItemDatabase &,
   return std::make_shared<ChestInteractableCompAssembler>(T);
 }
 
+int createNewKey(ItemDatabase &ItemDb) {
+  auto KeyTemplateId = ItemDb.getItemId("Key");
+  auto KeyTemplate = ItemDb.getItemProto(KeyTemplateId);
+  KeyTemplate.ItemId = ItemDb.getNewItemId();
+  KeyTemplate.Name = "Key " + std::to_string(KeyTemplate.ItemId);
+  ItemDb.addItemProto(KeyTemplate);
+  return KeyTemplate.ItemId;
+}
+
 std::shared_ptr<DoorCompAssembler>
 makeDoorCompAssembler(ItemDatabase &ItemDb, const rapidjson::Value &Json) {
   const auto &JsonObj = Json.GetObject();
@@ -149,7 +159,11 @@ makeDoorCompAssembler(ItemDatabase &ItemDb, const rapidjson::Value &Json) {
   Tile ClosedTile = parseTile(JsonObj["closed_tile"]);
   bool IsOpen = JsonObj["is_open"].GetBool();
   std::optional<int> KeyId; // TODO
-  (void)ItemDb;
+  if (JsonObj.HasMember("key")) {
+    // FIXME allow creating keys on the fly
+    (void)createNewKey;
+    KeyId = ItemDb.getItemId(JsonObj["key"].GetString());
+  }
   return std::make_shared<DoorCompAssembler>(IsOpen, OpenTile, ClosedTile,
                                              KeyId);
 }
@@ -189,8 +203,7 @@ const auto &getEntityAssemblerFactories() {
       {"stats", makeStatsCompAssembler},
       {"tile", makeTileCompAssembler},
       {"world_entry", makeWorldEntryAssembler},
-      {"level_entry_exit", makeLevelEntryExitAssembler}
-  };
+      {"level_entry_exit", makeLevelEntryExitAssembler}};
   return Factories;
 }
 

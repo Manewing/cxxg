@@ -39,6 +39,8 @@ public:
   std::map<char, Chest> Chests;
   std::map<char, WorldEntry> Dungeons;
   std::map<char, LockedDoor> LockedDoors;
+
+  std::map<char, std::string> Entities;
 };
 
 /// Base class for all level generators

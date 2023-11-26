@@ -110,19 +110,19 @@
   "locked_doors": [
     {
       "key": "x",
-      "key_name": "L1 Key"
+      "key_name": "l1_locked_door"
     },
     {
       "key": "y",
-      "key_name": "L2 Key"
+      "key_name": "l2_locked_door"
     },
     {
       "key": "z",
-      "key_name": "L3 Key"
+      "key_name": "l3_locked_door"
     },
     {
       "key": "u",
-      "key_name": "Final Key"
+      "key_name": "final_locked_door"
     }
   ],
   "dungeons": [

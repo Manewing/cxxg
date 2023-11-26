@@ -34,6 +34,42 @@
       }
     },
     {
+      "name": "l1_locked_door",
+      "from": "closed_door",
+      "assemblers": {
+        "door": {
+          "key": "L1 Key"
+        }
+      }
+    },
+    {
+      "name": "l2_locked_door",
+      "from": "closed_door",
+      "assemblers": {
+        "door": {
+          "key": "L2 Key"
+        }
+      }
+    },
+    {
+      "name": "l3_locked_door",
+      "from": "closed_door",
+      "assemblers": {
+        "door": {
+          "key": "L3 Key"
+        }
+      }
+    },
+    {
+      "name": "final_locked_door",
+      "from": "closed_door",
+      "assemblers": {
+        "door": {
+          "key": "Final Key"
+        }
+      }
+    },
+    {
       "name": "dummy_creature",
       "assemblers": {
         "collision": true,
