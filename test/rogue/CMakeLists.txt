@@ -26,7 +26,8 @@ add_cxxg_unittest(
 )
 
 set(DATA_DIR ${CMAKE_SOURCE_DIR}/games/rogue/data)
-set(SCHEMA_VALIDATOR ${DATA_DIR}/validator.py)
+set(SCRIPTS_DIR ${CMAKE_SOURCE_DIR}/games/rogue/scripts)
+set(SCHEMA_VALIDATOR ${SCRIPTS_DIR}/validator.py)
 
 add_cxxg_test(
   NAME rogue_json_schema_game_cfg
