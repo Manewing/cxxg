@@ -60,7 +60,7 @@ LevelDatabase LevelDatabase::load(const std::filesystem::path &LevelDbConfig) {
 
   const auto BasePath = LevelDbConfig.parent_path();
 
-  const auto SchemaPath = BasePath / "level_db_schema.json";
+  const auto SchemaPath = BasePath / "schemas" / "level_db_schema.json";
   // FIXME avoid requiring schema for tests
   const auto *SchemaPathPtr = &SchemaPath;
   if (!std::filesystem::exists(SchemaPath)) {

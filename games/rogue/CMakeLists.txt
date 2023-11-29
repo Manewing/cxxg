@@ -190,21 +190,22 @@ endif()
 add_custom_command(TARGET ${TARGET} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/data
-    ${CMAKE_CURRENT_BINARY_DIR}/build/data
+    ${CMAKE_CURRENT_BINARY_DIR}/data
 
+  # Post-process all JSON schemas
   COMMAND
     ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
     --schema-files
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/item_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/level_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/game_config_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/level_config_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/entity_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/game_config_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
     --output-dir
-      ${CMAKE_CURRENT_BINARY_DIR}/data
+      ${CMAKE_CURRENT_BINARY_DIR}/data/schemas
 
+  # Make JSON schemas available for tests
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/data/levels
-    ${CMAKE_CURRENT_BINARY_DIR}/data/levels
+    ${CMAKE_CURRENT_BINARY_DIR}/data/schemas
+    ${CMAKE_BINARY_DIR}/test/rogue/schemas
 )
-

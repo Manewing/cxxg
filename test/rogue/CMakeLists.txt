@@ -27,6 +27,8 @@ add_cxxg_unittest(
 
 set(DATA_DIR ${CMAKE_SOURCE_DIR}/games/rogue/data)
 set(BUILD_DATA_DIR ${CMAKE_BINARY_DIR}/games/rogue/data)
+set(SCHEMAS_DIR ${DATA_DIR}/schemas)
+set(BUILD_SCHEMAS_DIR ${BUILD_DATA_DIR}/schemas)
 set(SCRIPTS_DIR ${CMAKE_SOURCE_DIR}/games/rogue/scripts)
 set(SCHEMA_VALIDATOR ${SCRIPTS_DIR}/validator.py)
 
@@ -56,49 +58,49 @@ endfunction()
 add_schema_test(
   NAME item_db
   JSON_FILES ${DATA_DIR}/item_db.json
-  SCHEMA ${DATA_DIR}/item_db_schema.json
+  SCHEMA ${SCHEMAS_DIR}/item_db_schema.json
 )
 
 add_schema_test(
   NAME build_item_db
   JSON_FILES ${DATA_DIR}/item_db.json
-  SCHEMA ${BUILD_DATA_DIR}/item_db_schema.json
+  SCHEMA ${BUILD_SCHEMAS_DIR}/item_db_schema.json
 )
 
 add_schema_test(
   NAME creature_db
   JSON_FILES ${DATA_DIR}/creature_db.json
-  SCHEMA ${DATA_DIR}/creature_db_schema.json
+  SCHEMA ${SCHEMAS_DIR}/creature_db_schema.json
 )
 
 add_schema_test(
   NAME build_creature_db
   JSON_FILES ${DATA_DIR}/creature_db.json
-  SCHEMA ${BUILD_DATA_DIR}/creature_db_schema.json
+  SCHEMA ${BUILD_SCHEMAS_DIR}/creature_db_schema.json
 )
 
 add_schema_test(
   NAME level_db
   JSON_FILES ${DATA_DIR}/level_db.json
-  SCHEMA ${DATA_DIR}/level_db_schema.json
+  SCHEMA ${SCHEMAS_DIR}/level_db_schema.json
 )
 
 add_schema_test(
   NAME build_level_db
   JSON_FILES ${DATA_DIR}/level_db.json
-  SCHEMA ${BUILD_DATA_DIR}/level_db_schema.json
+  SCHEMA ${BUILD_SCHEMAS_DIR}/level_db_schema.json
 )
 
 add_schema_test(
   NAME game_config
   JSON_FILES ${DATA_DIR}/game_config.json ${DATA_DIR}/test_game_config.json
-  SCHEMA ${DATA_DIR}/game_config_schema.json
+  SCHEMA ${SCHEMAS_DIR}/game_config_schema.json
 )
 
 add_schema_test(
   NAME build_game_config
   JSON_FILES ${DATA_DIR}/game_config.json ${DATA_DIR}/test_game_config.json
-  SCHEMA ${BUILD_DATA_DIR}/game_config_schema.json
+  SCHEMA ${BUILD_SCHEMAS_DIR}/game_config_schema.json
 )
 
 file(GLOB LEVEL_FILES ${DATA_DIR}/levels/*.json)
@@ -106,11 +108,11 @@ file(GLOB LEVEL_FILES ${DATA_DIR}/levels/*.json)
 add_schema_test(
   NAME level_configs
   JSON_FILES ${LEVEL_FILES}
-  SCHEMA ${DATA_DIR}/level_config_schema.json
+  SCHEMA ${SCHEMAS_DIR}/level_config_schema.json
 )
 
 add_schema_test(
   NAME build_level_configs
   JSON_FILES ${LEVEL_FILES}
-  SCHEMA ${BUILD_DATA_DIR}/level_config_schema.json
+  SCHEMA ${BUILD_SCHEMAS_DIR}/level_config_schema.json
 )

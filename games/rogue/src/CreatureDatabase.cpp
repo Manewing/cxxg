@@ -26,7 +26,7 @@ CreatureDatabase::load(const std::filesystem::path &CreatureDbConfig) {
   CreatureDatabase Db;
 
   const auto SchemaPath =
-      CreatureDbConfig.parent_path() / "creature_db_schema.json";
+      CreatureDbConfig.parent_path() / "schemas" / "creature_db_schema.json";
   auto [DocStr, Doc] = loadJSON(CreatureDbConfig, &SchemaPath);
 
   auto Creatures = Doc["creatures"].GetArray();

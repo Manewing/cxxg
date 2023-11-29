@@ -26,7 +26,6 @@ static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
   return ItemIdsByName;
 }
 
-
 static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
                                                 const rapidjson::Value &V) {
   static const std::map<std::string,
@@ -219,7 +218,8 @@ static void fillLootTable(const ItemDatabase &DB, const rapidjson::Value &V,
 ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   ItemDatabase DB;
 
-  const auto SchemaPath = ItemDbConfig.parent_path() / "item_db_schema.json";
+  const auto SchemaPath =
+      ItemDbConfig.parent_path() / "schemas" / "item_db_schema.json";
   auto [DocStr, Doc] = loadJSON(ItemDbConfig, &SchemaPath);
 
   // Get map of item Ids and verify unique names
@@ -284,8 +284,8 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       }
     }
 
-    ItemPrototype Proto(DB.getNewItemId(), Name, Description, ItType, MaxStackSize,
-                        std::move(EffectInfos));
+    ItemPrototype Proto(DB.getNewItemId(), Name, Description, ItType,
+                        MaxStackSize, std::move(EffectInfos));
     DB.addItemProto(Proto, Specialization.get());
   }
 
@@ -305,9 +305,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
   return DB;
 }
 
-int ItemDatabase::getNewItemId() {
-  return MaxItemId++;
-}
+int ItemDatabase::getNewItemId() { return MaxItemId++; }
 
 int ItemDatabase::getItemId(const std::string &ItemName) const {
   const auto It = ItemIdsByName.find(ItemName);

@@ -506,7 +506,8 @@ LevelGeneratorLoader::loadCfg(unsigned Seed,
   LevelConfig LvlCfg;
 
   const auto BasePath = CfgFile.parent_path();
-  const auto SchemaFile = BasePath.parent_path() / "level_config_schema.json";
+  const auto SchemaFile =
+      BasePath.parent_path() / "schemas" / "level_config_schema.json";
   auto [DocStr, Doc] = loadJSON(CfgFile, &SchemaFile);
 
   auto MapCfg = Doc["map"].GetObject();

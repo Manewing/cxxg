@@ -317,9 +317,9 @@ EntityDatabase::load(ItemDatabase &ItemDb,
                      const std::filesystem::path &EntityDbConfig) {
   EntityDatabase Db;
 
-  //  const auto SchemaPath =
-  //      EntityDbConfig.parent_path() / "entity_db_schema.json";
-  auto [DocStr, Doc] = loadJSON(EntityDbConfig, nullptr);
+    const auto SchemaPath =
+        EntityDbConfig.parent_path() / "schemas" / "entity_db_schema.json";
+  auto [DocStr, Doc] = loadJSON(EntityDbConfig, &SchemaPath);
 
   // Create all entity templates
   const auto DefaultAssemblers = getDefaultEntityAssemblerCache();
