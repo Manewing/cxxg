@@ -44,7 +44,8 @@
                   "type": "string",
                   "description": "The effect of the capability"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "specialization": {
@@ -60,9 +61,11 @@
                   "type": "string",
                   "description": "The effect of the capability"
                 }
-              }
+              },
+              "additionalProperties": false
             }
-          }
+          },
+          "additionalProperties": false
         }
       }
     },
@@ -70,29 +73,23 @@
       "type": "object",
       "description": "Map of item effects by identifier",
       "additionalProperties": {
-        "type": "object",
-        "required": ["type"],
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "The type of the effect"
-          }
-        }
+        "$ref": "https://rogue-todo.com/item_effects_schema.json#/defs/effect/type"
       }
     },
     "item_specializations": {
       "type": "object",
       "description": "Map of item specializations by identifier",
       "additionalProperties": {
-        "type": "object",
-        "required": ["type"],
-        "properties": {
-          "type": {
-            "type": "string",
-            "description": "The type of the specialization"
-          }
-        }
+        "$ref": "https://rogue-todo.com/item_effects_schema.json#/defs/specialization/type"
+      }
+    },
+    "loot_tables": {
+      "type": "object",
+      "description": "Map of loot tables by identifier",
+      "additionalProperties": {
+        "$ref": "https://rogue-todo.com/loot_tb_schema.json#/defs/loot_table"
       }
     }
-  }
+  },
+  "additionalProperties": false
 }

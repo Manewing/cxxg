@@ -45,20 +45,20 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
           {"poison_debuff_comp",
            [](const auto &, const auto &V) {
              PoisonDebuffComp Buff;
-             parseReductionBuff(V, Buff);
+             parseReductionBuff(V["buff"], Buff);
              return makeApplyBuffItemEffect<PoisonDebuffComp, HealthComp>(Buff);
            }},
           {"health_regen_buff_comp",
            [](const auto &, const auto &V) {
              HealthRegenBuffComp Buff;
-             parseRegenerationBuff(V, Buff);
+             parseRegenerationBuff(V["buff"], Buff);
              return makeApplyBuffItemEffect<HealthRegenBuffComp, HealthComp>(
                  Buff);
            }},
           {"bleeding_debuff_comp",
            [](const auto &, const auto &V) {
              BleedingDebuffComp Buff;
-             parseReductionBuff(V, Buff);
+             parseReductionBuff(V["buff"], Buff);
              return makeApplyBuffItemEffect<BleedingDebuffComp, HealthComp>(
                  Buff);
            }},

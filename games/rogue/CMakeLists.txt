@@ -211,6 +211,8 @@ add_custom_command(
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/common_types_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/buffs_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/loot_tb_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_effects_schema.json
     --output-dir
       ${CMAKE_CURRENT_BINARY_DIR}/data/schemas
@@ -235,6 +237,8 @@ add_custom_command(
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/game_config_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/common_types_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/buffs_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/loot_tb_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_effects_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db.json
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
