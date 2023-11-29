@@ -126,10 +126,7 @@
       "from_template": "hostile_creature",
       "assemblers": {
         "equipment": true,
-        "auto_equip": true,
-        "inventory": {
-          "loot_table": "<not defined from enemy>"
-        }
+        "auto_equip": true
       }
     },
     {

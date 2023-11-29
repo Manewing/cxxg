@@ -1,0 +1,101 @@
+{
+  "$id": "https://rogue-todo.com/common_types_schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON schema for common types",
+  "defs": {
+    "item_type": {
+      "type": "string",
+      "description": "The type of the item",
+      "enum": [
+        "ring",
+        "amulet",
+        "helmet",
+        "chest_plate",
+        "pants",
+        "boots",
+        "weapon",
+        "shield",
+        "ranged",
+        "generic",
+        "consumable",
+        "quest",
+        "crafting"
+      ]
+    },
+    "capability_flags": {
+      "type": "string",
+      "description": "The type of the capability",
+      "enum": [
+        "use_on",
+        "equip_on",
+        "unequip_from",
+        "equipment",
+        "dismantle",
+        "ranged_use",
+        "adjacent_use"
+      ]
+    },
+    "stat_points": {
+      "type": "object",
+      "description": "The stat points for an item or a character",
+      "required": ["str", "dex", "int", "vit"],
+      "properties": {
+        "str": {
+          "type": "integer",
+          "description": "The strength stat points"
+        },
+        "dex": {
+          "type": "integer",
+          "description": "The dexterity stat points"
+        },
+        "int": {
+          "type": "integer",
+          "description": "The intelligence stat points"
+        },
+        "vit": {
+          "type": "integer",
+          "description": "The vitality stat points"
+        }
+      }
+    },
+    "tile": {
+      "type": "object",
+      "description": "The tile",
+      "required": ["char", "color"],
+      "properties": {
+        "char": {
+          "type": "string",
+          "description": "The character to display"
+        },
+        "color": {
+          "type": "string",
+          "description": "The color of the character"
+        },
+        "bg_color": {
+          "type": "string",
+          "description": "The background color of the character"
+        }
+      }
+    },
+    "faction_kind": {
+      "type": "string",
+      "description": "The kind of the faction for an entity",
+      "enum": ["nature", "enemy", "player"]
+    },
+    "race_kind": {
+      "type": "string",
+      "description": "The kind of race for an entity",
+      "enum": [
+        "human",
+        "elf",
+        "dwarf",
+        "orc",
+        "troll",
+        "goblin",
+        "undead",
+        "creature",
+        "dummy"
+      ]
+    }
+  }
+}

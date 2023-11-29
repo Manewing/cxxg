@@ -51,59 +51,75 @@ function(add_schema_test)
       ${SCHEMA_VALIDATOR}
         --json ${ARGS_JSON_FILES}
         --schema ${ARGS_SCHEMA}
+        --url "https://rogue-todo.com/"
         ${ARGS_RENAME}
   )
 endfunction()
 
+
+add_schema_test(
+  NAME entity_db
+  JSON_FILES ${BUILD_DATA_DIR}/entity_db.json
+  SCHEMA ${SCHEMAS_DIR}/entity_db_schema.json
+)
+
+add_schema_test(
+  NAME build_entity_db
+  JSON_FILES ${BUILD_DATA_DIR}/entity_db.json
+  SCHEMA ${BUILD_SCHEMAS_DIR}/entity_db_schema.json
+)
+
 add_schema_test(
   NAME item_db
-  JSON_FILES ${DATA_DIR}/item_db.json
+  JSON_FILES ${BUILD_DATA_DIR}/item_db.json
   SCHEMA ${SCHEMAS_DIR}/item_db_schema.json
 )
 
 add_schema_test(
   NAME build_item_db
-  JSON_FILES ${DATA_DIR}/item_db.json
+  JSON_FILES ${BUILD_DATA_DIR}/item_db.json
   SCHEMA ${BUILD_SCHEMAS_DIR}/item_db_schema.json
 )
 
 add_schema_test(
   NAME creature_db
-  JSON_FILES ${DATA_DIR}/creature_db.json
+  JSON_FILES ${BUILD_DATA_DIR}/creature_db.json
   SCHEMA ${SCHEMAS_DIR}/creature_db_schema.json
 )
 
 add_schema_test(
   NAME build_creature_db
-  JSON_FILES ${DATA_DIR}/creature_db.json
+  JSON_FILES ${BUILD_DATA_DIR}/creature_db.json
   SCHEMA ${BUILD_SCHEMAS_DIR}/creature_db_schema.json
 )
 
 add_schema_test(
   NAME level_db
-  JSON_FILES ${DATA_DIR}/level_db.json
+  JSON_FILES ${BUILD_DATA_DIR}/level_db.json
   SCHEMA ${SCHEMAS_DIR}/level_db_schema.json
 )
 
 add_schema_test(
   NAME build_level_db
-  JSON_FILES ${DATA_DIR}/level_db.json
+  JSON_FILES ${BUILD_DATA_DIR}/level_db.json
   SCHEMA ${BUILD_SCHEMAS_DIR}/level_db_schema.json
 )
 
 add_schema_test(
   NAME game_config
-  JSON_FILES ${DATA_DIR}/game_config.json ${DATA_DIR}/test_game_config.json
+  JSON_FILES ${BUILD_DATA_DIR}/game_config.json
+             ${BUILD_DATA_DIR}/test_game_config.json
   SCHEMA ${SCHEMAS_DIR}/game_config_schema.json
 )
 
 add_schema_test(
   NAME build_game_config
-  JSON_FILES ${DATA_DIR}/game_config.json ${DATA_DIR}/test_game_config.json
+  JSON_FILES ${BUILD_DATA_DIR}/game_config.json
+             ${BUILD_DATA_DIR}/test_game_config.json
   SCHEMA ${BUILD_SCHEMAS_DIR}/game_config_schema.json
 )
 
-file(GLOB LEVEL_FILES ${DATA_DIR}/levels/*.json)
+file(GLOB LEVEL_FILES ${BUILD_DATA_DIR}/levels/*.json)
 
 add_schema_test(
   NAME level_configs

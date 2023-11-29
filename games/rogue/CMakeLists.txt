@@ -187,25 +187,55 @@ message("Skipping target '${TARGET}' missing libymir")
 endif()
 
 
-add_custom_command(TARGET ${TARGET} POST_BUILD
+add_custom_target(
+  rogue_create_data_dir
+  ALL
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/data/
+)
+
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/data/
+
   COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/data
     ${CMAKE_CURRENT_BINARY_DIR}/data
 
   # Post-process all JSON schemas
   COMMAND
-    ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
     --schema-files
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/entity_db_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_db_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_db_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/game_config_schema.json
       ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/common_types_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_effects_schema.json
     --output-dir
       ${CMAKE_CURRENT_BINARY_DIR}/data/schemas
+
+  # Post-process JSON configurations
+  COMMAND
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/entity_db_post_process.py
+    --entity-db
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db.json
+    --output
+      ${CMAKE_CURRENT_BINARY_DIR}/data/entity_db.json
 
   # Make JSON schemas available for tests
   COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_BINARY_DIR}/data/schemas
-    ${CMAKE_BINARY_DIR}/test/rogue/schemas
+    ${CMAKE_BINARY_DIR}/test/rogue/schemas/
+
+  DEPENDS
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/entity_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/game_config_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/common_types_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_effects_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
 )

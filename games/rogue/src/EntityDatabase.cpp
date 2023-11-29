@@ -235,34 +235,6 @@ EntityTemplateInfo getEntityTemplateInfoFromJson(const rapidjson::Value &Json) {
   return Info;
 }
 
-// Merge partial assembler data from parent entity template
-void mergeAssemblerData(rapidjson::Document &Doc, rapidjson::Value &Dst,
-                        const rapidjson::Value &Src) {
-  rapidjson::Value MergedData;
-  for (const auto &[AsmName, AsmData] : Src.GetObject()) {
-    auto It = Dst.FindMember(AsmName);
-    if (It == Dst.MemberEnd()) {
-      continue;
-    }
-    if (!AsmData.IsObject() || !It->value.IsObject()) {
-      continue;
-    }
-
-    // Copy any missing members
-    auto &DstObj = It->value;
-    for (const auto &Member : AsmData.GetObject()) {
-      if (DstObj.HasMember(Member.name)) {
-        continue;
-      }
-      rapidjson::Value KeyCopy;
-      KeyCopy.CopyFrom(Member.name, Doc.GetAllocator());
-      rapidjson::Value MemberCopy;
-      MemberCopy.CopyFrom(Member.value, Doc.GetAllocator());
-      DstObj.AddMember(KeyCopy, MemberCopy, Doc.GetAllocator());
-    }
-  }
-}
-
 void createEntityTemplates(EntityDatabase &Db, ItemDatabase &ItemDb,
                            rapidjson::Document &Doc,
                            const EntityAssemblerCache &DefaultAssemblers,
@@ -280,8 +252,6 @@ void createEntityTemplates(EntityDatabase &Db, ItemDatabase &ItemDb,
     if (EntityJson.HasMember("from_template")) {
       auto From = std::string(EntityJson["from_template"].GetString());
       Info.from(Db.getEntityTemplate(Db.getEntityTemplateId(From)));
-      mergeAssemblerData(Doc, AssemblersMergedJson,
-                         EntityAssemblerJsons.at(From));
     }
 
     for (const auto &[Name, Data] : AssemblersMergedJson.GetObject()) {

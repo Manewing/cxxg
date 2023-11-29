@@ -28,23 +28,7 @@
           "types": {
             "type": "array",
             "items": {
-              "type": "string",
-              "description": "The type of the item",
-              "enum": [
-                "ring",
-                "amulet",
-                "helmet",
-                "chest_plate",
-                "pants",
-                "boots",
-                "weapon",
-                "shield",
-                "ranged",
-                "generic",
-                "consumable",
-                "quest",
-                "crafting"
-              ]
+              "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/item_type"
             }
           },
           "capabilities": {
@@ -54,17 +38,7 @@
               "required": ["type", "effect"],
               "properties": {
                 "type": {
-                  "type": "string",
-                  "description": "The type of the capability",
-                  "enum": [
-                    "use_on",
-                    "equip_on",
-                    "unequip_from",
-                    "equipment",
-                    "dismantle",
-                    "ranged_use",
-                    "adjacent_use"
-                  ]
+                  "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/capability_flags"
                 },
                 "effect": {
                   "type": "string",
@@ -80,9 +54,7 @@
               "required": ["type", "effect"],
               "properties": {
                 "type": {
-                  "type": "string",
-                  "description": "The type of the capability",
-                  "enum": ["use_on", "equip_on", "unequip_from", "equipment"]
+                  "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/capability_flags"
                 },
                 "specialization": {
                   "type": "string",
