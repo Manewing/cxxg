@@ -185,3 +185,26 @@ else()
 message("Skipping target '${TARGET}' missing libymir")
 
 endif()
+
+
+add_custom_command(TARGET ${TARGET} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/data
+    ${CMAKE_CURRENT_BINARY_DIR}/build/data
+
+  COMMAND
+    ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
+    --schema-files
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/item_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/level_db_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/game_config_schema.json
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/level_config_schema.json
+    --output-dir
+      ${CMAKE_CURRENT_BINARY_DIR}/data
+
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/data/levels
+    ${CMAKE_CURRENT_BINARY_DIR}/data/levels
+)
+

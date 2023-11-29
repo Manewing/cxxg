@@ -1,0 +1,36 @@
+{
+  "$id": "https://rogue-todo.com/game-config-schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Schema for the entity database",
+  "type": "object",
+  "required": ["entity_templates"],
+  "properties": {
+    "entity_templates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/components/entity_template"
+      }
+    }
+  },
+  "components": {
+    "entity_template": {
+      "type": "object",
+      "required": ["name", "assemblers"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "assemblers": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

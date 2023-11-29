@@ -26,46 +26,91 @@ add_cxxg_unittest(
 )
 
 set(DATA_DIR ${CMAKE_SOURCE_DIR}/games/rogue/data)
+set(BUILD_DATA_DIR ${CMAKE_BINARY_DIR}/games/rogue/data)
 set(SCRIPTS_DIR ${CMAKE_SOURCE_DIR}/games/rogue/scripts)
 set(SCHEMA_VALIDATOR ${SCRIPTS_DIR}/validator.py)
 
-add_cxxg_test(
-  NAME rogue_json_schema_game_cfg
-  COMMAND
-    ${SCHEMA_VALIDATOR}
-      --json ${DATA_DIR}/game_config.json ${DATA_DIR}/test_game_config.json
-      --schema ${DATA_DIR}/game_config_schema.json
+function(add_schema_test)
+  set(options "")
+  set(oneValueArgs NAME SCHEMA RENAME)
+  set(multiValueArgs JSON_FILES)
+
+  cmake_parse_arguments(
+    ARGS
+    "${options}"
+    "${oneValueArgs}"
+    "${multiValueArgs}"
+    ${ARGN}
+  )
+
+  add_cxxg_test(
+    NAME rogue_json_schema_${ARGS_NAME}
+    COMMAND
+      ${SCHEMA_VALIDATOR}
+        --json ${ARGS_JSON_FILES}
+        --schema ${ARGS_SCHEMA}
+        ${ARGS_RENAME}
+  )
+endfunction()
+
+add_schema_test(
+  NAME item_db
+  JSON_FILES ${DATA_DIR}/item_db.json
+  SCHEMA ${DATA_DIR}/item_db_schema.json
 )
 
-add_cxxg_test(
-  NAME rogue_json_schema_item_db
-  COMMAND
-    ${SCHEMA_VALIDATOR}
-      --json ${DATA_DIR}/item_db.json
-      --schema ${DATA_DIR}/item_db_schema.json
+add_schema_test(
+  NAME build_item_db
+  JSON_FILES ${DATA_DIR}/item_db.json
+  SCHEMA ${BUILD_DATA_DIR}/item_db_schema.json
 )
 
-add_cxxg_test(
-  NAME rogue_json_schema_creature_db
-  COMMAND
-    ${SCHEMA_VALIDATOR}
-      --json ${DATA_DIR}/creature_db.json
-      --schema ${DATA_DIR}/creature_db_schema.json
+add_schema_test(
+  NAME creature_db
+  JSON_FILES ${DATA_DIR}/creature_db.json
+  SCHEMA ${DATA_DIR}/creature_db_schema.json
 )
 
-add_cxxg_test(
-  NAME rogue_json_schema_level_db
-  COMMAND
-    ${SCHEMA_VALIDATOR}
-      --json ${DATA_DIR}/level_db.json
-      --schema ${DATA_DIR}/level_db_schema.json
+add_schema_test(
+  NAME build_creature_db
+  JSON_FILES ${DATA_DIR}/creature_db.json
+  SCHEMA ${BUILD_DATA_DIR}/creature_db_schema.json
+)
+
+add_schema_test(
+  NAME level_db
+  JSON_FILES ${DATA_DIR}/level_db.json
+  SCHEMA ${DATA_DIR}/level_db_schema.json
+)
+
+add_schema_test(
+  NAME build_level_db
+  JSON_FILES ${DATA_DIR}/level_db.json
+  SCHEMA ${BUILD_DATA_DIR}/level_db_schema.json
+)
+
+add_schema_test(
+  NAME game_config
+  JSON_FILES ${DATA_DIR}/game_config.json ${DATA_DIR}/test_game_config.json
+  SCHEMA ${DATA_DIR}/game_config_schema.json
+)
+
+add_schema_test(
+  NAME build_game_config
+  JSON_FILES ${DATA_DIR}/game_config.json ${DATA_DIR}/test_game_config.json
+  SCHEMA ${BUILD_DATA_DIR}/game_config_schema.json
 )
 
 file(GLOB LEVEL_FILES ${DATA_DIR}/levels/*.json)
-add_cxxg_test(
-  NAME rogue_json_schema_levels
-  COMMAND
-    ${SCHEMA_VALIDATOR}
-      --json ${LEVEL_FILES}
-      --schema ${DATA_DIR}/level_config_schema.json
+
+add_schema_test(
+  NAME level_configs
+  JSON_FILES ${LEVEL_FILES}
+  SCHEMA ${DATA_DIR}/level_config_schema.json
+)
+
+add_schema_test(
+  NAME build_level_configs
+  JSON_FILES ${LEVEL_FILES}
+  SCHEMA ${BUILD_DATA_DIR}/level_config_schema.json
 )
