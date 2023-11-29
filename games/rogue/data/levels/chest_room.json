@@ -43,7 +43,7 @@
   "creatures": [
     {
       "key": "s",
-      "name": "Skeleton",
+      "name": "skeleton",
       "loot": "rare_enemy"
     }
   ],

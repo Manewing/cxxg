@@ -6,12 +6,12 @@
   "creatures": [
     {
       "key": "s",
-      "name": "Skeleton",
+      "name": "skeleton",
       "loot": "common_enemy"
     },
     {
       "key": "t",
-      "name": "Troll",
+      "name": "troll",
       "loot": "rare_enemy"
     }
   ],

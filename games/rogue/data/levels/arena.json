@@ -58,32 +58,32 @@
   "creatures": [
     {
       "key": "s",
-      "name": "Skeleton",
+      "name": "skeleton",
       "loot": "common_enemy"
     },
     {
       "key": "r",
-      "name": "Sewer Rat",
+      "name": "sewer_rat",
       "loot": "common_rat"
     },
     {
       "key": "R",
-      "name": "Toxic Rat",
+      "name": "toxic_rat",
       "loot": "common_rat"
     },
     {
       "key": "t",
-      "name": "Troll",
+      "name": "troll",
       "loot": "rare_enemy"
     },
     {
       "key": "T",
-      "name": "Troll Berserker",
+      "name": "troll_berserker",
       "loot": "rare_enemy"
     },
     {
       "key": "b",
-      "name": "Blob",
+      "name": "blob",
       "loot": "common_blob"
     }
   ],

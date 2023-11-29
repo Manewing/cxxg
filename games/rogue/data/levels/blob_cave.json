@@ -6,7 +6,7 @@
   "creatures": [
     {
       "key": "b",
-      "name": "Blob",
+      "name": "blob",
       "loot": "common_blob"
     }
   ],

@@ -115,9 +115,20 @@
         "line_of_sight": true,
         "wander_ai": true,
         "inventory": {
-          "loot_table": "null",
+          "loot_table": "<not defined from hostile_creature>",
           "is_persistent": false,
           "is_looted": false
+        }
+      }
+    },
+    {
+      "name": "base_enemy",
+      "from": "hostile_creature",
+      "assemblers": {
+        "equipment": true,
+        "auto_equip": true,
+        "inventory": {
+          "loot_table": "<not defined from enemy>"
         }
       }
     },
@@ -141,6 +152,24 @@
         "tile": {
           "color": "#5C5F55",
           "char": "r"
+        },
+        "stats": {
+          "str": 2,
+          "dex": 6,
+          "int": 0,
+          "vit": 3
+        }
+      }
+    },
+    {
+      "name": "toxic_rat",
+      "from": "base_rat",
+      "display_name": "Toxic Rat",
+      "description": "A toxic rat TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#475D35",
+          "char": "R"
         },
         "stats": {
           "str": 2,
@@ -212,6 +241,105 @@
           "dex": 10,
           "int": 0,
           "vit": 3
+        }
+      }
+    },
+    {
+      "name": "base_blob",
+      "from": "hostile_creature",
+      "assemblers": {
+        "faction": "nature",
+        "race": "creature",
+        "inventory": {
+          "loot_table": "common_blob"
+        }
+      }
+    },
+    {
+      "name": "blob",
+      "from": "base_blob",
+      "display_name": "Blob",
+      "description": "A blob TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#2aa310",
+          "char": "b"
+        },
+        "stats": {
+          "str": 4,
+          "dex": 1,
+          "int": 0,
+          "vit": 7
+        }
+      }
+    },
+    {
+      "name": "skeleton",
+      "from": "base_enemy",
+      "display_name": "Skeleton",
+      "description": "A skeleton TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#b8ad74",
+          "char": "s"
+        },
+        "stats": {
+          "str": 2,
+          "dex": 30,
+          "int": 0,
+          "vit": 2
+        },
+        "inventory": {
+          "loot_table": "common_enemy"
+        },
+        "faction": "enemy",
+        "race": "undead"
+      }
+    },
+    {
+      "name": "troll_base",
+      "from": "base_enemy",
+      "assemblers": {
+        "faction": "enemy",
+        "race": "troll",
+        "inventory": {
+          "loot_table": "rare_enemy"
+        }
+      }
+    },
+    {
+      "name": "troll",
+      "from": "troll_base",
+      "display_name": "Troll",
+      "description": "A troll TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#236e36",
+          "char": "t"
+        },
+        "stats": {
+          "str": 4,
+          "dex": 5,
+          "int": 0,
+          "vit": 7
+        }
+      }
+    },
+    {
+      "name": "troll_berserker",
+      "from": "troll_base",
+      "display_name": "Troll Berserker",
+      "description": "A troll berserker TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#236e36",
+          "char": "T"
+        },
+        "stats": {
+          "str": 25,
+          "dex": 8,
+          "int": 0,
+          "vit": 30
         }
       }
     },

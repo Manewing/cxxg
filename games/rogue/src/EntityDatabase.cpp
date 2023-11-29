@@ -244,7 +244,7 @@ void mergeAssemblerData(rapidjson::Document &Doc, rapidjson::Value &Dst,
     if (It == Dst.MemberEnd()) {
       continue;
     }
-    if (!It->value.IsObject()) {
+    if (!AsmData.IsObject() || !It->value.IsObject()) {
       continue;
     }
 
@@ -378,19 +378,24 @@ entt::entity EntityFactory::createEntity(EntityTemplateId Id) const {
   Reg.emplace<NameComp>(Entity, EtTmpl.getDisplayName());
 
   // Assemble entity
-  for (auto &[AsmNm, Assembler] : EtTmpl.Assemblers) {
-    if (Assembler->isPostProcess()) {
-      continue;
+  try {
+    for (auto &[AsmNm, Assembler] : EtTmpl.Assemblers) {
+      if (Assembler->isPostProcess()) {
+        continue;
+      }
+      Assembler->assemble(Reg, Entity);
     }
-    Assembler->assemble(Reg, Entity);
-  }
 
-  // Run post-process assemblers
-  for (auto &[AsmNm, Assembler] : EtTmpl.Assemblers) {
-    if (!Assembler->isPostProcess()) {
-      continue;
+    // Run post-process assemblers
+    for (auto &[AsmNm, Assembler] : EtTmpl.Assemblers) {
+      if (!Assembler->isPostProcess()) {
+        continue;
+      }
+      Assembler->assemble(Reg, Entity);
     }
-    Assembler->assemble(Reg, Entity);
+  } catch (const std::exception &E) {
+    throw std::runtime_error("Failed to assemble entity: " + EtTmpl.Name +
+                             " -> " + std::string(E.what()));
   }
 
   return Entity;

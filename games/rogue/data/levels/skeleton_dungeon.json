@@ -6,7 +6,7 @@
   "creatures": [
     {
       "key": "s",
-      "name": "Skeleton",
+      "name": "skeleton",
       "loot": "common_enemy"
     }
   ],
