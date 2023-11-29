@@ -207,7 +207,7 @@ const auto &getEntityAssemblerFactories() {
   return Factories;
 }
 
-void setupDefaultAssemblers(EntityTemplateInfo &Info,
+void setupDefaultAssembler(EntityTemplateInfo &Info,
                             const EntityAssemblerCache &DefaultAssemblers,
                             const std::string &AsmName, bool IsPresent) {
   if (IsPresent) {
@@ -277,8 +277,8 @@ void createEntityTemplates(EntityDatabase &Db, ItemDatabase &ItemDb,
     AssemblersMergedJson.CopyFrom(AssemblersJson, Doc.GetAllocator());
 
     // Handle inheritance
-    if (EntityJson.HasMember("from")) {
-      auto From = std::string(EntityJson["from"].GetString());
+    if (EntityJson.HasMember("from_template")) {
+      auto From = std::string(EntityJson["from_template"].GetString());
       Info.from(Db.getEntityTemplate(Db.getEntityTemplateId(From)));
       mergeAssemblerData(Doc, AssemblersMergedJson,
                          EntityAssemblerJsons.at(From));
@@ -289,7 +289,7 @@ void createEntityTemplates(EntityDatabase &Db, ItemDatabase &ItemDb,
 
       // Look up assembler in default assembler cache
       if (Data.IsBool()) {
-        setupDefaultAssemblers(Info, DefaultAssemblers, AsmName,
+        setupDefaultAssembler(Info, DefaultAssemblers, AsmName,
                                Data.GetBool());
         continue;
       } else if (DefaultAssemblers.getOrNull(AsmName)) {

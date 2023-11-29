@@ -106,7 +106,7 @@ TEST_F(EntityDatabaseTest, LoadEntityWithInheritanceDefaultComps) {
       },
       {
         "name": "child",
-        "from": "parent",
+        "from_template": "parent",
         "display_name": "disp_child",
         "assemblers": {
           "visible": false
@@ -114,7 +114,7 @@ TEST_F(EntityDatabaseTest, LoadEntityWithInheritanceDefaultComps) {
       },
       {
         "name": "grand_child",
-        "from": "child",
+        "from_template": "child",
         "assemblers": {
           "visible": true,
           "position": true
@@ -171,7 +171,7 @@ TEST_F(EntityDatabaseTest, LoadEntityWithInheritancePartialData) {
       },
       {
         "name": "child",
-        "from": "parent",
+        "from_template": "parent",
         "assemblers": {
           "stats": {
             "str": 5
@@ -180,7 +180,7 @@ TEST_F(EntityDatabaseTest, LoadEntityWithInheritancePartialData) {
       },
       {
         "name": "grand_child",
-        "from": "child",
+        "from_template": "child",
         "assemblers": {
           "stats": {
             "dex": 6
@@ -248,7 +248,7 @@ TEST_F(EntityDatabaseTest, LoadEntityWithComplexAssemblers) {
       },
       {
         "name": "child",
-        "from": "parent",
+        "from_template": "parent",
         "assemblers": {
           "auto_equip": false,
           "equipment": false,

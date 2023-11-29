@@ -24,7 +24,7 @@
     },
     {
       "name": "open_door",
-      "from": "closed_door",
+      "from_template": "closed_door",
       "assemblers": {
         "block_los": false,
         "collision": false,
@@ -35,7 +35,7 @@
     },
     {
       "name": "l1_locked_door",
-      "from": "closed_door",
+      "from_template": "closed_door",
       "assemblers": {
         "door": {
           "key": "L1 Key"
@@ -44,7 +44,7 @@
     },
     {
       "name": "l2_locked_door",
-      "from": "closed_door",
+      "from_template": "closed_door",
       "assemblers": {
         "door": {
           "key": "L2 Key"
@@ -53,7 +53,7 @@
     },
     {
       "name": "l3_locked_door",
-      "from": "closed_door",
+      "from_template": "closed_door",
       "assemblers": {
         "door": {
           "key": "L3 Key"
@@ -62,7 +62,7 @@
     },
     {
       "name": "final_locked_door",
-      "from": "closed_door",
+      "from_template": "closed_door",
       "assemblers": {
         "door": {
           "key": "Final Key"
@@ -80,7 +80,7 @@
     },
     {
       "name": "silk_cocoon",
-      "from": "dummy_creature",
+      "from_template": "dummy_creature",
       "display_name": "Silk Cocoon",
       "description": "Suspended cocoon containing captured prey.",
       "assemblers": {
@@ -123,7 +123,7 @@
     },
     {
       "name": "base_enemy",
-      "from": "hostile_creature",
+      "from_template": "hostile_creature",
       "assemblers": {
         "equipment": true,
         "auto_equip": true,
@@ -134,7 +134,7 @@
     },
     {
       "name": "base_rat",
-      "from": "hostile_creature",
+      "from_template": "hostile_creature",
       "assemblers": {
         "faction": "nature",
         "race": "creature",
@@ -145,7 +145,7 @@
     },
     {
       "name": "sewer_rat",
-      "from": "base_rat",
+      "from_template": "base_rat",
       "display_name": "Sewer Rat",
       "description": "A rat TODO",
       "assemblers": {
@@ -163,7 +163,7 @@
     },
     {
       "name": "toxic_rat",
-      "from": "base_rat",
+      "from_template": "base_rat",
       "display_name": "Toxic Rat",
       "description": "A toxic rat TODO",
       "assemblers": {
@@ -181,7 +181,7 @@
     },
     {
       "name": "base_spider",
-      "from": "hostile_creature",
+      "from_template": "hostile_creature",
       "assemblers": {
         "faction": "nature",
         "race": "creature",
@@ -192,7 +192,7 @@
     },
     {
       "name": "arachnoth_hatchling",
-      "from": "base_spider",
+      "from_template": "base_spider",
       "display_name": "Arachnoth Hatchling",
       "description": "Agile spiderlings that scuttle around the lair.",
       "assemblers": {
@@ -210,7 +210,7 @@
     },
     {
       "name": "arachnoth_burrower",
-      "from": "base_spider",
+      "from_template": "base_spider",
       "display_name": "Arachnoth Burrower",
       "description": "Spider with razor-sharp claws that emerges from hidden tunnels to ambush intruders.",
       "assemblers": {
@@ -228,7 +228,7 @@
     },
     {
       "name": "arachnoth_broodguard",
-      "from": "base_spider",
+      "from_template": "base_spider",
       "display_name": "Arachnoth Broodguard",
       "description": "Large more aggressive spider that protects key areas of the lair.",
       "assemblers": {
@@ -246,7 +246,7 @@
     },
     {
       "name": "base_blob",
-      "from": "hostile_creature",
+      "from_template": "hostile_creature",
       "assemblers": {
         "faction": "nature",
         "race": "creature",
@@ -257,7 +257,7 @@
     },
     {
       "name": "blob",
-      "from": "base_blob",
+      "from_template": "base_blob",
       "display_name": "Blob",
       "description": "A blob TODO",
       "assemblers": {
@@ -275,7 +275,7 @@
     },
     {
       "name": "skeleton",
-      "from": "base_enemy",
+      "from_template": "base_enemy",
       "display_name": "Skeleton",
       "description": "A skeleton TODO",
       "assemblers": {
@@ -298,7 +298,7 @@
     },
     {
       "name": "troll_base",
-      "from": "base_enemy",
+      "from_template": "base_enemy",
       "assemblers": {
         "faction": "enemy",
         "race": "troll",
@@ -309,7 +309,7 @@
     },
     {
       "name": "troll",
-      "from": "troll_base",
+      "from_template": "troll_base",
       "display_name": "Troll",
       "description": "A troll TODO",
       "assemblers": {
@@ -327,7 +327,7 @@
     },
     {
       "name": "troll_berserker",
-      "from": "troll_base",
+      "from_template": "troll_base",
       "display_name": "Troll Berserker",
       "description": "A troll berserker TODO",
       "assemblers": {
@@ -353,7 +353,7 @@
     },
     {
       "name": "healer",
-      "from": "base_interact",
+      "from_template": "base_interact",
       "display_name": "Healer",
       "description": "A healer TODO",
       "assemblers": {
@@ -366,7 +366,7 @@
     },
     {
       "name": "shop",
-      "from": "base_interact",
+      "from_template": "base_interact",
       "display_name": "Shop",
       "description": "A shop TODO",
       "assemblers": {
@@ -379,7 +379,7 @@
     },
     {
       "name": "work_bench",
-      "from": "base_interact",
+      "from_template": "base_interact",
       "display_name": "Work Bench",
       "description": "A work bench TODO",
       "assemblers": {
@@ -392,7 +392,7 @@
     },
     {
       "name": "level_entry",
-      "from": "base_interact",
+      "from_template": "base_interact",
       "display_name": "Level Entry",
       "description": "A level entry TODO",
       "assemblers": {
@@ -408,7 +408,7 @@
     },
     {
       "name": "level_exit",
-      "from": "level_entry",
+      "from_template": "level_entry",
       "display_name": "Level Exit",
       "description": "A level exit TODO",
       "assemblers": {
