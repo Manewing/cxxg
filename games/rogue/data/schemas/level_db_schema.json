@@ -1,0 +1,54 @@
+{
+  "$id": "https://rogue-todo.com/level-db-schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Schema the level database",
+  "type": "object",
+  "required": ["level_tables"],
+  "properties": {
+    "level_tables": {
+      "type": "object",
+      "description": "Map of level name to level table",
+      "additionalProperties": {
+        "type": "object",
+        "description": "A level table",
+        "required": ["slots"],
+        "properties": {
+          "slots": {
+            "type": "array",
+            "description": "List of slots in the level table",
+            "items": {
+              "type": "object",
+              "description": "A slot in the level table",
+              "required": ["type", "weight"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "description": "The type of level container",
+                  "enum": ["level", "table"]
+                },
+                "weight": {
+                  "type": "number",
+                  "description": "Weight for the slot in the table"
+                },
+                "game_world": {
+                  "type": "string",
+                  "description": "The game world type for the level container"
+                },
+                "level_config": {
+                  "type": "string",
+                  "description": "The level config for the level container"
+                },
+                "ref": {
+                  "type": "string",
+                  "description": "The reference to another level table"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

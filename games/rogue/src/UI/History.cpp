@@ -3,6 +3,7 @@
 #include <rogue/History.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/History.h>
+#include <rogue/UI/Controls.h>
 
 namespace rogue::ui {
 
@@ -18,18 +19,18 @@ HistoryController::HistoryController(cxxg::types::Position Pos,
 
 bool HistoryController::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_DOWN:
+  case Controls::MoveDown.Char:
     if (!Hist.getMessages().empty() && Offset < Hist.getMessages().size() - 2) {
       Offset++;
     }
     break;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     if (Offset > 0) {
       Offset--;
     }
     break;
-  case cxxg::utils::KEY_ESC:
-  case 'h':
+  case Controls::CloseWindow.Char:
+  case Controls::HistoryUI.Char:
     return false;
   default:
     break;
@@ -37,8 +38,8 @@ bool HistoryController::handleInput(int Char) {
   return true;
 }
 
-std::string_view HistoryController::getInteractMsg() const {
-  return "[^/v] Navigate";
+std::string HistoryController::getInteractMsg() const {
+  return Controls::Navigate.getInteractMsg();
 }
 
 void HistoryController::draw(cxxg::Screen &Scr) const {
@@ -46,7 +47,8 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
   std::string_view Header = "History";
 
   // Draw header
-  Frame::drawFrameHeader(Scr, {Pos.X, Pos.Y}, Header, Scr.getSize().X);
+  Frame::drawFrameHeader(Scr, {Pos.X, Pos.Y}, Header, Scr.getSize().X,
+                         cxxg::types::Color::NONE, cxxg::types::Color::NONE);
 
   const auto &Msgs = Hist.getMessages();
   for (unsigned int Idx = 0; Idx < NumHistoryRows; Idx++) {
@@ -70,7 +72,12 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
       continue;
     }
 
-    Scr[LinePos] = Msgs.at(MsgPos);
+    const auto &Msg = Msgs.at(MsgPos);
+    if (Msg.Count > 1) {
+      Scr[LinePos][Pos.X] << Msg.Count << "x " << Msgs.at(MsgPos).Row;
+    } else {
+      Scr[LinePos][Pos.X] << Msgs.at(MsgPos).Row;
+    }
   }
 
   // Draw footer
@@ -81,7 +88,8 @@ void HistoryController::draw(cxxg::Screen &Scr) const {
   std::string Footer = std::to_string(Start) + "-" + std::to_string(End);
 
   Frame::drawFrameHeader(Scr, {Pos.X, Pos.Y + NumHistoryRows + 1}, Footer,
-                         Scr.getSize().X);
+                         Scr.getSize().X, cxxg::types::Color::NONE,
+                         cxxg::types::Color::NONE);
 }
 
 } // namespace rogue::ui

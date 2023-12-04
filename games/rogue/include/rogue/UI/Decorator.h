@@ -2,6 +2,7 @@
 #define ROGUE_UI_DECORATOR_H
 
 #include <cxxg/Types.h>
+#include <functional>
 #include <memory>
 #include <rogue/UI/Widget.h>
 
@@ -16,11 +17,24 @@ public:
 
   void setPos(cxxg::types::Position Pos) override;
   bool handleInput(int Char) override;
-  std::string_view getInteractMsg() const override;
+  std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
 
 protected:
   std::shared_ptr<Widget> Comp;
+};
+
+class BaseRectDecorator : public Decorator {
+public:
+  BaseRectDecorator(cxxg::types::Position Pos, cxxg::types::Size Size,
+                    std::shared_ptr<Widget> Comp);
+  void setPos(cxxg::types::Position Pos) override;
+  void draw(cxxg::Screen &Scr) const override;
+
+  cxxg::types::Size getSize() const { return Rect.getSize(); }
+
+protected:
+  BaseRect Rect;
 };
 
 // PreventCloseDecorator

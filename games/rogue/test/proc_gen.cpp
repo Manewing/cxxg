@@ -3,7 +3,6 @@
 #include <cxxg/Utils.h>
 #include <memory>
 #include <rogue/LevelGenerator.h>
-#include <rogue/NPCEntity.h>
 #include <rogue/Renderer.h>
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
@@ -42,10 +41,6 @@ const Tile WaterTile{
 // 50}}};
 
 const Tile ChunkMarker{{'x', cxxg::types::RgbColor{255, 0, 0, true, 0, 0, 0}}};
-
-const std::vector<std::string> Layers = {
-    "ground", "ground_deco", "walls", "objects", "walls_deco", "enemies",
-};
 
 ymir::Map<float> generateSimplexNoiseMap(ymir::Size2d<int> Size,
                                          ymir::Point2d<int> Offset = {0, 0},
@@ -96,7 +91,7 @@ struct Chunk {
 
 std::shared_ptr<Level> generateChunk(int LevelId, ymir::Rect2d<int> ChunkRect) {
   const auto Size = ChunkRect.Size;
-  auto NewChunk = std::make_shared<Level>(LevelId, Layers, Size);
+  auto NewChunk = std::make_shared<Level>(LevelId, Size);
 
   //  auto HeightMap = generateSimplexNoiseMap(Size, ChunkRect.Pos, 0, 2048.0f,
   //  6);
@@ -115,9 +110,9 @@ std::shared_ptr<Level> generateChunk(int LevelId, ymir::Rect2d<int> ChunkRect) {
   return NewChunk;
 }
 
-class GameWorld {
+class GameWorldProcGen {
 public:
-  virtual ~GameWorld() = default;
+  virtual ~GameWorldProcGen() = default;
   virtual void initialize(ymir::Point2d<int> InitPos = {0, 0}) = 0;
   virtual bool update(ymir::Point2d<int> Pos = {0, 0}) = 0;
 
@@ -132,7 +127,7 @@ public:
   }
 };
 
-class OverWorld : public GameWorld {
+class OverWorld : public GameWorldProcGen {
 public:
   explicit OverWorld(ymir::Size2d<int> ChunkSize) : ChunkSize(ChunkSize) {}
 
@@ -161,7 +156,6 @@ public:
   void loadChunk(ymir::Point2d<int> ChunkPos) {
     auto It = ChunkMap.lower_bound(ChunkPos);
     if (It == ChunkMap.end() || It->first != ChunkPos) {
-      std::cerr << "load chunk: " << ChunkPos << std::endl;
       auto Chunk = generateChunk(ChunkMap.size(), {ChunkPos, ChunkSize});
       ChunkMap.insert(It, {ChunkPos, Chunk});
     }
@@ -225,7 +219,7 @@ public:
 };
 
 ymir::Map<cxxg::types::ColoredChar> renderWorldMap(ymir::Size2d<int> Size,
-                                                   const GameWorld &GW,
+                                                   const GameWorldProcGen &GW,
                                                    ymir::Point2d<int> Center) {
   ymir::Map<cxxg::types::ColoredChar> VisibleMap(Size);
   ymir::Point2d<int> Offset;
@@ -312,7 +306,7 @@ private:
   int Speed = 1;
 
   const ymir::Size2d<int> ChunkSize = {256, 64};
-  std::shared_ptr<GameWorld> CurrentGameWorld;
+  std::shared_ptr<GameWorldProcGen> CurrentGameWorld;
 };
 
 int main(int Argc, char *Argv[]) {

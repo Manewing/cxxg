@@ -10,7 +10,9 @@ namespace cxxg {
 
 namespace types {
 
-template <class... Ts> struct Overloaded : Ts... { using Ts::operator()...; };
+template <class... Ts> struct Overloaded : Ts... {
+  using Ts::operator()...;
+};
 template <class... Ts> Overloaded(Ts...) -> Overloaded<Ts...>;
 
 template <typename T, typename... Ts>
@@ -110,27 +112,27 @@ std::ostream &operator<<(std::ostream &Out, const NoColor &NC);
 struct DefaultColor {
   FontStyle FS{};
 
-  constexpr auto italic() const {
+  constexpr auto italic(bool Enabled = true) const {
     auto Copy = *this;
-    Copy.FS.Italic = 1;
+    Copy.FS.Italic = Enabled ? 1 : 0;
     return Copy;
   }
 
-  constexpr auto bold() const {
+  constexpr auto bold(bool Enabled = true) const {
     auto Copy = *this;
-    Copy.FS.Bold = 1;
+    Copy.FS.Bold = Enabled ? 1 : 0;
     return Copy;
   }
 
-  constexpr auto underline() const {
+  constexpr auto underline(bool Enabled = true) const {
     auto Copy = *this;
-    Copy.FS.Underline = 1;
+    Copy.FS.Underline = Enabled ? 1 : 0;
     return Copy;
   }
 
-  constexpr auto striketrhough() const {
+  constexpr auto striketrhough(bool Enabled = true) const {
     auto Copy = *this;
-    Copy.FS.Strikethrough = 1;
+    Copy.FS.Strikethrough = Enabled ? 1 : 0;
     return Copy;
   }
 };
@@ -156,27 +158,27 @@ struct RgbColor {
   uint8_t BgB = 0;
   FontStyle FS{};
 
-  constexpr auto italic() const {
+  constexpr auto italic(bool Enabled = true) const {
     auto Copy = *this;
-    Copy.FS.Italic = 1;
+    Copy.FS.Italic = Enabled ? 1 : 0;
     return Copy;
   }
 
-  constexpr auto bold() const {
+  constexpr auto bold(bool Enabled = true) const {
     auto Copy = *this;
-    Copy.FS.Bold = 1;
+    Copy.FS.Bold = Enabled ? 1 : 0;
     return Copy;
   }
 
-  constexpr auto underline() const {
+  constexpr auto underline(bool Enabled = true) const {
     auto Copy = *this;
-    Copy.FS.Underline = 1;
+    Copy.FS.Underline = Enabled ? 1 : 0;
     return Copy;
   }
 
-  constexpr auto striketrhough() const {
+  constexpr auto striketrhough(bool Enabled = true) const {
     auto Copy = *this;
-    Copy.FS.Strikethrough = 1;
+    Copy.FS.Strikethrough = Enabled ? 1 : 0;
     return Copy;
   }
 };

@@ -1,0 +1,225 @@
+{
+  "$id": "https://rogue-todo.com/entity-db-schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Schema for the entity database",
+  "type": "object",
+  "required": ["entity_templates"],
+  "properties": {
+    "entity_templates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/defs/entity_template"
+      }
+    }
+  },
+  "defs": {
+    "entity_template": {
+      "type": "object",
+      "required": ["name", "assemblers"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "from_template": {
+          "type": "string",
+          "description": "Name of the template this template inherits from"
+        },
+        "assemblers": {
+          "type": "object",
+          "description": "Assembler that are to be used to create the entity. Marking any assembler as false will remove it from the entity if it was inherited from a parent.",
+          "properties": {
+            "position": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "collision": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "health": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "block_los": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "visible": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "attack_ai": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "wander_ai": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "line_of_sight": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "equipment": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "auto_equip": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "agility": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "healer": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "shop": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "work_bench": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
+            "door": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/door"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "faction": {
+              "anyOf": [
+                {
+                  "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/faction_kind"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "race": {
+              "anyOf": [
+                {
+                  "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/race_kind"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "stats": {
+              "anyOf": [
+                {
+                  "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/stat_points"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "inventory": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/inventory"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "tile": {
+              "anyOf": [
+                {
+                  "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "level_entry_exit": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/level_entry_exit"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "assembler_types": {
+      "door": {
+        "type": "object",
+        "required": ["is_open", "closed_tile", "open_tile"],
+        "properties": {
+          "is_open": {
+            "type": "boolean",
+            "description": "Whether the door is open or closed"
+          },
+          "key": {
+            "type": "string",
+            "description": "If provided key that opens the door"
+          },
+          "closed_tile": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          },
+          "open_tile": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "additionalProperties": false
+      },
+      "inventory": {
+        "type": "object",
+        "required": ["loot_table", "is_persistent", "is_looted"],
+        "properties": {
+          "loot_table": {
+            "type": "string",
+            "description": "Name of the loot table to use for creating this inventory"
+          },
+          "is_persistent": {
+            "type": "boolean",
+            "description": "Whether the inventory should be persistent or not"
+          },
+          "is_looted": {
+            "type": "boolean",
+            "description": "Whether the inventory has been looted or not"
+          }
+        },
+        "additionalProperties": false
+      },
+      "level_entry_exit": {
+        "type": "object",
+        "required": ["is_exit", "level_id"],
+        "properties": {
+          "is_exit": {
+            "type": "boolean",
+            "description": "Whether the entity is an exit or an entry"
+          },
+          "level_id": {
+            "type": "integer",
+            "description": "Id of the level to enter or exit"
+          }
+        },
+        "additionalProperties": false
+      },
+      "on_off": {
+        "type": "boolean",
+        "description": "Type for assemblers that can only be enabled or disabled"
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -8,9 +8,9 @@ namespace rogue {
 class StatsSystem : public System {
 public:
   using System::System;
-  void update() override;
+  void update(UpdateType Type) override;
 };
 
 } // namespace rogue
 
-#endif // #ifndef ROGUE_SYSTEMS_REGEN_SYSTEM_H
+#endif // #ifndef ROGUE_SYSTEMS_STATS_SYSTEM_H

@@ -1,0 +1,58 @@
+{
+  "$id": "https://rogue-todo.com/game-config-schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Schema the game config",
+  "type": "object",
+  "required": [
+    "creature_db_config",
+    "item_db_config",
+    "level_db_config",
+    "initial_game_world",
+    "initial_level_config",
+    "initial_items"
+  ],
+  "properties": {
+    "item_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the item DB config file"
+    },
+    "creature_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the creature DB config file"
+    },
+    "entity_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the entity DB config file"
+    },
+    "level_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the level DB config file"
+    },
+    "initial_game_world": {
+      "type": "string",
+      "description": ""
+    },
+    "initial_level_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the initial level configuration file"
+    },
+    "initial_items": {
+      "type": "array",
+      "description": "Items the player starts with",
+      "items": {
+        "type": "object",
+        "required": ["name", "count"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the item"
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of items"
+          }
+        }
+      }
+    }
+  }
+}

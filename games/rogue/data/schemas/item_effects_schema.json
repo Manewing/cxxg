@@ -1,0 +1,336 @@
+{
+  "$id": "https://rogue-todo.com/item_effects_schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON schema for item effects",
+  "defs": {
+    "effect": {
+      "type": {
+        "anyOf": [
+          {
+            "$ref": "#/defs/effect/health_item_effect"
+          },
+          {
+            "$ref": "#/defs/effect/damage_item_effect"
+          },
+          {
+            "$ref": "#/defs/effect/stats_buff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/poison_debuff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/health_regen_buff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/bleeding_debuff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/stats_buff_per_hit_comp"
+          },
+          {
+            "$ref": "#/defs/effect/armor_buff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/block_comp"
+          },
+          {
+            "$ref": "#/defs/effect/blinded_debuff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/mind_vision_buff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/invisibility_buff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/melee_attack_comp"
+          },
+          {
+            "$ref": "#/defs/effect/ranged_attack_comp"
+          },
+          {
+            "$ref": "#/defs/effect/dismantle"
+          }
+        ]
+      },
+      "health_item_effect": {
+        "type": "object",
+        "properties": {
+          "health_value": {
+            "type": "number",
+            "minimum": 0
+          },
+          "type": {
+            "const": "health_item_effect"
+          }
+        },
+        "required": ["health_value", "type"],
+        "additionalProperties": false
+      },
+      "damage_item_effect": {
+        "type": "object",
+        "properties": {
+          "damage_value": {
+            "type": "number",
+            "minimum": 0
+          },
+          "type": {
+            "const": "damage_item_effect"
+          }
+        },
+        "required": ["damage_value", "type"],
+        "additionalProperties": false
+      },
+      "stats_buff_comp": {
+        "type": "object",
+        "properties": {
+          "stats": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/stat_points"
+          },
+          "type": {
+            "const": "stats_buff_comp"
+          }
+        },
+        "required": ["stats", "type"],
+        "additionalProperties": false
+      },
+      "poison_debuff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "poison_debuff_comp"
+          },
+          "buff": {
+            "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/reduction_buff"
+          }
+        },
+        "required": ["buff", "type"],
+        "additionalProperties": false
+      },
+      "health_regen_buff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "health_regen_buff_comp"
+          },
+          "buff": {
+            "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/regeneration_buff"
+          }
+        },
+        "required": ["buff", "type"],
+        "additionalProperties": false
+      },
+      "bleeding_debuff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "bleeding_debuff_comp"
+          },
+          "buff": {
+            "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/reduction_buff"
+          }
+        },
+        "required": ["buff", "type"],
+        "additionalProperties": false
+      },
+      "stats_buff_per_hit_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "stats_buff_per_hit_comp"
+          },
+          "stats": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/stat_points"
+          },
+          "max_stacks": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "ticks": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["stats", "max_stacks", "ticks", "type"],
+        "additionalProperties": false
+      },
+      "armor_buff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "armor_buff_comp"
+          },
+          "phys_armor": {
+            "type": "number",
+            "minimum": 0
+          },
+          "magic_armor": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": ["phys_armor", "magic_armor", "type"],
+        "additionalProperties": false
+      },
+      "block_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "block_comp"
+          },
+          "block_chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": ["block_chance", "type"],
+        "additionalProperties": false
+      },
+      "blinded_debuff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "blinded_debuff_comp"
+          },
+          "ticks": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["ticks", "type"],
+        "additionalProperties": false
+      },
+      "mind_vision_buff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "mind_vision_buff_comp"
+          },
+          "ticks": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "range": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["ticks", "range", "type"],
+        "additionalProperties": false
+      },
+      "invisibility_buff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "invisibility_buff_comp"
+          },
+          "ticks": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["ticks", "type"],
+        "additionalProperties": false
+      },
+      "melee_attack_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "melee_attack_comp"
+          },
+          "phys_damage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "magic_damage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "ap_cost": {
+            "type": "integer",
+            "minimum": 10
+          }
+        },
+        "required": ["phys_damage", "magic_damage", "ap_cost", "type"],
+        "additionalProperties": false
+      },
+      "ranged_attack_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "ranged_attack_comp"
+          },
+          "phys_damage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "magic_damage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "ap_cost": {
+            "type": "integer",
+            "minimum": 10
+          }
+        },
+        "required": ["phys_damage", "magic_damage", "ap_cost", "type"],
+        "additionalProperties": false
+      },
+      "dismantle": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "dismantle"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": ["name", "amount"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["items", "type"],
+        "additionalProperties": false
+      }
+    },
+    "specialization": {
+      "type": {
+        "anyOf": [
+          {
+            "$ref": "#/defs/specialization/stats_buff_comp_spec"
+          }
+        ]
+      },
+      "stats_buff_comp_spec": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "stats_buff_comp_spec"
+          },
+          "max_points": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "min_points": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["min_points", "max_points", "type"],
+        "additionalProperties": false
+      }
+    }
+  }
+}

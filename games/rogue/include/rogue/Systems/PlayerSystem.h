@@ -10,7 +10,7 @@ class Level;
 class PlayerSystem : public System {
 public:
   explicit PlayerSystem(Level &L);
-  void update() override;
+  void update(UpdateType Type) override;
 
 private:
   Level &L;

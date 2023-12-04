@@ -39,6 +39,9 @@ public:
   /// Callback for handling drawing to the game screen, called from game loop.
   virtual void handleDraw();
 
+  /// Callback for handling showing notifications, called from game loop.
+  virtual void handleShowNotifications(bool ClearNotifications);
+
   /// Handles game exit, restores environment to its original state.
   virtual void handleExit();
 

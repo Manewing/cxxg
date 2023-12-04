@@ -11,9 +11,11 @@ public:
   TextBox(cxxg::types::Position Pos, cxxg::types::Size Size,
           const std::string &Text, cxxg::types::Size Padding = {2, 1});
 
+  void setText(const std::string &Text);
+
   bool handleInput(int Char) final;
 
-  std::string_view getInteractMsg() const final;
+  std::string getInteractMsg() const final;
 
   void draw(cxxg::Screen &Scr) const override;
 

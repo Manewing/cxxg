@@ -1,3 +1,4 @@
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/Level.h>
@@ -44,6 +45,14 @@ void Renderer::renderFogOfWar(const ymir::Map<bool, int> &SeenMap) {
   (void)FogTile;
 }
 
+void Renderer::renderAllLineOfSight() {
+  auto View = L.Reg.view<const PositionComp, const LineOfSightComp,
+                         const VisibleLOSComp>();
+  View.each([this](const auto &Pos, const auto &LOS, const auto &) {
+    renderLineOfSight(Pos, LOS.LOSRange);
+  });
+}
+
 void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
   renderVisible(AtPos);
 
@@ -52,11 +61,12 @@ void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
         renderVisible(Pos);
         return !L.isLOSBlocked(Pos);
       },
-      AtPos, Range, 0.01);
+      AtPos, Range, 0.3, 0.01);
 }
 
 void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
-  if (!VisibleMap.contains(AtPos + Offset)) {
+  if (!VisibleMap.contains(AtPos + Offset) ||
+      !RenderedLevelMap.contains(AtPos)) {
     return;
   }
   auto &Tile = VisibleMap.getTile(AtPos + Offset);
@@ -73,13 +83,32 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
   }
 }
 
+void Renderer::renderEffect(cxxg::types::ColoredChar EffC,
+                            ymir::Point2d<int> AtPos) {
+  if (!VisibleMap.contains(AtPos + Offset)) {
+    return;
+  }
+  VisibleMap.getTile(AtPos + Offset) = EffC;
+}
+
 void Renderer::renderEntities() {
   L.Reg.sort<TileComp>(
       [](const auto &Lhs, const auto &Rhs) { return Lhs.ZIndex < Rhs.ZIndex; });
   L.Reg.sort<PositionComp, TileComp>();
-  auto View = L.Reg.view<const PositionComp, const TileComp>();
-  View.each([this](const auto &Pos, const auto &T) {
-    RenderedLevelMap.getTile(Pos) = T.T;
+  auto View =
+      L.Reg.view<const PositionComp, const TileComp, const VisibleComp>();
+  View.each([this](const auto &Pos, const auto &T, const auto &VC) {
+    if (!VC.IsVisible && !VC.Partially) {
+      return;
+    }
+    if (!RenderedLevelMap.contains(Pos)) {
+      return;
+    }
+    if (!VC.IsVisible && VC.Partially) {
+      RenderedLevelMap.getTile(Pos).T.Char = T.T.T.Char;
+    } else {
+      RenderedLevelMap.getTile(Pos) = T.T;
+    }
   });
 }
 

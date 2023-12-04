@@ -2,7 +2,6 @@
 #define ROGUE_HISTORY_H
 
 #include <cxxg/Row.h>
-#include <rogue/Entity.h>
 #include <rogue/EventHub.h>
 #include <sstream>
 #include <string>
@@ -11,7 +10,13 @@
 namespace rogue {
 class Game;
 class History;
+struct DebugMessageEvent;
+struct EntityAttackEvent;
 struct EntityDiedEvent;
+struct BuffExpiredEvent;
+struct PlayerInfoMessageEvent;
+struct WarningMessageEvent;
+struct ErrorMessageEvent;
 } // namespace rogue
 
 namespace rogue {
@@ -36,41 +41,46 @@ class History {
   friend class HistoryMessageAssembler;
 
 public:
+  struct Message {
+    // FIXME refactor to decouple from cxxg
+    cxxg::Row Row;
+
+    /// Number of times this message has been repeated
+    unsigned Count = 1;
+  };
+
+public:
   explicit History(Game &G);
   HistoryMessageAssembler info();
   HistoryMessageAssembler warn();
 
-  const std::vector<cxxg::Row> &getMessages() const { return Messages; }
+  const std::vector<Message> &getMessages() const { return Messages; }
 
 private:
   void addMessage(const cxxg::Row &Msg);
 
 private:
   Game &G;
-  std::vector<cxxg::Row> Messages;
-};
-
-struct DebugMessageEvent : public Event {
-  std::stringstream Message;
-
-  template <typename Type> DebugMessageEvent &operator<<(const Type &T) {
-    Message << T;
-    return *this;
-  }
+  std::vector<Message> Messages;
 };
 
 class EventHistoryWriter : public EventHubConnector {
 public:
-  explicit EventHistoryWriter(History &Hist);
+  explicit EventHistoryWriter(History &Hist, bool Debug = false);
   void setEventHub(EventHub *Hub) final;
 
 private:
   void onEntityAttackEvent(const EntityAttackEvent &EAE);
   void onEntityDiedEvent(const EntityDiedEvent &EDE);
+  void onBuffExpiredEvent(const BuffExpiredEvent &BEE);
+  void onPlayerInfoMessageEvent(const PlayerInfoMessageEvent &PIME);
+  void onWarningMessageEvent(const WarningMessageEvent &WarnEv);
+  void onErrorMessageEvent(const ErrorMessageEvent &ErrEv);
   void onDebugMessageEvent(const DebugMessageEvent &DbgEv);
 
 private:
   History &Hist;
+  bool Debug = false;
 };
 
 } // namespace rogue

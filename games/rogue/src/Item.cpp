@@ -1,107 +1,72 @@
-#include <rogue/Components/Stats.h>
+#include <rogue/Components/Buffs.h>
 #include <rogue/Item.h>
+#include <rogue/ItemEffect.h>
+#include <rogue/ItemPrototype.h>
 
 namespace rogue {
-
-HealItemEffect::HealItemEffect(StatValue Amount) : Amount(Amount) {}
-
-bool HealItemEffect::canApplyTo(const entt::entity &Et,
-                                entt::registry &Reg) const {
-  return Reg.any_of<HealthComp>(Et);
-}
-
-void HealItemEffect::applyTo(const entt::entity &Et,
-                             entt::registry &Reg) const {
-  Reg.get<HealthComp>(Et).restore(Amount);
-}
-
-DamageItemEffect::DamageItemEffect(StatValue Amount) : Amount(Amount) {}
-
-bool DamageItemEffect::canApplyTo(const entt::entity &Et,
-                                  entt::registry &Reg) const {
-  return Reg.any_of<HealthComp>(Et);
-}
-
-void DamageItemEffect::applyTo(const entt::entity &Et,
-                               entt::registry &Reg) const {
-  Reg.get<HealthComp>(Et).reduce(Amount);
-}
-
-bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
-  return
-      // Equipment
-      ((Flags & CapabilityFlags::Equipment) != CapabilityFlags::None &&
-       (Type & ItemType::EquipmentMask) != ItemType::None) ||
-      // Consumable
-      ((Flags & CapabilityFlags::UseOn) != CapabilityFlags::None &&
-       (Type & ItemType::Consumable) != ItemType::None);
-}
-
-ItemPrototype::ItemPrototype(int ItemId, std::string N, ItemType Type,
-                             int MaxStatckSize, std::vector<EffectInfo> Eff)
-    : ItemId(ItemId), Name(std::move(N)), Type(Type),
-      MaxStatckSize(MaxStatckSize), Effects(std::move(Eff)) {}
-
-bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
-                               CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return false;
-  }
-  bool CanApply = true;
-  for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
-      CanApply = CanApply && Info.Effect->canApplyTo(Entity, Reg);
-    }
-  }
-  return CanApply;
-}
-
-void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
-                            CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return;
-  }
-  for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
-      Info.Effect->applyTo(Entity, Reg);
-    }
-  }
-}
-
-bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
-                                  entt::registry &Reg,
-                                  CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return false;
-  }
-  bool CanRemove = true;
-  for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
-      CanRemove = CanRemove && Info.Effect->canRemoveFrom(Entity, Reg);
-    }
-  }
-  return CanRemove;
-}
-
-void ItemPrototype::removeFrom(const entt::entity &Entity, entt::registry &Reg,
-                               CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags)) {
-    return;
-  }
-  for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
-      Info.Effect->removeFrom(Entity, Reg);
-    }
-  }
-}
 
 Item::Item(const ItemPrototype &Proto, int StackSize,
            const std::shared_ptr<ItemPrototype> &Spec)
     : StackSize(StackSize), Proto(&Proto), Specialization(Spec) {}
 
+namespace {
+
+std::string getQualifierName(const StatPoints &P) {
+  std::string Prefix = "+" + std::to_string(P.sum()) + " ";
+  if (P.Str == P.Dex && P.Str == P.Int && P.Str == P.Vit) {
+    return Prefix + "Bal. ";
+  }
+  if (P.Str >= P.Dex && P.Str >= P.Int && P.Str >= P.Vit) {
+    return Prefix + "Str. ";
+  }
+  if (P.Dex >= P.Str && P.Dex >= P.Int && P.Dex >= P.Vit) {
+    return Prefix + "Fast ";
+  }
+  if (P.Int >= P.Str && P.Int >= P.Dex && P.Int >= P.Vit) {
+    return Prefix + "Wise ";
+  }
+  if (P.Vit >= P.Str && P.Vit >= P.Dex && P.Vit >= P.Int) {
+    return Prefix + "Tgh. ";
+  }
+  return Prefix;
+}
+
+std::string getQualifierName(const Item &It) {
+  // Check for stats buff effect and return name based strongest
+  // stat point boost
+  for (const auto &ItEff : It.getAllEffects()) {
+    if ((ItEff.Flags & CapabilityFlags::Equipment) == CapabilityFlags::None) {
+      continue;
+    }
+    const auto *StatEff =
+        dynamic_cast<const ApplyBuffItemEffectBase *>(ItEff.Effect.get());
+    if (!StatEff) {
+      continue;
+    }
+    const auto *StatBuff =
+        dynamic_cast<const StatsBuffComp *>(&StatEff->getBuff());
+    if (!StatBuff) {
+      continue;
+    }
+    return getQualifierName(StatBuff->Bonus);
+  }
+  return "";
+}
+
+} // namespace
+
+int Item::getId() const { return getProto().ItemId; }
+
 std::string Item::getName() const {
-  // TODO make name depend on quality etc
+  if ((getType() & ItemType::EquipmentMask) != ItemType::None) {
+    return getQualifierName(*this) + getProto().Name;
+  }
   return getProto().Name;
+}
+
+std::string Item::getDescription() const {
+  // TODO make description depend on quality etc
+  return getProto().Description;
 }
 
 ItemType Item::getType() const {
@@ -111,6 +76,33 @@ ItemType Item::getType() const {
   return getProto().Type;
 }
 
+int Item::getMaxStackSize() const { return getProto().MaxStackSize; }
+
+std::vector<EffectInfo> Item::getAllEffects() const {
+  std::vector<EffectInfo> AllEffects;
+  auto NumEffects = getProto().Effects.size();
+  NumEffects += Specialization ? Specialization->Effects.size() : 0;
+  AllEffects.reserve(NumEffects);
+
+  for (const auto &Info : getProto().Effects) {
+    AllEffects.push_back(Info);
+  }
+  if (Specialization) {
+    for (const auto &Info : Specialization->Effects) {
+      AllEffects.push_back(Info);
+    }
+  }
+  return AllEffects;
+}
+
+CapabilityFlags Item::getCapabilityFlags() const {
+  auto Flags = getProto().getCapabilityFlags();
+  if (Specialization) {
+    Flags = Flags | Specialization->getCapabilityFlags();
+  }
+  return Flags;
+}
+
 bool Item::isSameKind(const Item &Other) const {
   return Proto == Other.Proto && Specialization == Other.Specialization;
 }
@@ -118,8 +110,8 @@ bool Item::isSameKind(const Item &Other) const {
 bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
                       CapabilityFlags Flags) const {
   bool SpecCanUseOn =
-      !Specialization || Specialization->canApplyTo(Entity, Reg, Flags);
-  return getProto().canApplyTo(Entity, Reg, Flags) && SpecCanUseOn;
+      Specialization && Specialization->canApplyTo(Entity, Reg, Flags);
+  return getProto().canApplyTo(Entity, Reg, Flags) || SpecCanUseOn;
 }
 
 void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
@@ -133,8 +125,8 @@ void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
 bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
                          CapabilityFlags Flags) const {
   bool SpecCanUnequipFrom =
-      !Specialization || Specialization->canRemoveFrom(Entity, Reg, Flags);
-  return getProto().canRemoveFrom(Entity, Reg, Flags) && SpecCanUnequipFrom;
+      Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags);
+  return getProto().canRemoveFrom(Entity, Reg, Flags) || SpecCanUnequipFrom;
 }
 
 void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,
@@ -146,55 +138,5 @@ void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,
 }
 
 const ItemPrototype &Item::getProto() const { return *Proto; }
-
-EquipmentSlot &Equipment::getSlot(ItemType It) {
-  return const_cast<EquipmentSlot &>(
-      static_cast<const Equipment *>(this)->getSlot(It));
-}
-
-const EquipmentSlot &Equipment::getSlot(ItemType It) const {
-  switch (It & ItemType::EquipmentMask) {
-  case ItemType::Ring:
-    return Ring;
-  case ItemType::Amulet:
-    return Amulet;
-  case ItemType::Helmet:
-    return Helmet;
-  case ItemType::ChestPlate:
-    return ChestPlate;
-  case ItemType::Pants:
-    return Pants;
-  case ItemType::Boots:
-    return Boots;
-  case ItemType::Weapon:
-    return Weapon;
-  case ItemType::OffHand:
-    return OffHand;
-  default:
-    break;
-  }
-  assert(false);
-  return OffHand;
-}
-
-bool Equipment::canEquip(ItemType Type) const {
-  if ((Type & ItemType::EquipmentMask) == ItemType::None) {
-    return false;
-  }
-  return getSlot(Type).It == std::nullopt;
-}
-
-void Equipment::equip(Item Item) {
-  auto Type = Item.getType();
-  auto &ES = getSlot(Type);
-  ES.It = std::move(Item);
-}
-
-Item Equipment::unequip(ItemType Type) {
-  auto &ES = getSlot(Type);
-  Item It = std::move(*ES.It);
-  ES.It = std::nullopt;
-  return It;
-}
 
 } // namespace rogue

@@ -1,0 +1,102 @@
+{
+  "$id": "https://rogue-todo.com/loot_tb_schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON schema for loot tables",
+  "defs": {
+    "loot_table": {
+      "type": "object",
+      "description": "A loot table consisting of a list of reward slots that are randomly picked",
+      "properties": {
+        "rolls": {
+          "type": "integer",
+          "description": "The number of times to roll the loot table for rewards picking and removing a slot",
+          "minimum": 1
+        },
+        "slots": {
+          "type": "array",
+          "description": "The list of slots to pick from",
+          "items": {
+            "$ref": "#/defs/loot_table_slot"
+          }
+        }
+      }
+    },
+    "loot_table_slot": {
+      "anyOf": [
+        {
+          "$ref": "#/defs/loot_table_slot_item"
+        },
+        {
+          "$ref": "#/defs/loot_table_slot_loot_table"
+        },
+        {
+          "$ref": "#/defs/loot_table_slot_null"
+        }
+      ]
+    },
+    "loot_table_slot_item": {
+      "type": "object",
+      "description": "A loot table slot that contains an item",
+      "properties": {
+        "type": {
+          "const": "item"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the item in the item database"
+        },
+        "min_count": {
+          "type": "integer",
+          "description": "The minimum number of items to give",
+          "minimum": 1
+        },
+        "max_count": {
+          "type": "integer",
+          "description": "The maximum number of items to give",
+          "minimum": 1
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The weight of the slot, used to determine the probability of the slot being picked"
+        }
+      },
+      "required": ["name", "weight", "min_count", "max_count", "type"],
+      "additionalProperties": false
+    },
+    "loot_table_slot_loot_table": {
+      "type": "object",
+      "description": "A loot table slot that contains another loot table",
+      "properties": {
+        "type": {
+          "const": "table"
+        },
+        "ref": {
+          "type": "string",
+          "description": "Name of the loot table in the item database"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The weight of the slot, used to determine the probability of the slot being picked"
+        }
+      },
+      "required": ["ref", "weight", "type"],
+
+      "additionalProperties": false
+    },
+    "loot_table_slot_null": {
+      "type": "object",
+      "description": "A loot table slot that contains nothing",
+      "properties": {
+        "type": {
+          "const": "null"
+        },
+        "weight": {
+          "type": "integer",
+          "description": "The weight of the slot, used to determine the probability of the slot being picked"
+        }
+      },
+      "required": ["weight", "type"],
+      "additionalProperties": false
+    }
+  }
+}

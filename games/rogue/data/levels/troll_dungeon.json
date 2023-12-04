@@ -1,0 +1,26 @@
+{
+  "map": {
+    "type": "generated",
+    "config": "troll_dungeon.cfg"
+  },
+  "creatures": [
+    {
+      "key": "s",
+      "name": "skeleton",
+      "loot": "common_enemy"
+    },
+    {
+      "key": "t",
+      "name": "troll",
+      "loot": "rare_enemy"
+    }
+  ],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "common_chest"
+    }
+  ],
+  "locked_doors": [],
+  "dungeons": []
+}

@@ -1,0 +1,421 @@
+{
+  "entity_templates": [
+    {
+      "name": "closed_door",
+      "display_name": "Door",
+      "description": "A door",
+      "assemblers": {
+        "position": true,
+        "collision": true,
+        "block_los": true,
+        "visible": true,
+        "door": {
+          "is_open": false,
+          "open_tile": {
+            "char": "/",
+            "color": "#737373"
+          },
+          "closed_tile": {
+            "char": "+",
+            "color": "#737373"
+          }
+        }
+      }
+    },
+    {
+      "name": "open_door",
+      "from_template": "closed_door",
+      "assemblers": {
+        "block_los": false,
+        "collision": false,
+        "door": {
+          "is_open": true
+        }
+      }
+    },
+    {
+      "name": "l1_locked_door",
+      "from_template": "closed_door",
+      "assemblers": {
+        "door": {
+          "key": "L1 Key"
+        }
+      }
+    },
+    {
+      "name": "l2_locked_door",
+      "from_template": "closed_door",
+      "assemblers": {
+        "door": {
+          "key": "L2 Key"
+        }
+      }
+    },
+    {
+      "name": "l3_locked_door",
+      "from_template": "closed_door",
+      "assemblers": {
+        "door": {
+          "key": "L3 Key"
+        }
+      }
+    },
+    {
+      "name": "final_locked_door",
+      "from_template": "closed_door",
+      "assemblers": {
+        "door": {
+          "key": "Final Key"
+        }
+      }
+    },
+    {
+      "name": "dummy_creature",
+      "assemblers": {
+        "collision": true,
+        "health": true,
+        "position": true,
+        "visible": true
+      }
+    },
+    {
+      "name": "silk_cocoon",
+      "from_template": "dummy_creature",
+      "display_name": "Silk Cocoon",
+      "description": "Suspended cocoon containing captured prey.",
+      "assemblers": {
+        "tile": {
+          "color": "#e0e0e0",
+          "char": "0"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 1
+        },
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "common_silk_cocoon",
+          "is_persistent": false,
+          "is_looted": false
+        },
+        "race": "dummy"
+      }
+    },
+    {
+      "name": "hostile_creature",
+      "assemblers": {
+        "attack_ai": true,
+        "collision": true,
+        "health": true,
+        "position": true,
+        "visible": true,
+        "agility": true,
+        "line_of_sight": true,
+        "wander_ai": true,
+        "inventory": {
+          "loot_table": "<not defined from hostile_creature>",
+          "is_persistent": false,
+          "is_looted": false
+        }
+      }
+    },
+    {
+      "name": "base_enemy",
+      "from_template": "hostile_creature",
+      "assemblers": {
+        "equipment": true,
+        "auto_equip": true
+      }
+    },
+    {
+      "name": "base_rat",
+      "from_template": "hostile_creature",
+      "assemblers": {
+        "faction": "nature",
+        "race": "creature",
+        "inventory": {
+          "loot_table": "common_rat"
+        }
+      }
+    },
+    {
+      "name": "sewer_rat",
+      "from_template": "base_rat",
+      "display_name": "Sewer Rat",
+      "description": "A rat TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#5C5F55",
+          "char": "r"
+        },
+        "stats": {
+          "str": 2,
+          "dex": 6,
+          "int": 0,
+          "vit": 3
+        }
+      }
+    },
+    {
+      "name": "toxic_rat",
+      "from_template": "base_rat",
+      "display_name": "Toxic Rat",
+      "description": "A toxic rat TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#475D35",
+          "char": "R"
+        },
+        "stats": {
+          "str": 2,
+          "dex": 6,
+          "int": 0,
+          "vit": 3
+        }
+      }
+    },
+    {
+      "name": "base_spider",
+      "from_template": "hostile_creature",
+      "assemblers": {
+        "faction": "nature",
+        "race": "creature",
+        "inventory": {
+          "loot_table": "common_spider"
+        }
+      }
+    },
+    {
+      "name": "arachnoth_hatchling",
+      "from_template": "base_spider",
+      "display_name": "Arachnoth Hatchling",
+      "description": "Agile spiderlings that scuttle around the lair.",
+      "assemblers": {
+        "tile": {
+          "color": "#418778",
+          "char": "h"
+        },
+        "stats": {
+          "str": 1,
+          "dex": 10,
+          "int": 0,
+          "vit": 1
+        }
+      }
+    },
+    {
+      "name": "arachnoth_burrower",
+      "from_template": "base_spider",
+      "display_name": "Arachnoth Burrower",
+      "description": "Spider with razor-sharp claws that emerges from hidden tunnels to ambush intruders.",
+      "assemblers": {
+        "tile": {
+          "color": "#2e2d22",
+          "char": "b"
+        },
+        "stats": {
+          "str": 1,
+          "dex": 20,
+          "int": 0,
+          "vit": 2
+        }
+      }
+    },
+    {
+      "name": "arachnoth_broodguard",
+      "from_template": "base_spider",
+      "display_name": "Arachnoth Broodguard",
+      "description": "Large more aggressive spider that protects key areas of the lair.",
+      "assemblers": {
+        "tile": {
+          "color": "#72de54",
+          "char": "B"
+        },
+        "stats": {
+          "str": 4,
+          "dex": 10,
+          "int": 0,
+          "vit": 3
+        }
+      }
+    },
+    {
+      "name": "base_blob",
+      "from_template": "hostile_creature",
+      "assemblers": {
+        "faction": "nature",
+        "race": "creature",
+        "inventory": {
+          "loot_table": "common_blob"
+        }
+      }
+    },
+    {
+      "name": "blob",
+      "from_template": "base_blob",
+      "display_name": "Blob",
+      "description": "A blob TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#2aa310",
+          "char": "b"
+        },
+        "stats": {
+          "str": 4,
+          "dex": 1,
+          "int": 0,
+          "vit": 7
+        }
+      }
+    },
+    {
+      "name": "skeleton",
+      "from_template": "base_enemy",
+      "display_name": "Skeleton",
+      "description": "A skeleton TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#b8ad74",
+          "char": "s"
+        },
+        "stats": {
+          "str": 2,
+          "dex": 30,
+          "int": 0,
+          "vit": 2
+        },
+        "inventory": {
+          "loot_table": "common_enemy"
+        },
+        "faction": "enemy",
+        "race": "undead"
+      }
+    },
+    {
+      "name": "troll_base",
+      "from_template": "base_enemy",
+      "assemblers": {
+        "faction": "enemy",
+        "race": "troll",
+        "inventory": {
+          "loot_table": "rare_enemy"
+        }
+      }
+    },
+    {
+      "name": "troll",
+      "from_template": "troll_base",
+      "display_name": "Troll",
+      "description": "A troll TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#236e36",
+          "char": "t"
+        },
+        "stats": {
+          "str": 4,
+          "dex": 5,
+          "int": 0,
+          "vit": 7
+        }
+      }
+    },
+    {
+      "name": "troll_berserker",
+      "from_template": "troll_base",
+      "display_name": "Troll Berserker",
+      "description": "A troll berserker TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#236e36",
+          "char": "T"
+        },
+        "stats": {
+          "str": 25,
+          "dex": 8,
+          "int": 0,
+          "vit": 30
+        }
+      }
+    },
+    {
+      "name": "base_interact",
+      "assemblers": {
+        "position": true,
+        "collision": true,
+        "visible": true
+      }
+    },
+    {
+      "name": "healer",
+      "from_template": "base_interact",
+      "display_name": "Healer",
+      "description": "A healer TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#278716",
+          "char": "h"
+        },
+        "healer": true
+      }
+    },
+    {
+      "name": "shop",
+      "from_template": "base_interact",
+      "display_name": "Shop",
+      "description": "A shop TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#a68733",
+          "char": "S"
+        },
+        "shop": true
+      }
+    },
+    {
+      "name": "work_bench",
+      "from_template": "base_interact",
+      "display_name": "Work Bench",
+      "description": "A work bench TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#735740",
+          "char": "W"
+        },
+        "work_bench": true
+      }
+    },
+    {
+      "name": "level_entry",
+      "from_template": "base_interact",
+      "display_name": "Level Entry",
+      "description": "A level entry TODO",
+      "assemblers": {
+        "tile": {
+          "color": "#489dcf",
+          "char": "<"
+        },
+        "level_entry_exit": {
+          "is_exit": false,
+          "level_id": 0
+        }
+      }
+    },
+    {
+      "name": "level_exit",
+      "from_template": "level_entry",
+      "display_name": "Level Exit",
+      "description": "A level exit TODO",
+      "assemblers": {
+        "tile": {
+          "char": "H"
+        },
+        "level_entry_exit": {
+          "is_exit": true
+        }
+      }
+    }
+  ]
+}

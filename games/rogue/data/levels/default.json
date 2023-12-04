@@ -1,0 +1,142 @@
+{
+  "map": {
+    "type": "designed",
+    "map_file": "default.map",
+    "default_char": {
+      "color": "#222222",
+      "key": " ",
+      "layer": "ground"
+    },
+    "char_info": {
+      " ": {
+        "color": "#222222",
+        "key": " ",
+        "layer": "ground"
+      },
+      "#": {
+        "color": "#737373",
+        "key": "#",
+        "layer": "walls"
+      },
+      "H": {
+        "color": "#489dcf",
+        "key": "H",
+        "layer": "entities"
+      },
+      "<": {
+        "color": "#489dcf",
+        "key": "<",
+        "layer": "entities"
+      },
+      "C": {
+        "color": "#fac43c",
+        "key": "C",
+        "layer": "entities"
+      },
+      "w": {
+        "color": "#735740",
+        "key": "w",
+        "layer": "entities"
+      },
+      "S": {
+        "color": "#a68733",
+        "key": "S",
+        "layer": "entities"
+      },
+      "h": {
+        "color": "#278716",
+        "key": "h",
+        "layer": "entities"
+      },
+      "1": {
+        "color": "#5C5F55",
+        "key": "1",
+        "layer": "entities"
+      },
+      "2": {
+        "color": "#363832",
+        "key": "2",
+        "layer": "entities"
+      },
+      "3": {
+        "color": "#b8ad74",
+        "key": "3",
+        "layer": "entities"
+      },
+      "'": {
+        "color": "#ed3424",
+        "key": "'",
+        "layer": "walls_deco"
+      },
+      "x": {
+        "color": "#524c3c",
+        "key": "x",
+        "layer": "entities"
+      },
+      "y": {
+        "color": "#524c3c",
+        "key": "y",
+        "layer": "entities"
+      },
+      "z": {
+        "color": "#524c3c",
+        "key": "z",
+        "layer": "entities"
+      },
+      "u": {
+        "color": "#524c3c",
+        "key": "u",
+        "layer": "entities"
+      },
+      "+": {
+        "color": "#524c3c",
+        "key": "+",
+        "layer": "entities"
+      },
+      "/": {
+        "color": "#524c3c",
+        "key": "/",
+        "layer": "entities"
+      }
+    }
+  },
+  "creatures": [],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "l1_key"
+    }
+  ],
+  "locked_doors": [
+    {
+      "key": "x",
+      "key_name": "l1_locked_door"
+    },
+    {
+      "key": "y",
+      "key_name": "l2_locked_door"
+    },
+    {
+      "key": "z",
+      "key_name": "l3_locked_door"
+    },
+    {
+      "key": "u",
+      "key_name": "final_locked_door"
+    }
+  ],
+  "dungeons": [
+    {
+      "key": "1",
+      "level_name": "level_1"
+    },
+    {
+      "key": "2",
+      "level_name": "level_2"
+    },
+    {
+      "key": "3",
+      "level_name": "level_3"
+    }
+  ]
+}

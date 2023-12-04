@@ -1,10 +1,11 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <rogue/Event.h>
 #include <rogue/EventHub.h>
 
 namespace {
 
-class DummyEventA : public rogue::Event {
+class DummyEventA : public rogue::BaseEvent {
 public:
   explicit DummyEventA(int Value) : Value(Value) {}
   int Value = 42;
@@ -15,7 +16,7 @@ inline bool operator==(const DummyEventA &Lhs,
   return Lhs.Value == Rhs.Value;
 }
 
-class DummyEventB : public rogue::Event {
+class DummyEventB : public rogue::BaseEvent {
 public:
   explicit DummyEventB(std::string Msg) : Msg(Msg) {}
   std::string Msg;
@@ -26,7 +27,7 @@ inline bool operator==(const DummyEventB &Lhs,
   return Lhs.Msg == Rhs.Msg;
 }
 
-class DummyEventC : public rogue::Event {
+class DummyEventC : public rogue::BaseEvent {
 public:
   explicit DummyEventC(std::string Msg) : Msg(Msg) {}
   std::string Msg;

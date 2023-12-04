@@ -9,8 +9,10 @@ namespace rogue {
 struct Tile {
   cxxg::types::ColoredChar T;
 
-  char kind() const { return T.Char; }
-  cxxg::types::TermColor color() const { return T.Color; }
+  char &kind() { return T.Char; }
+  cxxg::types::TermColor &color() { return T.Color; }
+  const char &kind() const { return T.Char; }
+  const cxxg::types::TermColor &color() const { return T.Color; }
 };
 inline bool operator==(const Tile &A, const Tile &B) noexcept {
   // Ignore coloring when comparing

@@ -18,8 +18,10 @@ public:
 
   void renderShadow(unsigned char Darkness);
   void renderFogOfWar(const ymir::Map<bool, int> &SeenMap);
+  void renderAllLineOfSight();
   void renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range);
   void renderVisible(ymir::Point2d<int> AtPos);
+  void renderEffect(cxxg::types::ColoredChar EffC, ymir::Point2d<int> AtPos);
 
   const ymir::Map<cxxg::types::ColoredChar> &get() const { return VisibleMap; }
 

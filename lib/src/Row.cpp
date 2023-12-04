@@ -46,6 +46,17 @@ RowAccessor &RowAccessor::operator<<(types::TermColor Cl) {
   return *this;
 }
 
+RowAccessor &RowAccessor::operator<<(const Row &OtherRw) {
+  for (size_t L = 0; L < OtherRw.Buffer.size(); L++) {
+    if (CurrentColor != OtherRw.ColorInfo.at(L)) {
+      *this << OtherRw.ColorInfo.at(L);
+    }
+    *this << OtherRw.Buffer.at(L);
+  }
+  *this << types::Color::NONE;
+  return *this;
+}
+
 void RowAccessor::flushBuffer() {
   if (!Valid) {
     return;
@@ -63,6 +74,7 @@ void RowAccessor::output(::std::string const &Str) {
   // check if the access is out of range, if so ignore it
   if (Rw.Buffer.size() == 0 || Offset >= static_cast<int>(Rw.Buffer.size()) ||
       Offset + static_cast<int>(Str.size()) <= 0) {
+    Offset += Str.size();
     return;
   }
 
@@ -97,10 +109,7 @@ void RowAccessor::output(::std::string const &Str) {
                 CurrentColor);
   }
 
-  // update offset of accessor by the amount of characters we already wrote
-  Offset += Count;
-
-  return;
+  Offset += Str.size();
 }
 
 Row::Row(size_t Size) {

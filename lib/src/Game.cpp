@@ -32,6 +32,12 @@ void Game::run(bool Blocking) {
 }
 
 void Game::handleDraw() {
+  handleShowNotifications(true);
+  Scr.update();
+  Scr.clear();
+}
+
+void Game::handleShowNotifications(bool Clear) {
   for (size_t L = 0; L < Notifications.size(); L++) {
     // get position for warning
     auto Y = Scr.getSize().Y - Notifications.size() + L;
@@ -39,10 +45,9 @@ void Game::handleDraw() {
     // print warning
     Scr[Y] = Notifications.at(L);
   }
-  Notifications.clear();
-
-  Scr.update();
-  Scr.clear();
+  if (Clear) {
+    Notifications.clear();
+  }
 }
 
 void Game::handleExit() {

@@ -55,6 +55,9 @@ int decodeEscape(int CharA, int CharB) {
     return KEY_LEFT;
   case 'C':
     return KEY_RIGHT;
+  case '3':
+    readChar();
+    return KEY_DEL_C;
   default:
     return CharB;
   }

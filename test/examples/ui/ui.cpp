@@ -69,7 +69,8 @@ private:
     Size S{static_cast<std::size_t>(18 + rand() % 8),
            static_cast<std::size_t>(5 + rand() % 5)};
     auto LS = std::make_shared<ListSelect>(P, S);
-    LS->setElements({"1. Item", "2. Item", "3. Item"});
+    LS->setElements(
+        {{"1. Item", cxxg::types::Color::RED}, {"2. Item"}, {"3. Item"}});
     return std::make_shared<Frame>(LS, P, S, "List");
   }
 

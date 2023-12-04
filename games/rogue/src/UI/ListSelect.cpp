@@ -1,10 +1,11 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/ListSelect.h>
 
 namespace rogue::ui {
 
-void ListSelect::setElements(const std::vector<std::string> &Elements) {
+void ListSelect::setElements(const std::vector<Element> &Elements) {
   this->Elements = Elements;
   SelectedElemIdx = 0;
 }
@@ -30,12 +31,12 @@ void ListSelect::selectPrev() {
 
 bool ListSelect::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
     return false;
-  case cxxg::utils::KEY_DOWN:
+  case Controls::MoveDown.Char:
     selectNext();
     break;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     selectPrev();
     break;
   default:
@@ -44,7 +45,9 @@ bool ListSelect::handleInput(int Char) {
   return true;
 }
 
-std::string_view ListSelect::getInteractMsg() const { return ""; }
+std::string ListSelect::getInteractMsg() const {
+  return Controls::Navigate.getInteractMsg();
+}
 
 void ListSelect::draw(cxxg::Screen &Scr) const {
   // Fill rect
@@ -60,14 +63,14 @@ void ListSelect::draw(cxxg::Screen &Scr) const {
   }
 }
 
-void ListSelect::drawFrameElement(cxxg::Screen &Scr, std::string_view Element,
+void ListSelect::drawFrameElement(cxxg::Screen &Scr, const Element &Elem,
                                   cxxg::types::Position Pos, unsigned Width,
                                   bool IsSelected) {
   if (IsSelected) {
     Scr[Pos.Y][Pos.X + 1] << ">";
   }
   (void)Width;
-  Scr[Pos.Y][Pos.X + 2] << Element;
+  Scr[Pos.Y][Pos.X + 2] << Elem.Color << Elem.Text << cxxg::types::Color::NONE;
 }
 
 } // namespace rogue::ui

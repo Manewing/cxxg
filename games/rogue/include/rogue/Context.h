@@ -2,15 +2,19 @@
 #define ROGUE_CONTEXT_H
 
 namespace rogue {
-class Game;
 class ItemDatabase;
+class EntityDatabase;
+class CreatureDatabase;
+class LevelDatabase;
 } // namespace rogue
 
 namespace rogue {
 
 struct GameContext {
-  Game &G;
   ItemDatabase &ItemDb;
+  EntityDatabase &EntityDb;
+  CreatureDatabase &CreatureDb;
+  LevelDatabase &LevelDb;
 };
 
 } // namespace rogue

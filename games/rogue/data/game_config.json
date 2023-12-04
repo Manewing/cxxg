@@ -1,0 +1,26 @@
+{
+  "item_db_config": "item_db.json",
+  "creature_db_config": "creature_db.json",
+  "entity_db_config": "entity_db.json",
+  "level_db_config": "level_db.json",
+  "initial_game_world": "dungeon_sweeper",
+  "initial_level_config": "levels/default.json",
+  "initial_items": [
+    {
+      "name": "Small Sword",
+      "count": 1
+    },
+    {
+      "name": "Linen Pants",
+      "count": 1
+    },
+    {
+      "name": "Linen Shirt",
+      "count": 1
+    },
+    {
+      "name": "Blueberry",
+      "count": 5
+    }
+  ]
+}

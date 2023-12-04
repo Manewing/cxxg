@@ -1,0 +1,21 @@
+{
+  "map": {
+    "type": "generated",
+    "config": "skeleton_dungeon.cfg"
+  },
+  "creatures": [
+    {
+      "key": "s",
+      "name": "skeleton",
+      "loot": "common_enemy"
+    }
+  ],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "rare_chest"
+    }
+  ],
+  "locked_doors": [],
+  "dungeons": []
+}

@@ -1,0 +1,45 @@
+{
+  "$id": "https://rogue-todo.com/buffs_schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON schema for item effects",
+  "defs": {
+    "reduction_buff": {
+      "type": "object",
+      "properties": {
+        "reduce_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tick_period": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ticks": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["reduce_amount", "tick_period", "ticks"],
+      "additionalProperties": false
+    },
+    "regeneration_buff": {
+      "type": "object",
+      "properties": {
+        "regen_amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "tick_period": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ticks": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["regen_amount", "tick_period", "ticks"],
+      "additionalProperties": false
+    }
+  }
+}

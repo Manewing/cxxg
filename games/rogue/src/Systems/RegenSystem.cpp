@@ -1,10 +1,8 @@
 #include <entt/entt.hpp>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Stats.h>
+#include <rogue/Event.h>
 #include <rogue/Systems/RegenSystem.h>
-
-// FIXME for debug message
-#include <rogue/History.h>
 
 namespace rogue {
 
@@ -14,9 +12,7 @@ template <typename T>
 using IsRegenComp = std::is_base_of<ValueRegenCompBase, T>;
 
 template <typename T>
-using IsRegenerationBuff = std::is_base_of<RegenerationBuff, T>;
-
-template <typename T> using IsReductionBuff = std::is_base_of<ReductionBuff, T>;
+using IsDimRetBuff = std::is_base_of<DiminishingReturnsValueGenBuff, T>;
 
 template <typename Component>
 typename std::enable_if_t<IsRegenComp<Component>::value>
@@ -37,50 +33,55 @@ runRegenUpdate(entt::registry &Reg) {
 
 template <typename Component, typename Buff>
 typename std::enable_if_t<IsRegenComp<Component>::value &&
-                          IsRegenerationBuff<Buff>::value>
-runRegenBuffUpdate(System &Sys, entt::registry &Reg) {
+                          IsDimRetBuff<Buff>::value>
+runDimRetValueGenBuff(System &Sys, entt::registry &Reg, bool Reduce) {
   auto View = Reg.view<Buff, Component>();
-  View.each([&Sys, &Reg](auto Entity, auto &B, auto &C) {
+  View.each([&Sys, &Reg, Reduce](auto Entity, auto &B, auto &C) {
     // Post decrement to match count
-    if (B.TicksLeft-- == 0) {
-      Sys.publish(DebugMessageEvent() << B.getName() << " expired");
+    auto St = B.tick();
+    if (St == TimedBuff::State::Expired) {
+      BuffExpiredEvent BEE;
+      BEE.Entity = Entity;
+      BEE.Buff = &B;
+      Sys.publish(BEE);
       Reg.erase<Buff>(Entity);
       return;
     }
-    // Restore the given amount to regenerate
-    C.restore(B.RegenAmount);
-  });
-}
-
-template <typename Component, typename Buff>
-typename std::enable_if_t<IsRegenComp<Component>::value &&
-                          IsReductionBuff<Buff>::value>
-runReductionBuffUpdate(System &Sys, entt::registry &Reg) {
-  auto View = Reg.view<Buff, Component>();
-  View.each([&Sys, &Reg](auto Entity, auto &B, auto &C) {
-    // Post decrement to match count
-    if (B.TicksLeft-- == 0) {
-      Sys.publish(DebugMessageEvent() << B.getName() << " expired");
-      Reg.erase<Buff>(Entity);
+    if (St == TimedBuff::State::Waiting) {
       return;
     }
     // Reduce the given amount
-    C.reduce(B.ReduceAmount);
+    Sys.publish(DebugMessageEvent() << B.getApplyDesc());
+    if (Reduce) {
+      C.reduce(B.TickAmount);
+    } else {
+      C.restore(B.TickAmount);
+    }
   });
 }
 
 } // namespace
 
-void RegenSystem::update() {
-  // Run regeneration
-  runRegenUpdate<HealthComp>(Reg);
-  runRegenUpdate<ManaComp>(Reg);
+void RegenSystem::update(UpdateType Type) {
+  if (Type != UpdateType::Tick) {
+    return;
+  }
 
-  // Process buffs
-  runRegenBuffUpdate<HealthComp, HealthRegenBuffComp>(*this, Reg);
-  runRegenBuffUpdate<ManaComp, ManaRegenBuffComp>(*this, Reg);
-  runReductionBuffUpdate<HealthComp, PoisonDebuffComp>(*this, Reg);
-  runReductionBuffUpdate<HealthComp, BleedingDebuffComp>(*this, Reg);
+  // Run mana regeneration
+  runRegenUpdate<ManaComp>(Reg);
+  runDimRetValueGenBuff<ManaComp, ManaRegenBuffComp>(*this, Reg,
+                                                     /*Reduce=*/false);
+
+  // Run health regeneration
+  runRegenUpdate<HealthComp>(Reg);
+  runDimRetValueGenBuff<HealthComp, HealthRegenBuffComp>(*this, Reg,
+                                                         /*Reduce=*/false);
+
+  // Run health reduction
+  runDimRetValueGenBuff<HealthComp, PoisonDebuffComp>(*this, Reg,
+                                                      /*Reduce=*/true);
+  runDimRetValueGenBuff<HealthComp, BleedingDebuffComp>(*this, Reg,
+                                                        /*Reduce=*/true);
 }
 
 } // namespace rogue

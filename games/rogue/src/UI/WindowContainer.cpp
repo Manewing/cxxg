@@ -1,7 +1,34 @@
 #include <cxxg/Screen.h>
+#include <optional>
+#include <rogue/UI/Frame.h>
+#include <rogue/UI/Widget.h>
 #include <rogue/UI/WindowContainer.h>
+#include <variant>
+#include <ymir/Types.hpp>
+#include <rogue/UI/Controls.h>
 
 namespace rogue::ui {
+
+std::optional<WindowContainer::WindowInfo>
+WindowContainer::WindowInfo::getWindowInfo(Widget *const Wdw) {
+  Widget *NextWdw = Wdw;
+  while (auto *Next = dynamic_cast<Decorator *>(NextWdw)) {
+    if (auto *BrWdw = dynamic_cast<BaseRectDecorator *>(Wdw)) {
+      auto Size = BrWdw->getSize();
+      return WindowInfo{BrWdw->getPos(), BrWdw->getSize(), Size.X * Size.Y,
+                        Wdw};
+    }
+
+    NextWdw = Next->getComp().get();
+  }
+
+  if (auto *BrWdw = dynamic_cast<BaseRect *>(NextWdw)) {
+    auto Size = BrWdw->getSize();
+    return WindowInfo{BrWdw->getPos(), BrWdw->getSize(), Size.X * Size.Y, Wdw};
+  }
+
+  return std::nullopt;
+}
 
 WindowContainer::WindowContainer(cxxg::types::Position Pos,
                                  cxxg::types::Size Size)
@@ -9,20 +36,20 @@ WindowContainer::WindowContainer(cxxg::types::Position Pos,
 
 bool WindowContainer::handleInput(int Char) {
   switch (Char) {
-  case KEY_MOVE:
+  case Controls::MoveWindow.Char:
     switchMoveActiveWindow(!MoveDeco);
     break;
-  case KEY_NEXT_WINDOW: {
+  case Controls::NextWindow.Char: {
     bool WasMoving = exitMoveActiveWindow();
     selectNextWindow();
     switchMoveActiveWindow(WasMoving);
   } break;
-  case KEY_PREV_WINDOW: {
+  case Controls::PrevWindow.Char: {
     bool WasMoving = exitMoveActiveWindow();
     selectPrevWindow();
     switchMoveActiveWindow(WasMoving);
   } break;
-  case KEY_AUTO_LAYOUT:
+  case Controls::AutoLayout.Char:
     autoLayoutWindows();
     break;
   default:
@@ -30,14 +57,15 @@ bool WindowContainer::handleInput(int Char) {
   }
 
   if (hasActiveWindow()) {
-    if (!getActiveWindow().handleInput(Char)) {
-      return closeActiveWindow();
+    auto &Wdw = getActiveWindow();
+    if (!Wdw.handleInput(Char)) {
+      return closeWindow(&Wdw);
     }
   }
   return false;
 }
 
-std::string_view WindowContainer::getInteractMsg() const {
+std::string WindowContainer::getInteractMsg() const {
   if (hasActiveWindow()) {
     return getActiveWindow().getInteractMsg();
   }
@@ -80,24 +108,74 @@ std::shared_ptr<Widget> &WindowContainer::getActiveWindowPtr() {
   return Windows.at(FocusIdx);
 }
 
-bool WindowContainer::closeActiveWindow() {
+bool WindowContainer::closeWindow(std::size_t Idx) {
   if (Windows.empty()) {
     return false;
   }
-  Windows.erase(Windows.begin() + FocusIdx);
+  Windows.erase(Windows.begin() + Idx);
   FocusIdx = 0;
+  selectWindow(PrevFocusIdx);
   return !Windows.empty();
 }
 
-void WindowContainer::addWindow(std::shared_ptr<Widget> Window) {
-  Windows.emplace_back(std::move(Window));
-  FocusIdx = Windows.size() - 1;
+bool WindowContainer::closeWindow(Widget *Wdw) {
+  for (std::size_t Idx = 0; Idx < Windows.size(); ++Idx) {
+    if (Windows.at(Idx).get() == Wdw) {
+      return closeWindow(Idx);
+    }
+  }
+  return false;
 }
 
+bool WindowContainer::closeActiveWindow() { return closeWindow(FocusIdx); }
+
+void WindowContainer::addWindow(std::shared_ptr<Widget> Window) {
+  Windows.emplace_back(std::move(Window));
+  selectWindow(Windows.size() - 1);
+}
+
+namespace {
+
+Frame *getFrameFromWidget(Widget *W) {
+  if (auto *F = dynamic_cast<Frame *>(W)) {
+    return F;
+  }
+  while (auto *Next = dynamic_cast<Decorator *>(W)) {
+    W = Next->getComp().get();
+    if (auto *F = dynamic_cast<Frame *>(W)) {
+      return F;
+    }
+  }
+  return nullptr;
+}
+
+void changeWindowHighlight(Widget &W, bool Highlight) {
+  if (auto *F = getFrameFromWidget(&W)) {
+    if (Highlight) {
+      F->setFrameColor(cxxg::types::RgbColor{255, 255, 200}.bold());
+      F->setHeaderColor(cxxg::types::RgbColor{255, 255, 200}.bold());
+    } else {
+      F->setFrameColor(cxxg::types::Color::NONE);
+      F->setHeaderColor(cxxg::types::Color::NONE);
+    }
+  }
+}
+
+} // namespace
+
 void WindowContainer::selectWindow(std::size_t Idx) {
+  if (FocusIdx < Windows.size()) {
+    changeWindowHighlight(*Windows.at(FocusIdx), false);
+  }
+
+  PrevFocusIdx = FocusIdx;
   FocusIdx = Idx;
   if (FocusIdx >= Windows.size()) {
     FocusIdx = 0;
+  }
+
+  if (!Windows.empty()) {
+    changeWindowHighlight(*Windows.at(FocusIdx), true);
   }
 }
 
@@ -113,14 +191,54 @@ void WindowContainer::selectPrevWindow() {
 
 void WindowContainer::autoLayoutWindows() { autoLayoutWindows(Pos, Size); }
 
+namespace {
+
+ymir::Rect2d<unsigned long> getRect(const WindowContainer::WindowInfo &WdwInfo,
+                                    bool Spacing = false) {
+  return {
+      {static_cast<unsigned long>(WdwInfo.Pos.X),
+       static_cast<unsigned long>(WdwInfo.Pos.Y)},
+      {WdwInfo.Size.X + (Spacing ? 1 : 0), WdwInfo.Size.Y + (Spacing ? 1 : 0)}};
+}
+
+bool isOverlapping(const WindowContainer::WindowInfo &WdwInfo,
+                   const std::vector<WindowContainer::WindowInfo> &WdwInfos) {
+  const auto ThisRect = getRect(WdwInfo);
+  for (const auto &Other : WdwInfos) {
+    if (WdwInfo.Wdw == Other.Wdw || (Other.Pos.X == -1 && Other.Pos.Y == -1)) {
+      continue;
+    }
+    if (ThisRect.overlaps(getRect(Other, true))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::optional<cxxg::types::Position> findPositionForWindow(
+    cxxg::types::Position StartPos, cxxg::types::Size Size,
+    WindowContainer::WindowInfo &WdwInfo,
+    const std::vector<WindowContainer::WindowInfo> &WdwInfos) {
+  for (unsigned long Y = StartPos.Y; Y < StartPos.Y + Size.Y; ++Y) {
+    for (unsigned long X = StartPos.X; X < StartPos.X + Size.X; ++X) {
+      if (X + WdwInfo.Size.X > StartPos.X + Size.X ||
+          Y + WdwInfo.Size.Y > StartPos.Y + Size.Y) {
+        continue;
+      }
+      WdwInfo.Pos = {static_cast<int>(X), static_cast<int>(Y)};
+      if (!isOverlapping(WdwInfo, WdwInfos)) {
+        return WdwInfo.Pos;
+      }
+    }
+  }
+  WdwInfo.Pos = {-1, -1};
+  return std::nullopt;
+}
+
+} // namespace
+
 void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
                                         cxxg::types::Size Size) {
-  struct WindowInfo {
-    cxxg::types::Position Pos{};
-    cxxg::types::Size Size{};
-    unsigned long Area = 0;
-    Widget *Wdw = nullptr;
-  };
   if (Windows.empty()) {
     return;
   }
@@ -128,16 +246,11 @@ void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
   WdwInfos.reserve(Windows.size());
 
   for (auto &Wdw : Windows) {
-    auto *W = Wdw.get();
-    while (auto *Next = dynamic_cast<Decorator *>(W)) {
-      W = Next->getComp().get();
-    }
-    if (auto *BrWdw = dynamic_cast<BaseRect *>(W)) {
-      auto Size = BrWdw->getSize();
-      WdwInfos.push_back(WindowInfo{BrWdw->getPos(), BrWdw->getSize(),
-                                    Size.X * Size.Y, Wdw.get()});
+    if (auto WI = WindowInfo::getWindowInfo(Wdw.get())) {
+      WdwInfos.push_back(*WI);
     }
   }
+
   if (WdwInfos.empty()) {
     return;
   }
@@ -145,24 +258,15 @@ void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
   std::sort(WdwInfos.begin(), WdwInfos.end(),
             [](const auto &A, const auto &B) { return A.Area > B.Area; });
 
-  auto PlacePos = StartPos;
-  //    auto *LastWdwInfo = &WdwInfos.at(0);
-  unsigned Height = WdwInfos.at(0).Size.Y;
+  // Auto layout windows based on their rectangle
   for (auto &WdwInfo : WdwInfos) {
-
-    if (PlacePos.X + WdwInfo.Size.X > Size.X) {
-      if (PlacePos.Y + WdwInfo.Size.Y > Size.Y) {
-        // abort, can't handle
-        return;
-      }
-      // FIXME adding the current height does not make sense
-      PlacePos = {0, PlacePos.Y + static_cast<int>(Height)};
-      Height = WdwInfo.Size.Y;
+    WdwInfo.Pos = {-1, -1};
+  }
+  WdwInfos.front().Pos = StartPos;
+  for (auto &WdwInfo : WdwInfos) {
+    if (auto Pos = findPositionForWindow(StartPos, Size, WdwInfo, WdwInfos)) {
+      WdwInfo.Wdw->setPos(*Pos);
     }
-
-    WdwInfo.Wdw->setPos(PlacePos);
-
-    PlacePos.X += static_cast<int>(WdwInfo.Size.X + 1);
   }
 }
 

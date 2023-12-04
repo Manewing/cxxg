@@ -1,0 +1,95 @@
+{
+  "$id": "https://rogue-todo.com/item-db-schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Schema the item database",
+  "type": "object",
+  "required": ["item_prototypes", "item_effects", "item_specializations"],
+  "properties": {
+    "item_prototypes": {
+      "type": "array",
+      "description": "A list of item prototypes",
+      "items": {
+        "description": "An item prototype",
+        "type": "object",
+        "required": ["name", "description", "types", "capabilities"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the item"
+          },
+          "description": {
+            "type": "string",
+            "description": "The description of the item"
+          },
+          "max_stack_size": {
+            "type": "integer",
+            "description": "The maximum number of this item that can be stacked in a single inventory slot"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/item_type"
+            }
+          },
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "effect"],
+              "properties": {
+                "type": {
+                  "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/capability_flags"
+                },
+                "effect": {
+                  "type": "string",
+                  "description": "The effect of the capability"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "specialization": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["type", "effect"],
+              "properties": {
+                "type": {
+                  "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/capability_flags"
+                },
+                "specialization": {
+                  "type": "string",
+                  "description": "The effect of the capability"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "item_effects": {
+      "type": "object",
+      "description": "Map of item effects by identifier",
+      "additionalProperties": {
+        "$ref": "https://rogue-todo.com/item_effects_schema.json#/defs/effect/type"
+      }
+    },
+    "item_specializations": {
+      "type": "object",
+      "description": "Map of item specializations by identifier",
+      "additionalProperties": {
+        "$ref": "https://rogue-todo.com/item_effects_schema.json#/defs/specialization/type"
+      }
+    },
+    "loot_tables": {
+      "type": "object",
+      "description": "Map of loot tables by identifier",
+      "additionalProperties": {
+        "$ref": "https://rogue-todo.com/loot_tb_schema.json#/defs/loot_table"
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,6 +1,7 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 #include <rogue/UI/Decorator.h>
+#include <rogue/UI/Controls.h>
 
 namespace rogue::ui {
 
@@ -18,11 +19,24 @@ void Decorator::setComp(std::shared_ptr<Widget> Comp) {
 
 bool Decorator::handleInput(int Char) { return Comp->handleInput(Char); }
 
-std::string_view Decorator::getInteractMsg() const {
-  return Comp->getInteractMsg();
-}
+std::string Decorator::getInteractMsg() const { return Comp->getInteractMsg(); }
 
 void Decorator::draw(cxxg::Screen &Scr) const { Comp->draw(Scr); }
+
+BaseRectDecorator::BaseRectDecorator(cxxg::types::Position Pos,
+                                     cxxg::types::Size Size,
+                                     std::shared_ptr<Widget> Comp)
+    : Decorator(Pos, std::move(Comp)), Rect(Pos, Size) {}
+
+void BaseRectDecorator::setPos(cxxg::types::Position Pos) {
+  Decorator::setPos(Pos);
+  Rect.setPos(Pos);
+}
+
+void BaseRectDecorator::draw(cxxg::Screen &Scr) const {
+  Rect.draw(Scr);
+  Decorator::draw(Scr);
+}
 
 void ExitHandlerProvider::registerExitHandler(ExitHandlerCallback EMC) {
   this->EMC = std::move(EMC);
@@ -35,19 +49,19 @@ MoveDecorator::MoveDecorator(const std::shared_ptr<Widget> &Comp)
 
 bool MoveDecorator::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
     handleExit();
     break;
-  case cxxg::utils::KEY_LEFT:
+  case Controls::MoveLeft.Char:
     setPos(Pos + cxxg::types::Position{-1, 0});
     break;
-  case cxxg::utils::KEY_RIGHT:
+  case Controls::MoveRight.Char:
     setPos(Pos + cxxg::types::Position{1, 0});
     break;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     setPos(Pos + cxxg::types::Position{0, -1});
     break;
-  case cxxg::utils::KEY_DOWN:
+  case Controls::MoveDown.Char:
     setPos(Pos + cxxg::types::Position{0, 1});
     break;
   default:

@@ -1,0 +1,21 @@
+{
+  "map": {
+    "type": "generated",
+    "config": "blob_cave.cfg"
+  },
+  "creatures": [
+    {
+      "key": "b",
+      "name": "blob",
+      "loot": "common_blob"
+    }
+  ],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "common_chest"
+    }
+  ],
+  "locked_doors": [],
+  "dungeons": []
+}

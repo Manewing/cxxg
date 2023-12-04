@@ -1,13 +1,30 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <entt/entt.hpp>
 #include <memory>
+#include <rogue/Components/AI.h>
+#include <rogue/Components/Combat.h>
+#include <rogue/Components/Helpers.h>
+#include <rogue/Components/Items.h>
+#include <rogue/Components/LOS.h>
+#include <rogue/Components/RaceFaction.h>
+#include <rogue/Components/Stats.h>
+#include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
+#include <rogue/Context.h>
+#include <rogue/CreatureDatabase.h>
+#include <rogue/EntityDatabase.h>
+#include <rogue/ItemDatabase.h>
+#include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
-#include <rogue/NPCEntity.h>
 #include <rogue/Renderer.h>
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
 
 using namespace rogue;
+
+static const Tile NPCTile{
+    {'@', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
 
 template <typename T, typename U>
 cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
@@ -19,6 +36,35 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
   return Scr;
 }
 
+using NPCCompList =
+    ComponentList<TileComp, FactionComp, PositionComp, StatsComp, HealthComp,
+                  NameComp, LineOfSightComp, AgilityComp, MeleeAttackComp,
+                  InventoryComp, EquipmentComp, CollisionComp>;
+
+entt::entity createNPCEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
+                             StatPoints Stats) {
+  auto Entity = Reg.create();
+  Reg.emplace<PositionComp>(Entity, Pos);
+  Reg.emplace<PhysState>(Entity);
+  Reg.emplace<ReasoningStateComp>(Entity);
+  Reg.emplace<TileComp>(Entity, NPCTile);
+  Reg.emplace<NameComp>(Entity, "NPC");
+  Reg.emplace<AgilityComp>(Entity);
+  Reg.emplace<StatsComp>(Entity, Stats);
+  Reg.emplace<HealthComp>(Entity);
+  Reg.emplace<FactionComp>(Entity, FactionKind::Player);
+  Reg.emplace<RaceComp>(Entity, RaceKind::Human);
+  Reg.emplace<LineOfSightComp>(Entity);
+  Reg.emplace<MeleeAttackComp>(Entity);
+  Reg.emplace<InventoryComp>(Entity);
+  Reg.emplace<EquipmentComp>(Entity);
+  Reg.emplace<CollisionComp>(Entity);
+
+  assert(NPCCompList::validate(Reg, Entity) && "NPC entity is invalid");
+
+  return Entity;
+}
+
 int main(int Argc, char *Argv[]) {
   if (Argc != 2) {
     std::cerr << "usage: " << Argv[0] << " <level_file>" << std::endl;
@@ -28,34 +74,17 @@ int main(int Argc, char *Argv[]) {
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
-  LevelGenerator LG;
+  rogue::ItemDatabase ItemDb;
+  rogue::EntityDatabase EntityDb;
+  rogue::CreatureDatabase CreatureDb;
+  rogue::LevelDatabase LevelDb;
+  rogue::GameContext Ctx{ItemDb, EntityDb, CreatureDb, LevelDb};
 
-  const Tile GroundTile{
-      {' ', cxxg::types::RgbColor{0, 0, 0, true, 100, 80, 50}}};
-  const Tile WallTile{
-      {'#', cxxg::types::RgbColor{60, 60, 60, true, 45, 45, 45}}};
-  const Tile WaterTile{
-      {'~', cxxg::types::RgbColor{40, 132, 191, true, 30, 110, 150}}};
-  const Tile TreeTile{
-      {'A', cxxg::types::RgbColor{10, 50, 15, true, 100, 80, 50}}};
-  const Tile BerryBushTile{
-      {'#', cxxg::types::RgbColor{140, 10, 50, true, 10, 50, 15}}};
-  const Tile NPCTile{
-      {'@', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
-
-  const std::vector<std::string> Layers = {
-      "ground", "ground_deco", "walls", "walls_deco", "entities", "objects",
-  };
-  const std::map<char, LevelGenerator::CharInfo> CharInfoMap = {
-      {GroundTile.kind(), {GroundTile, "ground"}},
-      {WallTile.kind(), {WallTile, "walls"}},
-      {WaterTile.kind(), {WaterTile, "objects"}},
-      {TreeTile.kind(), {TreeTile, "objects"}},
-      {'B', {BerryBushTile, "objects"}},
-  };
-  auto Level = LG.loadLevel(Argv[1], Layers, CharInfoMap, 0);
-  auto NPC = std::make_shared<NPCEntity>(ymir::Point2d<int>{4, 4}, NPCTile);
-  Level->Entities.push_back(NPC);
+  LevelGeneratorLoader LvlGenLoader(Ctx);
+  auto LG = LvlGenLoader.load(0, Argv[1]);
+  auto Level = LG->generateLevel(0);
+  auto NPCEntity =
+      createNPCEntity(Level->Reg, {4, 4}, StatPoints{10, 10, 10, 10});
 
   unsigned MaxTick = 1000;
   for (unsigned Tick = 0; Tick < MaxTick; Tick++) {
@@ -64,14 +93,17 @@ int main(int Argc, char *Argv[]) {
     Renderer Render(RenderSize, *Level, {40, 12});
     Scr << Render.get();
 
-    auto Need = NPC->getBiggestNeed();
-    Scr[0][0] << "NPC@" << NPC->Pos << " " << NPC->PS;
-    Scr[1][0] << "[" << Need << "][" << NPC->CurrentActionState << "/"
-              << NPC->getActionFromNeed(Need) << "]";
+    auto &PC = Level->Reg.get<PositionComp>(NPCEntity);
+    auto &PS = Level->Reg.get<PhysState>(NPCEntity);
+    auto &RSC = Level->Reg.get<ReasoningStateComp>(NPCEntity);
+    auto Need = PS.getBiggestNeed();
+    Scr[0][0] << "NPC@" << PC.Pos << " " << PS;
+    Scr[1][0] << "[" << Need << "][" << RSC.State << "/"
+              << getActionFromNeed(Need) << "]";
 
     Scr.update();
     Scr.clear();
-    Level->update();
+    Level->update(true);
     cxxg::utils::sleep(200000);
   }
 

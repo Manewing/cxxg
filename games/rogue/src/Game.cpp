@@ -3,13 +3,20 @@
 #include <cxxg/Types.h>
 #include <cxxg/Utils.h>
 #include <memory>
-#include <rogue/Components/AI.h>
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Player.h>
-#include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
+#include <rogue/Event.h>
 #include <rogue/Game.h>
+#include <rogue/GameConfig.h>
+#include <rogue/InventoryHandler.h>
 #include <rogue/Renderer.h>
+#include <rogue/UI/CommandLine.h>
+#include <rogue/UI/Controls.h>
+#include <rogue/UI/TargetUI.h>
 
 namespace rogue {
 
@@ -23,212 +30,480 @@ cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
   return Scr;
 }
 
-Game::Game(cxxg::Screen &Scr)
-    : cxxg::Game(Scr), Hist(*this), EHW(Hist), ItemDb(), Ctx({*this, ItemDb}),
-      LevelGen(&Ctx), CurrentLevel(nullptr), UICtrl(Scr) {}
+void RenderEventCollector::setEventHub(EventHub *EH) {
+  EventHubConnector::setEventHub(EH);
+  EH->subscribe(*this, &RenderEventCollector::onEntityAttackEvent);
+  EH->subscribe(*this, &RenderEventCollector::onDetectTargetEvent);
+  EH->subscribe(*this, &RenderEventCollector::onLostTargetEvent);
+}
+
+void RenderEventCollector::onEntityAttackEvent(const EntityAttackEvent &E) {
+  auto *PC = E.Registry->try_get<PositionComp>(E.Target);
+  if (!PC) {
+    return;
+  }
+  auto const AtPos = PC->Pos;
+  RenderFns.push_back([AtPos](Renderer &R) {
+    R.renderEffect(
+        cxxg::types::ColoredChar{'*', cxxg::types::RgbColor{155, 20, 20}},
+        AtPos);
+  });
+}
+
+void RenderEventCollector::onDetectTargetEvent(const DetectTargetEvent &E) {
+  auto *PC = E.Registry->try_get<PositionComp>(E.Entity);
+  if (!PC) {
+    return;
+  }
+  auto const AtPos = PC->Pos;
+  RenderFns.push_back([AtPos](Renderer &R) {
+    R.renderEffect(
+        cxxg::types::ColoredChar{'!', cxxg::types::RgbColor{173, 161, 130}},
+        AtPos);
+  });
+}
+
+void RenderEventCollector::onLostTargetEvent(const LostTargetEvent &E) {
+  auto *PC = E.Registry->try_get<PositionComp>(E.Entity);
+  if (!PC) {
+    return;
+  }
+  auto const AtPos = PC->Pos;
+  RenderFns.push_back([AtPos](Renderer &R) {
+    R.renderEffect(
+        cxxg::types::ColoredChar{'?', cxxg::types::RgbColor{56, 55, 89}},
+        AtPos);
+  });
+}
+
+void RenderEventCollector::apply(Renderer &R) {
+  for (auto &Fn : RenderFns) {
+    Fn(R);
+  }
+}
+
+void RenderEventCollector::clear() { RenderFns.clear(); }
+
+bool RenderEventCollector::hasEvents() const { return !RenderFns.empty(); }
+
+Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
+    : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
+      ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)),
+      EntityDb(EntityDatabase::load(ItemDb, Cfg.EntityDbConfig)),
+      CreatureDb(CreatureDatabase::load(Cfg.CreatureDbConfig)),
+      LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)),
+      Ctx({ItemDb, EntityDb, CreatureDb, LevelDb}),
+      LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
+      World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
+      UICtrl(Scr) {}
+
+namespace {
+
+void fillPlayerInventory(entt::registry &Reg, entt::entity Player,
+                         const GameConfig &Cfg, const ItemDatabase &ItemDb) {
+  // FIXME this should be part of an enemy/NPC AI system
+  auto &Inv = Reg.get<InventoryComp>(Player).Inv;
+  for (const auto &ItCfg : Cfg.InitialItems) {
+    auto ItId = ItemDb.getItemId(ItCfg.Name);
+    auto It = ItemDb.createItem(ItId, ItCfg.Count);
+    Inv.addItem(It);
+  }
+
+  // Try equipping items
+  InventoryHandler InvHandler(Player, Reg);
+  InvHandler.autoEquipItems();
+}
+
+} // namespace
 
 void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
+  // Set seed for random number generator
+  std::srand(Cfg.Seed);
+
   EHW.setEventHub(&EvHub);
+  EHW.subscribe(*this, &Game::onEntityDiedEvent);
+  EHW.subscribe(*this, &Game::onSwitchLevelEvent);
+  EHW.subscribe(*this, &Game::onSwitchGameWorldEvent);
+  EHW.subscribe(*this, &Game::onLootEvent);
+  REC.setEventHub(&EvHub);
+  World->setEventHub(&EvHub);
+  UICtrl.setEventHub(&EvHub);
 
-  switchLevel(0);
-  CurrentLevel->update();
+  switchLevel(0, /*ToEntry=*/true);
 
-  // DEBUG ==>
-  auto Player = CurrentLevel->getPlayer();
-  auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
-  InvComp.Inv.addItem(ItemDb.createItem(0, 20));
-  InvComp.Inv.addItem(ItemDb.createItem(1, 15));
-  InvComp.Inv.addItem(ItemDb.createItem(2, 10));
-  // <== DEBUG
+  // Fill player inventory
+  World->getCurrentLevelOrFail().createPlayer();
+  fillPlayerInventory(getLvlReg(), getPlayer(), Cfg, ItemDb);
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
+
+  // We could update the level here, but we want to draw the initial state.
+  handleUpdates(/*IsTick=*/false);
+
   handleDraw();
 }
 
-void Game::switchLevel(int Level) {
+void Game::switchLevel(int Level, bool ToEntry) {
   if (Level < 0) {
     Hist.warn() << "One can never leave...";
     return;
   }
 
-  if (Level >= static_cast<int>(Levels.size())) {
-    assert((Level - 1) < static_cast<int>(Levels.size()));
-    Levels.push_back(LevelGen.generateLevel(Level, Level));
-    Levels.back()->setEventHub(&EvHub);
-  }
-
-  if (!CurrentLevel) {
-    Levels.at(Level)->createPlayer();
-  } else if (CurrentLevel != Levels.at(Level)) {
-    Levels.at(Level)->movePlayer(*CurrentLevel);
-  }
-
-  CurrentLevel = Levels.at(Level);
-  CurrentLevelIdx = Level;
+  UICtrl.closeAll();
+  REC.clear();
+  World->switchLevel(Level, ToEntry);
 }
 
 bool Game::handleInput(int Char) {
+  if (UICtrl.hasCommandLineUI()) {
+    UICtrl.getWindowOfType<ui::CommandLineController>()->handleInput(Char);
+    return true;
+  }
+  Char = ui::Controls::getRemappedChar(Char);
+
+  movePlayer(ymir::Dir2d::NONE);
+
+  // Override keys
   switch (Char) {
-  case 'i': {
-    if (!CurrentLevel) {
-      return false;
+  case ui::Controls::InventoryUI.Char: {
+    handleUpdates(/*IsTick=*/false);
+    if (UICtrl.hasInventoryUI()) {
+      UICtrl.closeInventoryUI();
+      handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
+    } else {
+      UICtrl.setInventoryUI(getPlayerOrNull(), World->getCurrentLevelOrFail());
     }
-    auto Player = CurrentLevel->getPlayer();
-    if (Player == entt::null) {
-      return false;
-    }
-    auto &InvComp = CurrentLevel->Reg.get<InventoryComp>(Player);
-    // UI interaction do not update level
-    UICtrl.setInventoryUI(InvComp.Inv, Player, CurrentLevel->Reg);
     return true;
   }
-  case 'o': {
-    if (!CurrentLevel) {
-      return false;
+  case ui::Controls::EquipmentUI.Char: {
+    handleUpdates(/*IsTick=*/false);
+    if (UICtrl.hasEquipmentUI()) {
+      UICtrl.closeEquipmentUI();
+      handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
+    } else {
+      UICtrl.setEquipmentUI(getPlayerOrNull(), getLvlReg());
     }
-    auto Player = CurrentLevel->getPlayer();
-    if (Player == entt::null) {
-      return false;
-    }
-    auto &EquipComp = CurrentLevel->Reg.get<EquipmentComp>(Player);
-    // UI interaction do not update level
-    UICtrl.setEquipmentUI(EquipComp.Equip, Player, CurrentLevel->Reg);
     return true;
   }
-  case 'h':
-    UICtrl.setHistoryUI(Hist);
+  case ui::Controls::BuffsUI.Char: {
+    handleUpdates(/*IsTick=*/false);
+    if (UICtrl.hasBuffUI()) {
+      UICtrl.closeBuffUI();
+    } else {
+      UICtrl.setBuffUI(getPlayerOrNull(), getLvlReg());
+    }
     return true;
-  case 'c':
-    // TODO help show controls
-    return false;
+  }
+  case ui::Controls::HistoryUI.Char:
+    handleUpdates(/*IsTick=*/false);
+    if (UICtrl.hasHistoryUI()) {
+      UICtrl.closeHistoryUI();
+    } else {
+      UICtrl.setHistoryUI(Hist);
+    }
+    return true;
+  case ui::Controls::CharacterUI.Char: {
+    handleUpdates(/*IsTick=*/false);
+    if (UICtrl.hasStatsUI()) {
+      UICtrl.closeStatsUI();
+    } else {
+      UICtrl.setStatsUI(getPlayerOrNull(), getLvlReg());
+    }
+    return true;
+  }
+  case ui::Controls::TargetUI.Char: {
+    handleUpdates(/*IsTick=*/false);
+    if (UICtrl.hasTargetUI()) {
+      UICtrl.closeTargetUI();
+    } else {
+      auto &Lvl = World->getCurrentLevelOrFail();
+      auto SrcEt = getPlayer();
+      const auto &PC = getLvlReg().get<PositionComp>(getPlayer());
+      // No range, allow investigate entire level
+      UICtrl.setTargetUI(PC, {}, Lvl, [&Lvl, SrcEt](auto TgEt, auto TPos) {
+        CombatActionComp CC;
+        CC.Target = TgEt;
+        CC.RangedPos = TPos;
+        Lvl.Reg.template emplace<CombatActionComp>(SrcEt, CC);
+      });
+    }
+    return true;
+  }
+  case ui::Controls::CloseWindow.Char: {
+    if (!UICtrl.isUIActive()) {
+      UICtrl.setMenuUI(World->getCurrentLevelOrFail());
+      return true;
+    } else if (UICtrl.hasMenuUI()) {
+      UICtrl.closeMenuUI();
+      return true;
+    }
+    break;
+  }
   default:
     break;
   }
+
+  // Handle UI input
   if (UICtrl.isUIActive()) {
     UICtrl.handleInput(Char);
+    handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
     return true;
   }
 
   // FIXME add user input to context and process input in player system
   // FIXME play move and attack needs to be handled in update
   switch (Char) {
-  case 'a':
-  case cxxg::utils::KEY_LEFT:
+  case ui::Controls::MoveLeft.Char:
     movePlayer(ymir::Dir2d::LEFT);
     break;
-  case 'd':
-  case cxxg::utils::KEY_RIGHT:
+  case ui::Controls::MoveRight.Char:
     movePlayer(ymir::Dir2d::RIGHT);
     break;
-  case 's':
-  case cxxg::utils::KEY_DOWN:
+  case ui::Controls::MoveDown.Char:
     movePlayer(ymir::Dir2d::DOWN);
     break;
-  case 'w':
-  case cxxg::utils::KEY_UP:
+  case ui::Controls::MoveUp.Char:
     movePlayer(ymir::Dir2d::UP);
     break;
-  case cxxg::utils::KEY_SPACE:
+  case ui::Controls::Rest.Char:
+    // Wait a turn
+    Hist.info() << "Resting...";
     break;
-  case 'e':
-    tryInteract();
-    break;
+  case ui::Controls::Interact.Char:
+    if (tryInteract()) {
+      break;
+    }
+    // No interaction, no tick
+    return true;
   default:
     // Not a valid input do not update
-    return false;
+    return true;
   }
 
-  // Update level and handle entity updates
-  if (!CurrentLevel->update()) {
-    // FIXME return false currently indicates player died, refactor for event
-    // of player death
+  return handleUpdates(/*IsTick=*/true);
+}
+
+bool Game::handleUpdates(bool IsTick) {
+  if (!IsTick) {
+    World->getCurrentLevelOrFail().update(IsTick);
+    return true;
   }
+
+  // While the game is running update the level and draw to screen.
+  // We will perform ticks until enough ticks have passed for the player to have
+  // gained enough AP to take an action.
+  while (GameRunning) {
+    World->getCurrentLevelOrFail().update(true);
+    GameTicks++;
+
+    if (!GameRunning) {
+      break;
+    }
+
+    auto SleepAfterDraw = REC.hasEvents();
+    handleDrawLevel(true);
+    if (SleepAfterDraw) {
+      cxxg::utils::sleep(200000);
+    }
+
+    // Clear stdin buffer
+    cxxg::utils::getChar(false);
+
+    auto PC = getLvlReg().get<PlayerComp>(getPlayer());
+    if (PC.IsReady) {
+      break;
+    }
+  }
+
   return true;
 }
 
 void Game::handleDraw() {
-  // Render the current map
-  const auto RenderSize = ymir::Size2d<int>{80, 24};
-
-  // FIXME need to check that player is still alive!
-  auto Player = CurrentLevel->getPlayer();
-  auto &PC = CurrentLevel->Reg.get<PlayerComp>(Player);
-  auto PlayerPos = CurrentLevel->Reg.get<PositionComp>(Player).Pos;
-  auto LOSRange = CurrentLevel->Reg.get<LineOfSightComp>(Player).LOSRange;
-  auto Health = CurrentLevel->Reg.get<HealthComp>(Player);
-
-  Renderer Render(RenderSize, *CurrentLevel, PlayerPos);
-  Render.renderShadow(/*Darkness=*/30);
-  Render.renderFogOfWar(CurrentLevel->getPlayerSeenMap());
-  Render.renderLineOfSight(PlayerPos, /*Range=*/LOSRange);
-
-  // Draw map
-  Scr << Render.get();
-
-  std::string_view InteractStr = "";
-  if (PC.CurrentInteraction) {
-    InteractStr = "[E] " + PC.CurrentInteraction->Msg;
-  } else if (CurrentLevel->canInteract(PlayerPos)) {
-    InteractStr = "[E] Interact";
+  if (GameRunning) {
+    handleDrawLevel(false);
+  } else {
+    handleDrawGameOver();
   }
-
-  // Draw UI overlay
-  UICtrl.draw(CurrentLevelIdx, Health.Value, Health.MaxValue, InteractStr);
-
-  /// DEBUG==>
-  // const auto &SC = CurrentLevel->Reg.get<StatsComp>(Player);
-  // Scr[1][0] << "Int: " << SC.effective().Int << ", Str: " <<
-  // SC.effective().Str
-  //           << ", Dex: " << SC.effective().Dex
-  //           << ", Vit: " << SC.effective().Vit;
-  /// <== DEBUG
 
   cxxg::Game::handleDraw();
 }
 
 // FIXME move to player system?
 void Game::movePlayer(ymir::Dir2d Dir) {
-  if (!CurrentLevel) {
-    return;
-  }
-  auto Player = CurrentLevel->getPlayer();
-  if (Player == entt::null) {
-    return;
-  }
-  assert(CurrentLevel->Reg.valid(Player));
-  assert(CurrentLevel->Reg.all_of<MovementComp>(Player));
-  CurrentLevel->Reg.get<MovementComp>(Player).Dir = Dir;
+  auto Player = getPlayer();
+  getLvlReg().get<PlayerComp>(Player).MoveDir = Dir;
 }
 
 // FIXME move to player system?
-void Game::tryInteract() {
-  if (!CurrentLevel) {
-    return;
-  }
-  auto Player = CurrentLevel->getPlayer();
-  if (Player == entt::null) {
-    return;
-  }
-  auto &PC = CurrentLevel->Reg.get<PlayerComp>(Player);
-  auto PlayerPos = CurrentLevel->Reg.get<PositionComp>(Player).Pos;
+bool Game::tryInteract() {
+  auto Player = getPlayer();
+  auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
 
-  // Finalize interaction
-  if (PC.CurrentInteraction) {
-    PC.CurrentInteraction->Execute(*this, Player, CurrentLevel->Reg);
-    PC.CurrentInteraction = std::nullopt;
-    return;
-  }
+  const auto &CurrentLevel = World->getCurrentLevelOrFail();
+  auto InteractableEntities = CurrentLevel.getInteractables(PlayerPos);
 
-  auto InteractableEntities = CurrentLevel->getInteractables(PlayerPos);
+  // If there are no interactions we are done
   if (InteractableEntities.empty()) {
-    return;
+    return false;
+  }
+
+  // If there is only one action execute it
+  if (InteractableEntities.size() == 1) {
+    auto &InteractableEntity = InteractableEntities.at(0);
+    auto &Interactable = getLvlReg().get<InteractableComp>(InteractableEntity);
+    auto Player = getPlayer();
+    auto &PC = getLvlReg().get<PlayerComp>(Player);
+    PC.CurrentInteraction = Interactable.Action;
+
+    // This may switch level so needs to be last thing that is done
+    Interactable.Action.Execute(World->getCurrentLevelOrFail(), Player,
+                                getLvlReg());
+    return true;
+  }
+
+  // Multiple interactions, this show UI to select interaction
+  UICtrl.closeInteractUI();
+  UICtrl.setInteractUI(getPlayer(), getLvlReg().get<PositionComp>(getPlayer()),
+                       World->getCurrentLevelOrFail());
+
+  return true;
+}
+
+entt::registry &Game::getLvlReg() { return World->getCurrentLevelOrFail().Reg; }
+
+entt::entity Game::getPlayerOrNull() const {
+  const auto *CurrentLevel = World->getCurrentLevel();
+  if (!CurrentLevel) {
+    return entt::null;
+  }
+  return CurrentLevel->getPlayer();
+}
+
+entt::entity Game::getPlayer() const {
+  auto Player = getPlayerOrNull();
+  assert(Player != entt::null); // FIXME this should be an exception
+  return Player;
+}
+
+Interaction *Game::getAvailableInteraction() {
+  auto Player = getPlayer();
+  auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
+
+  const auto &CurrentLevel = World->getCurrentLevelOrFail();
+  auto InteractableEntities = CurrentLevel.getInteractables(PlayerPos);
+  if (InteractableEntities.empty()) {
+    return nullptr;
   }
 
   // TODO allow cycling through available objects
   auto &InteractableEntity = InteractableEntities.at(0);
-  auto &Interactable =
-      CurrentLevel->Reg.get<InteractableComp>(InteractableEntity);
-  PC.CurrentInteraction = Interactable.Action;
+  auto &Interactable = getLvlReg().get<InteractableComp>(InteractableEntity);
+  return &Interactable.Action;
+}
+
+void Game::onEntityDiedEvent(const EntityDiedEvent &E) {
+  if (E.isPlayerAffected()) {
+    GameRunning = false;
+  }
+}
+
+void Game::onSwitchLevelEvent(const SwitchLevelEvent &E) {
+  switchLevel(E.Level, E.ToEntry);
+}
+
+void Game::onSwitchGameWorldEvent(const SwitchGameWorldEvent &E) {
+  UICtrl.closeAll();
+  REC.clear();
+
+  World->switchWorld(Cfg.Seed, E.LevelName, E.SwitchEt);
+
+  // We could update the level here, but we want to draw the initial state.
+  handleUpdates(/*IsTick=*/false);
+}
+
+void Game::onLootEvent(const LootEvent &E) {
+  if (!E.isPlayerAffected() ||
+      &World->getCurrentLevelOrFail().Reg != E.Registry) {
+    return;
+  }
+  UICtrl.setLootUI(E.Entity, E.LootedEntity, World->getCurrentLevelOrFail(),
+                   E.LootName);
+}
+
+namespace {
+
+ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
+                                           entt::registry &Reg,
+                                           Interaction *Interact) {
+  const auto &Health = Reg.get<HealthComp>(Player);
+  const auto &AGC = Reg.get<AgilityComp>(Player);
+
+  ui::Controller::PlayerInfo PI;
+  PI.Health = Health.Value;
+  PI.MaxHealth = Health.MaxValue;
+  PI.AP = AGC.AP;
+  if (Interact) {
+    PI.InteractStr = "[e] " + Interact->Msg;
+  }
+
+  return PI;
+}
+
+std::optional<ui::Controller::TargetInfo> getUITargetInfo(entt::entity Player,
+                                                          entt::registry &Reg) {
+  const auto *CC = Reg.try_get<CombatAttackComp>(Player);
+  if (!CC || CC->Target == entt::null || !Reg.valid(CC->Target)) {
+    return {};
+  }
+  ui::Controller::TargetInfo TI;
+  auto *TNC = Reg.try_get<NameComp>(CC->Target);
+  auto *THC = Reg.try_get<HealthComp>(CC->Target);
+  TI.Name = TNC ? TNC->Name : "<NameCompMissing>";
+  TI.Health = THC ? THC->Value : 0;
+  TI.MaxHealth = THC ? THC->MaxValue : 0;
+  return TI;
+}
+
+} // namespace
+
+void Game::handleDrawLevel(bool UpdateScreen) {
+  // Render the current map
+  const auto RenderSize = ymir::Size2d<int>{static_cast<int>(Scr.getSize().X),
+                                            static_cast<int>(Scr.getSize().Y)};
+
+  // Get components for drawing from the current player
+  auto Player = getPlayer();
+  auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
+  auto CenterPos = PlayerPos;
+  if (auto *TUI = UICtrl.getWindowOfType<ui::TargetUI>()) {
+    CenterPos = TUI->getCursorPos();
+  }
+
+  auto &CurrentLevel = World->getCurrentLevelOrFail();
+  Renderer Render(RenderSize, CurrentLevel, CenterPos);
+  Render.renderShadow(/*Darkness=*/30);
+  Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
+  Render.renderAllLineOfSight();
+  REC.apply(Render);
+  REC.clear();
+
+  // Draw map
+  Scr << Render.get();
+
+  // Draw UI overlay
+  auto PI = getUIPlayerInfo(Player, getLvlReg(), getAvailableInteraction());
+  auto TI = getUITargetInfo(Player, getLvlReg());
+  UICtrl.draw(World->getCurrentLevelIdx(), PI, TI);
+
+  if (UpdateScreen) {
+    handleShowNotifications(false);
+    Scr.update();
+    Scr.clear();
+  }
+}
+
+void Game::handleDrawGameOver() {
+  // TODO
 }
 
 } // namespace rogue

@@ -1,0 +1,58 @@
+{
+  "map": {
+    "type": "designed",
+    "map_file": "chest_room.map",
+    "default_char": {
+      "color": "#222222",
+      "key": " ",
+      "layer": "ground"
+    },
+    "char_info": {
+      " ": {
+        "color": "#222222",
+        "key": " ",
+        "layer": "ground"
+      },
+      "#": {
+        "color": "#737373",
+        "key": "#",
+        "layer": "walls"
+      },
+      "C": {
+        "color": "#fac43c",
+        "key": "C",
+        "layer": "entities"
+      },
+      "H": {
+        "color": "#489dcf",
+        "key": "H",
+        "layer": "entities"
+      },
+      "<": {
+        "color": "#489dcf",
+        "key": "<",
+        "layer": "entities"
+      },
+      "s": {
+        "color": "#b8ad74",
+        "key": "s",
+        "layer": "entities"
+      }
+    }
+  },
+  "creatures": [
+    {
+      "key": "s",
+      "name": "skeleton",
+      "loot": "rare_enemy"
+    }
+  ],
+  "chests": [
+    {
+      "key": "C",
+      "loot": "mixed_chest"
+    }
+  ],
+  "locked_doors": [],
+  "dungeons": []
+}

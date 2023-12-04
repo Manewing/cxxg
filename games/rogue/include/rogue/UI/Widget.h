@@ -19,7 +19,7 @@ public:
   virtual void setPos(cxxg::types::Position P) { Pos = P; }
 
   virtual bool handleInput(int Char) = 0;
-  virtual std::string_view getInteractMsg() const = 0;
+  virtual std::string getInteractMsg() const = 0;
   virtual void draw(cxxg::Screen &Scr) const = 0;
 
 protected:
@@ -32,6 +32,10 @@ public:
 
   cxxg::types::Size getSize() const { return Size; }
   virtual void setSize(cxxg::types::Size S) { Size = S; }
+
+  bool handleInput(int) override { return false; }
+
+  std::string getInteractMsg() const override { return ""; }
 
   void draw(cxxg::Screen &Scr) const override;
 

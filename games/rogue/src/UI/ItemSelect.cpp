@@ -1,5 +1,6 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/ItemSelect.h>
 
 namespace rogue::ui {
@@ -10,12 +11,20 @@ static constexpr cxxg::types::RgbColor HighlightColor{255, 255, 255, true,
 static constexpr auto NoColor = cxxg::types::Color::NONE;
 } // namespace
 
-Select::Select(std::string Value, cxxg::types::Position Pos, unsigned Width)
-    : BaseRect(Pos, {Width, 1}), Value(std::move(Value)) {}
+Select::Select(std::string Value, cxxg::types::Position Pos, unsigned Width,
+               cxxg::types::TermColor ValueColor)
+    : BaseRect(Pos, {Width, 1}), Value(std::move(Value)),
+      ValueColor(ValueColor) {}
 
 void Select::setValue(std::string NewValue) { Value = std::move(NewValue); }
 
 const std::string &Select::getValue() const { return Value; }
+
+const cxxg::types::TermColor &Select::getValueColor() const {
+  return ValueColor;
+}
+
+void Select::setValueColor(cxxg::types::TermColor VC) { ValueColor = VC; }
 
 void Select::unselect() { IsSelected = false; }
 
@@ -28,32 +37,36 @@ bool Select::handleInput(int Char) {
   return false;
 }
 
-std::string_view Select::getInteractMsg() const { return ""; }
+std::string Select::getInteractMsg() const { return ""; }
 
 void Select::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
   if (IsSelected) {
-    Scr[Pos.Y][Pos.X] << HighlightColor << Value;
+    Scr[Pos.Y][Pos.X] << HighlightColor << Value << NoColor;
   } else {
-    Scr[Pos.Y][Pos.X] << Value;
+    Scr[Pos.Y][Pos.X] << ValueColor << Value << NoColor;
   }
 }
 
 LabeledSelect::LabeledSelect(std::string Label, std::string Value,
-                             cxxg::types::Position Pos, unsigned Width)
-    : Select(std::move(Value), Pos, Width), Label(std::move(Label)) {}
+                             cxxg::types::Position Pos, unsigned Width,
+                             cxxg::types::TermColor ValueColor,
+                             cxxg::types::TermColor LabelColor)
+    : Select(std::move(Value), Pos, Width, ValueColor), Label(std::move(Label)),
+      LabelColor(LabelColor) {}
 
 const std::string &LabeledSelect::getLabel() const { return Label; }
 
-std::string_view LabeledSelect::getInteractMsg() const { return ""; }
+std::string LabeledSelect::getInteractMsg() const { return ""; }
 
 void LabeledSelect::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
   if (IsSelected) {
-    Scr[Pos.Y][Pos.X] << HighlightColor << Label << ":" << NoColor << " "
-                      << Value;
+    Scr[Pos.Y][Pos.X] << HighlightColor << Label << ":"
+                      << " " << ValueColor << Value << NoColor;
   } else {
-    Scr[Pos.Y][Pos.X] << Label << ": " << Value;
+    Scr[Pos.Y][Pos.X] << LabelColor << Label << ": " << ValueColor << Value
+                      << NoColor;
   }
 }
 
@@ -114,15 +127,15 @@ void ItemSelect::setPos(cxxg::types::Position P) {
 
 bool ItemSelect::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
     return false;
-  case cxxg::utils::KEY_UP:
+  case Controls::MoveUp.Char:
     selectPrev();
     break;
-  case cxxg::utils::KEY_DOWN:
+  case Controls::MoveDown.Char:
     selectNext();
     break;
-  case cxxg::utils::KEY_ENTER:
+  case Controls::Interact.Char:
     handleSelect();
     break;
   default:
@@ -131,7 +144,9 @@ bool ItemSelect::handleInput(int Char) {
   return true;
 }
 
-std::string_view ItemSelect::getInteractMsg() const { return "[^v] Nav."; }
+std::string ItemSelect::getInteractMsg() const {
+  return Controls::Navigate.getInteractMsg();
+}
 
 void ItemSelect::draw(cxxg::Screen &Scr) const {
   for (const auto &S : Selects) {

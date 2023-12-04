@@ -8,15 +8,15 @@
 #include <ymir/Types.hpp>
 
 namespace rogue {
-class Game;
-}
+class EventHubConnector;
+} // namespace rogue
 
 namespace rogue {
 
 struct Interaction {
   std::string Msg;
-  std::function<void(Game &, entt::entity, entt::registry &)> Execute =
-      [](auto &, auto, auto &) {};
+  std::function<void(EventHubConnector &, entt::entity, entt::registry &)>
+      Execute = [](auto &, auto, auto &) {};
 };
 
 struct InteractableComp {
@@ -24,7 +24,6 @@ struct InteractableComp {
 };
 
 struct PlayerComp {
-public:
 public:
   static entt::entity createPlayer(entt::registry &Reg, const std::string &Name,
                                    ymir::Point2d<int> Pos = {});
@@ -36,6 +35,8 @@ public:
 
 public:
   std::optional<Interaction> CurrentInteraction;
+  ymir::Dir2d MoveDir = ymir::Dir2d::NONE;
+  bool IsReady = false;
 };
 
 } // namespace rogue

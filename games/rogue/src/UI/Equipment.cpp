@@ -1,46 +1,28 @@
 #include <cxxg/Utils.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Item.h>
+#include <rogue/UI/Controller.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/Frame.h>
+#include <rogue/UI/Inventory.h>
 #include <rogue/UI/ItemSelect.h>
+#include <rogue/UI/Tooltip.h>
 
 namespace rogue::ui {
 
-namespace {
+constexpr cxxg::types::Size TooltipSize = {40, 10};
+constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
-const char *getItemTypeLabel(ItemType It) {
-  switch (It & ItemType::EquipmentMask) {
-  case ItemType::Amulet:
-    return "Amulet";
-  case ItemType::ChestPlate:
-    return "Chest Plate";
-  case ItemType::Boots:
-    return "Boots";
-  case ItemType::Ring:
-    return "Ring";
-  case ItemType::Helmet:
-    return "Helmet";
-  case ItemType::Pants:
-    return "Pants";
-  case ItemType::Weapon:
-    return "Weapon";
-  case ItemType::OffHand:
-    return "Off Hand";
-  default:
-    break;
-  }
-  return "<unimp. ItemType>";
-}
-
-} // namespace
-
-EquipmentController::EquipmentController(Equipment &Equip, entt::entity Entity,
+EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
+                                         entt::entity Entity,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
-    : BaseRect(Pos, {40, 11}), Equip(Equip), Entity(Entity), Reg(Reg) {
+    : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip),
+      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg) {
+  InvHandler.setEventHub(Ctrl.getEventHub());
   ItSel = std::make_shared<ItemSelect>(Pos);
-  Dec = std::make_shared<Frame>(ItSel, Pos, Size, "Equipment");
+  Comp = std::make_shared<Frame>(ItSel, Pos, getSize(), "Equipment");
 
   int Count = 0;
   for (const auto *ES : Equip.all()) {
@@ -48,32 +30,23 @@ EquipmentController::EquipmentController(Equipment &Equip, entt::entity Entity,
   }
 }
 
-void EquipmentController::setPos(cxxg::types::Position Pos) {
-  BaseRect::setPos(Pos);
-  Dec->setPos(Pos);
-}
-
 bool EquipmentController::handleInput(int Char) {
   switch (Char) {
-  case cxxg::utils::KEY_ESC:
+  case Controls::CloseWindow.Char:
+  case Controls::EquipmentUI.Char:
     return false;
-  case 'o':
-    return false;
-  case 'u': {
-    auto InvComp = Reg.try_get<InventoryComp>(Entity);
-    if (!InvComp) {
-      // FIXME message
-      break;
-    }
+  case Controls::Info.Char: {
     auto SelIdx = ItSel->getSelectedIdx();
     auto *ES = Equip.all().at(SelIdx);
-    if (!ES->It ||
-        !ES->It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
-      // FIXME message
-      break;
+    if (ES->It) {
+      Ctrl.addWindow(std::make_shared<ItemTooltip>(
+          Pos + TooltipOffset, TooltipSize, *ES->It, /*Equipped=*/true));
     }
-    ES->It->removeFrom(Entity, Reg, CapabilityFlags::UnequipFrom);
-    InvComp->Inv.addItem(Equip.unequip(ES->BaseTypeFilter));
+  } break;
+  case Controls::Unequip.Char: {
+    const auto SelIdx = ItSel->getSelectedIdx();
+    const auto *ES = Equip.all().at(SelIdx);
+    InvHandler.tryUnequip(ES->BaseTypeFilter);
     updateSelectValues();
   } break;
 
@@ -83,13 +56,25 @@ bool EquipmentController::handleInput(int Char) {
   return true;
 }
 
-std::string_view EquipmentController::getInteractMsg() const {
-  return "[^v] Nav.";
+std::string EquipmentController::getInteractMsg() const {
+  std::vector<KeyOption> Options = {Controls::Navigate};
+
+  auto SelIdx = ItSel->getSelectedIdx();
+  auto *ES = Equip.all().at(SelIdx);
+
+  if (ES->It) {
+    Options.push_back(Controls::Info);
+    if (ES->It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
+      Options.push_back(Controls::Unequip);
+    }
+  }
+
+  return KeyOption::getInteractMsg(Options);
 }
 
 void EquipmentController::draw(cxxg::Screen &Scr) const {
-  BaseRect::draw(Scr);
-  Dec->draw(Scr);
+  updateSelectValues();
+  BaseRectDecorator::draw(Scr);
 }
 
 namespace {
@@ -101,18 +86,29 @@ std::string getSelectValue(const EquipmentSlot &ES) {
   return "---";
 }
 
+cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
+  if (ES.It) {
+    return InventoryControllerBase::getColorForItemType(ES.It->getType());
+  }
+  return cxxg::types::Color::NONE;
+}
+
 } // namespace
 
 void EquipmentController::addSelect(const EquipmentSlot &ES,
                                     cxxg::types::Position Pos) {
+  constexpr const auto NoColor = cxxg::types::Color::NONE;
   ItSel->addSelect<LabeledSelect>(getItemTypeLabel(ES.BaseTypeFilter),
-                                  getSelectValue(ES), Pos, 25);
+                                  getSelectValue(ES), Pos, 25, NoColor,
+                                  getSelectColor(ES));
 }
 
-void EquipmentController::updateSelectValues() {
+void EquipmentController::updateSelectValues() const {
   std::size_t Count = 0;
   for (const auto *ES : Equip.all()) {
-    ItSel->getSelect(Count++).setValue(getSelectValue(*ES));
+    auto &Sel = ItSel->getSelect(Count++);
+    Sel.setValue(getSelectValue(*ES));
+    Sel.setValueColor(getSelectColor(*ES));
   }
 }
 
