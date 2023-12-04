@@ -163,6 +163,17 @@
                   "const": false
                 }
               ]
+            },
+            "world_entry": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/world_entry"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -250,6 +261,17 @@
           },
           "looted_tile": {
             "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "additionalProperties": false
+      },
+      "world_entry": {
+        "type": "object",
+        "required": ["level_name"],
+        "properties": {
+          "level_name": {
+            "type": "string",
+            "description": "Name of the level to enter"
           }
         },
         "additionalProperties": false

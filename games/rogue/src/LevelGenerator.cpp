@@ -120,10 +120,10 @@ void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
 
   // Deal with creating dungeon entries
   if (auto It = Cfg.Dungeons.find(T.kind()); It != Cfg.Dungeons.end()) {
-    return createWorldEntry(L.Reg, Pos, T, It->second.LevelName);
-    // spawnAndPlaceEntity(L.Reg, Pos,
-    //                     Ctx.EntityDb.getEntityTemplateId("world_entry"));
-    // return;
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId(It->second.LevelName),
+                        L.getLevelId());
+    return;
   }
 
   // Deal with creating locked doors

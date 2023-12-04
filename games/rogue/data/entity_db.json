@@ -464,6 +464,52 @@
           }
         }
       }
+    },
+    {
+      "name": "base_world_entry",
+      "from_template": "base_interact",
+      "assemblers": {
+        "world_entry": {
+          "level_name": "<not defined from base_world_entry>"
+        },
+        "tile": {
+          "char": "<",
+          "color": "#ff0000"
+        }
+      }
+    },
+    {
+      "name": "level_1",
+      "from_template": "base_world_entry",
+      "display_name": "Level 1",
+      "description": "Level 1 TODO",
+      "assemblers": {
+        "world_entry": {
+          "level_name": "level_1"
+        }
+      }
+    },
+    {
+      "name": "level_2",
+      "from_template": "base_world_entry",
+      "display_name": "Level 2",
+      "description": "Level 2 TODO",
+      "assemblers": {
+        "world_entry": {
+          "level_name": "level_2"
+        }
+      }
+    },
+    {
+      "name": "level_3",
+      "from_template": "base_world_entry",
+      "display_name": "Level 3",
+      "description": "Level 3 TODO",
+      "assemblers": {
+        "world_entry": {
+          "level_name": "level_3"
+        }
+      }
     }
   ]
 }
