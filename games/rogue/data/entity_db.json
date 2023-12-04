@@ -119,6 +119,7 @@
       "from_template": "hostile_creature",
       "assemblers": {
         "equipment": true,
+        "drop_equipment": true,
         "auto_equip": true
       }
     },
@@ -157,6 +158,11 @@
       "display_name": "Toxic Rat",
       "description": "A toxic rat TODO",
       "assemblers": {
+        "inventory": {
+          "loot_table": "ltb_toxic_rat"
+        },
+        "equipment": true,
+        "auto_equip": true,
         "tile": {
           "color": "#475D35",
           "char": "R"

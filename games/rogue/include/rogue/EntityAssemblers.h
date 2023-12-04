@@ -148,6 +148,7 @@ private:
 using AttackAICompAssembler = DefaultConstructEntityAssembler<AttackAIComp>;
 using BlockLOSCompAssembler = DefaultConstructEntityAssembler<BlocksLOS>;
 using CollisionCompAssembler = DefaultConstructEntityAssembler<CollisionComp>;
+using DropEquipAssembler = DefaultConstructEntityAssembler<DropEquipmentComp>;
 using EquipmentCompAssembler = DefaultConstructEntityAssembler<EquipmentComp>;
 using HealthCompAssembler = DefaultConstructEntityAssembler<HealthComp>;
 using PlayerCompAssembler = DefaultConstructEntityAssembler<PlayerComp>;

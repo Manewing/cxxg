@@ -11,6 +11,8 @@ struct EquipmentComp {
   Equipment Equip;
 };
 
+struct DropEquipmentComp {};
+
 struct InventoryComp {
   Inventory Inv;
 };

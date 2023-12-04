@@ -331,6 +331,23 @@
       ]
     },
     {
+      "name": "Toxic Claws",
+      "description": "TODO",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "melee_5"
+        },
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_poison"
+        }
+      ],
+      "specializations": []
+    },
+    {
       "name": "Fire Wand",
       "description": "A wand casting fire balls",
       "max_stack_size": 1,
@@ -1237,6 +1254,23 @@
         {
           "type": "null",
           "weight": 70
+        }
+      ]
+    },
+    "ltb_toxic_rat": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Toxic Claws",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "common_rat",
+          "weight": -1
         }
       ]
     },

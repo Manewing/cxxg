@@ -90,6 +90,7 @@ EntityAssemblerCache getDefaultEntityAssemblerCache() {
   Cache.add<AutoEquipAssembler>("auto_equip");
   Cache.add<BlockLOSCompAssembler>("block_los");
   Cache.add<CollisionCompAssembler>("collision");
+  Cache.add<DropEquipAssembler>("drop_equipment");
   Cache.add<EquipmentCompAssembler>("equipment");
   Cache.add<HealthCompAssembler>("health");
   Cache.add<PlayerCompAssembler>("player");
