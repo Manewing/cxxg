@@ -95,22 +95,20 @@ TEST_F(LevelGeneratorTest, DesignedMapLevelGeneratorSimpleMapWithEntities) {
   Cfg.CharInfoMap['T'].Layer = "entities";
   Cfg.CharInfoMap['C'].T = rogue::Tile{{'C'}};
   Cfg.CharInfoMap['C'].Layer = "entities";
-  Cfg.EntityConfig = {.Creatures =
-                          {
-                              {'s', {"dummy_s", "loot_tb"}},
-                              {'T', {"dummy_t", "loot_tb"}},
-                          },
-                      .Chests =
-                          {
-                              {'C', {"loot_tb"}},
-                          },
-                      .Dungeons = {},
-                      .LockedDoors = {},
-                      .Entities = {}};
+  Cfg.EntityConfig = {.Entities = {
+                          {'s', "dummy_s"},
+                          {'T', "dummy_t"},
+                          {'C', "dummy_c"},
+                      }};
 
   ItemDb.addLootTable("loot_tb");
-  CreatureDb.addCreature(rogue::CreatureInfo{.Name = "dummy_s"});
-  CreatureDb.addCreature(rogue::CreatureInfo{.Name = "dummy_t"});
+  rogue::EntityTemplateInfo ETI;
+  ETI.Name = "dummy_s";
+  EntityDb.addEntityTemplate(ETI);
+  ETI.Name = "dummy_t";
+  EntityDb.addEntityTemplate(ETI);
+  ETI.Name = "dummy_c";
+  EntityDb.addEntityTemplate(ETI);
 
   rogue::DesignedMapLevelGenerator DMLG(Ctx, Cfg);
 
@@ -119,9 +117,8 @@ TEST_F(LevelGeneratorTest, DesignedMapLevelGeneratorSimpleMapWithEntities) {
   EXPECT_EQ(Lvl->Map.getSize(), ymir::Size2d<int>(4, 4));
   EXPECT_EQ(getWallTileKind(*Lvl, {0, 0}), '#');
 
-  auto View =
-      Lvl->Reg.view<const rogue::PositionComp, const rogue::InventoryComp>();
-  EXPECT_EQ(View.size_hint(), 3);
+  auto View = Lvl->Reg.view<const rogue::NameComp>();
+  EXPECT_EQ(View.size(), 3);
 }
 
 TEST_F(LevelGeneratorTest, GeneratedMapLevelGeneratorGenMap) {

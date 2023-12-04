@@ -3,19 +3,10 @@
     "type": "generated",
     "config": "blob_cave.cfg"
   },
-  "creatures": [
-    {
-      "key": "b",
-      "name": "blob",
-      "loot": "common_blob"
-    },
-    {
-      "key": "C",
-      "name": "common_chest",
-      "loot": "common_blob"
-    }
-  ],
-  "chests": [],
-  "locked_doors": [],
-  "dungeons": []
+  "entities": {
+    "b": "blob",
+    "C": "common_chest",
+    "H": "level_entry",
+    "<": "level_exit"
+  }
 }

@@ -3,24 +3,11 @@
     "type": "generated",
     "config": "troll_dungeon.cfg"
   },
-  "creatures": [
-    {
-      "key": "s",
-      "name": "skeleton",
-      "loot": "common_enemy"
-    },
-    {
-      "key": "t",
-      "name": "troll",
-      "loot": "rare_enemy"
-    }
-  ],
-  "chests": [
-    {
-      "key": "C",
-      "loot": "common_chest"
-    }
-  ],
-  "locked_doors": [],
-  "dungeons": []
+  "entities": {
+    "s": "skeleton",
+    "t": "troll",
+    "<": "level_entry",
+    "H": "level_exit",
+    "C": "rare_chest"
+  }
 }

@@ -24,19 +24,5 @@
       }
     ]
   },
-  "creatures": [
-    {
-      "key": "b",
-      "name": "Blob",
-      "loot": "common_blob"
-    }
-  ],
-  "chests": [
-    {
-      "key": "C",
-      "loot": "common_chest"
-    }
-  ],
-  "locked_doors": [],
-  "dungeons": []
+  "entities": {}
 }

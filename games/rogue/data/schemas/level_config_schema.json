@@ -3,113 +3,108 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "JSON Schema the level configuration",
   "type": "object",
-  "required": [
-    "map",
-    "creatures",
-    "chests",
-    "locked_doors",
-    "dungeons"
-  ],
+  "required": ["map", "entities"],
   "properties": {
     "map": {
+      "anyOf": [
+        {
+          "$ref": "#/def/designed_map"
+        },
+        {
+          "$ref": "#/def/generated_map"
+        },
+        {
+          "$ref": "#/def/composite_map"
+        }
+      ]
+    },
+    "entities": {
       "type": "object",
-      "required": [
-        "type"
-      ],
+      "description": "A list of character key to entity mappings",
+      "additionalProperties": {
+        "type": "string",
+        "description": "The name of the entity"
+      }
+    }
+  },
+  "def": {
+    "composite_map": {
+      "type": "object",
+      "required": ["type", "levels"],
       "properties": {
         "type": {
+          "const": "composite"
+        },
+        "levels": {
+          "type": "array",
+          "description": "A list of levels to be composited",
+          "items": {
+            "type": "object",
+            "required": ["end", "config"],
+            "properties": {
+              "end": {
+                "type": "integer",
+                "description": "The floor at which the level starts"
+              },
+              "config": {
+                "type": "string",
+                "description": "Relative path to the level config file"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "generated_map": {
+      "type": "object",
+      "required": ["type", "config"],
+      "properties": {
+        "type": {
+          "const": "generated"
+        },
+        "config": {
           "type": "string",
-          "description": "The type of map to generate",
-          "enum": [
-            "designed",
-            "generated",
-            "composite",
-            "empty"
-          ]
+          "description": "Relative path to the map generation config file"
         }
-      }
+      },
+      "additionalProperties": false
     },
-    "creatures": {
-      "type": "array",
-      "description": "A list of key to creature mappings",
-      "items": {
-        "type": "object",
-        "required": [
-          "key",
-          "name"
-        ],
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "The key of the creature in the dungeon"
-          },
-          "name": {
-            "type": "string",
-            "description": "The name of the creature"
+    "designed_map": {
+      "type": "object",
+      "required": ["type", "map_file", "char_info", "default_char"],
+      "properties": {
+        "type": {
+          "const": "designed"
+        },
+        "map_file": {
+          "type": "string",
+          "description": "Relative path to the map design file"
+        },
+        "default_char": {
+          "$ref": "#/def/char_info"
+        },
+        "char_info": {
+          "type": "object",
+          "description": "A list of character to tile and layer mappings",
+          "additionalProperties": {
+            "$ref": "#/def/char_info"
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
-    "chests": {
-      "type": "array",
-      "description": "A list of key to chest mappings",
-      "items": {
-        "type": "object",
-        "required": [
-          "key",
-          "loot"
-        ],
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "The key of the chest in the dungeon"
-          },
-          "loot": {
-            "type": "string",
-            "description": "Name of the loot table"
-          }
-        }
-      }
-    },
-    "locked_doors": {
-      "type": "array",
-      "description": "A list of key to chest mappings",
-      "items": {
-        "type": "object",
-        "required": [
-          "key",
-          "key_name"
-        ],
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "The key of the chest in the dungeon"
-          },
-          "key_name": {
-            "type": "string",
-            "description": "Name of the key to unlock the door"
-          }
-        }
-      }
-    },
-    "dungeons": {
-      "type": "array",
-      "description": "A list of key to chest mappings",
-      "items": {
-        "type": "object",
-        "required": [
-          "key",
-          "level_name"
-        ],
-        "properties": {
-          "key": {
-            "type": "string",
-            "description": "The key of the chest in the dungeon"
-          },
-          "level_name": {
-            "type": "string",
-            "description": "Name of the level table"
-          }
+    "char_info": {
+      "type": "object",
+      "required": ["tile", "layer"],
+      "properties": {
+        "tile": {
+          "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+        },
+        "layer": {
+          "type": "string",
+          "description": "The name of the layer"
         }
       }
     }
