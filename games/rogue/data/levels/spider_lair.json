@@ -4,6 +4,8 @@
     "config": "spider_lair.cfg"
   },
   "entities": {
+    "<": "level_entry",
+    "H": "level_exit",
     "0": "silk_cocoon",
     "h": "arachnoth_hatchling",
     "b": "arachnoth_burrower",
