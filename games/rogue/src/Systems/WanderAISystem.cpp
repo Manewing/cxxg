@@ -170,6 +170,7 @@ WanderAISystem::findTarget(entt::entity Entity,
         if ((TPC.Pos - AtPos).length() > double(LOSComp->LOSRange)) {
           return;
         }
+        auto const Offset = ymir::Point2d<double>(0.5, 0.5);
         ymir::Algorithm::rayCastDDA<int>(
             [&TargetEt, TPC, TEt](auto Pos) {
               if (TPC.Pos == Pos) {
@@ -177,7 +178,8 @@ WanderAISystem::findTarget(entt::entity Entity,
               }
             },
             [this](auto Pos) { return L.isLOSBlocked(Pos); }, LOSComp->LOSRange,
-            AtPos.template to<double>(), TPC.Pos.template to<double>());
+            AtPos.template to<double>() + Offset,
+            TPC.Pos.template to<double>() + Offset);
       });
 
   return {TargetEt, LOSComp, FacComp};
