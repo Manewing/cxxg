@@ -4,7 +4,6 @@
 namespace rogue {
 class ItemDatabase;
 class EntityDatabase;
-class CreatureDatabase;
 class LevelDatabase;
 } // namespace rogue
 
@@ -13,7 +12,6 @@ namespace rogue {
 struct GameContext {
   ItemDatabase &ItemDb;
   EntityDatabase &EntityDb;
-  CreatureDatabase &CreatureDb;
   LevelDatabase &LevelDb;
 };
 

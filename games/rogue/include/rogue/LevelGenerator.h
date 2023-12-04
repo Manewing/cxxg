@@ -16,30 +16,6 @@ struct GameContext;
 namespace rogue {
 
 struct LevelEntityConfig {
-public:
-  struct Creature {
-    std::string Name;
-    std::string LootTableName;
-  };
-
-  struct Chest {
-    std::string LootTableName;
-  };
-
-  struct WorldEntry {
-    std::string LevelName;
-  };
-
-  struct LockedDoor {
-    std::string KeyName;
-  };
-
-public:
-  std::map<char, Creature> Creatures;
-  std::map<char, Chest> Chests;
-  std::map<char, WorldEntry> Dungeons;
-  std::map<char, LockedDoor> LockedDoors;
-
   std::map<char, std::string> Entities;
 };
 
@@ -55,7 +31,7 @@ public:
 
 protected:
   void spawnEntities(const LevelEntityConfig &Cfg, Level &L) const;
-  void spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
+  void spawnEntity(char Char, const LevelEntityConfig &Cfg, Level &L,
                    ymir::Point2d<int> Pos) const;
 
 protected:

@@ -2,6 +2,7 @@
 #define ROGUE_COMPONENTS_LEVEL_H
 
 #include <optional>
+#include <rogue/Components/Visual.h>
 
 namespace rogue {
 
@@ -15,6 +16,8 @@ struct LevelEndComp {
 
 struct DoorComp {
   bool IsOpen = false;
+  Tile OpenTile;
+  Tile ClosedTile;
   std::optional<int> KeyId;
 
   bool hasLock() const { return KeyId.has_value(); }

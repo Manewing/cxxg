@@ -25,12 +25,14 @@ TEST(DeathSystemTest, CheckEmptyContainersAreRemoved) {
   rogue::DeathSystem DS(Reg);
 
   entt::entity Et = Reg.create();
-  Reg.emplace<rogue::InventoryComp>(Et).IsPersistent = false;
+  Reg.emplace<rogue::InventoryComp>(Et);
+  Reg.emplace<rogue::LootInteractComp>(Et).IsPersistent = false;
   DS.update(rogue::System::UpdateType::NoTick);
   EXPECT_FALSE(Reg.valid(Et));
 
   Et = Reg.create();
-  Reg.emplace<rogue::InventoryComp>(Et).IsPersistent = false;
+  Reg.emplace<rogue::InventoryComp>(Et);
+  Reg.emplace<rogue::LootInteractComp>(Et).IsPersistent = false;
   auto &HC = Reg.emplace<rogue::HealthComp>(Et);
   ASSERT_FALSE(HC.isDead());
   DS.update(rogue::System::UpdateType::NoTick);
@@ -41,7 +43,8 @@ TEST(DeathSystemTest, CheckEmptyContainersAreRemoved) {
   EXPECT_FALSE(Reg.valid(Et));
 
   Et = Reg.create();
-  Reg.emplace<rogue::InventoryComp>(Et).IsPersistent = true;
+  Reg.emplace<rogue::InventoryComp>(Et);
+  Reg.emplace<rogue::LootInteractComp>(Et).IsPersistent = true;
   DS.update(rogue::System::UpdateType::NoTick);
   EXPECT_TRUE(Reg.valid(Et));
 }

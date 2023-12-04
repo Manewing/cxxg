@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <rogue/Context.h>
-#include <rogue/CreatureDatabase.h>
 #include <rogue/EntityDatabase.h>
 #include <rogue/GameWorld.h>
 #include <rogue/ItemDatabase.h>
@@ -14,14 +13,14 @@ class GameWorldTest : public ::testing::Test {
 public:
   void SetUp() override {
     ItemDb = rogue::ItemDatabase();
-    CreatureDb = rogue::CreatureDatabase();
+    EntityDb = rogue::EntityDatabase();
+    LevelDb = rogue::LevelDatabase();
   }
 
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
-  rogue::CreatureDatabase CreatureDb;
   rogue::LevelDatabase LevelDb;
-  rogue::GameContext Ctx{ItemDb, EntityDb, CreatureDb, LevelDb};
+  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb};
 };
 
 TEST_F(GameWorldTest, MultiLevelDungeonEmpty) {

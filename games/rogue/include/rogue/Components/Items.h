@@ -3,6 +3,7 @@
 
 #include <rogue/Equipment.h>
 #include <rogue/Inventory.h>
+#include <rogue/Components/Visual.h>
 
 namespace rogue {
 
@@ -12,8 +13,14 @@ struct EquipmentComp {
 
 struct InventoryComp {
   Inventory Inv;
+};
+
+struct LootInteractComp {
+  bool IsLooted = false;
   bool IsPersistent = true;
-  bool Looted = false;
+  Tile DefaultTile;
+  Tile LootedTile;
+  std::string LootName;
 };
 
 } // namespace rogue

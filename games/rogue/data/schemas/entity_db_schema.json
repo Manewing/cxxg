@@ -152,6 +152,28 @@
                   "const": false
                 }
               ]
+            },
+            "loot_interact": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/loot_interact"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "world_entry": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/world_entry"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -183,19 +205,11 @@
       },
       "inventory": {
         "type": "object",
-        "required": ["loot_table", "is_persistent", "is_looted"],
+        "required": ["loot_table"],
         "properties": {
           "loot_table": {
             "type": "string",
             "description": "Name of the loot table to use for creating this inventory"
-          },
-          "is_persistent": {
-            "type": "boolean",
-            "description": "Whether the inventory should be persistent or not"
-          },
-          "is_looted": {
-            "type": "boolean",
-            "description": "Whether the inventory has been looted or not"
           }
         },
         "additionalProperties": false
@@ -211,6 +225,53 @@
           "level_id": {
             "type": "integer",
             "description": "Id of the level to enter or exit"
+          }
+        },
+        "additionalProperties": false
+      },
+      "loot_interact": {
+        "type": "object",
+        "required": [
+          "is_looted",
+          "is_persistent",
+          "loot_name",
+          "interact_text",
+          "default_tile",
+          "looted_tile"
+        ],
+        "properties": {
+          "is_looted": {
+            "type": "boolean",
+            "description": "Whether the loot has been looted or not"
+          },
+          "is_persistent": {
+            "type": "boolean",
+            "description": "Non persistent empty loot will be removed"
+          },
+          "loot_name": {
+            "type": "string",
+            "description": "Header for the UI window"
+          },
+          "interact_text": {
+            "type": "string",
+            "description": "Text to display when interacting"
+          },
+          "default_tile": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          },
+          "looted_tile": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "additionalProperties": false
+      },
+      "world_entry": {
+        "type": "object",
+        "required": ["level_name"],
+        "properties": {
+          "level_name": {
+            "type": "string",
+            "description": "Name of the level to enter"
           }
         },
         "additionalProperties": false

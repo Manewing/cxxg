@@ -19,6 +19,7 @@ struct Interaction {
       Execute = [](auto &, auto, auto &) {};
 };
 
+// FIXME allow having multiple action being caused by one interaction
 struct InteractableComp {
   Interaction Action;
 };

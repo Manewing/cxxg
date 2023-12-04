@@ -18,7 +18,6 @@ set(HEADER_FILES
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h
   include/rogue/Context.h
-  include/rogue/CreatureDatabase.h
   include/rogue/EntityAssemblers.h
   include/rogue/EntityDatabase.h
   include/rogue/Equipment.h
@@ -86,7 +85,6 @@ set(SOURCE_FILES
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
   src/Components/Visual.cpp
-  src/CreatureDatabase.cpp
   src/EntityAssemblers.cpp
   src/EntityDatabase.cpp
   src/Equipment.cpp
@@ -193,6 +191,9 @@ add_custom_target(
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/data/
 )
 
+file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json)
+file(GLOB SCHEMA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/*.json)
+file(GLOB LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/levels/*.json)
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/data/
 
@@ -204,16 +205,7 @@ add_custom_command(
   COMMAND
     ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
     --schema-files
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/entity_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/game_config_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/common_types_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/buffs_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/loot_tb_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_effects_schema.json
+        ${SCHEMA_FILES}
     --output-dir
       ${CMAKE_CURRENT_BINARY_DIR}/data/schemas
 
@@ -231,15 +223,8 @@ add_custom_command(
     ${CMAKE_BINARY_DIR}/test/rogue/schemas/
 
   DEPENDS
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/entity_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_db_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/game_config_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/level_config_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/common_types_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/buffs_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/loot_tb_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/item_effects_schema.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db.json
+      ${SCHEMA_FILES}
+      ${DATA_FILES}
+      ${LEVEL_FILES}
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
 )

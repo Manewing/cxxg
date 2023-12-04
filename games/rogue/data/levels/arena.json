@@ -3,96 +3,32 @@
     "type": "designed",
     "map_file": "arena.map",
     "default_char": {
-      "color": "#222222",
-      "key": " ",
+      "tile": {
+        "char": " ",
+        "color": "#222222"
+      },
       "layer": "ground"
     },
     "char_info": {
       " ": {
-        "color": "#222222",
-        "key": " ",
+        "tile": {
+          "char": " ",
+          "color": "#222222"
+        },
         "layer": "ground"
       },
       "#": {
-        "color": "#737373",
-        "key": "#",
+        "tile": {
+          "char": "#",
+          "color": "#737373"
+        },
         "layer": "walls"
-      },
-      "C": {
-        "color": "#fac43c",
-        "key": "C",
-        "layer": "entities"
-      },
-      "H": {
-        "color": "#489dcf",
-        "key": "H",
-        "layer": "entities"
-      },
-      "<": {
-        "color": "#489dcf",
-        "key": "<",
-        "layer": "entities"
-      },
-      "s": {
-        "color": "#b8ad74",
-        "key": "s",
-        "layer": "entities"
-      },
-      "t": {
-        "color": "#236e36",
-        "key": "t",
-        "layer": "entities"
-      },
-      "T": {
-        "color": "#236e36",
-        "key": "T",
-        "layer": "entities"
-      },
-      "b": {
-        "color": "#2aa310",
-        "key": "b",
-        "layer": "entities"
       }
     }
   },
-  "creatures": [
-    {
-      "key": "s",
-      "name": "skeleton",
-      "loot": "common_enemy"
-    },
-    {
-      "key": "r",
-      "name": "sewer_rat",
-      "loot": "common_rat"
-    },
-    {
-      "key": "R",
-      "name": "toxic_rat",
-      "loot": "common_rat"
-    },
-    {
-      "key": "t",
-      "name": "troll",
-      "loot": "rare_enemy"
-    },
-    {
-      "key": "T",
-      "name": "troll_berserker",
-      "loot": "rare_enemy"
-    },
-    {
-      "key": "b",
-      "name": "blob",
-      "loot": "common_blob"
-    }
-  ],
-  "chests": [
-    {
-      "key": "C",
-      "loot": "mixed_chest"
-    }
-  ],
-  "locked_doors": [],
-  "dungeons": []
+  "entities": {
+    "t": "troll",
+    "H": "level_entry",
+    "<": "level_exit"
+  }
 }

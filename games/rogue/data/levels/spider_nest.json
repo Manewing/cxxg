@@ -3,24 +3,9 @@
     "type": "generated",
     "config": "spider_nest.cfg"
   },
-  "creatures": [
-    {
-      "key": "0",
-      "name": "silk_cocoon",
-      "loot": "common_silk_cocoon"
-    },
-    {
-      "key": "h",
-      "name": "arachnoth_hatchling",
-      "loot": "common_spider"
-    },
-    {
-      "key": "b",
-      "name": "arachnoth_burrower",
-      "loot": "common_spider"
-    }
-  ],
-  "chests": [],
-  "locked_doors": [],
-  "dungeons": []
+  "entities": {
+    "0": "silk_cocoon",
+    "h": "arachnoth_hatchling",
+    "b": "arachnoth_burrower"
+  }
 }

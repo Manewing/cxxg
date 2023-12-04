@@ -3,56 +3,33 @@
     "type": "designed",
     "map_file": "rat_pit.map",
     "default_char": {
-      "color": "#222222",
-      "key": " ",
+      "tile": {
+        "char": " ",
+        "color": "#222222"
+      },
       "layer": "ground"
     },
     "char_info": {
       " ": {
-        "color": "#222222",
-        "key": " ",
+        "tile": {
+          "char": " ",
+          "color": "#222222"
+        },
         "layer": "ground"
       },
       "#": {
-        "color": "#737373",
-        "key": "#",
+        "tile": {
+          "char": "#",
+          "color": "#737373"
+        },
         "layer": "walls"
-      },
-      "v": {
-        "color": "#77412C",
-        "key": "v",
-        "layer": "entities"
-      },
-      "H": {
-        "color": "#489dcf",
-        "key": "H",
-        "layer": "entities"
-      },
-      "<": {
-        "color": "#489dcf",
-        "key": "<",
-        "layer": "entities"
-      },
-      "r": {
-        "color": "#5C5F55",
-        "key": "r",
-        "layer": "entities"
       }
     }
   },
-  "creatures": [
-    {
-      "key": "r",
-      "name": "sewer_rat",
-      "loot": "common_rat"
-    }
-  ],
-  "chests": [
-    {
-      "key": "v",
-      "loot": "mixed_chest"
-    }
-  ],
-  "locked_doors": [],
-  "dungeons": []
+  "entities": {
+    "r": "sewer_rat",
+    "<": "level_entry",
+    "H": "level_exit",
+    "v": "common_chest"
+  }
 }

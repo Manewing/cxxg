@@ -90,11 +90,12 @@ void reapDeadEntities(entt::registry &Reg, EventHubConnector &EHC,
 
 /// Empty inventory will be removed unless there is a health component
 void removeEmptyContainers(entt::registry &Reg, const entt::entity Entity,
-                           const InventoryComp &IC) {
+                           const InventoryComp &IC,
+                           const LootInteractComp &LIC) {
   if (Reg.any_of<HealthComp>(Entity)) {
     return;
   }
-  if (IC.Inv.empty() && !IC.IsPersistent) {
+  if (IC.Inv.empty() && !LIC.IsLooted && !LIC.IsPersistent) {
     Reg.destroy(Entity);
   }
 }
@@ -110,9 +111,9 @@ void DeathSystem::update(UpdateType Type) {
   });
 
   // FIXME should this be done somewhere else?
-  auto DropView = Reg.view<const InventoryComp>();
-  DropView.each([this](const auto &Entity, const auto IC) {
-    removeEmptyContainers(Reg, Entity, IC);
+  auto DropView = Reg.view<const InventoryComp, const LootInteractComp>();
+  DropView.each([this](const auto &Entity, const auto &IC, const auto &LIC) {
+    removeEmptyContainers(Reg, Entity, IC, LIC);
   });
 }
 

@@ -96,9 +96,7 @@
         },
         "faction": "nature",
         "inventory": {
-          "loot_table": "common_silk_cocoon",
-          "is_persistent": false,
-          "is_looted": false
+          "loot_table": "common_silk_cocoon"
         },
         "race": "dummy"
       }
@@ -113,12 +111,7 @@
         "visible": true,
         "agility": true,
         "line_of_sight": true,
-        "wander_ai": true,
-        "inventory": {
-          "loot_table": "<not defined from hostile_creature>",
-          "is_persistent": false,
-          "is_looted": false
-        }
+        "wander_ai": true
       }
     },
     {
@@ -414,6 +407,143 @@
         },
         "level_entry_exit": {
           "is_exit": true
+        }
+      }
+    },
+    {
+      "name": "base_chest",
+      "from_template": "base_interact",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "<not defined from base_chest>"
+        },
+        "loot_interact": {
+          "is_looted": false,
+          "is_persistent": true,
+          "loot_name": "Chest",
+          "interact_text": "Open Chest",
+          "default_tile": {
+            "char": "C",
+            "color": "#ff0000"
+          },
+          "looted_tile": {
+            "char": "c",
+            "color": "#00ff00"
+          }
+        }
+      }
+    },
+    {
+      "name": "stash",
+      "from_template": "base_chest",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "l1_key"
+        },
+        "loot_interact": {
+          "loot_name": "Stash",
+          "interact_text": "Open Stash",
+          "default_tile": {
+            "char": "C",
+            "color": "#fac43c"
+          },
+          "looted_tile": {
+            "char": "C",
+            "color": "#fac43c"
+          }
+        }
+      }
+    },
+    {
+      "name": "common_vase",
+      "from_template": "base_chest",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "common_chest"
+        },
+        "loot_interact": {
+          "loot_name": "Vase",
+          "interact_text": "Look into Vase",
+          "default_tile": {
+            "char": "v",
+            "color": "#77412c"
+          }
+        }
+      }
+    },
+    {
+      "name": "common_chest",
+      "from_template": "base_chest",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "common_chest"
+        },
+        "loot_interact": {
+          "default_tile": {
+            "char": "C",
+            "color": "#ff0000"
+          }
+        }
+      }
+    },
+    {
+      "name": "rare_chest",
+      "from_template": "base_chest",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "rare_chest"
+        },
+        "loot_interact": {
+          "default_tile": {
+            "char": "C",
+            "color": "#ff0000"
+          }
+        }
+      }
+    },
+    {
+      "name": "base_world_entry",
+      "from_template": "base_interact",
+      "assemblers": {
+        "world_entry": {
+          "level_name": "<not defined from base_world_entry>"
+        },
+        "tile": {
+          "char": "<",
+          "color": "#ff0000"
+        }
+      }
+    },
+    {
+      "name": "level_1",
+      "from_template": "base_world_entry",
+      "display_name": "Level 1",
+      "description": "Level 1 TODO",
+      "assemblers": {
+        "world_entry": {
+          "level_name": "level_1"
+        }
+      }
+    },
+    {
+      "name": "level_2",
+      "from_template": "base_world_entry",
+      "display_name": "Level 2",
+      "description": "Level 2 TODO",
+      "assemblers": {
+        "world_entry": {
+          "level_name": "level_2"
+        }
+      }
+    },
+    {
+      "name": "level_3",
+      "from_template": "base_world_entry",
+      "display_name": "Level 3",
+      "description": "Level 3 TODO",
+      "assemblers": {
+        "world_entry": {
+          "level_name": "level_3"
         }
       }
     }

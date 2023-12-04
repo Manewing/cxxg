@@ -27,10 +27,8 @@ void RaceCompAssembler::assemble(entt::registry &Reg,
 }
 
 InventoryCompAssembler::InventoryCompAssembler(const ItemDatabase &ItemDb,
-                                               const std::string &LootTable,
-                                               bool IsPersistent, bool IsLooted)
-    : ItemDb(ItemDb), LootTable(LootTable), IsPersistent(IsPersistent),
-      IsLooted(IsLooted) {}
+                                               const std::string &LootTable)
+    : ItemDb(ItemDb), LootTable(LootTable) {}
 
 namespace {
 
@@ -52,7 +50,7 @@ Inventory generateLootInventory(const ItemDatabase &ItemDb,
 void InventoryCompAssembler::assemble(entt::registry &Reg,
                                       entt::entity Entity) const {
   auto Inv = generateLootInventory(ItemDb, LootTable);
-  Reg.emplace<InventoryComp>(Entity, Inv, IsPersistent, IsLooted);
+  Reg.emplace<InventoryComp>(Entity, Inv);
 }
 
 bool AutoEquipAssembler::isPostProcess() const { return true; }
@@ -61,39 +59,6 @@ void AutoEquipAssembler::assemble(entt::registry &Reg,
                                   entt::entity Entity) const {
   InventoryHandler InvHdlr(Entity, Reg);
   InvHdlr.autoEquipItems();
-}
-
-ChestInteractableCompAssembler::ChestInteractableCompAssembler(Tile LootedTile)
-    : LootedTile(LootedTile) {}
-
-namespace {
-
-void handleLootChest(entt::registry &Reg, const entt::entity &Entity,
-                     const entt::entity &ActEt, EventHubConnector &EHC) {
-  auto &TC = Reg.template get<TileComp>(Entity);
-  auto &IC = Reg.template get<InventoryComp>(Entity);
-  if (!IC.Looted) {
-    if (auto *Rgb = std::get_if<cxxg::types::RgbColor>(&TC.T.color())) {
-      Rgb->R *= 0.5;
-      Rgb->G *= 0.5;
-      Rgb->B *= 0.5;
-    }
-    IC.Looted = true;
-  }
-
-  EHC.publish(LootEvent{{}, "Chest", ActEt, Entity, &Reg});
-}
-
-} // namespace
-
-void ChestInteractableCompAssembler::assemble(entt::registry &Reg,
-                                              entt::entity Entity) const {
-  (void)LootedTile; // FIXME
-  Reg.emplace<InteractableComp>(
-      Entity,
-      Interaction{"Open Chest", [Entity](auto &EHC, auto Et, auto &Reg) {
-                    handleLootChest(Reg, Entity, Et, EHC);
-                  }});
 }
 
 DoorCompAssembler::DoorCompAssembler(bool IsOpen, Tile OpenTile,
@@ -128,27 +93,27 @@ bool unlockDoor(entt::registry &Reg, const entt::entity &DoorEt,
 }
 
 void openDoor(entt::registry &Reg, const entt::entity &Entity) {
-  Reg.get<DoorComp>(Entity).IsOpen = true;
+  auto &DC = Reg.get<DoorComp>(Entity);
+  DC.IsOpen = true;
   Reg.erase<CollisionComp>(Entity);
   Reg.erase<BlocksLOS>(Entity);
   Reg.get<InteractableComp>(Entity).Action.Msg = "Close door";
 
-  // FIXME use open/closed door tiles
   auto &T = Reg.get<TileComp>(Entity);
   T.ZIndex = -2;
-  T.T.T.Char = '/';
+  T.T = DC.OpenTile;
 }
 
 void closeDoor(entt::registry &Reg, const entt::entity &Entity) {
-  Reg.get<DoorComp>(Entity).IsOpen = false;
+  auto &DC = Reg.get<DoorComp>(Entity);
+  DC.IsOpen = false;
   Reg.emplace<CollisionComp>(Entity);
   Reg.emplace<BlocksLOS>(Entity);
   Reg.get<InteractableComp>(Entity).Action.Msg = "Open door";
 
-  // FIXME use open/closed door tiles
   auto &T = Reg.get<TileComp>(Entity);
   T.ZIndex = 0;
-  T.T.T.Char = '+';
+  T.T = DC.ClosedTile;
 }
 
 } // namespace
@@ -158,9 +123,11 @@ void DoorCompAssembler::assemble(entt::registry &Reg,
   auto &DC = Reg.emplace<DoorComp>(Entity);
   DC.IsOpen = IsOpen;
   DC.KeyId = KeyId;
+  DC.OpenTile = OpenTile;
+  DC.ClosedTile = ClosedTile;
 
   const char *InteractMsg =
-      DC.isLocked() ? "Unlock door" : (IsOpen ? "Close door" : "XOpen door");
+      DC.isLocked() ? "Unlock door" : (IsOpen ? "Close door" : "Open door");
   Reg.emplace<InteractableComp>(
       Entity,
       Interaction{
@@ -183,11 +150,51 @@ void DoorCompAssembler::assemble(entt::registry &Reg,
             (void)Et;
           }});
 
-  auto &TC = Reg.emplace<TileComp>(Entity, IsOpen ? OpenTile : ClosedTile);
-  if (!IsOpen) {
-    TC.ZIndex = 0;
-  } else {
+  auto &TC = Reg.get_or_emplace<TileComp>(Entity);
+  if (IsOpen) {
+    TC.T = OpenTile;
     TC.ZIndex = -2;
+  } else {
+    TC.T = ClosedTile;
+    TC.ZIndex = 0;
+  }
+}
+
+LootedInteractCompAssembler::LootedInteractCompAssembler(
+    bool IsLooted, bool IsPersistent, Tile DefaultTile, Tile LootedTile,
+    const std::string &InteractText, const std::string &LootName)
+    : IsLooted(IsLooted), IsPersistent(IsPersistent), DefaultTile(DefaultTile),
+      LootedTile(LootedTile), InteractText(InteractText), LootName(LootName) {}
+
+namespace {
+void handleLoot(entt::registry &Reg, const entt::entity &Entity,
+                const entt::entity &ActEt, EventHubConnector &EHC) {
+  auto &TC = Reg.template get<TileComp>(Entity);
+  auto &LIC = Reg.template get<LootInteractComp>(Entity);
+  if (!LIC.IsLooted) {
+    TC.T = LIC.LootedTile;
+    LIC.IsLooted = true;
+  }
+  EHC.publish(LootEvent{{}, LIC.LootName, ActEt, Entity, &Reg});
+}
+
+} // namespace
+
+void LootedInteractCompAssembler::assemble(entt::registry &Reg,
+                                           entt::entity Entity) const {
+  Reg.emplace<InteractableComp>(
+      Entity,
+      Interaction{InteractText, [Entity](auto &EHC, auto Et, auto &Reg) {
+                    handleLoot(Reg, Entity, Et, EHC);
+                  }});
+  Reg.emplace<LootInteractComp>(Entity, IsLooted, IsPersistent, DefaultTile,
+                                LootedTile, LootName);
+
+  auto &TC = Reg.get_or_emplace<TileComp>(Entity);
+  if (IsLooted) {
+    TC.T = LootedTile;
+  } else {
+    TC.T = DefaultTile;
   }
 }
 
@@ -247,7 +254,8 @@ void ShopAssembler::assemble(entt::registry &Reg, entt::entity Entity) const {
                                         << "Shop not implemented yet.");
                             (void)Et;
                             (void)Reg;
-                            // EHC.publish(ShopOpenEvent{{}, Et, Entity, &Reg});
+                            // EHC.publish(ShopOpenEvent{{}, Et, Entity,
+                            // &Reg});
                           }});
 }
 

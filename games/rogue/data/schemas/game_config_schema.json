@@ -4,7 +4,6 @@
   "description": "JSON Schema the game config",
   "type": "object",
   "required": [
-    "creature_db_config",
     "item_db_config",
     "level_db_config",
     "initial_game_world",
@@ -15,10 +14,6 @@
     "item_db_config": {
       "type": "string",
       "description": "Relative (to the config) path to the item DB config file"
-    },
-    "creature_db_config": {
-      "type": "string",
-      "description": "Relative (to the config) path to the creature DB config file"
     },
     "entity_db_config": {
       "type": "string",
@@ -54,5 +49,6 @@
         }
       }
     }
-  }
+  },
+  "additionalProperties": false
 }

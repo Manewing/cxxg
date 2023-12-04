@@ -1,13 +1,12 @@
-#include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Level.h>
 #include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
-#include <rogue/CreatureDatabase.h>
 #include <rogue/EntityDatabase.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/JSON.h>
+#include <rogue/JSONHelpers.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/LootTable.h>
 #include <rogue/Parser.h>
@@ -34,25 +33,12 @@ void LevelGenerator::spawnEntities(const LevelEntityConfig &Cfg,
   auto &EntitiesMap = L.Map.get(Level::LayerEntitiesIdx);
   const auto AllEntitiesPos = EntitiesMap.findTilesNot(Level::EmptyTile);
   for (const auto &EntityPos : AllEntitiesPos) {
-    spawnEntity(EntitiesMap.getTile(EntityPos), Cfg, L, EntityPos);
+    spawnEntity(EntitiesMap.getTile(EntityPos).kind(), Cfg, L, EntityPos);
   }
   EntitiesMap.fill(Level::EmptyTile);
 }
 
 namespace {
-
-Inventory generateLootInventory(const ItemDatabase &ItemDb,
-                                const std::string &LootTableName) {
-  const auto &LtCt = ItemDb.getLootTable(LootTableName);
-  auto Loot = LtCt->generateLoot();
-
-  Inventory Inv;
-  for (const auto &Rw : Loot) {
-    auto It = ItemDb.createItem(Rw.ItId, Rw.Count);
-    Inv.addItem(It);
-  }
-  return Inv;
-}
 
 void spawnAndPlaceEntity(EntityFactory &Factory, ymir::Point2d<int> Pos,
                          EntityTemplateId EtId, int LevelId) {
@@ -71,110 +57,22 @@ void spawnAndPlaceEntity(EntityFactory &Factory, ymir::Point2d<int> Pos,
 
 } // namespace
 
-void LevelGenerator::spawnEntity(Tile T, const LevelEntityConfig &Cfg, Level &L,
-                                 ymir::Point2d<int> Pos) const {
+void LevelGenerator::spawnEntity(char Char, const LevelEntityConfig &Cfg,
+                                 Level &L, ymir::Point2d<int> Pos) const {
   EntityFactory Factory(L.Reg, Ctx.EntityDb);
-
-  // FIXME use entities map
-  if (auto It = Cfg.Creatures.find(T.kind()); It != Cfg.Creatures.end()) {
-    if (Ctx.EntityDb.hasEntityTemplate(It->second.Name)) {
-      spawnAndPlaceEntity(Factory, Pos,
-                          Ctx.EntityDb.getEntityTemplateId(It->second.Name),
-                          L.getLevelId());
-      return;
+  auto It = Cfg.Entities.find(Char);
+  if (It == Cfg.Entities.end()) {
+    std::stringstream SS;
+    SS << "Could not find entity for char: " << Char << " at " << Pos << "\n"
+       << "Entities:\n";
+    for (const auto &[K, V] : Cfg.Entities) {
+      SS << "  " << K << " -> " << V << "\n";
     }
+    throw std::out_of_range(SS.str());
   }
-
-  // FIXME outdated
-  // Deal with creating creatures
-  if (auto It = Cfg.Creatures.find(T.kind()); It != Cfg.Creatures.end()) {
-    auto CId = Ctx.CreatureDb.getCreatureId(It->second.Name);
-    const auto &CInfo = Ctx.CreatureDb.getCreature(CId);
-    if (CInfo.Faction == FactionKind::Nature) {
-      if (CInfo.Race == RaceKind::Dummy) {
-        createDummyCreature(
-            L.Reg, Pos, T, CInfo.Name,
-            generateLootInventory(Ctx.ItemDb, It->second.LootTableName),
-            CInfo.Stats);
-      } else {
-        createHostileCreature(
-            L.Reg, Pos, T, CInfo.Name,
-            generateLootInventory(Ctx.ItemDb, It->second.LootTableName),
-            CInfo.Stats);
-      }
-    } else {
-      createEnemy(L.Reg, Pos, T, CInfo.Name,
-                  generateLootInventory(Ctx.ItemDb, It->second.LootTableName),
-                  CInfo.Stats, CInfo.Faction, CInfo.Race);
-    }
-    return;
-  }
-
-  // Deal with creating chests
-  if (auto It = Cfg.Chests.find(T.kind()); It != Cfg.Chests.end()) {
-    createChestEntity(
-        L.Reg, Pos, T,
-        generateLootInventory(Ctx.ItemDb, It->second.LootTableName));
-    return;
-  }
-
-  // Deal with creating dungeon entries
-  if (auto It = Cfg.Dungeons.find(T.kind()); It != Cfg.Dungeons.end()) {
-    return createWorldEntry(L.Reg, Pos, T, It->second.LevelName);
-    // spawnAndPlaceEntity(L.Reg, Pos,
-    //                     Ctx.EntityDb.getEntityTemplateId("world_entry"));
-    // return;
-  }
-
-  // Deal with creating locked doors
-  if (auto It = Cfg.LockedDoors.find(T.kind()); It != Cfg.LockedDoors.end()) {
-    spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId(It->second.KeyName),
-                        L.getLevelId());
-    return;
-  }
-
-  // FIXME also have those in the config
-  switch (T.kind()) {
-  case 'H': {
-    spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("level_exit"),
-                        L.getLevelId());
-  } break;
-  case '<': {
-    spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("level_entry"),
-                        L.getLevelId());
-  } break;
-  case 'h': {
-    spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("healer"),
-                        L.getLevelId());
-  } break;
-  case 'S': {
-    spawnAndPlaceEntity(Factory, Pos, Ctx.EntityDb.getEntityTemplateId("shop"),
-                        L.getLevelId());
-  } break;
-  case 'w': {
-    spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("work_bench"),
-                        L.getLevelId());
-  } break;
-  case '+': {
-    spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("closed_door"),
-                        L.getLevelId());
-  } break;
-  case '/': {
-    spawnAndPlaceEntity(Factory, Pos,
-                        Ctx.EntityDb.getEntityTemplateId("open_door"),
-                        L.getLevelId());
-  } break;
-  default:
-    throw std::runtime_error("Invalid entity kind: " +
-                             std::string(1, T.kind()));
-    break;
-  }
+  spawnAndPlaceEntity(Factory, Pos,
+                      Ctx.EntityDb.getEntityTemplateId(It->second),
+                      L.getLevelId());
 }
 
 EmptyLevelGenerator::EmptyLevelGenerator(const GameContext &Ctx,
@@ -216,11 +114,11 @@ DesignedMapLevelGenerator::createNewLevel(int LevelId) const {
   LevelMap.get(Cfg.DefaultChar.Layer).fill(Cfg.DefaultChar.T);
 
   // Update level map from the character encoding in the designed map
-  Map.forEach([this, &LevelMap](auto Pos, auto Char) {
+  Map.forEach([this, &LevelMap, &NewLevel](auto Pos, auto Char) {
     auto It = Cfg.CharInfoMap.find(Char);
     if (It == Cfg.CharInfoMap.end()) {
-      throw std::out_of_range("Could not find char info for char: " +
-                              std::string(1, Char));
+      spawnEntity(Char, Cfg.EntityConfig, *NewLevel, Pos);
+      return;
     }
     auto &[T, Layer] = It->second;
     LevelMap.get(Layer).setTile(Pos, T);
@@ -375,63 +273,19 @@ namespace {
 
 DesignedMapLevelGenerator::Config::CharInfo
 parseCharInfo(const rapidjson::Value &V) {
-  const auto Color = ymir::Config::parseRgbColor(V["color"].GetString());
-  const auto Key = std::string_view(V["key"].GetString());
   const auto Layer = std::string(V["layer"].GetString());
-  cxxg::types::RgbColor CxxColor{Color.R, Color.G, Color.B};
-
-  if (V.HasMember("bg_color")) {
-    const auto BgColor = ymir::Config::parseRgbColor(V["bg_color"].GetString());
-    CxxColor.HasBackground = true;
-    CxxColor.BgR = BgColor.R;
-    CxxColor.BgG = BgColor.G;
-    CxxColor.BgB = BgColor.B;
-  }
-
-  Tile T = {{Key[0], CxxColor}};
-  return DesignedMapLevelGenerator::Config::CharInfo{T, Layer};
+  const auto Tile = parseTile(V["tile"]);
+  return {Tile, Layer};
 }
 
 LevelEntityConfig loadLevelEntityConfigFromJSON(const rapidjson::Value &V) {
   LevelEntityConfig Cfg;
-
-  // Load level specific creature configuration
-  for (const auto &C : V["creatures"].GetArray()) {
-    auto Key = std::string(C["key"].GetString());
-    assert(Key.size() == 1);
-    LevelEntityConfig::Creature CreatureCfg;
-    CreatureCfg.Name = C["name"].GetString();
-    CreatureCfg.LootTableName = C["loot"].GetString();
-    Cfg.Creatures[Key[0]] = CreatureCfg;
+  // Load level specific entity configuration
+  for (const auto &[Key, Value] : V["entities"].GetObject()) {
+    auto KeyStr = std::string(Key.GetString());
+    assert(KeyStr.size() == 1);
+    Cfg.Entities[KeyStr[0]] = std::string(Value.GetString());
   }
-
-  // Load level specific chest configuration
-  for (const auto &C : V["chests"].GetArray()) {
-    auto Key = std::string(C["key"].GetString());
-    assert(Key.size() == 1);
-    LevelEntityConfig::Chest ChestCfg;
-    ChestCfg.LootTableName = C["loot"].GetString();
-    Cfg.Chests[Key[0]] = ChestCfg;
-  }
-
-  // Load level specific dungeon configuration
-  for (const auto &C : V["dungeons"].GetArray()) {
-    auto Key = std::string(C["key"].GetString());
-    assert(Key.size() == 1);
-    LevelEntityConfig::WorldEntry WE;
-    WE.LevelName = C["level_name"].GetString();
-    Cfg.Dungeons[Key[0]] = WE;
-  }
-
-  // Load level specific locked door configuration
-  for (const auto &C : V["locked_doors"].GetArray()) {
-    auto Key = std::string(C["key"].GetString());
-    assert(Key.size() == 1);
-    LevelEntityConfig::LockedDoor LD;
-    LD.KeyName = C["key_name"].GetString();
-    Cfg.LockedDoors[Key[0]] = LD;
-  }
-
   return Cfg;
 }
 

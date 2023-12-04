@@ -1,7 +1,6 @@
 set(SOURCES
   Components/BuffsTest.cpp
   Components/HelpersTest.cpp
-  CreatureDatabaseTest.cpp
   EntityDatabaseHelpersTest.cpp
   EntityDatabaseTest.cpp
   EntityFactoryTest.cpp
@@ -119,7 +118,7 @@ add_schema_test(
   SCHEMA ${BUILD_SCHEMAS_DIR}/game_config_schema.json
 )
 
-file(GLOB LEVEL_FILES ${BUILD_DATA_DIR}/levels/*.json)
+file(GLOB LEVEL_FILES ${DATA_DIR}/levels/*.json)
 
 add_schema_test(
   NAME level_configs
