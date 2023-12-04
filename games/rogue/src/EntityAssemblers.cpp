@@ -93,27 +93,27 @@ bool unlockDoor(entt::registry &Reg, const entt::entity &DoorEt,
 }
 
 void openDoor(entt::registry &Reg, const entt::entity &Entity) {
-  Reg.get<DoorComp>(Entity).IsOpen = true;
+  auto &DC = Reg.get<DoorComp>(Entity);
+  DC.IsOpen = true;
   Reg.erase<CollisionComp>(Entity);
   Reg.erase<BlocksLOS>(Entity);
   Reg.get<InteractableComp>(Entity).Action.Msg = "Close door";
 
-  // FIXME use open/closed door tiles
   auto &T = Reg.get<TileComp>(Entity);
   T.ZIndex = -2;
-  T.T.T.Char = '/';
+  T.T = DC.OpenTile;
 }
 
 void closeDoor(entt::registry &Reg, const entt::entity &Entity) {
-  Reg.get<DoorComp>(Entity).IsOpen = false;
+  auto &DC = Reg.get<DoorComp>(Entity);
+  DC.IsOpen = false;
   Reg.emplace<CollisionComp>(Entity);
   Reg.emplace<BlocksLOS>(Entity);
   Reg.get<InteractableComp>(Entity).Action.Msg = "Open door";
 
-  // FIXME use open/closed door tiles
   auto &T = Reg.get<TileComp>(Entity);
   T.ZIndex = 0;
-  T.T.T.Char = '+';
+  T.T = DC.ClosedTile;
 }
 
 } // namespace
@@ -123,9 +123,11 @@ void DoorCompAssembler::assemble(entt::registry &Reg,
   auto &DC = Reg.emplace<DoorComp>(Entity);
   DC.IsOpen = IsOpen;
   DC.KeyId = KeyId;
+  DC.OpenTile = OpenTile;
+  DC.ClosedTile = ClosedTile;
 
   const char *InteractMsg =
-      DC.isLocked() ? "Unlock door" : (IsOpen ? "Close door" : "XOpen door");
+      DC.isLocked() ? "Unlock door" : (IsOpen ? "Close door" : "Open door");
   Reg.emplace<InteractableComp>(
       Entity,
       Interaction{
