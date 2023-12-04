@@ -49,12 +49,13 @@ void Level::setEventHub(EventHub *Hub) {
 }
 
 bool Level::update(bool IsTick) {
-  updatePlayerSeenMap();
   updateEntityPosCache();
 
   for (auto &Sys : Systems) {
     Sys->update(IsTick ? System::UpdateType::Tick : System::UpdateType::NoTick);
   }
+
+  updatePlayerSeenMap();
 
   return true;
 }
