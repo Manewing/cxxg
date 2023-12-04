@@ -3,7 +3,6 @@
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
-#include <rogue/CreatureDatabase.h>
 #include <rogue/EntityDatabase.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/LevelDatabase.h>
@@ -32,14 +31,14 @@ class LevelGeneratorTest : public ::testing::Test {
 public:
   void SetUp() override {
     ItemDb = rogue::ItemDatabase();
-    CreatureDb = rogue::CreatureDatabase();
+    EntityDb = rogue::EntityDatabase();
+    LevelDb = rogue::LevelDatabase();
   }
 
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
-  rogue::CreatureDatabase CreatureDb;
   rogue::LevelDatabase LevelDb;
-  rogue::GameContext Ctx{ItemDb, EntityDb, CreatureDb, LevelDb};
+  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb};
 };
 
 TEST_F(LevelGeneratorTest, EmptyLevelGenerator) {

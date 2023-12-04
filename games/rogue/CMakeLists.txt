@@ -18,7 +18,6 @@ set(HEADER_FILES
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h
   include/rogue/Context.h
-  include/rogue/CreatureDatabase.h
   include/rogue/EntityAssemblers.h
   include/rogue/EntityDatabase.h
   include/rogue/Equipment.h
@@ -86,7 +85,6 @@ set(SOURCE_FILES
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
   src/Components/Visual.cpp
-  src/CreatureDatabase.cpp
   src/EntityAssemblers.cpp
   src/EntityDatabase.cpp
   src/Equipment.cpp

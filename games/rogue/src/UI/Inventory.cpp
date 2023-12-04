@@ -1,6 +1,5 @@
 #include <cxxg/Utils.h>
 #include <iomanip>
-#include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/LOS.h>
 #include <rogue/Components/Transform.h>

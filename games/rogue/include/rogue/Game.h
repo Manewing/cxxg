@@ -4,7 +4,6 @@
 #include <cxxg/Game.h>
 #include <memory>
 #include <rogue/Context.h>
-#include <rogue/CreatureDatabase.h>
 #include <rogue/EntityDatabase.h>
 #include <rogue/EventHub.h>
 #include <rogue/GameWorld.h>
@@ -93,7 +92,6 @@ private:
 
   ItemDatabase ItemDb;
   EntityDatabase EntityDb;
-  CreatureDatabase CreatureDb;
   LevelDatabase LevelDb;
 
   GameContext Ctx;

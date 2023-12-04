@@ -2,13 +2,8 @@
 #define ROGUE_ENTITY_ASSEMBLERS_H
 
 #include <entt/entt.hpp>
-#include <rogue/Components/Visual.h>
-#include <rogue/EntityDatabase.h>
-#include <ymir/Types.hpp>
-
 #include <rogue/Components/AI.h>
 #include <rogue/Components/Combat.h>
-#include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/LOS.h>
 #include <rogue/Components/Level.h>
@@ -16,6 +11,9 @@
 #include <rogue/Components/RaceFaction.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
+#include <rogue/Components/Visual.h>
+#include <rogue/EntityDatabase.h>
+#include <ymir/Types.hpp>
 
 namespace rogue {
 
