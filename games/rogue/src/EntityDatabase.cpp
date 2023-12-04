@@ -129,18 +129,20 @@ std::shared_ptr<InventoryCompAssembler>
 makeInventoryCompAssembler(ItemDatabase &ItemDb, const rapidjson::Value &Json) {
   const auto &JsonObj = Json.GetObject();
   std::string LootTable = JsonObj["loot_table"].GetString();
-  bool IsPersistent = JsonObj["is_persistent"].GetBool();
-  bool IsLooted = JsonObj["is_looted"].GetBool();
-  return std::make_shared<InventoryCompAssembler>(ItemDb, LootTable,
-                                                  IsPersistent, IsLooted);
+  return std::make_shared<InventoryCompAssembler>(ItemDb, LootTable);
 }
 
-std::shared_ptr<ChestInteractableCompAssembler>
-makeChestInteractableCompAssembler(ItemDatabase &,
-                                   const rapidjson::Value &Json) {
+std::shared_ptr<LootedInteractCompAssembler>
+makeLootInteractCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   const auto &JsonObj = Json.GetObject();
-  Tile T = parseTile(JsonObj["looted_tile"]);
-  return std::make_shared<ChestInteractableCompAssembler>(T);
+  std::string InteractText = JsonObj["interact_text"].GetString();
+  std::string LootName = JsonObj["loot_name"].GetString();
+  bool IsPersistent = JsonObj["is_persistent"].GetBool();
+  bool IsLooted = JsonObj["is_looted"].GetBool();
+  Tile DefaultTile = parseTile(JsonObj["default_tile"]);
+  Tile LootedTile = parseTile(JsonObj["looted_tile"]);
+  return std::make_shared<LootedInteractCompAssembler>(
+      IsLooted, IsPersistent, DefaultTile, LootedTile, InteractText, LootName);
 }
 
 int createNewKey(ItemDatabase &ItemDb) {
@@ -195,7 +197,6 @@ using EntityAssemblerFactories =
 
 const auto &getEntityAssemblerFactories() {
   static const EntityAssemblerFactories Factories = {
-      {"chest", makeChestInteractableCompAssembler},
       {"door", makeDoorCompAssembler},
       {"faction", makeFactionCompAssembler},
       {"inventory", makeInventoryCompAssembler},
@@ -203,7 +204,8 @@ const auto &getEntityAssemblerFactories() {
       {"stats", makeStatsCompAssembler},
       {"tile", makeTileCompAssembler},
       {"world_entry", makeWorldEntryAssembler},
-      {"level_entry_exit", makeLevelEntryExitAssembler}};
+      {"level_entry_exit", makeLevelEntryExitAssembler},
+      {"loot_interact", makeLootInteractCompAssembler}};
   return Factories;
 }
 

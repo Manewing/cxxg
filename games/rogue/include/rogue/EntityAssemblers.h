@@ -57,30 +57,18 @@ private:
 class InventoryCompAssembler : public EntityAssembler {
 public:
   InventoryCompAssembler(const ItemDatabase &ItemDb,
-                         const std::string &LootTable, bool IsPersistent,
-                         bool IsLooted);
+                         const std::string &LootTable);
   void assemble(entt::registry &Reg, entt::entity Entity) const override;
 
 private:
   const ItemDatabase &ItemDb;
   std::string LootTable;
-  bool IsPersistent;
-  bool IsLooted;
 };
 
 class AutoEquipAssembler : public EntityAssembler {
 public:
   bool isPostProcess() const override;
   void assemble(entt::registry &Reg, entt::entity Entity) const override;
-};
-
-class ChestInteractableCompAssembler : public EntityAssembler {
-public:
-  explicit ChestInteractableCompAssembler(Tile LootedTile);
-  void assemble(entt::registry &Reg, entt::entity Entity) const override;
-
-private:
-  Tile LootedTile;
 };
 
 class DoorCompAssembler : public EntityAssembler {
@@ -96,13 +84,21 @@ private:
   std::optional<int> KeyId;
 };
 
-class LootInteractableCompAssembler : public EntityAssembler {
+class LootedInteractCompAssembler : public EntityAssembler {
 public:
-  explicit LootInteractableCompAssembler(const std::string &LootTable);
+  explicit LootedInteractCompAssembler(bool IsLooted, bool IsPersistent,
+                                       Tile DefaultTile, Tile LootedTile,
+                                       const std::string &InteractText,
+                                       const std::string &LootName);
   void assemble(entt::registry &Reg, entt::entity Entity) const override;
 
 private:
-  std::string LootTable;
+  bool IsLooted;
+  bool IsPersistent;
+  Tile DefaultTile;
+  Tile LootedTile;
+  std::string InteractText;
+  std::string LootName;
 };
 
 class WorldEntryInteractableCompAssembler : public EntityAssembler {

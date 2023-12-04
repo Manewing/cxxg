@@ -8,14 +8,14 @@
       "key": "b",
       "name": "blob",
       "loot": "common_blob"
-    }
-  ],
-  "chests": [
+    },
     {
       "key": "C",
-      "loot": "common_chest"
+      "name": "common_chest",
+      "loot": "common_blob"
     }
   ],
+  "chests": [],
   "locked_doors": [],
   "dungeons": []
 }

@@ -125,17 +125,6 @@ namespace {
 
 void handleLootChest(entt::registry &Reg, const entt::entity &Entity,
                      const entt::entity &ActEt, EventHubConnector &EHC) {
-  auto &TC = Reg.template get<TileComp>(Entity);
-  auto &IC = Reg.template get<InventoryComp>(Entity);
-  if (!IC.Looted) {
-    if (auto *Rgb = std::get_if<cxxg::types::RgbColor>(&TC.T.color())) {
-      Rgb->R *= 0.5;
-      Rgb->G *= 0.5;
-      Rgb->B *= 0.5;
-    }
-    IC.Looted = true;
-  }
-
   EHC.publish(LootEvent{{}, "Chest", ActEt, Entity, &Reg});
 }
 
@@ -151,8 +140,6 @@ void createChestEntity(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   // Copy inventory
   auto &IC = Reg.emplace<InventoryComp>(Entity);
   IC.Inv = I;
-  IC.IsPersistent = true;
-  IC.Looted = false; // FIXME allow to control this from arguments
 
   Reg.emplace<InteractableComp>(
       Entity,
@@ -175,8 +162,11 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
 
   // Copy inventory
   auto &IC = Reg.emplace<InventoryComp>(Entity);
-  IC.IsPersistent = false;
   IC.Inv = I;
+
+  auto &LIC = Reg.emplace<LootInteractComp>(Entity);
+  LIC.IsLooted = false;
+  LIC.IsPersistent = false;
 
   Reg.emplace<InteractableComp>(
       Entity,

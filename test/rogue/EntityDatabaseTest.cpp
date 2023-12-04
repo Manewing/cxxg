@@ -162,9 +162,7 @@ TEST_F(EntityDatabaseTest, LoadEntityWithComplexAssemblers) {
         "name": "parent",
         "assemblers": {
           "inventory": {
-            "loot_table": "dummy_loot_table",
-            "is_persistent": true,
-            "is_looted": false
+            "loot_table": "dummy_loot_table"
           },
           "tile": {
             "char": "f",

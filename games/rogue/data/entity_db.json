@@ -96,9 +96,7 @@
         },
         "faction": "nature",
         "inventory": {
-          "loot_table": "common_silk_cocoon",
-          "is_persistent": false,
-          "is_looted": false
+          "loot_table": "common_silk_cocoon"
         },
         "race": "dummy"
       }
@@ -113,12 +111,7 @@
         "visible": true,
         "agility": true,
         "line_of_sight": true,
-        "wander_ai": true,
-        "inventory": {
-          "loot_table": "<not defined from hostile_creature>",
-          "is_persistent": false,
-          "is_looted": false
-        }
+        "wander_ai": true
       }
     },
     {
@@ -414,6 +407,61 @@
         },
         "level_entry_exit": {
           "is_exit": true
+        }
+      }
+    },
+    {
+      "name": "base_chest",
+      "from_template": "base_interact",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "<not defined from base_chest>"
+        },
+        "loot_interact": {
+          "is_looted": false,
+          "is_persistent": true,
+          "loot_name": "Chest",
+          "interact_text": "Open Chest",
+          "default_tile": {
+            "char": "C",
+            "color": "#ff0000"
+          },
+          "looted_tile": {
+            "char": "c",
+            "color": "#00ff00"
+          }
+        }
+      }
+    },
+    {
+      "name": "common_vase",
+      "from_template": "base_chest",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "common_chest"
+        },
+        "loot_interact": {
+          "loot_name": "Vase",
+          "interact_text": "Look into Vase",
+          "default_tile": {
+            "char": "v",
+            "color": "#77412c"
+          }
+        }
+      }
+    },
+    {
+      "name": "common_chest",
+      "from_template": "base_chest",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "common_chest"
+        },
+        "loot_interact": {
+          "default_tile": {
+            "char": "C",
+            "color": "#ff0000"
+          }
         }
       }
     }
