@@ -208,8 +208,8 @@ const auto &getEntityAssemblerFactories() {
 }
 
 void setupDefaultAssembler(EntityTemplateInfo &Info,
-                            const EntityAssemblerCache &DefaultAssemblers,
-                            const std::string &AsmName, bool IsPresent) {
+                           const EntityAssemblerCache &DefaultAssemblers,
+                           const std::string &AsmName, bool IsPresent) {
   if (IsPresent) {
     const auto &AsmPtr = DefaultAssemblers.get(AsmName);
     // Overwrite any present assembler
@@ -259,8 +259,7 @@ void createEntityTemplates(EntityDatabase &Db, ItemDatabase &ItemDb,
 
       // Look up assembler in default assembler cache
       if (Data.IsBool()) {
-        setupDefaultAssembler(Info, DefaultAssemblers, AsmName,
-                               Data.GetBool());
+        setupDefaultAssembler(Info, DefaultAssemblers, AsmName, Data.GetBool());
         continue;
       } else if (DefaultAssemblers.getOrNull(AsmName)) {
         throw std::runtime_error("Expected boolean for default assembler: " +
@@ -287,8 +286,8 @@ EntityDatabase::load(ItemDatabase &ItemDb,
                      const std::filesystem::path &EntityDbConfig) {
   EntityDatabase Db;
 
-    const auto SchemaPath =
-        EntityDbConfig.parent_path() / "schemas" / "entity_db_schema.json";
+  const auto SchemaPath =
+      EntityDbConfig.parent_path() / "schemas" / "entity_db_schema.json";
   auto [DocStr, Doc] = loadJSON(EntityDbConfig, &SchemaPath);
 
   // Create all entity templates

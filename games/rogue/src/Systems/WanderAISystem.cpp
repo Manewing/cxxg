@@ -161,8 +161,8 @@ WanderAISystem::findTarget(entt::entity Entity,
   // FIXME only finds single target, no ordering of distance
   entt::entity TargetEt = entt::null;
   Reg.view<PositionComp, FactionComp, VisibleComp>().each(
-      [this, &TargetEt, &LOSComp, &FacComp,
-       AtPos](entt::entity TEt, const auto &TPC, const auto &TFC, const auto &) {
+      [this, &TargetEt, &LOSComp, &FacComp, AtPos](
+          entt::entity TEt, const auto &TPC, const auto &TFC, const auto &) {
         if (TFC.Faction == FacComp->Faction) {
           return;
         }

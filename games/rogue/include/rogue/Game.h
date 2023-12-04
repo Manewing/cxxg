@@ -5,13 +5,13 @@
 #include <memory>
 #include <rogue/Context.h>
 #include <rogue/CreatureDatabase.h>
+#include <rogue/EntityDatabase.h>
 #include <rogue/EventHub.h>
 #include <rogue/GameWorld.h>
 #include <rogue/History.h>
 #include <rogue/ItemDatabase.h>
-#include <rogue/EntityDatabase.h>
-#include <rogue/LevelDatabase.h>
 #include <rogue/Level.h>
+#include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/UI/Controller.h>
 #include <ymir/LayeredMap.hpp>

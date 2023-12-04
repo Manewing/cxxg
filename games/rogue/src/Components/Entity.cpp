@@ -59,7 +59,6 @@ void createDummyCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,
   Reg.emplace<FactionComp>(Entity, FactionKind::Nature);
   Reg.emplace<StatsComp>(Entity).Base = Stats;
   Reg.emplace<InventoryComp>(Entity).Inv = I;
-
 }
 
 void createHostileCreature(entt::registry &Reg, ymir::Point2d<int> Pos, Tile T,

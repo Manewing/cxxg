@@ -1,8 +1,8 @@
 #ifndef ROGUE_JSON_HELPERS_H
 #define ROGUE_JSON_HELPERS_H
 
-#include <rogue/JSON.h>
 #include <rogue/Components/Stats.h>
+#include <rogue/JSON.h>
 #include <rogue/Tile.h>
 
 namespace rogue {
@@ -27,6 +27,6 @@ void parseRegenerationBuff(const rapidjson::Value &V, T &Buff) {
   Buff.init(TickAmount, RealDuration, TickPeriod);
 }
 
-}
+} // namespace rogue
 
 #endif // #ifndef ROGUE_JSON_HELPERS_H

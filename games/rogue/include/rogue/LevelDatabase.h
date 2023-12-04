@@ -77,7 +77,7 @@ public:
   getLevelInfo(const std::string &LevelName) const;
 
   void addLevelTable(const std::string &LevelName,
-                         std::shared_ptr<LevelTable> LC);
+                     std::shared_ptr<LevelTable> LC);
 
 private:
   std::map<std::string, std::shared_ptr<LevelTable>> LevelsByName;

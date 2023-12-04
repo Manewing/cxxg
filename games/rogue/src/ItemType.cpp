@@ -124,10 +124,10 @@ const char *getCapabilityFlagLabel(CapabilityFlags Flags) {
   if ((CapabilityFlags::UseOn | CapabilityFlags::Self) == Flags) {
     return "Use";
   }
-  if ((CapabilityFlags::UseOn | CapabilityFlags::Ranged)== Flags) {
+  if ((CapabilityFlags::UseOn | CapabilityFlags::Ranged) == Flags) {
     return "Ranged use";
   }
-  if ((CapabilityFlags::UseOn | CapabilityFlags::Adjacent)== Flags) {
+  if ((CapabilityFlags::UseOn | CapabilityFlags::Adjacent) == Flags) {
     return "Adjacent use";
   }
   switch (Flags) {

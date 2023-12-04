@@ -1,7 +1,7 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
-#include <rogue/UI/Decorator.h>
 #include <rogue/UI/Controls.h>
+#include <rogue/UI/Decorator.h>
 
 namespace rogue::ui {
 

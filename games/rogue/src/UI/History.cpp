@@ -1,9 +1,9 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 #include <rogue/History.h>
+#include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/History.h>
-#include <rogue/UI/Controls.h>
 
 namespace rogue::ui {
 

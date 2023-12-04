@@ -2,15 +2,15 @@
 #include <cxxg/Utils.h>
 #include <iomanip>
 #include <rogue/UI/Buffs.h>
+#include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/History.h>
 #include <rogue/UI/Interact.h>
 #include <rogue/UI/Inventory.h>
-#include <rogue/UI/Stats.h>
-#include <rogue/UI/CommandLine.h>
-#include <rogue/UI/TargetUI.h>
 #include <rogue/UI/Menu.h>
+#include <rogue/UI/Stats.h>
+#include <rogue/UI/TargetUI.h>
 
 // FIXME get rid of dep
 #include <rogue/Components/Items.h>
@@ -192,10 +192,11 @@ void Controller::closeBuffUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<BuffsInfo>());
 }
 
-void Controller::setLootUI(entt::entity Entity, entt::entity InvEt,
-                           Level &Lvl, const std::string &Header) {
+void Controller::setLootUI(entt::entity Entity, entt::entity InvEt, Level &Lvl,
+                           const std::string &Header) {
   auto &InvComp = Lvl.Reg.get<InventoryComp>(InvEt);
-  WdwContainer.addWindow<LootController>(*this, InvComp.Inv, Entity, Lvl, Header);
+  WdwContainer.addWindow<LootController>(*this, InvComp.Inv, Entity, Lvl,
+                                         Header);
   WdwContainer.autoLayoutWindows();
 }
 
@@ -222,7 +223,8 @@ void Controller::closeHistoryUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<HistoryController>());
 }
 
-void Controller::setTargetUI(ymir::Point2d<int> TargetPos, std::optional<unsigned> Range, Level &Lvl,
+void Controller::setTargetUI(ymir::Point2d<int> TargetPos,
+                             std::optional<unsigned> Range, Level &Lvl,
                              const TargetUI::SelectTargetCb &Cb) {
   closeAll();
   WdwContainer.addWindow<TargetUI>(*this, TargetPos, Range, Lvl, Cb);

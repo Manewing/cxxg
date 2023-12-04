@@ -27,7 +27,7 @@ public:
 
 private:
   std::string Text;
-	std::size_t CursorPos = 0;
+  std::size_t CursorPos = 0;
 };
 
 class CommandLineController : public BaseRectDecorator,
