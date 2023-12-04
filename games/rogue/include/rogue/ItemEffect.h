@@ -144,37 +144,19 @@ public:
   const BuffBase &getBuff() const final { return Buff; }
 
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
-    if constexpr (sizeof...(RequiredComps) == 0) {
-      return true;
-    } else {
-      return Reg.all_of<RequiredComps...>(Et);
-    }
+    return BuffApplyHelper<BuffType, RequiredComps...>::canApplyTo(Et, Reg);
   }
 
   void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
-    auto ExistingBuff = Reg.try_get<BuffType>(Et);
-    if (ExistingBuff) {
-      ExistingBuff->add(Buff);
-    } else {
-      Reg.emplace<BuffType>(Et, Buff);
-    }
+    BuffApplyHelper<BuffType, RequiredComps...>::applyTo(Buff, Et, Reg);
   }
 
   bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    if constexpr (sizeof...(RequiredComps) == 0) {
-      return true;
-    } else {
-      return Reg.all_of<RequiredComps...>(Et);
-    }
+    return BuffApplyHelper<BuffType, RequiredComps...>::canRemoveFrom(Et, Reg);
   }
 
   void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    auto ExistingBuff = Reg.try_get<BuffType>(Et);
-    if (ExistingBuff) {
-      if (ExistingBuff->remove(Buff)) {
-        Reg.erase<BuffType>(Et);
-      }
-    }
+    BuffApplyHelper<BuffType, RequiredComps...>::removeFrom(Buff, Et, Reg);
   }
 
 private:

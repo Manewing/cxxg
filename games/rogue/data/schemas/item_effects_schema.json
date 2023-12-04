@@ -49,6 +49,15 @@
             "$ref": "#/defs/effect/ranged_attack_comp"
           },
           {
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_poison"
+          },
+          {
+            "$ref": "#/defs/effect/chance_on_hit_to_bleeding"
+          },
+          {
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_blinded"
+          },
+          {
             "$ref": "#/defs/effect/dismantle"
           }
         ]
@@ -193,12 +202,11 @@
           "type": {
             "const": "blinded_debuff_comp"
           },
-          "ticks": {
-            "type": "integer",
-            "minimum": 1
+          "buff": {
+            "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/blinded_debuff_comp"
           }
         },
-        "required": ["ticks", "type"],
+        "required": ["buff", "type"],
         "additionalProperties": false
       },
       "mind_vision_buff_comp": {
@@ -275,6 +283,60 @@
           }
         },
         "required": ["phys_damage", "magic_damage", "ap_cost", "type"],
+        "additionalProperties": false
+      },
+      "chance_on_hit_to_apply_poison": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "chance_on_hit_to_apply_poison"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "buff": {
+            "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/reduction_buff"
+          }
+        },
+        "required": ["buff", "type", "chance"],
+        "additionalProperties": false
+      },
+      "chance_on_hit_to_bleeding": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "chance_on_hit_to_apply_bleeding"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "buff": {
+            "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/reduction_buff"
+          }
+        },
+        "required": ["buff", "type", "chance"],
+        "additionalProperties": false
+      },
+      "chance_on_hit_to_apply_blinded": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "chance_on_hit_to_apply_blinded"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "buff": {
+            "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/blinded_debuff_comp"
+          }
+        },
+        "required": ["buff", "type", "chance"],
         "additionalProperties": false
       },
       "dismantle": {

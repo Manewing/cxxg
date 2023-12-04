@@ -40,6 +40,17 @@
       },
       "required": ["regen_amount", "tick_period", "ticks"],
       "additionalProperties": false
+    },
+    "blinded_debuff_comp": {
+      "type": "object",
+      "properties": {
+        "ticks": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": ["ticks"],
+      "additionalProperties": false
     }
   }
 }

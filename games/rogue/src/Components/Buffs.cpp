@@ -1,9 +1,17 @@
 #include <iomanip>
+#include <random>
 #include <rogue/Components/Buffs.h>
 #include <sstream>
-#include <string_view>
 
 namespace rogue {
+
+// FIXME move this, also should this be based on the level seed?
+static std::random_device RandomEngine;
+
+bool BuffBase::rollForPercentage(StatValue Percentage) {
+  std::uniform_real_distribution<StatValue> Chance(0, 100);
+  return Chance(RandomEngine) <= Percentage;
+}
 
 void AdditiveBuff::add(const AdditiveBuff &Other) {
   SourceCount += Other.SourceCount;
@@ -120,7 +128,7 @@ std::string DiminishingReturnsValueGenBuff::getParamDescription(
   return SS.str();
 }
 
-std::string_view StatsBuffComp::getName() const { return "Stats buff"; }
+std::string StatsBuffComp::getName() const { return "Stats buff"; }
 
 std::string StatsBuffComp::getDescription() const {
   std::stringstream SS;
@@ -128,9 +136,7 @@ std::string StatsBuffComp::getDescription() const {
   return SS.str();
 }
 
-std::string_view StatsTimedBuffComp::getName() const {
-  return "Timed stats buff";
-}
+std::string StatsTimedBuffComp::getName() const { return "Timed stats buff"; }
 
 std::string StatsTimedBuffComp::getDescription() const {
   std::stringstream SS;
@@ -154,7 +160,7 @@ void StatsTimedBuffComp::add(const StatsTimedBuffComp &Other) {
   TicksLeft = Other.TicksLeft;
 }
 
-std::string_view PoisonDebuffComp::getName() const { return "Poison debuff"; }
+std::string PoisonDebuffComp::getName() const { return "Poison debuff"; }
 
 std::string PoisonDebuffComp::getApplyDesc() const {
   return getParamApplyDesc("Poison damage taken ", "", "HP");
@@ -164,9 +170,7 @@ std::string PoisonDebuffComp::getDescription() const {
   return getParamDescription("Poison reduces health by ", "", "HP");
 }
 
-std::string_view BleedingDebuffComp::getName() const {
-  return "Bleeding debuff";
-}
+std::string BleedingDebuffComp::getName() const { return "Bleeding debuff"; }
 
 std::string BleedingDebuffComp::getApplyDesc() const {
   return getParamApplyDesc("Bleed health by ", "", "HP");
@@ -176,7 +180,7 @@ std::string BleedingDebuffComp::getDescription() const {
   return getParamDescription("Bleeding reduces health by ", "", "HP");
 }
 
-std::string_view HealthRegenBuffComp::getName() const {
+std::string HealthRegenBuffComp::getName() const {
   return "Health regeneration buff";
 }
 
@@ -188,7 +192,7 @@ std::string HealthRegenBuffComp::getDescription() const {
   return getParamDescription("Health increased by ", "", "HP");
 }
 
-std::string_view ManaRegenBuffComp::getName() const {
+std::string ManaRegenBuffComp::getName() const {
   return "Mana regeneration buff";
 }
 
@@ -200,7 +204,7 @@ std::string ManaRegenBuffComp::getDescription() const {
   return getParamDescription("Mana increased by ", "", "MP");
 }
 
-std::string_view BlindedDebuffComp::getName() const { return "Blinded"; }
+std::string BlindedDebuffComp::getName() const { return "Blinded"; }
 
 std::string BlindedDebuffComp::getDescription() const {
   std::stringstream SS;
@@ -212,7 +216,7 @@ void BlindedDebuffComp::add(const BlindedDebuffComp &Other) {
   TicksLeft = std::max(TicksLeft, Other.TicksLeft);
 }
 
-std::string_view MindVisionBuffComp::getName() const { return "Mind Vision"; }
+std::string MindVisionBuffComp::getName() const { return "Mind Vision"; }
 
 std::string MindVisionBuffComp::getDescription() const {
   std::stringstream SS;
@@ -226,9 +230,7 @@ void MindVisionBuffComp::add(const MindVisionBuffComp &Other) {
   Range = Other.Range;
 }
 
-std::string_view InvisibilityBuffComp::getName() const {
-  return "Invisibility";
-}
+std::string InvisibilityBuffComp::getName() const { return "Invisibility"; }
 
 std::string InvisibilityBuffComp::getDescription() const {
   std::stringstream SS;
@@ -240,7 +242,7 @@ void InvisibilityBuffComp::add(const InvisibilityBuffComp &Other) {
   TicksLeft = std::max(TicksLeft, Other.TicksLeft);
 }
 
-std::string_view ArmorBuffComp::getName() const { return "Armor Buff"; }
+std::string ArmorBuffComp::getName() const { return "Armor Buff"; }
 
 std::string ArmorBuffComp::getDescription() const {
   std::stringstream SS;
@@ -305,7 +307,7 @@ StatValue ArmorBuffComp::getMagicEffectiveDamage(StatValue Damage,
   return Damage * 100.0 / (100.0 + Armor * 0.5);
 }
 
-std::string_view BlockBuffComp::getName() const { return "Chance to block"; }
+std::string BlockBuffComp::getName() const { return "Chance to block"; }
 
 std::string BlockBuffComp::getDescription() const {
   std::stringstream SS;
@@ -327,7 +329,7 @@ bool BlockBuffComp::remove(const BlockBuffComp &Other) {
   return false;
 }
 
-std::string_view StatsBuffPerHitComp::getName() const {
+std::string StatsBuffPerHitComp::getName() const {
   return "Stats buff per hit";
 }
 
