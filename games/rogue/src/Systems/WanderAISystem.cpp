@@ -158,26 +158,27 @@ WanderAISystem::findTarget(entt::entity Entity,
     return {entt::null, nullptr, nullptr};
   }
 
-  // FIMXE only finds single target, no ordering of distance
+  // FIXME only finds single target, no ordering of distance
   entt::entity TargetEt = entt::null;
-  ymir::Algorithm::traverseLOS(
-      [this, &TargetEt, &FacComp](auto Pos) {
-        auto T = L.getEntityAt(Pos);
-        if (T == entt::null) {
-          return !L.isLOSBlocked(Pos);
+  Reg.view<PositionComp, FactionComp, VisibleComp>().each(
+      [this, &TargetEt, &LOSComp, &FacComp,
+       AtPos](entt::entity TEt, const auto &TPC, const auto &TFC, const auto &) {
+        if (TFC.Faction == FacComp->Faction) {
+          return;
         }
-        if (auto *VC = Reg.try_get<VisibleComp>(T); !VC || !VC->IsVisible) {
-          return !L.isLOSBlocked(Pos);
+
+        if ((TPC.Pos - AtPos).length() > double(LOSComp->LOSRange)) {
+          return;
         }
-        if (auto TFac = Reg.try_get<FactionComp>(T);
-            TFac && FacComp->Faction != TFac->Faction) {
-          TargetEt = T;
-          // Target blocks LOS
-          return true;
-        }
-        return !L.isLOSBlocked(Pos);
-      },
-      AtPos, LOSComp->LOSRange, 0.3);
+        ymir::Algorithm::rayCastDDA<int>(
+            [&TargetEt, TPC, TEt](auto Pos) {
+              if (TPC.Pos == Pos) {
+                TargetEt = TEt;
+              }
+            },
+            [this](auto Pos) { return L.isLOSBlocked(Pos); }, LOSComp->LOSRange,
+            AtPos.template to<double>(), TPC.Pos.template to<double>());
+      });
 
   return {TargetEt, LOSComp, FacComp};
 }
@@ -240,8 +241,8 @@ std::optional<ymir::Point2d<int>> WanderAISystem::findPathToPoint(
   }
   if (PathToTarget.empty()) {
     // FIXME this can happen when the targeted entity moves out of range of the
-    // LOS, this means that the dijkstra map is too small to be able to find a path
-    // to the target. Could be avoided by switching to an A* algorithm.
+    // LOS, this means that the dijkstra map is too small to be able to find a
+    // path to the target. Could be avoided by switching to an A* algorithm.
     publish(ErrorMessageEvent()
             << "can't find path from " << AtPos << " to " << FutureToPos);
     return AtPos;

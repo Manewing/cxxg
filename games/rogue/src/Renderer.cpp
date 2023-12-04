@@ -56,12 +56,9 @@ void Renderer::renderAllLineOfSight() {
 void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
   renderVisible(AtPos);
 
-  ymir::Algorithm::traverseLOS(
-      [this](auto Pos) -> bool {
-        renderVisible(Pos);
-        return !L.isLOSBlocked(Pos);
-      },
-      AtPos, Range, 0.3, 0.01);
+  ymir::Algorithm::shadowCasting<int>(
+      [this](auto Pos) { renderVisible(Pos); },
+      [this](auto Pos) { return L.isLOSBlocked(Pos); }, AtPos, Range);
 }
 
 void Renderer::renderVisible(ymir::Point2d<int> AtPos) {

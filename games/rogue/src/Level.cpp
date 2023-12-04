@@ -175,7 +175,8 @@ bool Level::isWallBlocked(ymir::Point2d<int> Pos) const {
 }
 
 bool Level::isLOSBlocked(ymir::Point2d<int> Pos) const {
-  if (EntityPosCache.contains(Pos) && EntityPosCache.getTile(Pos) != entt::null) {
+  if (EntityPosCache.contains(Pos) &&
+      EntityPosCache.getTile(Pos) != entt::null) {
     return Reg.any_of<BlocksLOS>(EntityPosCache.getTile(Pos));
   }
   return isWallBlocked(Pos);
@@ -204,9 +205,7 @@ Level::getDijkstraMap(Tile Target, std::size_t Layer) const {
   return {DM, TilePos};
 }
 
-void Level::revealMap() {
-  PlayerSeenMap.fill(true);
-}
+void Level::revealMap() { PlayerSeenMap.fill(true); }
 
 const ymir::Map<bool, int> &Level::getPlayerSeenMap() const {
   return PlayerSeenMap;
@@ -239,15 +238,15 @@ void Level::updateEntityPosition(const entt::entity &Entity,
 void Level::updatePlayerSeenMap() {
   Reg.view<LineOfSightComp, VisibleLOSComp, PositionComp>().each(
       [this](const auto &LC, const auto &, const auto &PC) {
-        ymir::Algorithm::traverseLOS(
-            [this](auto Pos) -> bool {
+        ymir::Algorithm::shadowCasting<int>(
+            [this](auto Pos) {
               if (!PlayerSeenMap.contains(Pos)) {
-                return false;
+                return;
               }
               PlayerSeenMap.getTile(Pos) = true;
-              return !isLOSBlocked(Pos);
             },
-            PC.Pos, LC.LOSRange, 0.3, 0.01);
+            [this](auto Pos) { return isLOSBlocked(Pos); }, PC.Pos,
+            LC.LOSRange);
       });
 }
 
