@@ -4,6 +4,7 @@
 namespace rogue {
 
 bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
+  // FIXME this should be moved to ItemType
   return
       // Equipment
       ((Flags & CapabilityFlags::Equipment) != CapabilityFlags::None &&

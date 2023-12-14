@@ -79,6 +79,8 @@ private:
   std::vector<DismantleResult> Results;
 };
 
+// FIXME add remove component effect
+
 template <typename CompType, typename... RequiredComps>
 class SetComponentEffect : public ItemEffect {
 public:
@@ -134,14 +136,25 @@ makeSetComponentEffect(const CompType &Comp) {
 class ApplyBuffItemEffectBase : public ItemEffect {
 public:
   virtual const BuffBase &getBuff() const = 0;
+  // FIXME move to ItemEffect base
+  virtual bool canAddFrom(const ApplyBuffItemEffectBase &Other) const = 0;
+  // FIXME move to ItemEffect base
+  virtual void addFrom(const ApplyBuffItemEffectBase &Other) = 0;
+  // FIXME move to ItemEffect base
+  virtual std::shared_ptr<ItemEffect> clone() const = 0;
 };
 
 template <typename BuffType, typename... RequiredComps>
 class ApplyBuffItemEffect : public ApplyBuffItemEffectBase {
 public:
+  using OwnType = ApplyBuffItemEffect<BuffType, RequiredComps...>;
+
+public:
   explicit ApplyBuffItemEffect(const BuffType &Buff) : Buff(Buff) {}
 
   const BuffBase &getBuff() const final { return Buff; }
+
+  const BuffType &getBuffCasted() const { return Buff; }
 
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
     return BuffApplyHelper<BuffType, RequiredComps...>::canApplyTo(Et, Reg);
@@ -157,6 +170,20 @@ public:
 
   void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {
     BuffApplyHelper<BuffType, RequiredComps...>::removeFrom(Buff, Et, Reg);
+  }
+
+  std::shared_ptr<ItemEffect> clone() const final {
+    return std::make_shared<OwnType>(static_cast<const OwnType &>(*this));
+  }
+
+  bool canAddFrom(const ApplyBuffItemEffectBase &Other) const final {
+    return dynamic_cast<const OwnType *>(&Other) != nullptr;
+  }
+
+  void addFrom(const ApplyBuffItemEffectBase &Other) final {
+    auto *OtherPtr = dynamic_cast<const OwnType *>(&Other);
+    assert(OtherPtr);
+    Buff.add(OtherPtr->Buff);
   }
 
 private:

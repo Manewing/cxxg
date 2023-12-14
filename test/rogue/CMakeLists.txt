@@ -1,6 +1,7 @@
 set(SOURCES
   Components/BuffsTest.cpp
   Components/HelpersTest.cpp
+  CraftingSystemTest.cpp
   EntityDatabaseHelpersTest.cpp
   EntityDatabaseTest.cpp
   EntityFactoryTest.cpp
