@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <optional>
 #include <rogue/Components/Helpers.h>
+#include <rogue/Components/LOS.h>
 #include <rogue/Components/Stats.h>
 #include <string>
 #include <string_view>
@@ -12,10 +13,12 @@ namespace rogue {
 
 // All buffs that can be applied to an entity have to inherit from this class
 struct BuffBase {
+  static bool rollForPercentage(StatValue Percentage);
+
   virtual ~BuffBase() = default;
 
   /// Returns a name for the buff, e.g. "Poison Debuff"
-  virtual std::string_view getName() const = 0;
+  virtual std::string getName() const = 0;
 
   /// Returns a description of the buff, e.g. "Poisoned for 5 ticks"
   virtual std::string getDescription() const = 0;
@@ -76,7 +79,7 @@ public:
 
 struct StatsBuffComp : public AdditiveBuff, public BuffBase {
 public:
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getDescription() const override;
   void add(const StatsBuffComp &Other);
   bool remove(const StatsBuffComp &Other);
@@ -86,7 +89,7 @@ public:
 };
 
 struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getDescription() const override;
   void add(const StatsTimedBuffComp &Other);
 };
@@ -102,7 +105,7 @@ struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
 struct PoisonDebuffComp : public DiminishingReturnsValueGenBuff,
                           public BuffBase {
 public:
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getApplyDesc() const override;
   std::string getDescription() const override;
 };
@@ -110,7 +113,7 @@ public:
 struct BleedingDebuffComp : public DiminishingReturnsValueGenBuff,
                             public BuffBase {
 public:
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getApplyDesc() const override;
   std::string getDescription() const override;
 };
@@ -118,7 +121,7 @@ public:
 struct HealthRegenBuffComp : public DiminishingReturnsValueGenBuff,
                              public BuffBase {
 public:
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getApplyDesc() const override;
   std::string getDescription() const override;
 };
@@ -126,7 +129,7 @@ public:
 struct ManaRegenBuffComp : public DiminishingReturnsValueGenBuff,
                            public BuffBase {
 public:
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getApplyDesc() const override;
   std::string getDescription() const override;
 };
@@ -137,14 +140,14 @@ public:
   static constexpr const StatValue Factor = 0.1;
 
 public:
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getDescription() const override;
   void add(const BlindedDebuffComp &Other);
 };
 
 struct MindVisionBuffComp : public TimedBuff, public BuffBase {
 public:
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getDescription() const override;
   void add(const MindVisionBuffComp &Other);
 
@@ -154,7 +157,7 @@ public:
 
 struct InvisibilityBuffComp : public TimedBuff, public BuffBase {
 public:
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getDescription() const override;
   void add(const InvisibilityBuffComp &Other);
 };
@@ -163,7 +166,7 @@ struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
   StatValue PhysArmor = 0;
   StatValue MagicArmor = 0;
 
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getDescription() const override;
 
   void add(const ArmorBuffComp &Other);
@@ -186,17 +189,98 @@ struct BlockBuffComp : public AdditiveBuff, public BuffBase {
   /// Block chance in percent
   StatValue BlockChance = 5.0;
 
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getDescription() const override;
 
   void add(const BlockBuffComp &Other);
   bool remove(const BlockBuffComp &Other);
 };
 
+template <typename BuffType, typename... RequiredComps> class BuffApplyHelper {
+public:
+  static bool canApplyTo(const entt::entity &Et, entt::registry &Reg) {
+    if constexpr (sizeof...(RequiredComps) == 0) {
+      return true;
+    } else {
+      return Reg.all_of<RequiredComps...>(Et);
+    }
+  }
+
+  static void applyTo(const BuffType &Buff, const entt::entity &Et,
+                      entt::registry &Reg) {
+    auto ExistingBuff = Reg.try_get<BuffType>(Et);
+    if (ExistingBuff) {
+      ExistingBuff->add(Buff);
+    } else {
+      Reg.emplace<BuffType>(Et, Buff);
+    }
+  }
+
+  static bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) {
+    if constexpr (sizeof...(RequiredComps) == 0) {
+      return true;
+    } else {
+      return Reg.all_of<RequiredComps...>(Et);
+    }
+  }
+
+  static void removeFrom(const BuffType &Buff, const entt::entity &Et,
+                         entt::registry &Reg) {
+    auto ExistingBuff = Reg.try_get<BuffType>(Et);
+    if (ExistingBuff) {
+      if (ExistingBuff->remove(Buff)) {
+        Reg.erase<BuffType>(Et);
+      }
+    }
+  }
+};
+
+/// Chance on hit to apply a buff
+template <typename BuffType, typename... RequiredComps>
+struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
+  /// Chance to apply buff in percent
+  StatValue Chance = 5.0;
+
+  /// Buff to apply
+  BuffType Buff;
+
+  std::string getName() const override {
+    return std::to_string(Chance) + "% chance to apply " + Buff.getName();
+  }
+
+  std::string getDescription() const override {
+    return std::to_string(Chance) + "% chance to apply " +
+           Buff.getDescription();
+  }
+
+  void add(const ChanceToApplyBuffComp &Other) {
+    AdditiveBuff::add(Other);
+    Buff.add(Other.Buff);
+  }
+
+  bool remove(const ChanceToApplyBuffComp &Other) {
+    if (!AdditiveBuff::remove(Other)) {
+      return false;
+    }
+    return Buff.remove(Other.Buff);
+  }
+
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const {
+    return BuffApplyHelper<BuffType, RequiredComps...>::canApplyTo(Et, Reg);
+  }
+
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const {
+    if (!rollForPercentage(Chance)) {
+      return;
+    }
+    BuffApplyHelper<BuffType, RequiredComps...>::applyTo(Buff, Et, Reg);
+  }
+};
+
 /// Applies a time based stats buff every time the entity hits sth, only one can
 /// be active
 struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
-  std::string_view getName() const override;
+  std::string getName() const override;
   std::string getDescription() const override;
 
   void add(const StatsBuffPerHitComp &Other);
@@ -216,11 +300,20 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
   std::optional<StatPoint> AppliedStack = std::nullopt;
 };
 
-using BuffTypeList =
-    ComponentList<StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
-                  BleedingDebuffComp, HealthRegenBuffComp, ManaRegenBuffComp,
-                  BlindedDebuffComp, MindVisionBuffComp, InvisibilityBuffComp,
-                  ArmorBuffComp, BlockBuffComp, StatsBuffPerHitComp>;
+// Chance to apply on hit to target
+using CoHTargetPoisonDebuffComp =
+    ChanceToApplyBuffComp<PoisonDebuffComp, HealthComp>;
+using CoHTargetBleedingDebuffComp =
+    ChanceToApplyBuffComp<BleedingDebuffComp, HealthComp>;
+using CoHTargetBlindedDebuffComp =
+    ChanceToApplyBuffComp<BlindedDebuffComp, LineOfSightComp>;
+
+using BuffTypeList = ComponentList<
+    StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
+    CoHTargetPoisonDebuffComp, BleedingDebuffComp, CoHTargetBleedingDebuffComp,
+    HealthRegenBuffComp, ManaRegenBuffComp, BlindedDebuffComp,
+    CoHTargetBlindedDebuffComp, MindVisionBuffComp, InvisibilityBuffComp,
+    ArmorBuffComp, BlockBuffComp, StatsBuffPerHitComp>;
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);

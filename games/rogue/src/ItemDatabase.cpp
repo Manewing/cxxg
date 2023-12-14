@@ -85,8 +85,9 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
           {"blinded_debuff_comp",
            [](const auto &, const auto &V) {
              BlindedDebuffComp BDC;
-             BDC.TicksLeft = V["ticks"].GetUint();
-             return makeApplyBuffItemEffect<BlindedDebuffComp>(BDC);
+             BDC.TicksLeft = V["buff"]["ticks"].GetUint();
+             return makeApplyBuffItemEffect<BlindedDebuffComp, LineOfSightComp>(
+                 BDC);
            }},
           {"mind_vision_buff_comp",
            [](const auto &, const auto &V) {
@@ -127,6 +128,27 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              Buff.MaxStacks = V["max_stacks"].GetUint();
              return makeApplyBuffItemEffect<StatsBuffPerHitComp, StatsComp>(
                  Buff);
+           }},
+          {"chance_on_hit_to_apply_poison",
+           [](const auto &, const auto &V) {
+             CoHTargetPoisonDebuffComp Effect;
+             Effect.Chance = V["chance"].GetDouble();
+             parseReductionBuff(V["buff"], Effect.Buff);
+             return makeApplyBuffItemEffect<CoHTargetPoisonDebuffComp>(Effect);
+           }},
+          {"chance_on_hit_to_apply_bleeding",
+           [](const auto &, const auto &V) {
+             CoHTargetBleedingDebuffComp Effect;
+             Effect.Chance = V["chance"].GetDouble();
+             parseReductionBuff(V["buff"], Effect.Buff);
+             return makeApplyBuffItemEffect<CoHTargetBleedingDebuffComp>(Effect);
+           }},
+          {"chance_on_hit_to_apply_blinded",
+           [](const auto &, const auto &V) {
+             CoHTargetBlindedDebuffComp Effect;
+             Effect.Chance = V["chance"].GetDouble();
+             Effect.Buff.TicksLeft = V["buff"]["ticks"].GetUint();
+             return makeApplyBuffItemEffect<CoHTargetBlindedDebuffComp>(Effect);
            }},
           {"dismantle", [](const auto &DB, const auto &V) {
              std::vector<DismantleEffect::DismantleResult> Results;

@@ -26,6 +26,16 @@ void applyCombatComps(entt::registry &Reg, entt::entity Attacker,
   }
 }
 
+template <typename ChanceOnHitBuffType>
+void tryApplyChanceOnHitBuff(entt::registry &Reg, entt::entity Target,
+                             entt::entity Source) {
+  if (auto *COHB = Reg.try_get<ChanceOnHitBuffType>(Source)) {
+    if (COHB->canApplyTo(Target, Reg)) {
+      COHB->applyTo(Target, Reg);
+    }
+  }
+}
+
 std::optional<unsigned> applyDamage(entt::registry &Reg,
                                     const entt::entity Target,
                                     HealthComp &THealth, const DamageComp &DC) {
@@ -46,6 +56,11 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
     NewDC.PhysDamage = ABC->getPhysEffectiveDamage(NewDC.PhysDamage, SC);
     NewDC.PhysDamage = ABC->getMagicEffectiveDamage(NewDC.PhysDamage, SC);
   }
+
+  tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source);
+  tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source);
+  tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source);
+
   THealth.reduce(NewDC.PhysDamage);
   THealth.reduce(NewDC.MagicDamage);
   return NewDC.total();

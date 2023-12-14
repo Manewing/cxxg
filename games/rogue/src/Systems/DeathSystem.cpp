@@ -50,10 +50,12 @@ Inventory getDropInventoryFromEntity(entt::entity Entity, entt::registry &Reg) {
   if (auto *IC = Reg.try_get<InventoryComp>(Entity)) {
     Inv = IC->Inv;
   }
-  if (auto *EC = Reg.try_get<EquipmentComp>(Entity)) {
-    for (const auto &ES : EC->Equip.all()) {
-      if (!ES->empty()) {
-        Inv.addItem(ES->unequip());
+  if (Reg.any_of<DropEquipmentComp>(Entity)) {
+    if (auto *EC = Reg.try_get<EquipmentComp>(Entity)) {
+      for (const auto &ES : EC->Equip.all()) {
+        if (!ES->empty()) {
+          Inv.addItem(ES->unequip());
+        }
       }
     }
   }

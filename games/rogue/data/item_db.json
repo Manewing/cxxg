@@ -103,7 +103,9 @@
     },
     "blinded_debuff_comp": {
       "type": "blinded_debuff_comp",
-      "ticks": 600
+      "buff": {
+        "ticks": 600
+      }
     },
     "mind_vision_buff_comp": {
       "type": "mind_vision_buff_comp",
@@ -155,6 +157,15 @@
       "phys_damage": 0,
       "magic_damage": 5,
       "ap_cost": 20
+    },
+    "low_chance_to_apply_poison": {
+      "type": "chance_on_hit_to_apply_poison",
+      "buff": {
+        "reduce_amount": 0.5,
+        "ticks": 5,
+        "tick_period": 20
+      },
+      "chance": 60.0
     },
     "dismantle_iron_equip": {
       "type": "dismantle",
@@ -318,6 +329,23 @@
           "specialization": "common_stats_buff_effect"
         }
       ]
+    },
+    {
+      "name": "Toxic Claws",
+      "description": "TODO",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "melee_5"
+        },
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_poison"
+        }
+      ],
+      "specializations": []
     },
     {
       "name": "Fire Wand",
@@ -1226,6 +1254,23 @@
         {
           "type": "null",
           "weight": 70
+        }
+      ]
+    },
+    "ltb_toxic_rat": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Toxic Claws",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "common_rat",
+          "weight": -1
         }
       ]
     },

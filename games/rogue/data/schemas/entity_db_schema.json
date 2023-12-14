@@ -64,6 +64,9 @@
             "auto_equip": {
               "$ref": "#/defs/assembler_types/on_off"
             },
+            "drop_equipment": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
             "agility": {
               "$ref": "#/defs/assembler_types/on_off"
             },
