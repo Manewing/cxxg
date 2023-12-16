@@ -7,7 +7,7 @@ namespace {
 
 const rogue::ItemPrototype DummyConsumable(
     1, "consumable", "desc", rogue::ItemType::Consumable, 5,
-    {{rogue::CapabilityFlags::UseOn, std::make_shared<rogue::ItemEffect>()}});
+    {{rogue::CapabilityFlags::UseOn, std::make_shared<rogue::NullEffect>()}});
 
 TEST(InventoryTest, Empty) {
   rogue::Inventory Inv;

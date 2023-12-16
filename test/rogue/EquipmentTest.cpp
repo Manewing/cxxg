@@ -5,11 +5,11 @@
 
 namespace {
 
-const auto NullEffect = std::make_shared<rogue::ItemEffect>();
+const auto NullEffect = std::make_shared<rogue::NullEffect>();
 
-const rogue::ItemPrototype DummyConsumable(
-    1, "consumable", "desc", rogue::ItemType::Consumable, 5,
-    {{rogue::CapabilityFlags::UseOn, std::make_shared<rogue::ItemEffect>()}});
+const rogue::ItemPrototype
+    DummyConsumable(1, "consumable", "desc", rogue::ItemType::Consumable, 5,
+                    {{rogue::CapabilityFlags::UseOn, NullEffect}});
 
 const rogue::ItemPrototype
     DummyRing(2, "ring", "desc", rogue::ItemType::Ring, 1,

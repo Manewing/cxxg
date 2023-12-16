@@ -1,3 +1,4 @@
+#include "ItemsCommon.h"
 #include <gtest/gtest.h>
 #include <rogue/Components/Buffs.h>
 #include <rogue/ItemDatabase.h>
@@ -6,37 +7,37 @@
 namespace rogue {
 
 // After cleanup add this as documentation!
-// 
+//
 // Avoid hard coding specific item types, items are created by the effects
 // via composition.
-// 
-// 
+//
+//
 // How to deal with corner cases such as:
 //     Small Sword + Blueberry -> ??
-// 
+//
 //     -> based on capability flags only items with a specific
 //         flag already set can be modified with further extensions
 //         to that flag
-//     
+//
 //     -> start item determines what elements can be added
-// 
+//
 //     -> utilize item type to avoid allowing items with equip modifier
 //         to be equipped if they are not equipment
-// 
+//
 // Arcane Liquid + Glas Vial -> Potion
-// 
+//
 // Rune Dust + Modifier -> Rune
 //     Bone -> Strong against undead
-// 
+//
 // Potion + Essence -> Specialized Potion
 // -> apply to using entity
-// 
+//
 // Rune + Equipment -> Specialized Equipment
 // -> apply to equipping entity
-// 
+//
 // Bomb + Essence -> Specialized Bomb
 // -> apply to hit entity
-// 
+//
 // Consumables for:
 // -> increased armor (iron skin)
 // -> health increase
@@ -47,7 +48,7 @@ namespace rogue {
 // -> removing debuffs
 // -> mana increase
 // -> mana generation
-// 
+//
 // Small Sword
 // Bone
 // Blueberry
@@ -58,47 +59,47 @@ namespace rogue {
 // Spider Silk
 // Venomous Fang
 // Spiderling Venom Sac
-// 
-// 
+//
+//
 // Crafting tree for recipes
 // -> avoid linear lookup of items
 // -> map with key tuple (item_id, count)
-// 
-// 
+//
+//
 // Ideas:
-// 
+//
 // Charcoal: Modifier, Crafting
 // - Use: Remove poison debuff
-// 
+//
 // Sewer meat: Modifier, Consumable, Crafting
 // - Use: Poison debuff
 // - Use: Heals 5HP
-// 
+//
 // Blueberry: Modifier, Consumable, Crafting
 // - Use: Health generation increased
-// 
+//
 // Potion Base:  Crafting, PType
 // - <emtpy>
-// 
+//
 // Glas vial: Crafting
 // - <empt>
-// 
+//
 // Arcane liquid: Crafting
 // - <empty>
-// 
+//
 // A valid recipe would be:
 // [Glas vial, Arcane liquid]
 // It would yield the "Potion Base" item
-// 
+//
 // A valid modifier recipe could be:
 // [PType, Sewer meat, Charcoal, Blueberry], "%s Potion"
-// 
+//
 // And would yield for example the following item "Nature Healing Potion":
-// 
+//
 // Nature healing potion:
 // - Use: Heals 5 HP
 // - Use: Health generation increased
-// 
+//
 // recipes:
 //   - ingredients:
 //       - name: Leather Scrap
@@ -148,7 +149,7 @@ namespace rogue {
 //     results:
 //       - name: Arcane Potion Base
 //         count: 1
-// 
+//
 // modifier_recipes:
 //   - ingredients:
 //       - item_type: potion
@@ -165,8 +166,6 @@ namespace rogue {
 //       modifiers:
 //       - item_type: crafting_modifier
 //         count: 1
-
-
 
 class CraftingDatabase {
 public:
@@ -201,7 +200,8 @@ public:
         ((First.getType() & ItemType::EquipmentMask) != ItemType::None &&
          (Second.getType() & ItemType::Crafting) != ItemType::None);
     if (!IsValid) {
-      std::cerr << "not valid: " << getItemTypeLabel(First.getType()) << " +  "
+      std::cerr << "not valid: " << First.getName() << " + " << Second.getName()
+                << " for " << getItemTypeLabel(First.getType()) << " +  "
                 << getItemTypeLabel(Second.getType()) << std::endl;
       return std::nullopt;
     }
@@ -233,34 +233,40 @@ public:
 
     // Create new effects from effects in prototype that can be added
     std::vector<EffectInfo> NewEffects;
-    for (const auto &Effect : Proto.Effects) {
-      // FIXME make this possible for all effects, avoid any duplicate effect
-      // types
-      auto BuffEff =
-          dynamic_cast<const ApplyBuffItemEffectBase *>(Effect.Effect.get());
+    std::optional<EffectInfo> NullInfo;
+    CapabilityFlags EffectFlags = CapabilityFlags::None;
+    for (const auto &Info : Proto.Effects) {
+      auto Effect = Info.Effect.get();
 
-      if (BuffEff == nullptr) {
-        NewEffects.push_back(Effect);
+      // Handle NullEffect separately, we only keep the effect if no other
+      // effect has the same flags
+      if (dynamic_cast<NullEffect *>(Info.Effect.get())) {
+        if (NullInfo) {
+          NullInfo->Flags |= Info.Flags;
+        } else {
+          NullInfo = Info;
+        }
         continue;
       }
-      for (auto &NewEffect : NewEffects) {
-        if (NewEffect.Flags != Effect.Flags) {
+      EffectFlags |= Info.Flags;
+
+      for (auto &NewInfo : NewEffects) {
+        if (NewInfo.Flags != Info.Flags) {
           continue;
         }
-        auto NewBuffEff =
-            dynamic_cast<ApplyBuffItemEffectBase *>(NewEffect.Effect.get());
-        if (NewBuffEff == nullptr) {
-          continue;
-        }
-        if (NewBuffEff->canAddFrom(*BuffEff)) {
-          NewBuffEff->addFrom(*BuffEff);
-          BuffEff = nullptr;
+        auto NewEffect = NewInfo.Effect.get();
+        if (NewEffect->canAddFrom(*Effect)) {
+          NewEffect->addFrom(*Effect);
+          Effect = nullptr;
           break;
         }
       }
-      if (BuffEff) {
-        NewEffects.push_back({Effect.Flags, BuffEff->clone()});
+      if (Effect) {
+        NewEffects.push_back({Info.Flags, Effect->clone()});
       }
+    }
+    if (NullInfo && (NullInfo->Flags & ~EffectFlags) != CapabilityFlags::None) {
+      NewEffects.push_back(*NullInfo);
     }
     Proto.Effects = NewEffects;
 
@@ -279,88 +285,14 @@ private:
 
 namespace {
 
-rogue::ArmorBuffComp makeArmorBuffComp(rogue::StatValue MagicArmor,
-                                       rogue::StatValue PhysArmor) {
-  rogue::ArmorBuffComp Buff;
-  Buff.MagicArmor = MagicArmor;
-  Buff.PhysArmor = PhysArmor;
-  return Buff;
-}
-
-rogue::PoisonDebuffComp makePoisonDebuffComp(rogue::StatValue TA,
-                                             rogue::StatValue RD, unsigned TP) {
-  rogue::PoisonDebuffComp Buff;
-  Buff.init(TA, RD, TP);
-  return Buff;
-}
-
-// FIXME add real null effect type
-const auto NullEffect = std::make_shared<rogue::ItemEffect>();
-using ArmorEffectType =
-    rogue::ApplyBuffItemEffect<rogue::ArmorBuffComp, rogue::HealthComp>;
-const auto ArmorEffect =
-    rogue::makeApplyBuffItemEffect<rogue::ArmorBuffComp, rogue::HealthComp>(
-        makeArmorBuffComp(1, 2));
-const auto HealEffect = std::make_shared<rogue::HealItemEffect>(42);
-using PoisonEffectType =
-    rogue::ApplyBuffItemEffect<rogue::PoisonDebuffComp, rogue::HealthComp>;
-const auto PoisonEffect =
-    rogue::makeApplyBuffItemEffect<rogue::PoisonDebuffComp, rogue::HealthComp>(
-        makePoisonDebuffComp(1.0, 4.0, 2));
-// TODO remove poison effect
-
-const rogue::ItemPrototype
-    DummyHelmetA(1, "helmet_a", "desc", rogue::ItemType::Helmet, 1,
-                 {{rogue::CapabilityFlags::Equipment, ArmorEffect},
-                  {rogue::CapabilityFlags::Dismantle, NullEffect}});
-const rogue::ItemPrototype
-    DummyHelmetB(2, "helmet_b", "desc", rogue::ItemType::Helmet, 1,
-                 {{rogue::CapabilityFlags::Equipment, ArmorEffect}});
-const rogue::ItemPrototype
-    DummyRing(3, "ring", "desc", rogue::ItemType::Ring, 1,
-              {{rogue::CapabilityFlags::Equipment, NullEffect}});
-
-// Cursed ring can not be unequipped
-const rogue::ItemPrototype
-    CursedRing(5, "cursed_ring", "desc", rogue::ItemType::Ring, 1,
-               {{rogue::CapabilityFlags::EquipOn, NullEffect}});
-
-const rogue::ItemPrototype
-    DummyHeal(6, "dummy_heal", "desc",
-              rogue::ItemType::Consumable | rogue::ItemType::Crafting, 5,
-              {{rogue::CapabilityFlags::UseOn, HealEffect}});
-
-const rogue::ItemPrototype
-    DummyPoison(7, "poison_liquid", "desc",
-                rogue::ItemType::Consumable | rogue::ItemType::Crafting, 5,
-                {{rogue::CapabilityFlags::UseOn, HealEffect},
-                 {rogue::CapabilityFlags::UseOn, PoisonEffect}});
-
-const rogue::ItemPrototype
-    DummyPotion(8, "potion", "desc", rogue::ItemType::Consumable, 5,
-                {{rogue::CapabilityFlags::UseOn, NullEffect}});
-
-const rogue::ItemPrototype
-    DummyPlate(9, "plate", "desc", rogue::ItemType::Crafting, 5,
-               {{rogue::CapabilityFlags::Equipment, ArmorEffect}});
-
-rogue::ItemDatabase createDummyDatabase() {
-  rogue::ItemDatabase Db;
-  Db.addItemProto(DummyHelmetA);
-  Db.addItemProto(DummyHelmetB);
-  Db.addItemProto(DummyRing);
-  Db.addItemProto(CursedRing);
-  Db.addItemProto(DummyHeal);
-  Db.addItemProto(DummyPoison);
-  Db.addItemProto(DummyPotion);
-  Db.addItemProto(DummyPlate);
-  return Db;
-}
-
 class CraftingSystemTest : public ::testing::Test {
 public:
-  void SetUp() override { Db = createDummyDatabase(); }
+  void SetUp() override {
+    DummyItems = rogue::test::DummyItems();
+    Db = DummyItems.createItemDatabase();
+  }
 
+  rogue::test::DummyItems DummyItems;
   rogue::ItemDatabase Db;
 };
 
@@ -378,8 +310,8 @@ TEST_F(CraftingSystemTest, SingleItem) {
 
 TEST_F(CraftingSystemTest, InvalidCombination) {
   rogue::CraftingSystem System(Db);
-  auto Helmet = Db.createItem(DummyHelmetA.ItemId);
-  auto Ring = Db.createItem(DummyRing.ItemId);
+  auto Helmet = Db.createItem(DummyItems.DummyHelmetA.ItemId);
+  auto Ring = Db.createItem(DummyItems.DummyRing.ItemId);
 
   auto Result = System.tryCraft({Helmet, Ring});
   EXPECT_FALSE(Result.has_value());
@@ -387,8 +319,8 @@ TEST_F(CraftingSystemTest, InvalidCombination) {
 
 TEST_F(CraftingSystemTest, SimpleEquipmentEnhancement) {
   rogue::CraftingSystem System(Db);
-  auto Helmet = Db.createItem(DummyHelmetA.ItemId);
-  auto Plate = Db.createItem(DummyPlate.ItemId);
+  auto Helmet = Db.createItem(DummyItems.DummyHelmetA.ItemId);
+  auto Plate = Db.createItem(DummyItems.DummyPlateCrafting.ItemId);
   auto Result = System.tryCraft({Helmet, Plate});
   ASSERT_TRUE(Result.has_value());
 
@@ -398,18 +330,18 @@ TEST_F(CraftingSystemTest, SimpleEquipmentEnhancement) {
   EXPECT_EQ(Result->getMaxStackSize(), 1);
   EXPECT_EQ(Result->getAllEffects().size(), 2);
 
-  auto ArmorBuff = dynamic_cast<const ArmorEffectType *>(
-      Result->getAllEffects().at(0).Effect.get());
+  auto ArmorBuff =
+      dynamic_cast<const rogue::test::DummyItems::ArmorEffectType *>(
+          Result->getAllEffects().at(0).Effect.get());
   ASSERT_NE(ArmorBuff, nullptr);
-  EXPECT_EQ(ArmorBuff->getBuffCasted().MagicArmor, 2);
-  EXPECT_EQ(ArmorBuff->getBuffCasted().PhysArmor, 4);
+  EXPECT_EQ(ArmorBuff->Value, 10);
 }
 
 TEST_F(CraftingSystemTest, MultiComponentPotionCrafting) {
   rogue::CraftingSystem System(Db);
-  auto Potion = Db.createItem(DummyPotion.ItemId);
-  auto Poison = Db.createItem(DummyPoison.ItemId);
-  auto Heal = Db.createItem(DummyHeal.ItemId);
+  auto Potion = Db.createItem(DummyItems.DummyPotion.ItemId);
+  auto Poison = Db.createItem(DummyItems.DummyPoisonConsumable.ItemId);
+  auto Heal = Db.createItem(DummyItems.DummyHealConsumable.ItemId);
 
   auto Result = System.tryCraft({Potion, Poison, Heal});
   ASSERT_TRUE(Result.has_value());
@@ -419,9 +351,9 @@ TEST_F(CraftingSystemTest, MultiComponentPotionCrafting) {
   EXPECT_EQ(Result->StackSize, 1);
   EXPECT_EQ(Result->getMaxStackSize(), 5);
 
-  // FIXME should be two, NullEffect needs to be filtered out
-  // and HealEffects should be combined
-  EXPECT_EQ(Result->getAllEffects().size(), 4);
+  EXPECT_EQ(Result->getAllEffects().size(), 2)
+      << "Should be 2, NullEffect needs to be filtered out and HealEffects "
+         "should be combined";
 
   auto HealEffect = dynamic_cast<const rogue::HealItemEffect *>(
       Result->getAllEffects().at(0).Effect.get());

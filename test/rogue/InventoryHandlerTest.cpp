@@ -1,3 +1,4 @@
+#include "ItemsCommon.h"
 #include <gtest/gtest.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Player.h>
@@ -11,27 +12,18 @@
 
 namespace {
 
-const auto NullEffect = std::make_shared<rogue::ItemEffect>();
+class InventoryHandlerTest : public ::testing::Test {
+public:
+  void SetUp() override {
+    DummyItems = rogue::test::DummyItems();
+    Reg = entt::registry();
+    Entity = Reg.create();
+  }
 
-const rogue::ItemPrototype
-    DummyHelmetA(1, "helmet_a", "desc", rogue::ItemType::Helmet, 1,
-                 {{rogue::CapabilityFlags::Equipment, NullEffect},
-                  {rogue::CapabilityFlags::Dismantle, NullEffect}});
-const rogue::ItemPrototype
-    DummyHelmetB(2, "helmet_b", "desc", rogue::ItemType::Helmet, 1,
-                 {{rogue::CapabilityFlags::Equipment, NullEffect}});
-const rogue::ItemPrototype
-    DummyRing(3, "ring", "desc", rogue::ItemType::Ring, 1,
-              {{rogue::CapabilityFlags::Equipment, NullEffect}});
-
-// Cursed ring can not be unequipped
-const rogue::ItemPrototype
-    CursedRing(5, "cursed_ring", "desc", rogue::ItemType::Ring, 1,
-               {{rogue::CapabilityFlags::EquipOn, NullEffect}});
-
-const rogue::ItemPrototype
-    DummyConsumable(6, "consumable", "desc", rogue::ItemType::Consumable, 5,
-                    {{rogue::CapabilityFlags::UseOn, NullEffect}});
+  rogue::test::DummyItems DummyItems;
+  entt::registry Reg;
+  entt::entity Entity;
+};
 
 class EventListener {
 public:
@@ -42,11 +34,10 @@ public:
   std::vector<std::string> Messages;
 };
 
-TEST(InventoryHandlerTest, TryUnequipItem) {
-  entt::registry Reg;
-  entt::entity Entity = Reg.create();
+TEST_F(InventoryHandlerTest, TryUnequipItem) {
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
+  Reg.emplace<rogue::HealthComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg);
   rogue::EventHub Hub;
   EventListener Listener;
@@ -64,14 +55,14 @@ TEST(InventoryHandlerTest, TryUnequipItem) {
   EXPECT_FALSE(InvHandler.tryUnequip(rogue::ItemType::Helmet))
       << "Expect not to be able to unequip if there is nothing equipped";
 
-  Equip.equip(rogue::Item(DummyHelmetA), Entity, Reg);
+  Equip.equip(rogue::Item(DummyItems.DummyHelmetA), Entity, Reg);
   EXPECT_TRUE(InvHandler.tryUnequip(rogue::ItemType::Helmet))
       << "Expect to be able to unequip if there is something equipped";
   ASSERT_EQ(Inv.size(), 1);
   EXPECT_EQ(Inv.getItem(0).getName(), "helmet_a");
   EXPECT_FALSE(InvHandler.tryUnequip(rogue::ItemType::Helmet));
 
-  Equip.equip(rogue::Item(CursedRing), Entity, Reg);
+  Equip.equip(rogue::Item(DummyItems.DummyCursedRing), Entity, Reg);
   EXPECT_FALSE(InvHandler.tryUnequip(rogue::ItemType::Ring))
       << "Expect not to be able to unequip if there is a cursed item equipped";
   ASSERT_EQ(Inv.size(), 1);
@@ -85,9 +76,7 @@ TEST(InventoryHandlerTest, TryUnequipItem) {
   EXPECT_EQ(Listener.Messages, RefMessages);
 }
 
-TEST(InventoryHandlerTest, TryEquipInventoryItem) {
-  entt::registry Reg;
-  entt::entity Entity = Reg.create();
+TEST_F(InventoryHandlerTest, TryEquipInventoryItem) {
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg);
@@ -102,10 +91,10 @@ TEST(InventoryHandlerTest, TryEquipInventoryItem) {
 
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
   InvHandler.refresh();
-  Inv.addItem(rogue::Item(DummyHelmetA));
-  Inv.addItem(rogue::Item(DummyHelmetB));
-  Inv.addItem(rogue::Item(DummyRing));
-  Inv.addItem(rogue::Item(CursedRing));
+  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.DummyHelmetB));
+  Inv.addItem(rogue::Item(DummyItems.DummyRing));
+  Inv.addItem(rogue::Item(DummyItems.DummyCursedRing));
   EXPECT_FALSE(InvHandler.tryEquipItem(0))
       << "Expect not to be able to equip if there is no equipment";
 
@@ -163,9 +152,7 @@ TEST(InventoryHandlerTest, TryEquipInventoryItem) {
   EXPECT_EQ(Listener.Messages, RefMessages);
 }
 
-TEST(InventoryHandlerTest, TryDropItem) {
-  entt::registry Reg;
-  entt::entity Entity = Reg.create();
+TEST_F(InventoryHandlerTest, TryDropItem) {
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg);
@@ -183,7 +170,7 @@ TEST(InventoryHandlerTest, TryDropItem) {
   EXPECT_THROW(InvHandler.tryDropItem(0), std::out_of_range)
       << "Expect to throw if trying to drop item index out of range";
 
-  Inv.addItem(rogue::Item(DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
 
   EXPECT_TRUE(InvHandler.tryDropItem(0))
       << "Expect to be able to drop item if there is inventory and position";
@@ -196,9 +183,7 @@ TEST(InventoryHandlerTest, TryDropItem) {
   EXPECT_EQ(Listener.Messages, RefMessages);
 }
 
-TEST(InventoryHandlerTest, TryDismantleItem) {
-  entt::registry Reg;
-  entt::entity Entity = Reg.create();
+TEST_F(InventoryHandlerTest, TryDismantleItem) {
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg);
@@ -216,14 +201,14 @@ TEST(InventoryHandlerTest, TryDismantleItem) {
   EXPECT_THROW(InvHandler.tryDismantleItem(0), std::out_of_range)
       << "Expect to throw if trying to dismantle item index out of range";
 
-  Inv.addItem(rogue::Item(DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
 
   EXPECT_TRUE(InvHandler.tryDismantleItem(0))
       << "Expect to be able to dismantle item if there is inventory and "
          "position";
   ASSERT_EQ(Inv.size(), 0);
 
-  Inv.addItem(rogue::Item(CursedRing));
+  Inv.addItem(rogue::Item(DummyItems.DummyCursedRing));
   EXPECT_FALSE(InvHandler.tryDismantleItem(0))
       << "Expect not to be able to dismantle item if it can not be dismantled";
   ASSERT_EQ(Inv.size(), 1);
@@ -234,9 +219,7 @@ TEST(InventoryHandlerTest, TryDismantleItem) {
   EXPECT_EQ(Listener.Messages, RefMessages);
 }
 
-TEST(InventoryHandlerTest, TryUseItem) {
-  entt::registry Reg;
-  entt::entity Entity = Reg.create();
+TEST_F(InventoryHandlerTest, TryUseItem) {
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg);
@@ -253,24 +236,22 @@ TEST(InventoryHandlerTest, TryUseItem) {
   EXPECT_THROW(InvHandler.tryUseItem(0), std::out_of_range)
       << "Expect to throw if trying to use item index out of range";
 
-  Inv.addItem(rogue::Item(DummyConsumable));
+  Inv.addItem(rogue::Item(DummyItems.DummyHealConsumable));
 
   EXPECT_TRUE(InvHandler.tryUseItem(0))
       << "Expect to be able to use item if there is inventory and position";
   ASSERT_EQ(Inv.size(), 0);
 
-  Inv.addItem(rogue::Item(DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
   EXPECT_FALSE(InvHandler.tryUseItem(0))
       << "Expect not to be able to use item if it can not be used";
 
-  std::vector<std::string> RefMessages = {"Used consumable on Entity",
+  std::vector<std::string> RefMessages = {"Used dummy_heal on Entity",
                                           "Can not use helmet_a on Entity"};
   EXPECT_EQ(Listener.Messages, RefMessages);
 }
 
-TEST(InventoryHandlerTest, TryUseItemOnTarget) {
-  entt::registry Reg;
-  entt::entity Entity = Reg.create();
+TEST_F(InventoryHandlerTest, TryUseItemOnTarget) {
   entt::entity TargetEntity = Reg.create();
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::NameComp>(TargetEntity, "Target");
@@ -289,23 +270,21 @@ TEST(InventoryHandlerTest, TryUseItemOnTarget) {
   EXPECT_THROW(InvHandler.tryUseItem(0), std::out_of_range)
       << "Expect to throw if trying to use item index out of range";
 
-  Inv.addItem(rogue::Item(DummyConsumable));
+  Inv.addItem(rogue::Item(DummyItems.DummyHealConsumable));
   EXPECT_TRUE(InvHandler.tryUseItemOnTarget(0, TargetEntity))
       << "Expect to be able to use item if there is inventory and position";
   ASSERT_EQ(Inv.size(), 0);
 
-  Inv.addItem(rogue::Item(DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
   EXPECT_FALSE(InvHandler.tryUseItemOnTarget(0, TargetEntity))
       << "Expect not to be able to use item if it can not be used";
 
-  std::vector<std::string> RefMessages = {"Used consumable on Target",
+  std::vector<std::string> RefMessages = {"Used dummy_heal on Target",
                                           "Can not use helmet_a on Target"};
   EXPECT_EQ(Listener.Messages, RefMessages);
 }
 
-TEST(InventoryHandlerTest, AutoEquipItems) {
-  entt::registry Reg;
-  entt::entity Entity = Reg.create();
+TEST_F(InventoryHandlerTest, AutoEquipItems) {
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
@@ -316,10 +295,10 @@ TEST(InventoryHandlerTest, AutoEquipItems) {
   Hub.subscribe(Listener, &EventListener::onPlayerInfoMessageEvent);
   InvHandler.setEventHub(&Hub);
 
-  Inv.addItem(rogue::Item(DummyHelmetA));
-  Inv.addItem(rogue::Item(DummyHelmetB));
-  Inv.addItem(rogue::Item(DummyRing));
-  Inv.addItem(rogue::Item(CursedRing));
+  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.DummyHelmetB));
+  Inv.addItem(rogue::Item(DummyItems.DummyRing));
+  Inv.addItem(rogue::Item(DummyItems.DummyCursedRing));
 
   InvHandler.autoEquipItems();
   ASSERT_EQ(Inv.size(), 2);

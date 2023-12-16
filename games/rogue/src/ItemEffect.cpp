@@ -4,7 +4,29 @@
 
 namespace rogue {
 
+std::shared_ptr<ItemEffect> NullEffect::clone() const {
+  return std::make_shared<NullEffect>(*this);
+}
+
 HealItemEffect::HealItemEffect(StatValue Amount) : Amount(Amount) {}
+
+std::shared_ptr<ItemEffect> HealItemEffect::clone() const {
+  return std::make_shared<HealItemEffect>(*this);
+}
+
+bool HealItemEffect::canAddFrom(const ItemEffect &Other) const {
+  if (auto *OtherHeal = dynamic_cast<const HealItemEffect *>(&Other)) {
+    // Currently anything can be added may make sense to restrict this
+    return true;
+  }
+  return false;
+}
+
+void HealItemEffect::addFrom(const ItemEffect &Other) {
+  if (auto *OtherHeal = dynamic_cast<const HealItemEffect *>(&Other)) {
+    Amount += OtherHeal->Amount;
+  }
+}
 
 bool HealItemEffect::canApplyTo(const entt::entity &Et,
                                 entt::registry &Reg) const {
@@ -17,6 +39,24 @@ void HealItemEffect::applyTo(const entt::entity &Et,
 }
 
 DamageItemEffect::DamageItemEffect(StatValue Amount) : Amount(Amount) {}
+
+std::shared_ptr<ItemEffect> DamageItemEffect::clone() const {
+  return std::make_shared<DamageItemEffect>(*this);
+}
+
+bool DamageItemEffect::canAddFrom(const ItemEffect &Other) const {
+  if (auto *OtherDamage = dynamic_cast<const DamageItemEffect *>(&Other)) {
+    // Currently anything can be added may make sense to restrict this
+    return true;
+  }
+  return false;
+}
+
+void DamageItemEffect::addFrom(const ItemEffect &Other) {
+  if (auto *OtherDamage = dynamic_cast<const DamageItemEffect *>(&Other)) {
+    Amount += OtherDamage->Amount;
+  }
+}
 
 bool DamageItemEffect::canApplyTo(const entt::entity &Et,
                                   entt::registry &Reg) const {
@@ -31,6 +71,26 @@ void DamageItemEffect::applyTo(const entt::entity &Et,
 DismantleEffect::DismantleEffect(const ItemDatabase &DB,
                                  std::vector<DismantleResult> Results)
     : ItemDb(DB), Results(std::move(Results)) {}
+
+std::shared_ptr<ItemEffect> DismantleEffect::clone() const {
+  return std::make_shared<DismantleEffect>(*this);
+}
+
+bool DismantleEffect::canAddFrom(const ItemEffect &Other) const {
+  if (auto *OtherDismantle = dynamic_cast<const DismantleEffect *>(&Other)) {
+    // Currently anything can be added may make sense to restrict this
+    return true;
+  }
+  return false;
+}
+
+void DismantleEffect::addFrom(const ItemEffect &Other) {
+  if (auto *OtherDismantle = dynamic_cast<const DismantleEffect *>(&Other)) {
+    for (const auto &Result : OtherDismantle->Results) {
+      Results.push_back(Result);
+    }
+  }
+}
 
 bool DismantleEffect::canApplyTo(const entt::entity &Et,
                                  entt::registry &Reg) const {

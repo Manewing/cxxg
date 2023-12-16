@@ -24,6 +24,12 @@ class ItemEffect {
 public:
   virtual ~ItemEffect() = default;
 
+  virtual std::shared_ptr<ItemEffect> clone() const = 0;
+
+  virtual bool canAddFrom(const ItemEffect &) const { return true; }
+
+  virtual void addFrom(const ItemEffect &) {}
+
   virtual bool canApplyTo(const entt::entity &, entt::registry &) const {
     return true;
   }
@@ -37,10 +43,19 @@ public:
   virtual void removeFrom(const entt::entity &, entt::registry &) const {}
 };
 
+class NullEffect : public ItemEffect {
+public:
+  std::shared_ptr<ItemEffect> clone() const final;
+};
+
 class HealItemEffect : public ItemEffect {
 public:
   explicit HealItemEffect(StatValue Amount);
   StatValue getAmount() const { return Amount; }
+
+  std::shared_ptr<ItemEffect> clone() const final;
+  bool canAddFrom(const ItemEffect &Other) const final;
+  void addFrom(const ItemEffect &Other) final;
 
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
   void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
@@ -54,6 +69,9 @@ public:
   explicit DamageItemEffect(StatValue Amount);
   StatValue getAmount() const { return Amount; }
 
+  std::shared_ptr<ItemEffect> clone() const final;
+  bool canAddFrom(const ItemEffect &Other) const final;
+  void addFrom(const ItemEffect &Other) final;
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
   void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
 
@@ -71,6 +89,9 @@ public:
 public:
   explicit DismantleEffect(const ItemDatabase &ItemDb,
                            std::vector<DismantleResult> Results);
+  std::shared_ptr<ItemEffect> clone() const final;
+  bool canAddFrom(const ItemEffect &Other) const final;
+  void addFrom(const ItemEffect &Other) final;
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
   void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
 
@@ -84,8 +105,11 @@ private:
 template <typename CompType, typename... RequiredComps>
 class SetComponentEffect : public ItemEffect {
 public:
+  using OwnType = SetComponentEffect<CompType, RequiredComps...>;
+
+public:
   static const CompType *getOrNull(const ItemEffect &It) {
-    if (auto *SCE = dynamic_cast<const SetComponentEffect<CompType> *>(&It)) {
+    if (auto *SCE = dynamic_cast<const OwnType *>(&It)) {
       return &SCE->Comp;
     }
     return nullptr;
@@ -93,6 +117,18 @@ public:
 
 public:
   explicit SetComponentEffect(const CompType &Comp) : Comp(Comp) {}
+
+  std::shared_ptr<ItemEffect> clone() const final {
+    return std::make_shared<OwnType>(Comp);
+  }
+
+  /// Adding is possible if the item effect has the identical type
+  bool canAddFrom(const ItemEffect &Other) const final {
+    return dynamic_cast<const OwnType *>(&Other) != nullptr;
+  }
+
+  /// Adding has no effect, only the first component setting effect is kept
+  void addFrom(const ItemEffect &) final {}
 
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
     if constexpr (sizeof...(RequiredComps) == 0) {
@@ -136,12 +172,6 @@ makeSetComponentEffect(const CompType &Comp) {
 class ApplyBuffItemEffectBase : public ItemEffect {
 public:
   virtual const BuffBase &getBuff() const = 0;
-  // FIXME move to ItemEffect base
-  virtual bool canAddFrom(const ApplyBuffItemEffectBase &Other) const = 0;
-  // FIXME move to ItemEffect base
-  virtual void addFrom(const ApplyBuffItemEffectBase &Other) = 0;
-  // FIXME move to ItemEffect base
-  virtual std::shared_ptr<ItemEffect> clone() const = 0;
 };
 
 template <typename BuffType, typename... RequiredComps>
@@ -176,11 +206,11 @@ public:
     return std::make_shared<OwnType>(static_cast<const OwnType &>(*this));
   }
 
-  bool canAddFrom(const ApplyBuffItemEffectBase &Other) const final {
+  bool canAddFrom(const ItemEffect &Other) const final {
     return dynamic_cast<const OwnType *>(&Other) != nullptr;
   }
 
-  void addFrom(const ApplyBuffItemEffectBase &Other) final {
+  void addFrom(const ItemEffect &Other) final {
     auto *OtherPtr = dynamic_cast<const OwnType *>(&Other);
     assert(OtherPtr);
     Buff.add(OtherPtr->Buff);
