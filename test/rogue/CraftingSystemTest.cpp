@@ -195,14 +195,11 @@ public:
 
     // Filter out any invalid combinations
     const auto IsValid =
-        ((First.getType() & ItemType::Consumable) != ItemType::None &&
+        ((First.getType() & ItemType::CraftingBase) != ItemType::None &&
          (Second.getType() & ItemType::Crafting) != ItemType::None) ||
         ((First.getType() & ItemType::EquipmentMask) != ItemType::None &&
          (Second.getType() & ItemType::Crafting) != ItemType::None);
     if (!IsValid) {
-      std::cerr << "not valid: " << First.getName() << " + " << Second.getName()
-                << " for " << getItemTypeLabel(First.getType()) << " +  "
-                << getItemTypeLabel(Second.getType()) << std::endl;
       return std::nullopt;
     }
 
@@ -362,7 +359,7 @@ TEST_F(CraftingSystemTest, MultiComponentPotionCrafting) {
   auto Result = System.tryCraft({Potion, Poison, Heal});
   ASSERT_TRUE(Result.has_value());
 
-  EXPECT_EQ(Result->getType(), rogue::ItemType::Consumable);
+  EXPECT_EQ(Result->getType(), rogue::ItemType::Consumable | rogue::ItemType::CraftingBase);
   EXPECT_EQ(Result->getName(), "potion");
   EXPECT_EQ(Result->StackSize, 1);
   EXPECT_EQ(Result->getMaxStackSize(), 5);
@@ -392,8 +389,9 @@ TEST_F(CraftingSystemTest, RemoveEffectCrafting) {
   auto Charcoal = Db.createItem(DummyItems.CharcoalCrafting.ItemId);
 
   auto Result = System.tryCraft({Potion, Poison, Heal, Charcoal});
+  ASSERT_TRUE(Result.has_value());
 
-  EXPECT_EQ(Result->getType(), rogue::ItemType::Consumable);
+  EXPECT_EQ(Result->getType(), rogue::ItemType::Consumable | rogue::ItemType::CraftingBase);
   EXPECT_EQ(Result->getName(), "potion");
   EXPECT_EQ(Result->StackSize, 1);
   EXPECT_EQ(Result->getMaxStackSize(), 5);
@@ -407,6 +405,25 @@ TEST_F(CraftingSystemTest, RemoveEffectCrafting) {
           Result->getAllEffects().at(0).Effect.get());
   ASSERT_NE(HealEffect, nullptr);
   EXPECT_EQ(HealEffect->Value, 2);
+}
+
+TEST_F(CraftingSystemTest, InvalidRecipeOnlyCraftingItems) {
+  rogue::CraftingSystem System(Db);
+  auto Plate = Db.createItem(DummyItems.PlateCrafting.ItemId);
+  auto Charcoal = Db.createItem(DummyItems.CharcoalCrafting.ItemId);
+  auto Heal = Db.createItem(DummyItems.HealConsumable.ItemId);
+
+  auto Result = System.tryCraft({Plate, Charcoal});
+  EXPECT_FALSE(Result.has_value());
+
+  Result = System.tryCraft({Heal, Charcoal});
+  EXPECT_FALSE(Result.has_value());
+
+  Result = System.tryCraft({Charcoal, Charcoal});
+  EXPECT_FALSE(Result.has_value());
+
+  Result = System.tryCraft({Plate, Charcoal, Heal});
+  EXPECT_FALSE(Result.has_value());
 }
 
 } // namespace

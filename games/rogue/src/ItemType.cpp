@@ -17,7 +17,7 @@ ItemType getItemType(const std::string &Type) {
       {"weapon", ItemType::Weapon},
       {"shield", ItemType::Shield},
       {"ranged", ItemType::Ranged},
-      {"generic", ItemType::Generic},
+      {"crafting_base", ItemType::CraftingBase},
       {"consumable", ItemType::Consumable},
       {"quest", ItemType::Quest},
       {"crafting", ItemType::Crafting},
@@ -68,8 +68,8 @@ std::string getItemTypeLabel(ItemType It) {
     Label << Pred << "Ranged";
     Pred = ", ";
   }
-  if ((It & ItemType::Generic) != ItemType::None) {
-    Label << Pred << "Generic";
+  if ((It & ItemType::CraftingBase) != ItemType::None) {
+    Label << Pred << "Crafting Base";
     Pred = ", ";
   }
   if ((It & ItemType::Consumable) != ItemType::None) {

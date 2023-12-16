@@ -22,9 +22,12 @@ enum class ItemType {
   Ranged = 0x100,
   EquipmentMask = 0xfff,
 
-  // general item types
-  Generic = 0x1000,
+  /// Items that can be used as a basis for crafting a new item
+  CraftingBase = 0x1000,
+
+  /// Consumable items can be used to apply an effect to an entity
   Consumable = 0x2000,
+
   Quest = 0x4000,
   Crafting = 0x8000,
   GeneralMask = 0xf000,
