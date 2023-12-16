@@ -18,6 +18,7 @@ set(HEADER_FILES
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h
   include/rogue/Context.h
+  include/rogue/CraftingHandler.h
   include/rogue/EntityAssemblers.h
   include/rogue/EntityDatabase.h
   include/rogue/Equipment.h
@@ -31,10 +32,10 @@ set(HEADER_FILES
   include/rogue/Item.h
   include/rogue/ItemDatabase.h
   include/rogue/ItemEffect.h
-  include/rogue/LevelDatabase.h
   include/rogue/ItemPrototype.h
   include/rogue/ItemSpecialization.h
   include/rogue/ItemType.h
+  include/rogue/LevelDatabase.h
   include/rogue/JSON.h
   include/rogue/JSONHelpers.h
   include/rogue/Level.h
@@ -85,6 +86,7 @@ set(SOURCE_FILES
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
   src/Components/Visual.cpp
+  src/CraftingHandler.cpp
   src/EntityAssemblers.cpp
   src/EntityDatabase.cpp
   src/Equipment.cpp
