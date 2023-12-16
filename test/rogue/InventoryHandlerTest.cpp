@@ -55,14 +55,14 @@ TEST_F(InventoryHandlerTest, TryUnequipItem) {
   EXPECT_FALSE(InvHandler.tryUnequip(rogue::ItemType::Helmet))
       << "Expect not to be able to unequip if there is nothing equipped";
 
-  Equip.equip(rogue::Item(DummyItems.DummyHelmetA), Entity, Reg);
+  Equip.equip(rogue::Item(DummyItems.HelmetA), Entity, Reg);
   EXPECT_TRUE(InvHandler.tryUnequip(rogue::ItemType::Helmet))
       << "Expect to be able to unequip if there is something equipped";
   ASSERT_EQ(Inv.size(), 1);
   EXPECT_EQ(Inv.getItem(0).getName(), "helmet_a");
   EXPECT_FALSE(InvHandler.tryUnequip(rogue::ItemType::Helmet));
 
-  Equip.equip(rogue::Item(DummyItems.DummyCursedRing), Entity, Reg);
+  Equip.equip(rogue::Item(DummyItems.CursedRing), Entity, Reg);
   EXPECT_FALSE(InvHandler.tryUnequip(rogue::ItemType::Ring))
       << "Expect not to be able to unequip if there is a cursed item equipped";
   ASSERT_EQ(Inv.size(), 1);
@@ -91,10 +91,10 @@ TEST_F(InventoryHandlerTest, TryEquipInventoryItem) {
 
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
   InvHandler.refresh();
-  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
-  Inv.addItem(rogue::Item(DummyItems.DummyHelmetB));
-  Inv.addItem(rogue::Item(DummyItems.DummyRing));
-  Inv.addItem(rogue::Item(DummyItems.DummyCursedRing));
+  Inv.addItem(rogue::Item(DummyItems.HelmetA));
+  Inv.addItem(rogue::Item(DummyItems.HelmetB));
+  Inv.addItem(rogue::Item(DummyItems.Ring));
+  Inv.addItem(rogue::Item(DummyItems.CursedRing));
   EXPECT_FALSE(InvHandler.tryEquipItem(0))
       << "Expect not to be able to equip if there is no equipment";
 
@@ -170,7 +170,7 @@ TEST_F(InventoryHandlerTest, TryDropItem) {
   EXPECT_THROW(InvHandler.tryDropItem(0), std::out_of_range)
       << "Expect to throw if trying to drop item index out of range";
 
-  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.HelmetA));
 
   EXPECT_TRUE(InvHandler.tryDropItem(0))
       << "Expect to be able to drop item if there is inventory and position";
@@ -201,14 +201,14 @@ TEST_F(InventoryHandlerTest, TryDismantleItem) {
   EXPECT_THROW(InvHandler.tryDismantleItem(0), std::out_of_range)
       << "Expect to throw if trying to dismantle item index out of range";
 
-  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.HelmetA));
 
   EXPECT_TRUE(InvHandler.tryDismantleItem(0))
       << "Expect to be able to dismantle item if there is inventory and "
          "position";
   ASSERT_EQ(Inv.size(), 0);
 
-  Inv.addItem(rogue::Item(DummyItems.DummyCursedRing));
+  Inv.addItem(rogue::Item(DummyItems.CursedRing));
   EXPECT_FALSE(InvHandler.tryDismantleItem(0))
       << "Expect not to be able to dismantle item if it can not be dismantled";
   ASSERT_EQ(Inv.size(), 1);
@@ -236,13 +236,13 @@ TEST_F(InventoryHandlerTest, TryUseItem) {
   EXPECT_THROW(InvHandler.tryUseItem(0), std::out_of_range)
       << "Expect to throw if trying to use item index out of range";
 
-  Inv.addItem(rogue::Item(DummyItems.DummyHealConsumable));
+  Inv.addItem(rogue::Item(DummyItems.HealConsumable));
 
   EXPECT_TRUE(InvHandler.tryUseItem(0))
       << "Expect to be able to use item if there is inventory and position";
   ASSERT_EQ(Inv.size(), 0);
 
-  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.HelmetA));
   EXPECT_FALSE(InvHandler.tryUseItem(0))
       << "Expect not to be able to use item if it can not be used";
 
@@ -270,12 +270,12 @@ TEST_F(InventoryHandlerTest, TryUseItemOnTarget) {
   EXPECT_THROW(InvHandler.tryUseItem(0), std::out_of_range)
       << "Expect to throw if trying to use item index out of range";
 
-  Inv.addItem(rogue::Item(DummyItems.DummyHealConsumable));
+  Inv.addItem(rogue::Item(DummyItems.HealConsumable));
   EXPECT_TRUE(InvHandler.tryUseItemOnTarget(0, TargetEntity))
       << "Expect to be able to use item if there is inventory and position";
   ASSERT_EQ(Inv.size(), 0);
 
-  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
+  Inv.addItem(rogue::Item(DummyItems.HelmetA));
   EXPECT_FALSE(InvHandler.tryUseItemOnTarget(0, TargetEntity))
       << "Expect not to be able to use item if it can not be used";
 
@@ -295,10 +295,10 @@ TEST_F(InventoryHandlerTest, AutoEquipItems) {
   Hub.subscribe(Listener, &EventListener::onPlayerInfoMessageEvent);
   InvHandler.setEventHub(&Hub);
 
-  Inv.addItem(rogue::Item(DummyItems.DummyHelmetA));
-  Inv.addItem(rogue::Item(DummyItems.DummyHelmetB));
-  Inv.addItem(rogue::Item(DummyItems.DummyRing));
-  Inv.addItem(rogue::Item(DummyItems.DummyCursedRing));
+  Inv.addItem(rogue::Item(DummyItems.HelmetA));
+  Inv.addItem(rogue::Item(DummyItems.HelmetB));
+  Inv.addItem(rogue::Item(DummyItems.Ring));
+  Inv.addItem(rogue::Item(DummyItems.CursedRing));
 
   InvHandler.autoEquipItems();
   ASSERT_EQ(Inv.size(), 2);

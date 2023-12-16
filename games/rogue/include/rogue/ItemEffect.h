@@ -100,8 +100,6 @@ private:
   std::vector<DismantleResult> Results;
 };
 
-// FIXME add remove component effect
-
 template <typename CompType, typename... RequiredComps>
 class SetComponentEffect : public ItemEffect {
 public:
@@ -226,6 +224,71 @@ makeApplyBuffItemEffect(const BuffType &Buff) {
   return std::make_shared<ApplyBuffItemEffect<BuffType, RequiredComps...>>(
       Buff);
 }
+
+class RemoveEffectBase : public ItemEffect {
+public:
+  virtual bool removesEffect(const ItemEffect &Other) const = 0;
+};
+
+template <typename ItemEffectType>
+class RemoveEffect : public RemoveEffectBase {
+public:
+  using OwnType = RemoveEffect<ItemEffectType>;
+
+public:
+  std::shared_ptr<ItemEffect> clone() const final {
+    return std::make_shared<OwnType>();
+  }
+
+  /// Adding is possible if the item effect has the identical type. However it
+  /// has no effect, only the first component removing the effect is kept
+  bool canAddFrom(const ItemEffect &Other) const final {
+    return dynamic_cast<const OwnType *>(&Other) != nullptr;
+  }
+
+  /// Removes effect of matching type
+  bool removesEffect(const ItemEffect &Other) const final {
+    return dynamic_cast<const ItemEffectType *>(&Other) != nullptr;
+  }
+};
+
+template <typename CompType, typename... RequiredComps>
+class RemoveComponentEffect : public ItemEffect {
+public:
+  using OwnType = RemoveComponentEffect<CompType, RequiredComps...>;
+
+public:
+  explicit RemoveComponentEffect() {}
+
+  std::shared_ptr<ItemEffect> clone() const final {
+    return std::make_shared<OwnType>();
+  }
+
+  /// Adding is possible if the item effect has the identical type. However it
+  /// has no effect, only the first component removing the effect is kept
+  bool canAddFrom(const ItemEffect &Other) const final {
+    return dynamic_cast<const OwnType *>(&Other) != nullptr;
+  }
+
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
+    if constexpr (sizeof...(RequiredComps) == 0) {
+      return true;
+    } else {
+      return Reg.all_of<CompType, RequiredComps...>(Et);
+    }
+  }
+
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
+    Reg.remove<CompType>(Et);
+  }
+
+  /// Removing the effect does nothing
+  bool canRemoveFrom(const entt::entity &, entt::registry &) const final {
+    return true;
+  }
+
+  void removeFrom(const entt::entity &, entt::registry &) const final {}
+};
 
 } // namespace rogue
 

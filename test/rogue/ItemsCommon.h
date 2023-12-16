@@ -43,6 +43,7 @@ public:
     using DamageEffectType = DummyItemEffect<1>;
     using HealEffectType = DummyItemEffect<2>;
     using PoisonEffectType = DummyItemEffect<3>;
+    using CleansePoisonEffectType = rogue::RemoveEffect<PoisonEffectType>;
 
 public:
   DummyItems();
@@ -50,14 +51,15 @@ public:
   ItemDatabase createItemDatabase();
 
 public:
-  ItemPrototype DummyHelmetA;
-  ItemPrototype DummyHelmetB;
-  ItemPrototype DummyRing;
-  ItemPrototype DummyCursedRing;
-  ItemPrototype DummyHealConsumable;
-  ItemPrototype DummyPoisonConsumable;
-  ItemPrototype DummyPotion;
-  ItemPrototype DummyPlateCrafting;
+  ItemPrototype HelmetA;
+  ItemPrototype HelmetB;
+  ItemPrototype Ring;
+  ItemPrototype CursedRing;
+  ItemPrototype HealConsumable;
+  ItemPrototype PoisonConsumable;
+  ItemPrototype Potion;
+  ItemPrototype PlateCrafting;
+  ItemPrototype CharcoalCrafting;
 };
 
 } // namespace rogue::test

@@ -248,6 +248,22 @@ public:
         }
         continue;
       }
+
+      // Handle RemoveEffectBase separately, we remove all newly added effects
+      // that are removed by this effect
+      if (auto *RM = dynamic_cast<const RemoveEffectBase *>(Effect)) {
+        auto RMFlags = Info.Flags;
+        auto It = std::remove_if(NewEffects.begin(), NewEffects.end(),
+                                 [RM, RMFlags](const EffectInfo &Info) {
+                                   if (Info.Flags != RMFlags) {
+                                     return false;
+                                   }
+                                   return RM->removesEffect(*Info.Effect);
+                                 });
+        NewEffects.erase(It, NewEffects.end());
+        continue;
+      }
+
       EffectFlags |= Info.Flags;
 
       for (auto &NewInfo : NewEffects) {
@@ -310,8 +326,8 @@ TEST_F(CraftingSystemTest, SingleItem) {
 
 TEST_F(CraftingSystemTest, InvalidCombination) {
   rogue::CraftingSystem System(Db);
-  auto Helmet = Db.createItem(DummyItems.DummyHelmetA.ItemId);
-  auto Ring = Db.createItem(DummyItems.DummyRing.ItemId);
+  auto Helmet = Db.createItem(DummyItems.HelmetA.ItemId);
+  auto Ring = Db.createItem(DummyItems.Ring.ItemId);
 
   auto Result = System.tryCraft({Helmet, Ring});
   EXPECT_FALSE(Result.has_value());
@@ -319,8 +335,8 @@ TEST_F(CraftingSystemTest, InvalidCombination) {
 
 TEST_F(CraftingSystemTest, SimpleEquipmentEnhancement) {
   rogue::CraftingSystem System(Db);
-  auto Helmet = Db.createItem(DummyItems.DummyHelmetA.ItemId);
-  auto Plate = Db.createItem(DummyItems.DummyPlateCrafting.ItemId);
+  auto Helmet = Db.createItem(DummyItems.HelmetA.ItemId);
+  auto Plate = Db.createItem(DummyItems.PlateCrafting.ItemId);
   auto Result = System.tryCraft({Helmet, Plate});
   ASSERT_TRUE(Result.has_value());
 
@@ -334,14 +350,14 @@ TEST_F(CraftingSystemTest, SimpleEquipmentEnhancement) {
       dynamic_cast<const rogue::test::DummyItems::ArmorEffectType *>(
           Result->getAllEffects().at(0).Effect.get());
   ASSERT_NE(ArmorBuff, nullptr);
-  EXPECT_EQ(ArmorBuff->Value, 10);
+  EXPECT_EQ(ArmorBuff->Value, 2);
 }
 
 TEST_F(CraftingSystemTest, MultiComponentPotionCrafting) {
   rogue::CraftingSystem System(Db);
-  auto Potion = Db.createItem(DummyItems.DummyPotion.ItemId);
-  auto Poison = Db.createItem(DummyItems.DummyPoisonConsumable.ItemId);
-  auto Heal = Db.createItem(DummyItems.DummyHealConsumable.ItemId);
+  auto Potion = Db.createItem(DummyItems.Potion.ItemId);
+  auto Poison = Db.createItem(DummyItems.PoisonConsumable.ItemId);
+  auto Heal = Db.createItem(DummyItems.HealConsumable.ItemId);
 
   auto Result = System.tryCraft({Potion, Poison, Heal});
   ASSERT_TRUE(Result.has_value());
@@ -355,10 +371,42 @@ TEST_F(CraftingSystemTest, MultiComponentPotionCrafting) {
       << "Should be 2, NullEffect needs to be filtered out and HealEffects "
          "should be combined";
 
-  auto HealEffect = dynamic_cast<const rogue::HealItemEffect *>(
-      Result->getAllEffects().at(0).Effect.get());
-  //  ASSERT_NE(HealEffect, nullptr);
-  EXPECT_EQ(HealEffect, nullptr); // FIXME
+  auto HealEffect =
+      dynamic_cast<const rogue::test::DummyItems::HealEffectType *>(
+          Result->getAllEffects().at(0).Effect.get());
+  ASSERT_NE(HealEffect, nullptr);
+  EXPECT_EQ(HealEffect->Value, 2);
+
+  auto PoisonEffect =
+      dynamic_cast<const rogue::test::DummyItems::PoisonEffectType *>(
+          Result->getAllEffects().at(1).Effect.get());
+  ASSERT_NE(PoisonEffect, nullptr);
+  EXPECT_EQ(PoisonEffect->Value, 1);
+}
+
+TEST_F(CraftingSystemTest, RemoveEffectCrafting) {
+  rogue::CraftingSystem System(Db);
+  auto Potion = Db.createItem(DummyItems.Potion.ItemId);
+  auto Poison = Db.createItem(DummyItems.PoisonConsumable.ItemId);
+  auto Heal = Db.createItem(DummyItems.HealConsumable.ItemId);
+  auto Charcoal = Db.createItem(DummyItems.CharcoalCrafting.ItemId);
+
+  auto Result = System.tryCraft({Potion, Poison, Heal, Charcoal});
+
+  EXPECT_EQ(Result->getType(), rogue::ItemType::Consumable);
+  EXPECT_EQ(Result->getName(), "potion");
+  EXPECT_EQ(Result->StackSize, 1);
+  EXPECT_EQ(Result->getMaxStackSize(), 5);
+
+  EXPECT_EQ(Result->getAllEffects().size(), 1)
+      << "Should be 1, NullEffect needs to be filtered out and HealEffects "
+         "should be combined, Charcoal should remove the poison effect";
+
+  auto HealEffect =
+      dynamic_cast<const rogue::test::DummyItems::HealEffectType *>(
+          Result->getAllEffects().at(0).Effect.get());
+  ASSERT_NE(HealEffect, nullptr);
+  EXPECT_EQ(HealEffect->Value, 2);
 }
 
 } // namespace
