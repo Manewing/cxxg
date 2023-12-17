@@ -17,7 +17,8 @@ namespace rogue {
 class Item {
 public:
   explicit Item(const ItemPrototype &Proto, int StackSize = 1,
-                const std::shared_ptr<ItemPrototype> &Specialization = nullptr);
+                const std::shared_ptr<ItemPrototype> &Specialization = nullptr,
+                bool SpecOverrides = false);
   virtual ~Item() = default;
 
   int getId() const;
@@ -41,7 +42,6 @@ public:
   void removeFrom(const entt::entity &Entity, entt::registry &Reg,
                   CapabilityFlags Flags) const;
 
-private:
   const ItemPrototype &getProto() const;
 
 public:
@@ -50,6 +50,7 @@ public:
 private:
   const ItemPrototype *Proto = nullptr;
   std::shared_ptr<const ItemPrototype> Specialization = nullptr;
+  bool SpecOverrides = false;
 };
 
 } // namespace rogue

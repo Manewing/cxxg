@@ -18,6 +18,7 @@ std::optional<Item> CraftingHandler::tryCraft(const std::vector<Item> &Items) {
   if ((First.getType() & ItemType::Crafting) &&
       (Second.getType() & ItemType::Crafting)) {
     // TODO: craft item if it matches recipe,
+    (void)ItemDb;
   }
 
   // Filter out any invalid combinations
@@ -32,33 +33,29 @@ std::optional<Item> CraftingHandler::tryCraft(const std::vector<Item> &Items) {
   return craftEnhancedItem(Items);
 }
 
-Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) {
-  auto &First = Items.at(0);
-  auto Flags = First.getCapabilityFlags();
+namespace {
 
-  // Create new item prototype, we explicitly copy all effects from the first
-  // item (including the specialization effects). The item specialization will
-  // not be copied (the first item is already specialized).
-  auto NewItemId = ItemDb.getNewItemId();
-  ItemPrototype Proto(NewItemId, First.getName(), First.getDescription(),
-                      First.getType(), First.getMaxStackSize(),
-                      First.getAllEffects());
-
-  // Combine effects from all other items
+std::vector<EffectInfo> getAllEffects(const std::vector<Item> &Items,
+                                      CapabilityFlags Flags) {
+  std::vector<EffectInfo> AllEffects = Items.front().getAllEffects();
   for (std::size_t Idx = 1; Idx < Items.size(); ++Idx) {
-    auto &Item = Items.at(Idx);
-    for (const auto &Info : Item.getAllEffects()) {
+    auto &It = Items.at(Idx);
+    for (const auto &Info : It.getAllEffects()) {
       if (Info.Flags & Flags) {
-        Proto.Effects.push_back(Info);
+        AllEffects.push_back(Info);
       }
     }
   }
+  return AllEffects;
+}
 
-  // Create new effects from effects in prototype that can be added
+/// Computes new effects by combining all effects in the order they are provided
+std::vector<EffectInfo>
+computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
   std::vector<EffectInfo> NewEffects;
   std::optional<EffectInfo> NullInfo;
   CapabilityFlags EffectFlags = CapabilityFlags::None;
-  for (const auto &Info : Proto.Effects) {
+  for (const auto &Info : AllEffects) {
     auto Effect = Info.Effect.get();
 
     // Handle NullEffect separately, we only keep the effect if no other
@@ -107,13 +104,29 @@ Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) {
   if (NullInfo && (NullInfo->Flags & ~EffectFlags)) {
     NewEffects.push_back(*NullInfo);
   }
-  Proto.Effects = NewEffects;
+  return NewEffects;
+}
 
-  // Register the new item prototype
-  ItemDb.addItemProto(std::move(Proto));
+} // namespace
+
+Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) {
+  auto &First = Items.at(0);
+  auto Flags = First.getCapabilityFlags();
+
+  // Create new item prototype to use as the overriding item specialization, we
+  // explicitly copy all effects from the first item (including the
+  // specialization effects). The item specialization will not be copied (the
+  // first item is already specialized).
+  auto Special = std::make_shared<ItemPrototype>(
+      -1, First.getName(), First.getDescription(), First.getType(),
+      First.getMaxStackSize(), std::vector<EffectInfo>{});
+
+  // Combine effects from all other items
+  Special->Effects = getAllEffects(Items, Flags);
+  Special->Effects = computeNewEffects(Special->Effects);
 
   // Create the new item
-  return ItemDb.createItem(NewItemId, /*StackSize=*/1);
+  return Item(First.getProto(), /*StackSize=*/1, Special, /*SpecOverrides=*/true);
 }
 
 } // namespace rogue

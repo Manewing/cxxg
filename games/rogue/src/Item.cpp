@@ -6,8 +6,8 @@
 namespace rogue {
 
 Item::Item(const ItemPrototype &Proto, int StackSize,
-           const std::shared_ptr<ItemPrototype> &Spec)
-    : StackSize(StackSize), Proto(&Proto), Specialization(Spec) {}
+           const std::shared_ptr<ItemPrototype> &Spec, bool SpecOverrides)
+    : StackSize(StackSize), Proto(&Proto), Specialization(Spec), SpecOverrides(SpecOverrides) {}
 
 namespace {
 
@@ -79,6 +79,9 @@ ItemType Item::getType() const {
 int Item::getMaxStackSize() const { return getProto().MaxStackSize; }
 
 std::vector<EffectInfo> Item::getAllEffects() const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->Effects;
+  }
   std::vector<EffectInfo> AllEffects;
   auto NumEffects = getProto().Effects.size();
   NumEffects += Specialization ? Specialization->Effects.size() : 0;
