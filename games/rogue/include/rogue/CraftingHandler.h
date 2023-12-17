@@ -11,14 +11,43 @@ class ItemDatabase;
 
 namespace rogue {
 
+class CraftingRecipe {
+public:
+  using ItemId = int;
+
+public:
+  CraftingRecipe(std::vector<ItemId> RequiredItems,
+                 std::vector<ItemId> ResultItems)
+      : RequiredItems(std::move(RequiredItems)), ResultItems(ResultItems) {}
+
+  const std::vector<ItemId> &getRequiredItems() const { return RequiredItems; }
+  const std::vector<ItemId> &getResultItems() const { return ResultItems; }
+
+private:
+  std::vector<ItemId> RequiredItems;
+  std::vector<ItemId> ResultItems;
+};
+
+struct CraftingNode {
+  using ItemId = int;
+
+  std::optional<std::vector<ItemId>> ResultItems;
+  std::map<ItemId, CraftingNode> Children;
+
+  const std::optional<std::vector<ItemId>> &search(const std::vector<Item> &Items) const;
+};
+
 class CraftingHandler {
 public:
-  explicit CraftingHandler(ItemDatabase &ItemDb);
-  std::optional<Item> tryCraft(const std::vector<Item> &Items);
+  explicit CraftingHandler(const ItemDatabase &ItemDb);
+  void addRecipe(const CraftingRecipe &Recipe);
+
+  std::optional<std::vector<Item>> tryCraft(const std::vector<Item> &Items);
   Item craftEnhancedItem(const std::vector<Item> &Items);
 
 private:
-  ItemDatabase &ItemDb;
+  const ItemDatabase &ItemDb;
+  CraftingNode Tree;
 };
 
 } // namespace rogue

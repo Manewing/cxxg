@@ -136,6 +136,10 @@ public:
   ItemPrototype Potion;
   ItemPrototype PlateCrafting;
   ItemPrototype CharcoalCrafting;
+  ItemPrototype CraftingA;
+  ItemPrototype CraftingB;
+  ItemPrototype CraftingC;
+  ItemPrototype CraftingD;
 };
 
 } // namespace rogue::test

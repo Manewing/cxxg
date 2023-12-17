@@ -42,16 +42,20 @@ DummyItems::DummyItems()
       PlateCrafting(0, "plate", "desc", rogue::ItemType::Crafting, 5,
                     {{rogue::CapabilityFlags::Equipment, ArmorEffect}}),
       CharcoalCrafting(0, "charcoal", "desc", rogue::ItemType::Crafting, 5,
-                       {{rogue::CapabilityFlags::UseOn, CleansePoisonEffect}})
-
-{}
+                       {{rogue::CapabilityFlags::UseOn, CleansePoisonEffect}}),
+      CraftingA(0, "crafting_a", "desc", rogue::ItemType::Crafting, 5, {{}}),
+      CraftingB(0, "crafting_b", "desc", rogue::ItemType::Crafting, 5, {{}}),
+      CraftingC(0, "crafting_c", "desc", rogue::ItemType::Crafting, 5, {{}}),
+      CraftingD(0, "crafting_d", "desc", rogue::ItemType::Crafting, 5, {{}}) {}
 
 ItemDatabase DummyItems::createItemDatabase() {
   ItemDatabase DB;
   std::vector<ItemPrototype *> AllProtos = {
       &this->HelmetA,    &this->HelmetB,        &this->Ring,
       &this->CursedRing, &this->HealConsumable, &this->PoisonConsumable,
-      &this->Potion,     &this->PlateCrafting,  &this->CharcoalCrafting};
+      &this->Potion,     &this->PlateCrafting,  &this->CharcoalCrafting,
+      &this->CraftingA,  &this->CraftingB,      &this->CraftingC,
+      &this->CraftingD};
   for (auto *Proto : AllProtos) {
     Proto->ItemId = DB.getNewItemId();
     DB.addItemProto(*Proto);

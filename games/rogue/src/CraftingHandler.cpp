@@ -2,11 +2,48 @@
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 
+#include <iostream>
 namespace rogue {
 
-CraftingHandler::CraftingHandler(ItemDatabase &ItemDb) : ItemDb(ItemDb) {}
+const std::optional<std::vector<CraftingNode::ItemId>> &
+CraftingNode::search(const std::vector<Item> &Items) const {
+  static const std::optional<std::vector<ItemId>> Empty;
+  if (Items.empty()) {
+    return Empty;
+  }
 
-std::optional<Item> CraftingHandler::tryCraft(const std::vector<Item> &Items) {
+  const CraftingNode *Node = this;
+  for (auto &It : Items) {
+    auto ItNode = Node->Children.find(It.getId());
+    if (ItNode == Node->Children.end()) {
+      return Empty;
+    }
+    Node = &ItNode->second;
+  }
+
+  return Node->ResultItems;
+}
+
+CraftingHandler::CraftingHandler(const ItemDatabase &ItemDb) : ItemDb(ItemDb) {}
+
+void CraftingHandler::addRecipe(const CraftingRecipe &Recipe) {
+  if (Recipe.getResultItems().empty() || Recipe.getRequiredItems().empty()) {
+    throw std::runtime_error("CraftingHandler::addRecipe: Empty recipe");
+  }
+
+  CraftingNode *Node = &Tree;
+  for (auto &Id : Recipe.getRequiredItems()) {
+    Node = &Node->Children[Id];
+  }
+
+  if (Node->ResultItems) {
+    throw std::runtime_error("CraftingHandler::addRecipe: Duplicate recipe");
+  }
+  Node->ResultItems = Recipe.getResultItems();
+}
+
+std::optional<std::vector<Item>>
+CraftingHandler::tryCraft(const std::vector<Item> &Items) {
   if (Items.size() < 2) {
     return std::nullopt;
   }
@@ -15,10 +52,16 @@ std::optional<Item> CraftingHandler::tryCraft(const std::vector<Item> &Items) {
 
   // If both items are crafting items this indicates a crafting recipe,
   // otherwise it's a modification of an item or invalid combination
-  if ((First.getType() & ItemType::Crafting) &&
+  if ((First.getType() & (ItemType::Crafting | ItemType::CraftingBase)) &&
       (Second.getType() & ItemType::Crafting)) {
-    // TODO: craft item if it matches recipe,
-    (void)ItemDb;
+    auto Result = Tree.search(Items);
+    if (Result) {
+      std::vector<Item> CraftedItems;
+      for (auto &Id : *Result) {
+        CraftedItems.push_back(ItemDb.createItem(Id));
+      }
+      return CraftedItems;
+    }
   }
 
   // Filter out any invalid combinations
@@ -30,7 +73,7 @@ std::optional<Item> CraftingHandler::tryCraft(const std::vector<Item> &Items) {
     return std::nullopt;
   }
 
-  return craftEnhancedItem(Items);
+  return std::vector<Item>{craftEnhancedItem(Items)};
 }
 
 namespace {
@@ -126,7 +169,8 @@ Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) {
   Special->Effects = computeNewEffects(Special->Effects);
 
   // Create the new item
-  return Item(First.getProto(), /*StackSize=*/1, Special, /*SpecOverrides=*/true);
+  return Item(First.getProto(), /*StackSize=*/1, Special,
+              /*SpecOverrides=*/true);
 }
 
 } // namespace rogue

@@ -103,70 +103,39 @@ namespace rogue {
 //
 // recipes:
 //   - ingredients:
-//       - name: Leather Scrap
-//         count: 10
+//       - Leather Scrap
 //     results:
-//       - name: Leather
-//         count: 1
+//       - Leather
 //   - ingredients:
-//       - name: Wooden Log
-//         count: 2
-//       - name: Leather Scrap
-//         count: 1
-//       - name: Iron Scrap
-//         count: 1
-//       - name: Wooden Log
-//         count: 2
+//       - Wooden Log
+//       - Wooden Log
+//       - Leather Scrap
+//       - Iron Scrap
+//       - Wooden Log
+//       - Wooden Log
 //     results:
-//       - name: Wooden Shield
-//         count: 1
+//       - Wooden Shield
 //   - ingredients:
-//       - name: Rune Dust
-//         count: 2
-//       - name: Iron Scrap
-//         count: 1
-//       - name: Stone
-//         count: 1
+//       - Rune Dust
+//       - Iron Scrap
+//       - Stone
 //     results:
-//       - name: Fire Stone
-//         count: 1
+//       - Fire Stone
 //   - ingredients:
-//       - name: Wooden Log
-//         count: 5
-//       - name: Fire Stone
-//         count: 1
+//       - Wooden Log
+//       - Wooden Log
+//       - Wooden Log
+//       - Fire Stone
 //     results:
-//       - name: Ash
-//         count: 1
-//       - name: Fire Stone
-//         count: 1
-//       - name: Charcoal
-//         count: 1
+//       - Ash
+//       - Ash
+//       - Fire Stone
+//       - Charcoal
 //   - ingredients:
-//       - name: Glass Vial
-//         count: 1
-//       - name: Arcane Liquid
-//         count: 1
+//       - Glass Vial
+//       - Arcane Liquid
 //     results:
-//       - name: Arcane Potion Base
-//         count: 1
-//
-// modifier_recipes:
-//   - ingredients:
-//       - item_type: potion
-//         count: 1
-//     modifiers:
-//       - item_type: crafting_modifier
-//         count: 1
-//     results:
-//       - template_name: "_X_Potion_Y_"
-//         count: 1
-//     - ingredients:
-//       - item_type: weapon
-//         count: 1
-//       modifiers:
-//       - item_type: crafting_modifier
-//         count: 1
+//       - Arcane Potion Base
 
 class CraftingDatabase {
 public:
@@ -216,18 +185,21 @@ TEST_F(CraftingSystemTest, SimpleEquipmentEnhancement) {
   rogue::CraftingHandler System(Db);
   auto Helmet = Db.createItem(DummyItems.HelmetA.ItemId);
   auto Plate = Db.createItem(DummyItems.PlateCrafting.ItemId);
-  auto Result = System.tryCraft({Helmet, Plate});
-  ASSERT_TRUE(Result.has_value());
 
-  EXPECT_EQ(Result->getType(), rogue::ItemType::Helmet);
-  EXPECT_EQ(Result->getName(), "helmet_a");
-  EXPECT_EQ(Result->StackSize, 1);
-  EXPECT_EQ(Result->getMaxStackSize(), 1);
-  EXPECT_EQ(Result->getAllEffects().size(), 2);
+  auto ResultVec = System.tryCraft({Helmet, Plate});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  const auto &Result = ResultVec->at(0);
+
+  EXPECT_EQ(Result.getType(), rogue::ItemType::Helmet);
+  EXPECT_EQ(Result.getName(), "helmet_a");
+  EXPECT_EQ(Result.StackSize, 1);
+  EXPECT_EQ(Result.getMaxStackSize(), 1);
+  EXPECT_EQ(Result.getAllEffects().size(), 2);
 
   auto ArmorBuff =
       dynamic_cast<const rogue::test::DummyItems::ArmorEffectType *>(
-          Result->getAllEffects().at(0).Effect.get());
+          Result.getAllEffects().at(0).Effect.get());
   ASSERT_NE(ArmorBuff, nullptr);
   EXPECT_EQ(ArmorBuff->Value, 2);
 }
@@ -238,28 +210,30 @@ TEST_F(CraftingSystemTest, MultiComponentPotionCrafting) {
   auto Poison = Db.createItem(DummyItems.PoisonConsumable.ItemId);
   auto Heal = Db.createItem(DummyItems.HealConsumable.ItemId);
 
-  auto Result = System.tryCraft({Potion, Poison, Heal});
-  ASSERT_TRUE(Result.has_value());
+  auto ResultVec = System.tryCraft({Potion, Poison, Heal});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  const auto &Result = ResultVec->at(0);
 
-  EXPECT_EQ(Result->getType(),
+  EXPECT_EQ(Result.getType(),
             rogue::ItemType::Consumable | rogue::ItemType::CraftingBase);
-  EXPECT_EQ(Result->getName(), "potion");
-  EXPECT_EQ(Result->StackSize, 1);
-  EXPECT_EQ(Result->getMaxStackSize(), 5);
+  EXPECT_EQ(Result.getName(), "potion");
+  EXPECT_EQ(Result.StackSize, 1);
+  EXPECT_EQ(Result.getMaxStackSize(), 5);
 
-  EXPECT_EQ(Result->getAllEffects().size(), 2)
+  EXPECT_EQ(Result.getAllEffects().size(), 2)
       << "Should be 2, NullEffect needs to be filtered out and HealEffects "
          "should be combined";
 
   auto HealEffect =
       dynamic_cast<const rogue::test::DummyItems::HealEffectType *>(
-          Result->getAllEffects().at(0).Effect.get());
+          Result.getAllEffects().at(0).Effect.get());
   ASSERT_NE(HealEffect, nullptr);
   EXPECT_EQ(HealEffect->Value, 2);
 
   auto PoisonEffect =
       dynamic_cast<const rogue::test::DummyItems::PoisonEffectType *>(
-          Result->getAllEffects().at(1).Effect.get());
+          Result.getAllEffects().at(1).Effect.get());
   ASSERT_NE(PoisonEffect, nullptr);
   EXPECT_EQ(PoisonEffect->Value, 1);
 }
@@ -271,22 +245,24 @@ TEST_F(CraftingSystemTest, RemoveEffectCrafting) {
   auto Heal = Db.createItem(DummyItems.HealConsumable.ItemId);
   auto Charcoal = Db.createItem(DummyItems.CharcoalCrafting.ItemId);
 
-  auto Result = System.tryCraft({Potion, Poison, Heal, Charcoal});
-  ASSERT_TRUE(Result.has_value());
+  auto ResultVec = System.tryCraft({Potion, Poison, Heal, Charcoal});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  const auto &Result = ResultVec->at(0);
 
-  EXPECT_EQ(Result->getType(),
+  EXPECT_EQ(Result.getType(),
             rogue::ItemType::Consumable | rogue::ItemType::CraftingBase);
-  EXPECT_EQ(Result->getName(), "potion");
-  EXPECT_EQ(Result->StackSize, 1);
-  EXPECT_EQ(Result->getMaxStackSize(), 5);
+  EXPECT_EQ(Result.getName(), "potion");
+  EXPECT_EQ(Result.StackSize, 1);
+  EXPECT_EQ(Result.getMaxStackSize(), 5);
 
-  EXPECT_EQ(Result->getAllEffects().size(), 1)
+  EXPECT_EQ(Result.getAllEffects().size(), 1)
       << "Should be 1, NullEffect needs to be filtered out and HealEffects "
          "should be combined, Charcoal should remove the poison effect";
 
   auto HealEffect =
       dynamic_cast<const rogue::test::DummyItems::HealEffectType *>(
-          Result->getAllEffects().at(0).Effect.get());
+          Result.getAllEffects().at(0).Effect.get());
   ASSERT_NE(HealEffect, nullptr);
   EXPECT_EQ(HealEffect->Value, 2);
 }
@@ -308,6 +284,79 @@ TEST_F(CraftingSystemTest, InvalidRecipeOnlyCraftingItems) {
 
   Result = System.tryCraft({Plate, Charcoal, Heal});
   EXPECT_FALSE(Result.has_value());
+}
+
+TEST_F(CraftingSystemTest, SimpleRecipe) {
+  rogue::CraftingHandler System(Db);
+  rogue::CraftingRecipe Recipe(
+      {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+      {DummyItems.CraftingC.ItemId});
+  System.addRecipe(Recipe);
+
+  auto A = Db.createItem(DummyItems.CraftingA.ItemId);
+  auto B = Db.createItem(DummyItems.CraftingB.ItemId);
+
+  auto ResultVec = System.tryCraft({A, B});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  const auto &Result = ResultVec->at(0);
+  EXPECT_EQ(Result.getName(), "crafting_c");
+}
+
+TEST_F(CraftingSystemTest, RecipeOverrides) {
+  rogue::CraftingHandler System(Db);
+  auto Potion = Db.createItem(DummyItems.Potion.ItemId);
+  auto Heal = Db.createItem(DummyItems.HealConsumable.ItemId);
+
+  auto ResultVec = System.tryCraft({Potion, Heal});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  EXPECT_EQ(ResultVec->at(0).getName(), "potion");
+
+  rogue::CraftingRecipe Recipe(
+      {DummyItems.Potion.ItemId, DummyItems.HealConsumable.ItemId},
+      {DummyItems.CraftingA.ItemId});
+  System.addRecipe(Recipe);
+
+  ResultVec = System.tryCraft({Potion, Heal});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  EXPECT_EQ(ResultVec->at(0).getName(), "crafting_a");
+}
+
+TEST_F(CraftingSystemTest, MultipleRecipes) {
+  rogue::CraftingHandler System(Db);
+  rogue::CraftingRecipe RecipeAB(
+      {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+      {DummyItems.HelmetA.ItemId});
+  rogue::CraftingRecipe RecipeABC(
+      {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId, DummyItems.CraftingC.ItemId},
+      {DummyItems.HelmetB.ItemId});
+  rogue::CraftingRecipe RecipeAC(
+      {DummyItems.CraftingA.ItemId, DummyItems.CraftingC.ItemId},
+      {DummyItems.Potion.ItemId});
+  System.addRecipe(RecipeAB);
+  System.addRecipe(RecipeABC);
+  System.addRecipe(RecipeAC);
+
+  auto A = Db.createItem(DummyItems.CraftingA.ItemId);
+  auto B = Db.createItem(DummyItems.CraftingB.ItemId);
+  auto C = Db.createItem(DummyItems.CraftingC.ItemId);
+
+  auto ResultVec = System.tryCraft({A, B});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  EXPECT_EQ(ResultVec->at(0).getName(), "helmet_a");
+
+  ResultVec = System.tryCraft({A, B, C});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  EXPECT_EQ(ResultVec->at(0).getName(), "helmet_b");
+
+  ResultVec = System.tryCraft({A, C});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  EXPECT_EQ(ResultVec->at(0).getName(), "potion");
 }
 
 } // namespace
