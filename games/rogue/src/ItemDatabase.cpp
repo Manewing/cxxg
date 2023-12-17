@@ -283,13 +283,13 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     ItemType ItType = ItemType::None;
     for (const auto &ItemType : ItemProtoJson["types"].GetArray()) {
       const auto ItemTypeStr = ItemType.GetString();
-      ItType |= getItemType(ItemTypeStr);
+      ItType |= ItemType::fromString(ItemTypeStr);
     }
 
     std::vector<EffectInfo> EffectInfos;
     for (const auto &CapJson : ItemProtoJson["capabilities"].GetArray()) {
       const auto &CapInfo = CapJson.GetObject();
-      const auto Flag = getCapabilityFlag(CapInfo["type"].GetString());
+      const auto Flag = CapabilityFlags::fromString(CapInfo["type"].GetString());
       const auto Effect = Effects.at(CapJson["effect"].GetString());
       EffectInfos.push_back({Flag, Effect});
     }
@@ -299,7 +299,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       Specialization = std::make_unique<ItemSpecializations>();
       for (const auto &SpecJson : ItemProtoJson["specializations"].GetArray()) {
         const auto &SpecInfo = SpecJson.GetObject();
-        const auto Flags = getCapabilityFlag(SpecInfo["type"].GetString());
+        const auto Flags = CapabilityFlags::fromString(SpecInfo["type"].GetString());
         const auto Spec =
             Specializations.at(SpecInfo["specialization"].GetString());
         Specialization->addSpecialization(Flags, Spec);

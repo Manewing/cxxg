@@ -1,6 +1,6 @@
+#include <rogue/CraftingHandler.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
-#include <rogue/CraftingHandler.h>
 
 namespace rogue {
 
@@ -15,17 +15,16 @@ std::optional<Item> CraftingHandler::tryCraft(const std::vector<Item> &Items) {
 
   // If both items are crafting items this indicates a crafting recipe,
   // otherwise it's a modification of an item or invalid combination
-  if ((First.getType() & ItemType::Crafting) != ItemType::None &&
-      (Second.getType() & ItemType::Crafting) != ItemType::None) {
+  if ((First.getType() & ItemType::Crafting) &&
+      (Second.getType() & ItemType::Crafting)) {
     // TODO: craft item if it matches recipe,
   }
 
   // Filter out any invalid combinations
-  const auto IsValid =
-      ((First.getType() & ItemType::CraftingBase) != ItemType::None &&
-       (Second.getType() & ItemType::Crafting) != ItemType::None) ||
-      ((First.getType() & ItemType::EquipmentMask) != ItemType::None &&
-       (Second.getType() & ItemType::Crafting) != ItemType::None);
+  const auto IsValid = ((First.getType() & ItemType::CraftingBase) &&
+                        (Second.getType() & ItemType::Crafting)) ||
+                       ((First.getType() & ItemType::EquipmentMask) &&
+                        (Second.getType() & ItemType::Crafting));
   if (!IsValid) {
     return std::nullopt;
   }
@@ -49,7 +48,7 @@ Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) {
   for (std::size_t Idx = 1; Idx < Items.size(); ++Idx) {
     auto &Item = Items.at(Idx);
     for (const auto &Info : Item.getAllEffects()) {
-      if ((Info.Flags & Flags) != CapabilityFlags::None) {
+      if (Info.Flags & Flags) {
         Proto.Effects.push_back(Info);
       }
     }
@@ -105,7 +104,7 @@ Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) {
       NewEffects.push_back({Info.Flags, Effect->clone()});
     }
   }
-  if (NullInfo && (NullInfo->Flags & ~EffectFlags) != CapabilityFlags::None) {
+  if (NullInfo && (NullInfo->Flags & ~EffectFlags)) {
     NewEffects.push_back(*NullInfo);
   }
   Proto.Effects = NewEffects;

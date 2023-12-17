@@ -8,13 +8,12 @@ bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
   // FIXME this should be moved to ItemType
   return
       // Equipment
-      ((Flags & CapabilityFlags::Equipment) != CapabilityFlags::None &&
-       (Type & ItemType::EquipmentMask) != ItemType::None) ||
+      ((Flags & CapabilityFlags::Equipment) &&
+       (Type & ItemType::EquipmentMask)) ||
       // Consumable
-      ((Flags & CapabilityFlags::UseOn) != CapabilityFlags::None &&
-       (Type & ItemType::Consumable) != ItemType::None)
+      ((Flags & CapabilityFlags::UseOn) && (Type & ItemType::Consumable))
       // Dismantle
-      || ((Flags & CapabilityFlags::Dismantle) != CapabilityFlags::None);
+      || ((Flags & CapabilityFlags::Dismantle));
 }
 
 ItemPrototype::ItemPrototype(int ItemId, std::string N, std::string D,
@@ -32,7 +31,7 @@ CapabilityFlags ItemPrototype::getCapabilityFlags() const {
 }
 
 bool ItemPrototype::checkCapabilityFlags(CapabilityFlags Flags) const {
-  return canApply(Type, Flags) && (Flags & getCapabilityFlags()) != CapabilityFlags::None;
+  return canApply(Type, Flags) && bool(Flags & getCapabilityFlags());
 }
 
 bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
@@ -42,7 +41,7 @@ bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
   }
   bool CanApply = true;
   for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
+    if (Info.Flags & Flags) {
       CanApply = CanApply && Info.Effect->canApplyTo(Entity, Reg);
     }
   }
@@ -53,14 +52,13 @@ void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
                             CapabilityFlags Flags) const {
   if (!checkCapabilityFlags(Flags)) {
     std::stringstream SS;
-    SS << "Can't apply item '" << Name << "' to entity with flags "
-       << getCapabilityFlagLabel(Flags)
-       << " (item flags: " << getCapabilityFlagLabel(getCapabilityFlags())
-       << ", item type: " << getItemTypeLabel(Type) << ")";
+    SS << "Can't apply item '" << Name << "' to entity with flags " << Flags
+       << " (item flags: " << getCapabilityFlags() << ", item type: " << Type
+       << ")";
     throw std::runtime_error(SS.str());
   }
   for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
+    if (Info.Flags & Flags) {
       Info.Effect->applyTo(Entity, Reg);
     }
   }
@@ -74,7 +72,7 @@ bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
   }
   bool CanRemove = true;
   for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
+    if (Info.Flags & Flags) {
       CanRemove = CanRemove && Info.Effect->canRemoveFrom(Entity, Reg);
     }
   }
@@ -85,14 +83,13 @@ void ItemPrototype::removeFrom(const entt::entity &Entity, entt::registry &Reg,
                                CapabilityFlags Flags) const {
   if (!checkCapabilityFlags(Flags)) {
     std::stringstream SS;
-    SS << "Can't remove item '" << Name << "' from entity with flags "
-       << getCapabilityFlagLabel(Flags)
-       << " (item flags: " << getCapabilityFlagLabel(getCapabilityFlags())
-       << ", item type: " << getItemTypeLabel(Type) << ")";
+    SS << "Can't remove item '" << Name << "' from entity with flags " << Flags
+       << " (item flags: " << getCapabilityFlags() << ", item type: " << Type
+       << ")";
     throw std::runtime_error(SS.str());
   }
   for (const auto &Info : Effects) {
-    if ((Info.Flags & Flags) != CapabilityFlags::None) {
+    if (Info.Flags & Flags) {
       Info.Effect->removeFrom(Entity, Reg);
     }
   }

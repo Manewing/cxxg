@@ -21,16 +21,16 @@ constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
 cxxg::types::TermColor
 InventoryControllerBase::getColorForItemType(ItemType Type) {
-  if ((Type & ItemType::Quest) != ItemType::None) {
+  if (Type & ItemType::Quest) {
     return cxxg::types::RgbColor{195, 196, 90};
   }
-  if ((Type & ItemType::EquipmentMask) != ItemType::None) {
+  if (Type & ItemType::EquipmentMask) {
     return cxxg::types::RgbColor{227, 175, 91};
   }
-  if ((Type & ItemType::Consumable) != ItemType::None) {
+  if (Type & ItemType::Consumable) {
     return cxxg::types::RgbColor{112, 124, 219};
   }
-  if ((Type & ItemType::Crafting) != ItemType::None) {
+  if (Type & ItemType::Crafting) {
     return cxxg::types::RgbColor{182, 186, 214};
   }
   return cxxg::types::Color::NONE;
@@ -115,8 +115,7 @@ bool InventoryController::handleInput(int Char) {
     InvHandler.tryEquipItem(ItemIdx);
   } break;
   case Controls::Use.Char: {
-    if ((Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) !=
-        CapabilityFlags::None) {
+    if (Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
       std::optional<unsigned> Range;
       if (auto *LOSComp = Lvl.Reg.try_get<LineOfSightComp>(Entity)) {
@@ -131,8 +130,7 @@ bool InventoryController::handleInput(int Char) {
                        });
       return false;
     }
-    if ((Inv.getItem(ItemIdx).getCapabilityFlags() &
-         CapabilityFlags::Adjacent) != CapabilityFlags::None) {
+    if (Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Adjacent) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
       Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
                        [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
@@ -170,17 +168,17 @@ std::string InventoryController::getInteractMsg() const {
 
   const auto &SelectedItem = Inv.getItem(List->getSelectedElement());
   std::vector<KeyOption> Options = {Controls::Info, Controls::Drop};
-  if ((SelectedItem.getType() & ItemType::EquipmentMask) != ItemType::None) {
+  // FIXME this should all be based on capability flags, not item type
+  if (SelectedItem.getType() & ItemType::EquipmentMask) {
     Options.push_back(Controls::Equip);
   }
-  if ((SelectedItem.getType() & ItemType::Crafting) != ItemType::None) {
+  if (SelectedItem.getType() & ItemType::Crafting) {
     Options.push_back(Controls::Craft);
   }
-  if ((SelectedItem.getType() & ItemType::Consumable) != ItemType::None) {
+  if (SelectedItem.getType() & ItemType::Consumable) {
     Options.push_back(Controls::Use);
   }
-  if ((SelectedItem.getCapabilityFlags() & CapabilityFlags::Dismantle) !=
-      CapabilityFlags::None) {
+  if (SelectedItem.getCapabilityFlags() & CapabilityFlags::Dismantle) {
     Options.push_back(Controls::Dismantle);
   }
   if (Ctrl.hasLootUI()) {

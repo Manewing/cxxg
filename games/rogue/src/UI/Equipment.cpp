@@ -98,9 +98,8 @@ cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
 void EquipmentController::addSelect(const EquipmentSlot &ES,
                                     cxxg::types::Position Pos) {
   constexpr const auto NoColor = cxxg::types::Color::NONE;
-  ItSel->addSelect<LabeledSelect>(getItemTypeLabel(ES.BaseTypeFilter),
-                                  getSelectValue(ES), Pos, 25, NoColor,
-                                  getSelectColor(ES));
+  ItSel->addSelect<LabeledSelect>(ES.BaseTypeFilter.str(), getSelectValue(ES),
+                                  Pos, 25, NoColor, getSelectColor(ES));
 }
 
 void EquipmentController::updateSelectValues() const {

@@ -5,9 +5,9 @@ namespace rogue {
 void EquipmentSlot::equip(Item I) {
   if ((I.getType() & BaseTypeFilter) == ItemType::None) {
     throw std::runtime_error("Can not equip item: " + I.getName() +
-                             +" of type " + getItemTypeLabel(I.getType()) +
+                             +" of type " + I.getType().str() +
                              " (" + std::to_string(int(I.getType())) +
-                             ") to slot: " + getItemTypeLabel(BaseTypeFilter) +
+                             ") to slot: " + BaseTypeFilter.str() +
                              " (" + std::to_string(int(BaseTypeFilter)) + ")");
   }
   It = std::move(I);
@@ -29,7 +29,7 @@ EquipmentSlot &Equipment::getSlot(ItemType It) {
 
 const EquipmentSlot &Equipment::getSlot(ItemType It) const {
   if ((It & ItemType::EquipmentMask) == ItemType::None) {
-    throw std::runtime_error("Invalid item type: " + getItemTypeLabel(It));
+    throw std::runtime_error("Invalid item type: " + It.str());
   }
   if ((It & ItemType::Ring) == ItemType::Ring) {
     return Ring;
@@ -56,7 +56,7 @@ const EquipmentSlot &Equipment::getSlot(ItemType It) const {
       (It & ItemType::Shield) == ItemType::Shield) {
     return OffHand;
   }
-  throw std::runtime_error("Invalid item type: " + getItemTypeLabel(It));
+  throw std::runtime_error("Invalid item type: " + It.str());
   return OffHand;
 }
 

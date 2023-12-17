@@ -62,7 +62,7 @@ std::string getEffectDescription(const EffectInfo &EffInfo) {
 std::string getCapabilityDescription(const std::vector<EffectInfo> &AllEffects,
                                      CapabilityFlags Flag) {
   std::stringstream SS;
-  SS << getCapabilityFlagLabel(Flag) << ":\n";
+  SS << Flag << ":\n";
   bool HasAny = false;
   for (const auto &EffInfo : AllEffects) {
     if ((EffInfo.Flags & Flag) != Flag) {
@@ -93,7 +93,7 @@ std::string getItemEffectDescription(const Item &It) {
 
 std::string getItemText(const Item &It) {
   std::stringstream SS;
-  SS << "Type: " << getItemTypeLabel(It.getType()) << "\n---\n"
+  SS << "Type: " << It.getType() << "\n---\n"
      << getItemEffectDescription(It) << "---\n"
      << It.getDescription();
   return SS.str();
