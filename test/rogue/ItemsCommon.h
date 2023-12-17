@@ -35,6 +35,77 @@ public:
   }
 };
 
+template <unsigned N> struct DummyComp {
+  static constexpr auto Key = N;
+  int Value = 1;
+};
+
+template <unsigned N> struct DummyRequiredComp {
+  static constexpr auto Key = N;
+  int Value = 1;
+};
+
+template <typename CompType, typename... RequiredComps>
+class DummyComponentEffect : public ItemEffect {
+public:
+  using OwnType = DummyComponentEffect<CompType, RequiredComps...>;
+
+public:
+  static std::shared_ptr<ItemEffect> get(const CompType &Comp = CompType()) {
+    return std::make_shared<OwnType>(Comp);
+  }
+
+public:
+  explicit DummyComponentEffect(const CompType &Comp) : Comp(Comp) {}
+
+  std::shared_ptr<ItemEffect> clone() const final {
+    return std::make_shared<OwnType>(*this);
+  }
+
+  bool canAddFrom(const ItemEffect &Other) const final {
+    return dynamic_cast<const OwnType *>(&Other) != nullptr;
+  }
+
+  void addFrom(const ItemEffect &Other) final {
+    if (auto *OtherDummy = dynamic_cast<const OwnType *>(&Other)) {
+      Comp.Value += OtherDummy->Comp.Value;
+    }
+  }
+
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
+    if constexpr (sizeof...(RequiredComps) == 0) {
+      return true;
+    } else {
+      return Reg.all_of<RequiredComps...>(Et);
+    }
+  }
+
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
+    auto *Existing = Reg.try_get<CompType>(Et);
+    if (Existing) {
+      Existing->Value += Comp.Value;
+    } else {
+      Reg.emplace<CompType>(Et, Comp);
+    }
+  }
+
+  bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) const final {
+    return Reg.all_of<CompType, RequiredComps...>(Et);
+  }
+
+  void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {
+    auto *Existing = Reg.try_get<CompType>(Et);
+    if (Existing) {
+      Existing->Value -= Comp.Value;
+      if (Existing->Value <= 0) {
+        Reg.remove<CompType>(Et);
+      }
+    }
+  }
+
+  CompType Comp;
+};
+
 class DummyItems {
 public:
   using ArmorEffectType = DummyItemEffect<0>;

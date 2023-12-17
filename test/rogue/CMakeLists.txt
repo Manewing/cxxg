@@ -10,9 +10,10 @@ set(SOURCES
   GameWorldTest.cpp
   InventoryHandlerTest.cpp
   InventoryTest.cpp
-  ItemCommon.cpp
+  ItemsCommon.cpp
   ItemDatabaseTest.cpp
   ItemPrototypeTest.cpp
+  ItemTest.cpp
   LevelDatabaseTest.cpp
   LevelGeneratorTest.cpp
   LootTableTest.cpp

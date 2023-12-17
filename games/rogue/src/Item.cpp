@@ -7,7 +7,8 @@ namespace rogue {
 
 Item::Item(const ItemPrototype &Proto, int StackSize,
            const std::shared_ptr<ItemPrototype> &Spec, bool SpecOverrides)
-    : StackSize(StackSize), Proto(&Proto), Specialization(Spec), SpecOverrides(SpecOverrides) {}
+    : StackSize(StackSize), Proto(&Proto), Specialization(Spec),
+      SpecOverrides(SpecOverrides) {}
 
 namespace {
 
@@ -112,6 +113,9 @@ bool Item::isSameKind(const Item &Other) const {
 
 bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
                       CapabilityFlags Flags) const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->canApplyTo(Entity, Reg, Flags);
+  }
   bool SpecCanUseOn =
       Specialization && Specialization->canApplyTo(Entity, Reg, Flags);
   return getProto().canApplyTo(Entity, Reg, Flags) || SpecCanUseOn;
@@ -121,12 +125,18 @@ void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
                    CapabilityFlags Flags) const {
   if (Specialization) {
     Specialization->applyTo(Entity, Reg, Flags);
+    if (SpecOverrides) {
+      return;
+    }
   }
   getProto().applyTo(Entity, Reg, Flags);
 }
 
 bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
                          CapabilityFlags Flags) const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->canRemoveFrom(Entity, Reg, Flags);
+  }
   bool SpecCanUnequipFrom =
       Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags);
   return getProto().canRemoveFrom(Entity, Reg, Flags) || SpecCanUnequipFrom;
@@ -136,6 +146,9 @@ void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,
                       CapabilityFlags Flags) const {
   if (Specialization) {
     Specialization->removeFrom(Entity, Reg, Flags);
+    if (SpecOverrides) {
+      return;
+    }
   }
   getProto().removeFrom(Entity, Reg, Flags);
 }
