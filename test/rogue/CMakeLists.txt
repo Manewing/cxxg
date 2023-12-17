@@ -12,6 +12,7 @@ set(SOURCES
   InventoryTest.cpp
   ItemCommon.cpp
   ItemDatabaseTest.cpp
+  ItemPrototypeTest.cpp
   LevelDatabaseTest.cpp
   LevelGeneratorTest.cpp
   LootTableTest.cpp

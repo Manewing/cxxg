@@ -21,29 +21,27 @@ public:
   int Value = 0;
 };
 
-template <unsigned N>
-class DummyItemEffect : public DummyItemEffectBase {
+template <unsigned N> class DummyItemEffect : public DummyItemEffectBase {
 public:
-    explicit DummyItemEffect(int Value) : DummyItemEffectBase(Value) {}
-    virtual ~DummyItemEffect() = default;
-    
-    std::shared_ptr<ItemEffect> clone() const final {
-        return std::make_shared<DummyItemEffect<N>>(*this);
-    }
+  explicit DummyItemEffect(int Value) : DummyItemEffectBase(Value) {}
+  virtual ~DummyItemEffect() = default;
 
-    bool canAddFrom(const ItemEffect &Other) const final {
-        return dynamic_cast<const DummyItemEffect<N> *>(&Other) != nullptr;
-    }
+  std::shared_ptr<ItemEffect> clone() const final {
+    return std::make_shared<DummyItemEffect<N>>(*this);
+  }
+
+  bool canAddFrom(const ItemEffect &Other) const final {
+    return dynamic_cast<const DummyItemEffect<N> *>(&Other) != nullptr;
+  }
 };
-
 
 class DummyItems {
 public:
-    using ArmorEffectType = DummyItemEffect<0>;
-    using DamageEffectType = DummyItemEffect<1>;
-    using HealEffectType = DummyItemEffect<2>;
-    using PoisonEffectType = DummyItemEffect<3>;
-    using CleansePoisonEffectType = rogue::RemoveEffect<PoisonEffectType>;
+  using ArmorEffectType = DummyItemEffect<0>;
+  using DamageEffectType = DummyItemEffect<1>;
+  using HealEffectType = DummyItemEffect<2>;
+  using PoisonEffectType = DummyItemEffect<3>;
+  using CleansePoisonEffectType = rogue::RemoveEffect<PoisonEffectType>;
 
 public:
   DummyItems();
@@ -51,6 +49,13 @@ public:
   ItemDatabase createItemDatabase();
 
 public:
+  static const std::shared_ptr<ItemEffect> NullEffect;
+  static const std::shared_ptr<ItemEffect> ArmorEffect;
+  static const std::shared_ptr<ItemEffect> DamageEffect;
+  static const std::shared_ptr<ItemEffect> HealEffect;
+  static const std::shared_ptr<ItemEffect> PoisonEffect;
+  static const std::shared_ptr<ItemEffect> CleansePoisonEffect;
+
   ItemPrototype HelmetA;
   ItemPrototype HelmetB;
   ItemPrototype Ring;

@@ -17,15 +17,6 @@ rogue::PoisonDebuffComp makePoisonDebuffComp(rogue::StatValue TA,
   return Buff;
 }
 
-// FIXME add real null effect type
-const auto NullEffect = std::make_shared<rogue::NullEffect>();
-const auto ArmorEffect = std::make_shared<DummyItems::ArmorEffectType>(1);
-const auto DamageEffect = std::make_shared<DummyItems::DamageEffectType>(1);
-const auto HealEffect = std::make_shared<DummyItems::HealEffectType>(1);
-const auto PoisonEffect = std::make_shared<DummyItems::PoisonEffectType>(1);
-const auto CleansePoisonEffect =
-    std::make_shared<DummyItems::CleansePoisonEffectType>();
-
 DummyItems::DummyItems()
     : HelmetA(0, "helmet_a", "desc", rogue::ItemType::Helmet, 1,
               {{rogue::CapabilityFlags::Equipment, ArmorEffect},
@@ -67,5 +58,17 @@ ItemDatabase DummyItems::createItemDatabase() {
   }
   return DB;
 }
+const std::shared_ptr<rogue::ItemEffect> DummyItems::NullEffect =
+    std::make_shared<rogue::NullEffect>();
+const std::shared_ptr<rogue::ItemEffect> DummyItems::ArmorEffect =
+    std::make_shared<DummyItems::ArmorEffectType>(1);
+const std::shared_ptr<rogue::ItemEffect> DummyItems::DamageEffect =
+    std::make_shared<DummyItems::DamageEffectType>(1);
+const std::shared_ptr<rogue::ItemEffect> DummyItems::HealEffect =
+    std::make_shared<DummyItems::HealEffectType>(1);
+const std::shared_ptr<rogue::ItemEffect> DummyItems::PoisonEffect =
+    std::make_shared<DummyItems::PoisonEffectType>(1);
+const std::shared_ptr<rogue::ItemEffect> DummyItems::CleansePoisonEffect =
+    std::make_shared<DummyItems::CleansePoisonEffectType>();
 
 } // namespace rogue::test

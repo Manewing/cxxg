@@ -1,5 +1,6 @@
 #include <rogue/ItemEffect.h>
 #include <rogue/ItemPrototype.h>
+#include <sstream>
 
 namespace rogue {
 
@@ -30,10 +31,13 @@ CapabilityFlags ItemPrototype::getCapabilityFlags() const {
   return Flags;
 }
 
+bool ItemPrototype::checkCapabilityFlags(CapabilityFlags Flags) const {
+  return canApply(Type, Flags) && (Flags & getCapabilityFlags()) != CapabilityFlags::None;
+}
+
 bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
                                CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags) ||
-      (Flags & getCapabilityFlags()) == CapabilityFlags::None) {
+  if (!checkCapabilityFlags(Flags)) {
     return false;
   }
   bool CanApply = true;
@@ -47,6 +51,14 @@ bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
 
 void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
                             CapabilityFlags Flags) const {
+  if (!checkCapabilityFlags(Flags)) {
+    std::stringstream SS;
+    SS << "Can't apply item '" << Name << "' to entity with flags "
+       << getCapabilityFlagLabel(Flags)
+       << " (item flags: " << getCapabilityFlagLabel(getCapabilityFlags())
+       << ", item type: " << getItemTypeLabel(Type) << ")";
+    throw std::runtime_error(SS.str());
+  }
   for (const auto &Info : Effects) {
     if ((Info.Flags & Flags) != CapabilityFlags::None) {
       Info.Effect->applyTo(Entity, Reg);
@@ -57,8 +69,7 @@ void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
 bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
                                   entt::registry &Reg,
                                   CapabilityFlags Flags) const {
-  if (!canApply(Type, Flags) ||
-      (Flags & getCapabilityFlags()) == CapabilityFlags::None) {
+  if (!checkCapabilityFlags(Flags)) {
     return false;
   }
   bool CanRemove = true;
@@ -72,6 +83,14 @@ bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
 
 void ItemPrototype::removeFrom(const entt::entity &Entity, entt::registry &Reg,
                                CapabilityFlags Flags) const {
+  if (!checkCapabilityFlags(Flags)) {
+    std::stringstream SS;
+    SS << "Can't remove item '" << Name << "' from entity with flags "
+       << getCapabilityFlagLabel(Flags)
+       << " (item flags: " << getCapabilityFlagLabel(getCapabilityFlags())
+       << ", item type: " << getItemTypeLabel(Type) << ")";
+    throw std::runtime_error(SS.str());
+  }
   for (const auto &Info : Effects) {
     if ((Info.Flags & Flags) != CapabilityFlags::None) {
       Info.Effect->removeFrom(Entity, Reg);
