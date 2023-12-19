@@ -351,14 +351,17 @@ bool Game::tryInteract() {
   if (InteractableEntities.size() == 1) {
     auto &InteractableEntity = InteractableEntities.at(0);
     auto &Interactable = getLvlReg().get<InteractableComp>(InteractableEntity);
-    auto Player = getPlayer();
-    auto &PC = getLvlReg().get<PlayerComp>(Player);
-    PC.CurrentInteraction = Interactable.Action;
 
-    // This may switch level so needs to be last thing that is done
-    Interactable.Action.Execute(World->getCurrentLevelOrFail(), Player,
-                                getLvlReg());
-    return true;
+    if (Interactable.Actions.size() == 1) {
+      auto Player = getPlayer();
+      auto &PC = getLvlReg().get<PlayerComp>(Player);
+      PC.CurrentInteraction = Interactable.Actions.front();
+
+      // This may switch level so needs to be last thing that is done
+      Interactable.Actions.front().Execute(World->getCurrentLevelOrFail(),
+                                           Player, getLvlReg());
+      return true;
+    }
   }
 
   // Multiple interactions, this show UI to select interaction
@@ -385,6 +388,8 @@ entt::entity Game::getPlayer() const {
   return Player;
 }
 
+// FIXME this only returns a single one but there is the possibility to have multiple
+// and also cycle the options. We need a proper HUD UI to handle this
 Interaction *Game::getAvailableInteraction() {
   auto Player = getPlayer();
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;
@@ -395,10 +400,9 @@ Interaction *Game::getAvailableInteraction() {
     return nullptr;
   }
 
-  // TODO allow cycling through available objects
   auto &InteractableEntity = InteractableEntities.at(0);
   auto &Interactable = getLvlReg().get<InteractableComp>(InteractableEntity);
-  return &Interactable.Action;
+  return &Interactable.Actions.front();
 }
 
 void Game::onEntityDiedEvent(const EntityDiedEvent &E) {

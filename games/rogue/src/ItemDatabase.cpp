@@ -141,7 +141,8 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              CoHTargetBleedingDebuffComp Effect;
              Effect.Chance = V["chance"].GetDouble();
              parseReductionBuff(V["buff"], Effect.Buff);
-             return makeApplyBuffItemEffect<CoHTargetBleedingDebuffComp>(Effect);
+             return makeApplyBuffItemEffect<CoHTargetBleedingDebuffComp>(
+                 Effect);
            }},
           {"chance_on_hit_to_apply_blinded",
            [](const auto &, const auto &V) {
@@ -161,7 +162,7 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              return std::make_shared<DismantleEffect>(DB, std::move(Results));
            }}};
 
-  const auto EffectType = V["type"].GetString();
+  const auto EffectType = std::string(V["type"].GetString());
   const auto It = Factories.find(EffectType);
   if (It == Factories.end()) {
     throw std::out_of_range("Unknown item effect: " + std::string(EffectType));
@@ -289,7 +290,8 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     std::vector<EffectInfo> EffectInfos;
     for (const auto &CapJson : ItemProtoJson["capabilities"].GetArray()) {
       const auto &CapInfo = CapJson.GetObject();
-      const auto Flag = CapabilityFlags::fromString(CapInfo["type"].GetString());
+      const auto Flag =
+          CapabilityFlags::fromString(CapInfo["type"].GetString());
       const auto Effect = Effects.at(CapJson["effect"].GetString());
       EffectInfos.push_back({Flag, Effect});
     }
@@ -299,7 +301,8 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       Specialization = std::make_unique<ItemSpecializations>();
       for (const auto &SpecJson : ItemProtoJson["specializations"].GetArray()) {
         const auto &SpecInfo = SpecJson.GetObject();
-        const auto Flags = CapabilityFlags::fromString(SpecInfo["type"].GetString());
+        const auto Flags =
+            CapabilityFlags::fromString(SpecInfo["type"].GetString());
         const auto Spec =
             Specializations.at(SpecInfo["specialization"].GetString());
         Specialization->addSpecialization(Flags, Spec);

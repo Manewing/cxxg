@@ -1,18 +1,13 @@
-#include <rogue/Components/AI.h>
-#include <rogue/Components/Combat.h>
 #include <rogue/Components/Entity.h>
 #include <rogue/Components/Items.h>
 #include <rogue/Components/LOS.h>
 #include <rogue/Components/Level.h>
 #include <rogue/Components/Player.h>
-#include <rogue/Components/RaceFaction.h>
-#include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/Context.h>
 #include <rogue/Event.h>
 #include <rogue/EventHub.h>
-#include <rogue/InventoryHandler.h>
 
 namespace rogue {
 
@@ -33,11 +28,10 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   LIC.IsLooted = false;
   LIC.IsPersistent = false;
 
-  Reg.emplace<InteractableComp>(
-      Entity,
-      Interaction{"Loot", [Entity](auto &EHC, auto Et, auto &Reg) {
-                    EHC.publish(LootEvent{{}, "Loot", Et, Entity, &Reg});
-                  }});
+  auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
+  ITC.Actions.push_back({"Loot", [Entity](auto &EHC, auto Et, auto &Reg) {
+    EHC.publish(LootEvent{{}, "Loot", Et, Entity, &Reg});
+  }});
 
   Reg.emplace<VisibleComp>(Entity);
 }

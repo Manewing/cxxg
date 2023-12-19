@@ -207,10 +207,10 @@ void InventoryHandler::autoEquipItems() {
   }
 }
 
-void InventoryHandler::tryCraftItems() {
+bool InventoryHandler::tryCraftItems() {
   // Nothing can be crafted if there is no inventory
   if (!Inv) {
-    return;
+    return false;
   }
 
   // Try crafting all items in the inventory
@@ -219,7 +219,10 @@ void InventoryHandler::tryCraftItems() {
   // Add all new items to the inventory
   if (NewItemsOrNone) {
     Inv->setItems(*NewItemsOrNone);
+    return true;
   }
+
+  return false;
 }
 
 } // namespace rogue

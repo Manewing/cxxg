@@ -17,12 +17,13 @@
 
 namespace rogue {
 
-template <typename T>
+template <typename T, bool IsPostProcess = false>
 class DefaultConstructEntityAssembler : public EntityAssembler {
 public:
   void assemble(entt::registry &Reg, entt::entity Entity) const override {
     Reg.emplace<T>(Entity);
   }
+  bool isPostProcess() const override { return IsPostProcess; }
 };
 
 class TileCompAssembler : public EntityAssembler {
@@ -132,6 +133,7 @@ public:
 class WorkbenchAssembler : public EntityAssembler {
 public:
   void assemble(entt::registry &Reg, entt::entity Entity) const override;
+  bool isPostProcess() const override;
 };
 
 class StatsCompAssembler : public EntityAssembler {

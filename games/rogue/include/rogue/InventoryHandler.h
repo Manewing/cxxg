@@ -55,7 +55,7 @@ public:
   void autoEquipItems();
 
   /// Tries to craft the items in the inventory
-  void tryCraftItems();
+  bool tryCraftItems();
 
 private:
   entt::entity Entity;
