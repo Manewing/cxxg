@@ -39,14 +39,15 @@ struct CraftingNode {
 
 class CraftingHandler {
 public:
+  CraftingHandler() = default;
   explicit CraftingHandler(const ItemDatabase &ItemDb);
   void addRecipe(const CraftingRecipe &Recipe);
 
-  std::optional<std::vector<Item>> tryCraft(const std::vector<Item> &Items);
-  Item craftEnhancedItem(const std::vector<Item> &Items);
+  std::optional<std::vector<Item>> tryCraft(const std::vector<Item> &Items) const;
+  Item craftEnhancedItem(const std::vector<Item> &Items) const;
 
 private:
-  const ItemDatabase &ItemDb;
+  const ItemDatabase *ItemDb = nullptr;
   CraftingNode Tree;
 };
 

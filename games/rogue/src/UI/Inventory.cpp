@@ -4,6 +4,7 @@
 #include <rogue/Components/LOS.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
 #include <rogue/Level.h>
@@ -42,7 +43,7 @@ InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  Level &Lvl,
                                                  const std::string &Header)
     : BaseRectDecorator({2, 2}, {40, 18}, nullptr), Ctrl(Ctrl), Inv(Inv),
-      Entity(Entity), Lvl(Lvl), InvHandler(Entity, Lvl.Reg) {
+      Entity(Entity), Lvl(Lvl), InvHandler(Entity, Lvl.Reg, CraftingHandler()) {
   InvHandler.setEventHub(Ctrl.getEventHub());
   List = std::make_shared<ListSelect>(Pos, getSize());
   Comp = std::make_shared<Frame>(List, Pos, getSize(), Header);
@@ -124,7 +125,7 @@ bool InventoryController::handleInput(int Char) {
       Ctrl.setTargetUI(PC.Pos, Range, Lvl,
                        [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
                         ItemIdx](auto TgEt, auto) -> void {
-                         InventoryHandler IH(E, R);
+                         InventoryHandler IH(E, R, CraftingHandler());
                          IH.setEventHub(Hub);
                          IH.tryUseItemOnTarget(ItemIdx, TgEt);
                        });
@@ -135,7 +136,7 @@ bool InventoryController::handleInput(int Char) {
       Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
                        [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
                         ItemIdx](auto TgEt, auto) -> void {
-                         InventoryHandler IH(E, R);
+                         InventoryHandler IH(E, R, CraftingHandler());
                          IH.setEventHub(Hub);
                          IH.tryUseItemOnTarget(ItemIdx, TgEt);
                        });

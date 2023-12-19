@@ -24,7 +24,7 @@ CraftingNode::search(const std::vector<Item> &Items) const {
   return Node->ResultItems;
 }
 
-CraftingHandler::CraftingHandler(const ItemDatabase &ItemDb) : ItemDb(ItemDb) {}
+CraftingHandler::CraftingHandler(const ItemDatabase &ItemDb) : ItemDb(&ItemDb) {}
 
 void CraftingHandler::addRecipe(const CraftingRecipe &Recipe) {
   if (Recipe.getResultItems().empty() || Recipe.getRequiredItems().empty()) {
@@ -43,7 +43,7 @@ void CraftingHandler::addRecipe(const CraftingRecipe &Recipe) {
 }
 
 std::optional<std::vector<Item>>
-CraftingHandler::tryCraft(const std::vector<Item> &Items) {
+CraftingHandler::tryCraft(const std::vector<Item> &Items) const {
   if (Items.size() < 2) {
     return std::nullopt;
   }
@@ -58,7 +58,7 @@ CraftingHandler::tryCraft(const std::vector<Item> &Items) {
     if (Result) {
       std::vector<Item> CraftedItems;
       for (auto &Id : *Result) {
-        CraftedItems.push_back(ItemDb.createItem(Id));
+        CraftedItems.push_back(ItemDb->createItem(Id));
       }
       return CraftedItems;
     }
@@ -152,7 +152,7 @@ computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
 
 } // namespace
 
-Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) {
+Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) const {
   auto &First = Items.at(0);
   auto Flags = First.getCapabilityFlags();
 

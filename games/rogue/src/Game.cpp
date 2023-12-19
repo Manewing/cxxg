@@ -90,8 +90,8 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
       ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)),
       EntityDb(EntityDatabase::load(ItemDb, Cfg.EntityDbConfig)),
-      LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)),
-      Ctx({ItemDb, EntityDb, LevelDb}),
+      LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)), Crafter(ItemDb),
+      Ctx({ItemDb, EntityDb, LevelDb, Crafter}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
       UICtrl(Scr) {}
@@ -99,7 +99,8 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
 namespace {
 
 void fillPlayerInventory(entt::registry &Reg, entt::entity Player,
-                         const GameConfig &Cfg, const ItemDatabase &ItemDb) {
+                         const GameConfig &Cfg, const ItemDatabase &ItemDb,
+                         const CraftingHandler &Crafter) {
   // FIXME this should be part of an enemy/NPC AI system
   auto &Inv = Reg.get<InventoryComp>(Player).Inv;
   for (const auto &ItCfg : Cfg.InitialItems) {
@@ -109,7 +110,7 @@ void fillPlayerInventory(entt::registry &Reg, entt::entity Player,
   }
 
   // Try equipping items
-  InventoryHandler InvHandler(Player, Reg);
+  InventoryHandler InvHandler(Player, Reg, Crafter);
   InvHandler.autoEquipItems();
 }
 
@@ -132,7 +133,7 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
 
   // Fill player inventory
   World->getCurrentLevelOrFail().createPlayer();
-  fillPlayerInventory(getLvlReg(), getPlayer(), Cfg, ItemDb);
+  fillPlayerInventory(getLvlReg(), getPlayer(), Cfg, ItemDb, Crafter);
 
   cxxg::Game::initialize(BufferedInput, TickDelayUs);
 

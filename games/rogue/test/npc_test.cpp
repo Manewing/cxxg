@@ -12,6 +12,7 @@
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/Context.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/EntityDatabase.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/LevelDatabase.h>
@@ -76,7 +77,8 @@ int main(int Argc, char *Argv[]) {
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
   rogue::LevelDatabase LevelDb;
-  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb};
+  rogue::CraftingHandler Crafter(ItemDb);
+  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb, Crafter};
 
   LevelGeneratorLoader LvlGenLoader(Ctx);
   auto LG = LvlGenLoader.load(0, Argv[1]);

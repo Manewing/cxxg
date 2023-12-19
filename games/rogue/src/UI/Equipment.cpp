@@ -8,6 +8,7 @@
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/Tooltip.h>
+#include <rogue/CraftingHandler.h>
 
 namespace rogue::ui {
 
@@ -19,7 +20,7 @@ EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
     : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip),
-      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg) {
+      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg, CraftingHandler()) {
   InvHandler.setEventHub(Ctrl.getEventHub());
   ItSel = std::make_shared<ItemSelect>(Pos);
   Comp = std::make_shared<Frame>(ItSel, Pos, getSize(), "Equipment");

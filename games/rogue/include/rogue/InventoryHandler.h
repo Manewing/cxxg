@@ -9,13 +9,15 @@
 namespace rogue {
 class Inventory;
 class Equipment;
+class CraftingHandler ;
 } // namespace rogue
 
 namespace rogue {
 
 class InventoryHandler : public EventHubConnector {
 public:
-  explicit InventoryHandler(entt::entity Entity, entt::registry &Reg);
+  explicit InventoryHandler(entt::entity Entity, entt::registry &Reg,
+  const CraftingHandler &Crafter);
 
   /// Updates the inventory handler with the latest inventory and equipment
   void refresh();
@@ -52,15 +54,21 @@ public:
   /// Auto equip items from inventory
   void autoEquipItems();
 
+  /// Tries to craft the items in the inventory
+  void tryCraftItems();
+
 private:
   entt::entity Entity;
   entt::registry &Reg;
+  const CraftingHandler &Crafter;
+
   Inventory *Inv = nullptr;
   Equipment *Equip = nullptr;
 
   // FIXME we can get rid of this when changing to general events for
   // equip/unequip, etc.
   bool IsPlayer = false;
+
 };
 
 } // namespace rogue

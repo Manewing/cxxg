@@ -1,3 +1,4 @@
+#include <rogue/CraftingHandler.h>
 #include <rogue/EntityAssemblers.h>
 #include <rogue/Event.h>
 #include <rogue/InventoryHandler.h>
@@ -57,7 +58,8 @@ bool AutoEquipAssembler::isPostProcess() const { return true; }
 
 void AutoEquipAssembler::assemble(entt::registry &Reg,
                                   entt::entity Entity) const {
-  InventoryHandler InvHdlr(Entity, Reg);
+  CraftingHandler Crafter;
+  InventoryHandler InvHdlr(Entity, Reg, Crafter);
   InvHdlr.autoEquipItems();
 }
 

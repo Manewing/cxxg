@@ -68,4 +68,6 @@ std::size_t Inventory::size() const { return Items.size(); }
 
 bool Inventory::empty() const { return Items.empty(); }
 
+void Inventory::clear() { Items.clear(); }
+
 } // namespace rogue

@@ -21,6 +21,7 @@ public:
 
 public:
   const Item &getItem(std::size_t ItemIdx) const { return Items.at(ItemIdx); }
+  void setItems(std::vector<Item> Items) { this->Items = std::move(Items); }
   const std::vector<Item> &getItems() const { return Items; }
 
   void addItem(Item It);
@@ -34,6 +35,7 @@ public:
 
   std::size_t size() const;
   bool empty() const;
+  void clear();
 
 private:
   std::vector<Item> Items;

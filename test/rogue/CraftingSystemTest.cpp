@@ -329,9 +329,10 @@ TEST_F(CraftingSystemTest, MultipleRecipes) {
   rogue::CraftingRecipe RecipeAB(
       {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
       {DummyItems.HelmetA.ItemId});
-  rogue::CraftingRecipe RecipeABC(
-      {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId, DummyItems.CraftingC.ItemId},
-      {DummyItems.HelmetB.ItemId});
+  rogue::CraftingRecipe RecipeABC({DummyItems.CraftingA.ItemId,
+                                   DummyItems.CraftingB.ItemId,
+                                   DummyItems.CraftingC.ItemId},
+                                  {DummyItems.HelmetB.ItemId});
   rogue::CraftingRecipe RecipeAC(
       {DummyItems.CraftingA.ItemId, DummyItems.CraftingC.ItemId},
       {DummyItems.Potion.ItemId});
@@ -357,6 +358,14 @@ TEST_F(CraftingSystemTest, MultipleRecipes) {
   ASSERT_TRUE(ResultVec.has_value());
   ASSERT_EQ(ResultVec->size(), 1);
   EXPECT_EQ(ResultVec->at(0).getName(), "potion");
+}
+
+TEST_F(CraftingSystemTest, NoItemDb) {
+  rogue::CraftingHandler System;
+  auto A = Db.createItem(DummyItems.CraftingA.ItemId);
+  auto B = Db.createItem(DummyItems.CraftingB.ItemId);
+  auto ResultVec = System.tryCraft({A, B});
+  EXPECT_FALSE(ResultVec.has_value());
 }
 
 } // namespace

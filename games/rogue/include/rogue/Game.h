@@ -16,6 +16,7 @@
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
 #include <ymir/Types.hpp>
+#include <rogue/CraftingHandler.h>
 
 namespace rogue {
 struct Interaction;
@@ -93,6 +94,7 @@ private:
   ItemDatabase ItemDb;
   EntityDatabase EntityDb;
   LevelDatabase LevelDb;
+  CraftingHandler Crafter;
 
   GameContext Ctx;
 
