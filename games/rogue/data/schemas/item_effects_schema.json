@@ -59,6 +59,9 @@
           },
           {
             "$ref": "#/defs/effect/dismantle"
+          },
+          {
+            "const": "null"
           }
         ]
       },

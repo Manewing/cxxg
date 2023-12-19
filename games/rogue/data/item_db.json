@@ -225,11 +225,15 @@
       "name": "Blueberry",
       "description": "A blue berry that can be eaten",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": ["crafting", "consumable"],
       "capabilities": [
         {
           "type": "use_on",
           "effect": "minor_quick_health_regen_effect"
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_health_effect"
         }
       ]
     },
@@ -237,7 +241,7 @@
       "name": "Green Goo",
       "description": "It may not win any culinary awards for taste, but it holds a unique restorative power.",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": ["crafting", "consumable"],
       "capabilities": [
         {
           "type": "use_on",
@@ -253,7 +257,7 @@
       "name": "Sewer Meat",
       "description": "Obtained from the unsavory denizens of the sewers, this dubious food source offers a double-edged benefit.",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": ["crafting", "consumable"],
       "capabilities": [
         {
           "type": "use_on",
@@ -321,6 +325,10 @@
         {
           "type": "equipment",
           "effect": "melee_5"
+        },
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_poison"
         }
       ],
       "specializations": [
@@ -436,6 +444,30 @@
         {
           "type": "use_on",
           "effect": "invisibility_buff_comp"
+        }
+      ]
+    },
+    {
+      "name": "Arcane Potion",
+      "description": "Base for potions brewing",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting_base"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "null"
+        }
+      ]
+    },
+    {
+      "name": "Armor Plating",
+      "description": "Can be used to enhance equipment with armor",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_2"
         }
       ]
     },
@@ -1042,6 +1074,15 @@
           "name": "L3 Key",
           "min_count": 1,
           "max_count": 1,
+          "weight": -1
+        }
+      ]
+    },
+    "null": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "null",
           "weight": -1
         }
       ]

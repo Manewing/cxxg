@@ -260,6 +260,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     auto Effect = createEffect(DB, V);
     Effects.emplace(EffectName, Effect);
   }
+  Effects["null"] = std::make_shared<NullEffect>();
 
   // Create specializations
   std::map<std::string, std::shared_ptr<ItemSpecialization>> Specializations;
