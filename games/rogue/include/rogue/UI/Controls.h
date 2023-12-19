@@ -50,7 +50,9 @@ struct Controls {
   // Inventory controls
   static constexpr KeyOption Info = {'q', "Info", "Show info about the item"};
   static constexpr KeyOption Navigate = {'^', "Nav.", "Navigate up/down"};
-  static constexpr KeyOption Take = {'e', "Take", "Take the item"};
+  static constexpr KeyOption Take = {'e', "Take", "Take the item stack"};
+  static constexpr KeyOption TakeOne = {'E', "Take x1",
+                                        "Take one item from the stack"};
   static constexpr KeyOption SpendPoint = {'e', "Spend", "Spend a point"};
   static constexpr KeyOption Equip = {'e', "Equip", "Equip the selected item"};
   static constexpr KeyOption Unequip = {'u', "Unequip",
@@ -58,7 +60,10 @@ struct Controls {
   static constexpr KeyOption Drop = {'d', "Drop", "Drop the selected item"};
   static constexpr KeyOption Dismantle = {'a', "Dismantle",
                                           "Dismantle the selected item"};
-  static constexpr KeyOption Store = {'s', "Store", "Store the selected item"};
+  static constexpr KeyOption Store = {'S', "Store",
+                                      "Store the selected item stack"};
+  static constexpr KeyOption StoreOne = {'s', "Store x1",
+                                         "Store one item of selected stack"};
   static constexpr KeyOption Use = {
       'u', "Use", "Use the selected item, only works for consumables."};
   static constexpr KeyOption SelectTarget = {' ', "Sel.",

@@ -114,6 +114,7 @@ public:
   }
 
 public:
+  SetComponentEffect() = default;
   explicit SetComponentEffect(const CompType &Comp) : Comp(Comp) {}
 
   std::shared_ptr<ItemEffect> clone() const final {

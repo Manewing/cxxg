@@ -150,6 +150,11 @@ bool InventoryController::handleInput(int Char) {
   case Controls::Dismantle.Char: {
     InvHandler.tryDismantleItem(ItemIdx);
   } break;
+  case Controls::StoreOne.Char:
+    if (auto *LUI = Ctrl.getWindowOfType<LootController>()) {
+      LUI->getInventory().addItem(Inv.takeItem(ItemIdx, 1));
+    }
+    break;
   case Controls::Store.Char:
     if (auto *LUI = Ctrl.getWindowOfType<LootController>()) {
       LUI->getInventory().addItem(Inv.takeItem(ItemIdx));
@@ -184,6 +189,7 @@ std::string InventoryController::getInteractMsg() const {
   }
   if (Ctrl.hasLootUI()) {
     Options.push_back(Controls::Store);
+    Options.push_back(Controls::StoreOne);
   }
   return KeyOption::getInteractMsg(Options);
 }
@@ -201,6 +207,14 @@ bool LootController::handleInput(int Char) {
     }
     auto &EtInv = Lvl.Reg.get<InventoryComp>(Entity).Inv;
     EtInv.addItem(Inv.takeItem(List->getSelectedElement()));
+    updateElements();
+  } break;
+  case Controls::TakeOne.Char: {
+    if (Inv.empty()) {
+      break;
+    }
+    auto &EtInv = Lvl.Reg.get<InventoryComp>(Entity).Inv;
+    EtInv.addItem(Inv.takeItem(List->getSelectedElement(), 1));
     updateElements();
   } break;
   default:

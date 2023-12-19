@@ -388,8 +388,8 @@ entt::entity Game::getPlayer() const {
   return Player;
 }
 
-// FIXME this only returns a single one but there is the possibility to have multiple
-// and also cycle the options. We need a proper HUD UI to handle this
+// FIXME this only returns a single one but there is the possibility to have
+// multiple and also cycle the options. We need a proper HUD UI to handle this
 Interaction *Game::getAvailableInteraction() {
   auto Player = getPlayer();
   auto PlayerPos = getLvlReg().get<PositionComp>(Player).Pos;

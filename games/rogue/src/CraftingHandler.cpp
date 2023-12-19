@@ -24,7 +24,8 @@ CraftingNode::search(const std::vector<Item> &Items) const {
   return Node->ResultItems;
 }
 
-CraftingHandler::CraftingHandler(const ItemDatabase &ItemDb) : ItemDb(&ItemDb) {}
+CraftingHandler::CraftingHandler(const ItemDatabase &ItemDb)
+    : ItemDb(&ItemDb) {}
 
 void CraftingHandler::addRecipe(const CraftingRecipe &Recipe) {
   if (Recipe.getResultItems().empty() || Recipe.getRequiredItems().empty()) {

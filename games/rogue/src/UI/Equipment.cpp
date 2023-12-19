@@ -1,5 +1,6 @@
 #include <cxxg/Utils.h>
 #include <rogue/Components/Items.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/Item.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
@@ -8,7 +9,6 @@
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/Tooltip.h>
-#include <rogue/CraftingHandler.h>
 
 namespace rogue::ui {
 

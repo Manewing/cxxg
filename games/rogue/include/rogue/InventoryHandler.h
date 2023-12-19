@@ -9,7 +9,7 @@
 namespace rogue {
 class Inventory;
 class Equipment;
-class CraftingHandler ;
+class CraftingHandler;
 } // namespace rogue
 
 namespace rogue {
@@ -17,7 +17,7 @@ namespace rogue {
 class InventoryHandler : public EventHubConnector {
 public:
   explicit InventoryHandler(entt::entity Entity, entt::registry &Reg,
-  const CraftingHandler &Crafter);
+                            const CraftingHandler &Crafter);
 
   /// Updates the inventory handler with the latest inventory and equipment
   void refresh();
@@ -68,7 +68,6 @@ private:
   // FIXME we can get rid of this when changing to general events for
   // equip/unequip, etc.
   bool IsPlayer = false;
-
 };
 
 } // namespace rogue

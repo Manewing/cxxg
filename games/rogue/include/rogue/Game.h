@@ -4,6 +4,7 @@
 #include <cxxg/Game.h>
 #include <memory>
 #include <rogue/Context.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/EntityDatabase.h>
 #include <rogue/EventHub.h>
 #include <rogue/GameWorld.h>
@@ -16,7 +17,6 @@
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
 #include <ymir/Types.hpp>
-#include <rogue/CraftingHandler.h>
 
 namespace rogue {
 struct Interaction;

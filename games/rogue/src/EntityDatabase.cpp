@@ -134,7 +134,8 @@ makeInventoryCompAssembler(ItemDatabase &ItemDb, const rapidjson::Value &Json) {
   if (JsonObj.HasMember("max_stack_size")) {
     MaxStackSize = JsonObj["max_stack_size"].GetUint();
   }
-  return std::make_shared<InventoryCompAssembler>(ItemDb, LootTable, MaxStackSize);
+  return std::make_shared<InventoryCompAssembler>(ItemDb, LootTable,
+                                                  MaxStackSize);
 }
 
 std::shared_ptr<LootedInteractCompAssembler>

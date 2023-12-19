@@ -5,10 +5,10 @@ namespace rogue {
 void EquipmentSlot::equip(Item I) {
   if ((I.getType() & BaseTypeFilter) == ItemType::None) {
     throw std::runtime_error("Can not equip item: " + I.getName() +
-                             +" of type " + I.getType().str() +
-                             " (" + std::to_string(int(I.getType())) +
-                             ") to slot: " + BaseTypeFilter.str() +
-                             " (" + std::to_string(int(BaseTypeFilter)) + ")");
+                             +" of type " + I.getType().str() + " (" +
+                             std::to_string(int(I.getType())) +
+                             ") to slot: " + BaseTypeFilter.str() + " (" +
+                             std::to_string(int(BaseTypeFilter)) + ")");
   }
   It = std::move(I);
 }
