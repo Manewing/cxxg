@@ -22,26 +22,41 @@ TEST(InventoryTest, AddItem) {
   rogue::Inventory Inv;
   rogue::Item It(DummyConsumable, 2);
   Inv.addItem(It);
-  ASSERT_EQ(Inv.size(), 1);
+  ASSERT_EQ(Inv.size(), 1) << Inv;
   EXPECT_EQ(Inv.getItem(0).StackSize, 2);
   EXPECT_EQ(Inv.getItem(0).getName(), "consumable");
   EXPECT_EQ(Inv.getItemIndexForId(1), 0);
   Inv.addItem(It);
-  ASSERT_EQ(Inv.size(), 1);
+  ASSERT_EQ(Inv.size(), 1) << Inv;
   EXPECT_EQ(Inv.getItem(0).StackSize, 4);
   EXPECT_EQ(Inv.getItemIndexForId(1), 0);
   Inv.addItem(It);
-  ASSERT_EQ(Inv.size(), 2);
+  ASSERT_EQ(Inv.size(), 2) << Inv;
   EXPECT_EQ(Inv.getItem(0).StackSize, 5);
   EXPECT_EQ(Inv.getItem(1).StackSize, 1);
   EXPECT_EQ(Inv.getItemIndexForId(1), 0);
   Inv.addItem(It);
   Inv.addItem(It);
   Inv.addItem(It);
-  ASSERT_EQ(Inv.size(), 3);
+  ASSERT_EQ(Inv.size(), 3) << Inv;
   EXPECT_EQ(Inv.getItem(0).StackSize, 5);
   EXPECT_EQ(Inv.getItem(1).StackSize, 5);
   EXPECT_EQ(Inv.getItem(2).StackSize, 2);
+  EXPECT_EQ(Inv.getItemIndexForId(1), 0);
+}
+
+TEST(InventoryTest, AddItemInvMaxStack) {
+  rogue::Inventory Inv(/*MaxStackSize=*/1);
+  rogue::Item It(DummyConsumable, 2);
+  Inv.addItem(It);
+  ASSERT_EQ(Inv.size(), 2) << Inv;
+  EXPECT_EQ(Inv.getItem(0).StackSize, 1);
+  EXPECT_EQ(Inv.getItem(0).getName(), "consumable");
+  EXPECT_EQ(Inv.getItemIndexForId(1), 0);
+  Inv.addItem(It);
+  ASSERT_EQ(Inv.size(), 4) << Inv;
+  EXPECT_EQ(Inv.getItem(0).StackSize, 1);
+  EXPECT_EQ(Inv.getItem(3).StackSize, 1);
   EXPECT_EQ(Inv.getItemIndexForId(1), 0);
 }
 

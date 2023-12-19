@@ -20,6 +20,8 @@ public:
                           entt::entity Entity, entt::registry &Reg);
 
 public:
+  Inventory() = default;
+  Inventory(unsigned MaxStackSize) : MaxStackSize(MaxStackSize) {}
   const Item &getItem(std::size_t ItemIdx) const { return Items.at(ItemIdx); }
   void setItems(std::vector<Item> Items) { this->Items = std::move(Items); }
   const std::vector<Item> &getItems() const { return Items; }
@@ -39,7 +41,12 @@ public:
 
 private:
   std::vector<Item> Items;
+
+  /// A max stack size of zero indicates no limit
+  unsigned MaxStackSize = 0;
 };
+
+std::ostream &operator<<(std::ostream &OS, const Inventory &Inv);
 
 } // namespace rogue
 

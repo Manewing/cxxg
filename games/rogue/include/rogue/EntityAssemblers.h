@@ -55,12 +55,13 @@ private:
 class InventoryCompAssembler : public EntityAssembler {
 public:
   InventoryCompAssembler(const ItemDatabase &ItemDb,
-                         const std::string &LootTable);
+                         const std::string &LootTable, unsigned MaxStackSize);
   void assemble(entt::registry &Reg, entt::entity Entity) const override;
 
 private:
   const ItemDatabase &ItemDb;
   std::string LootTable;
+  unsigned MaxStackSize = 0;
 };
 
 class AutoEquipAssembler : public EntityAssembler {

@@ -28,17 +28,19 @@ void RaceCompAssembler::assemble(entt::registry &Reg,
 }
 
 InventoryCompAssembler::InventoryCompAssembler(const ItemDatabase &ItemDb,
-                                               const std::string &LootTable)
-    : ItemDb(ItemDb), LootTable(LootTable) {}
+                                               const std::string &LootTable,
+                                               unsigned MaxStackSize)
+    : ItemDb(ItemDb), LootTable(LootTable), MaxStackSize(MaxStackSize) {}
 
 namespace {
 
 Inventory generateLootInventory(const ItemDatabase &ItemDb,
-                                const std::string &LootTable) {
+                                const std::string &LootTable,
+                                unsigned MaxStackSize) {
   const auto &LtCt = ItemDb.getLootTable(LootTable);
   auto Loot = LtCt->generateLoot();
 
-  Inventory Inv;
+  Inventory Inv(MaxStackSize);
   for (const auto &Rw : Loot) {
     auto It = ItemDb.createItem(Rw.ItId, Rw.Count);
     Inv.addItem(It);
@@ -50,7 +52,7 @@ Inventory generateLootInventory(const ItemDatabase &ItemDb,
 
 void InventoryCompAssembler::assemble(entt::registry &Reg,
                                       entt::entity Entity) const {
-  auto Inv = generateLootInventory(ItemDb, LootTable);
+  auto Inv = generateLootInventory(ItemDb, LootTable, MaxStackSize);
   Reg.emplace<InventoryComp>(Entity, Inv);
 }
 
