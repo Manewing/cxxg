@@ -816,6 +816,57 @@
       "capabilities": []
     },
     {
+      "name": "Leather",
+      "description": "A sheet of leather",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Fire Stone",
+      "description": "A stone enchanted with fire magic",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Ash",
+      "description": "A pile of ash",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Glass Vial",
+      "description": "A glas vial TODO",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Arcane Liquid",
+      "description": "An arcane liquid TODO",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Charcoal",
+      "description": "A piece of charcoal",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "remove_poison_effect"
+        },
+        {
+          "type": "use_on",
+          "effect": "remove_poison_debuff"
+        }
+      ]
+    },
+    {
       "name": "Rune Dust",
       "description": "A dust of rune",
       "max_stack_size": 99,

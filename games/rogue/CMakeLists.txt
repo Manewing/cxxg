@@ -18,6 +18,7 @@ set(HEADER_FILES
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h
   include/rogue/Context.h
+  include/rogue/CraftingDatabase.h
   include/rogue/CraftingHandler.h
   include/rogue/EntityAssemblers.h
   include/rogue/EntityDatabase.h
@@ -86,6 +87,7 @@ set(SOURCE_FILES
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
   src/Components/Visual.cpp
+  src/CraftingDatabase.cpp
   src/CraftingHandler.cpp
   src/EntityAssemblers.cpp
   src/EntityDatabase.cpp
@@ -193,7 +195,7 @@ add_custom_target(
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/data/
 )
 
-file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json)
+file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json ${CMAKE_CURRENT_SOURCE_DIR}/data/*.yaml)
 file(GLOB SCHEMA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/*.json)
 file(GLOB LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/levels/*.json)
 add_custom_command(
@@ -210,6 +212,13 @@ add_custom_command(
         ${SCHEMA_FILES}
     --output-dir
       ${CMAKE_CURRENT_BINARY_DIR}/data/schemas
+
+  # Post-process all YAML data files
+  COMMAND
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/yaml_json.py
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/crafting_db.yaml
+      ${CMAKE_CURRENT_BINARY_DIR}/data/crafting_db.json
+
 
   # Post-process JSON configurations
   COMMAND

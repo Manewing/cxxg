@@ -85,6 +85,18 @@ add_schema_test(
 )
 
 add_schema_test(
+  NAME crafting_db
+  JSON_FILES ${BUILD_DATA_DIR}/crafting_db.json
+  SCHEMA ${SCHEMAS_DIR}/crafting_db_schema.json
+)
+
+add_schema_test(
+  NAME build_crafting_db
+  JSON_FILES ${BUILD_DATA_DIR}/crafting_db.json
+  SCHEMA ${BUILD_SCHEMAS_DIR}/crafting_db_schema.json
+)
+
+add_schema_test(
   NAME creature_db
   JSON_FILES ${BUILD_DATA_DIR}/creature_db.json
   SCHEMA ${SCHEMAS_DIR}/creature_db_schema.json

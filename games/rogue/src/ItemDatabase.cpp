@@ -171,6 +171,30 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
   return It->second(DB, V);
 }
 
+static void addDefaultConstructEffects(
+    std::map<std::string, std::shared_ptr<ItemEffect>> &Effects,
+    const std::string &EffectName, const std::shared_ptr<ItemEffect> &Effect) {
+  const auto It = Effects.find(EffectName);
+  if (It != Effects.end()) {
+    throw std::out_of_range("Conflicting special effect (reserved name): " +
+                            EffectName);
+  }
+  Effects[EffectName] = Effect;
+}
+
+static void addDefaultConstructEffects(
+    std::map<std::string, std::shared_ptr<ItemEffect>> &Effects) {
+  using PoisonDebuffEffect = ApplyBuffItemEffect<PoisonDebuffComp, HealthComp>;
+  using RemovePoisonEffect = RemoveEffect<PoisonDebuffEffect>;
+  using RemovePoisonDebuff = RemoveComponentEffect<PoisonDebuffComp>;
+
+  addDefaultConstructEffects(Effects, "null", std::make_shared<NullEffect>());
+  addDefaultConstructEffects(Effects, "remove_poison_effect",
+                             std::make_shared<RemovePoisonEffect>());
+  addDefaultConstructEffects(Effects, "remove_poison_debuff",
+                             std::make_shared<RemovePoisonDebuff>());
+}
+
 static std::shared_ptr<ItemSpecialization>
 createSpecialization(const rapidjson::Value &V) {
   static std::map<std::string,
@@ -260,7 +284,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     auto Effect = createEffect(DB, V);
     Effects.emplace(EffectName, Effect);
   }
-  Effects["null"] = std::make_shared<NullEffect>();
+  addDefaultConstructEffects(Effects);
 
   // Create specializations
   std::map<std::string, std::shared_ptr<ItemSpecialization>> Specializations;

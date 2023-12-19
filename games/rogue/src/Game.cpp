@@ -94,7 +94,12 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
       Ctx({ItemDb, EntityDb, LevelDb, Crafter}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
-      UICtrl(Scr) {}
+      UICtrl(Scr) {
+  auto CraftDb = CraftingDatabase::load(ItemDb, Cfg.CraftingDbConfig);
+  for (const auto &Recipe : CraftDb.getRecipes()) {
+    Crafter.addRecipe(Recipe);
+  }
+}
 
 namespace {
 

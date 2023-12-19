@@ -2,6 +2,7 @@
 #define ROGUE_CRAFTING_HANDLER_H
 
 #include <optional>
+#include <rogue/CraftingDatabase.h>
 #include <rogue/Item.h>
 #include <vector>
 
@@ -10,23 +11,6 @@ class ItemDatabase;
 }
 
 namespace rogue {
-
-class CraftingRecipe {
-public:
-  using ItemId = int;
-
-public:
-  CraftingRecipe(std::vector<ItemId> RequiredItems,
-                 std::vector<ItemId> ResultItems)
-      : RequiredItems(std::move(RequiredItems)), ResultItems(ResultItems) {}
-
-  const std::vector<ItemId> &getRequiredItems() const { return RequiredItems; }
-  const std::vector<ItemId> &getResultItems() const { return ResultItems; }
-
-private:
-  std::vector<ItemId> RequiredItems;
-  std::vector<ItemId> ResultItems;
-};
 
 struct CraftingNode {
   using ItemId = int;

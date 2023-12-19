@@ -100,50 +100,6 @@ namespace rogue {
 // Nature healing potion:
 // - Use: Heals 5 HP
 // - Use: Health generation increased
-//
-// recipes:
-//   - ingredients:
-//       - Leather Scrap
-//     results:
-//       - Leather
-//   - ingredients:
-//       - Wooden Log
-//       - Wooden Log
-//       - Leather Scrap
-//       - Iron Scrap
-//       - Wooden Log
-//       - Wooden Log
-//     results:
-//       - Wooden Shield
-//   - ingredients:
-//       - Rune Dust
-//       - Iron Scrap
-//       - Stone
-//     results:
-//       - Fire Stone
-//   - ingredients:
-//       - Wooden Log
-//       - Wooden Log
-//       - Wooden Log
-//       - Fire Stone
-//     results:
-//       - Ash
-//       - Ash
-//       - Fire Stone
-//       - Charcoal
-//   - ingredients:
-//       - Glass Vial
-//       - Arcane Liquid
-//     results:
-//       - Arcane Potion Base
-
-class CraftingDatabase {
-public:
-  CraftingDatabase(const ItemDatabase &Db) : Db(Db) { (void)this->Db; }
-
-private:
-  const ItemDatabase &Db;
-};
 
 } // namespace rogue
 
