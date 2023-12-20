@@ -20,6 +20,7 @@ namespace rogue::ui {
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
+// FIXME Move this to UI/Item
 cxxg::types::TermColor
 InventoryControllerBase::getColorForItemType(ItemType Type) {
   if (Type & ItemType::Quest) {

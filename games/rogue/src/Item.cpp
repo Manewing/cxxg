@@ -12,6 +12,7 @@ Item::Item(const ItemPrototype &Proto, int StackSize,
 
 namespace {
 
+// FIXME Move this to UI/Item
 std::string getQualifierName(const StatPoints &P) {
   std::string Prefix = "+" + std::to_string(P.sum()) + " ";
   if (P.Str == P.Dex && P.Str == P.Int && P.Str == P.Vit) {

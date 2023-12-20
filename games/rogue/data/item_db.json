@@ -352,8 +352,7 @@
           "type": "equipment",
           "effect": "low_chance_to_apply_poison"
         }
-      ],
-      "specializations": []
+      ]
     },
     {
       "name": "Fire Wand",
@@ -1093,6 +1092,40 @@
         }
       ]
     },
+    "common_crafting": {
+      "rolls": 3,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Wooden Log",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Stone",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Iron Scrap",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Rune Dust",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        }
+
+      ]
+    },
     "l1_key": {
       "rolls": 1,
       "slots": [
@@ -1163,6 +1196,11 @@
         {
           "type": "table",
           "ref": "common_equip",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "common_crafting",
           "weight": 20
         },
         {

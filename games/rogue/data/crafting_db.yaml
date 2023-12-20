@@ -13,6 +13,16 @@ recipes:
     results:
       - Wooden Shield
   - ingredients:
+      - Wooden Log
+      - Leather Scrap
+      - Leather Scrap
+      - Iron Scrap
+      - Leather Scrap
+      - Leather Scrap
+      - Wooden Log
+    results:
+      - Wooden Bow
+  - ingredients:
       - Rune Dust
       - Iron Scrap
       - Stone
