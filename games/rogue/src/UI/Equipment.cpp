@@ -6,9 +6,9 @@
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/Frame.h>
-#include <rogue/UI/Inventory.h>
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/Tooltip.h>
+#include <rogue/UI/Item.h>
 
 namespace rogue::ui {
 
@@ -89,7 +89,7 @@ std::string getSelectValue(const EquipmentSlot &ES) {
 
 cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
   if (ES.It) {
-    return InventoryControllerBase::getColorForItemType(ES.It->getType());
+    return getColorForItemType(ES.It->getType());
   }
   return cxxg::types::Color::NONE;
 }
@@ -100,7 +100,7 @@ void EquipmentController::addSelect(const EquipmentSlot &ES,
                                     cxxg::types::Position Pos) {
   constexpr const auto NoColor = cxxg::types::Color::NONE;
   ItSel->addSelect<LabeledSelect>(ES.BaseTypeFilter.str(), getSelectValue(ES),
-                                  Pos, 25, NoColor, getSelectColor(ES));
+                                  Pos, 25, NoColor, NoColor);
 }
 
 void EquipmentController::updateSelectValues() const {

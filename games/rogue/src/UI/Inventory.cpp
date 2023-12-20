@@ -14,29 +14,12 @@
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/ListSelect.h>
 #include <rogue/UI/Tooltip.h>
+#include <rogue/UI/Item.h>
 
 namespace rogue::ui {
 
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
-
-// FIXME Move this to UI/Item
-cxxg::types::TermColor
-InventoryControllerBase::getColorForItemType(ItemType Type) {
-  if (Type & ItemType::Quest) {
-    return cxxg::types::RgbColor{195, 196, 90};
-  }
-  if (Type & ItemType::EquipmentMask) {
-    return cxxg::types::RgbColor{227, 175, 91};
-  }
-  if (Type & ItemType::Consumable) {
-    return cxxg::types::RgbColor{112, 124, 219};
-  }
-  if (Type & ItemType::Crafting) {
-    return cxxg::types::RgbColor{182, 186, 214};
-  }
-  return cxxg::types::Color::NONE;
-}
 
 InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  Inventory &Inv,
