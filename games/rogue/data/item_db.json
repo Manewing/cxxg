@@ -304,10 +304,6 @@
         },
         {
           "type": "equipment",
-          "effect": "stats_buff_effect_str_1"
-        },
-        {
-          "type": "equipment",
           "effect": "melee_2"
         }
       ]

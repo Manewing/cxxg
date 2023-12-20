@@ -124,13 +124,15 @@ bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
 
 void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
                    CapabilityFlags Flags) const {
-  if (Specialization) {
+  if (Specialization && Specialization->canApplyTo(Entity, Reg, Flags)) {
     Specialization->applyTo(Entity, Reg, Flags);
     if (SpecOverrides) {
       return;
     }
   }
-  getProto().applyTo(Entity, Reg, Flags);
+  if (getProto().canApplyTo(Entity, Reg, Flags)) {
+    getProto().applyTo(Entity, Reg, Flags);
+  }
 }
 
 bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
@@ -145,13 +147,15 @@ bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
 
 void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,
                       CapabilityFlags Flags) const {
-  if (Specialization) {
+  if (Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags)) {
     Specialization->removeFrom(Entity, Reg, Flags);
     if (SpecOverrides) {
       return;
     }
   }
-  getProto().removeFrom(Entity, Reg, Flags);
+  if (getProto().canRemoveFrom(Entity, Reg, Flags)) {
+    getProto().removeFrom(Entity, Reg, Flags);
+  }
 }
 
 const ItemPrototype &Item::getProto() const { return *Proto; }
