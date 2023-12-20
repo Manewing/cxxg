@@ -17,6 +17,7 @@ std::shared_ptr<ItemEffect> HealItemEffect::clone() const {
 bool HealItemEffect::canAddFrom(const ItemEffect &Other) const {
   if (auto *OtherHeal = dynamic_cast<const HealItemEffect *>(&Other)) {
     // Currently anything can be added may make sense to restrict this
+    (void)OtherHeal;
     return true;
   }
   return false;
@@ -47,6 +48,7 @@ std::shared_ptr<ItemEffect> DamageItemEffect::clone() const {
 bool DamageItemEffect::canAddFrom(const ItemEffect &Other) const {
   if (auto *OtherDamage = dynamic_cast<const DamageItemEffect *>(&Other)) {
     // Currently anything can be added may make sense to restrict this
+    (void)OtherDamage;
     return true;
   }
   return false;
@@ -79,6 +81,7 @@ std::shared_ptr<ItemEffect> DismantleEffect::clone() const {
 bool DismantleEffect::canAddFrom(const ItemEffect &Other) const {
   if (auto *OtherDismantle = dynamic_cast<const DismantleEffect *>(&Other)) {
     // Currently anything can be added may make sense to restrict this
+    (void)OtherDismantle;
     return true;
   }
   return false;

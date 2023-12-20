@@ -22,7 +22,7 @@ class Interact : public BaseRectDecorator {
 public:
   struct InteractionInfo {
     const entt::entity Entity;
-    const Interaction &Interaction;
+    const Interaction &Action;
   };
 
 public:

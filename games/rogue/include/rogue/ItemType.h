@@ -6,6 +6,7 @@
 #include <rogue/BitOps.h>
 #include <string>
 #include <ymir/Enum.hpp>
+#include <optional>
 
 namespace rogue {
 

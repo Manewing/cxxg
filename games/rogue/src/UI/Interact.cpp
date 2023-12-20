@@ -83,10 +83,10 @@ void Interact::handleInteraction() {
   const auto &Info = Interactions.at(SelIdx);
 
   auto &PC = Lvl.Reg.get<PlayerComp>(SrcEt);
-  PC.CurrentInteraction = Info.Interaction;
+  PC.CurrentInteraction = Info.Action;
 
   // This may switch level so needs to be last thing that is done
-  Info.Interaction.Execute(Lvl, SrcEt, Lvl.Reg);
+  Info.Action.Execute(Lvl, SrcEt, Lvl.Reg);
 }
 
 } // namespace rogue::ui
