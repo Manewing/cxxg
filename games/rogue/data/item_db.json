@@ -506,12 +506,6 @@
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
         }
-      ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "minor_stats_buff_effect"
-        }
       ]
     },
     {
@@ -593,12 +587,6 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
-        }
-      ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "minor_stats_buff_effect"
         }
       ]
     },
