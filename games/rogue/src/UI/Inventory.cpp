@@ -78,7 +78,7 @@ void InventoryControllerBase::updateElements() const {
     } else {
       SS << std::setw(3) << Item.StackSize << "x " << Item.getName();
     }
-    Elements.push_back({SS.str(), getColorForItemType(Item.getType())});
+    Elements.push_back({SS.str(), getColorForItem(Item)});
   }
   auto PrevIdx = List->getSelectedElement();
   List->setElements(Elements);

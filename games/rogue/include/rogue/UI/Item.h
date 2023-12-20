@@ -13,6 +13,8 @@ namespace rogue::ui {
 
 cxxg::types::TermColor getColorForItemType(ItemType Type);
 
+cxxg::types::TermColor getColorForItem(const Item &It);
+
 std::string getEffectDescription(const EffectInfo &EffInfo);
 
 std::string getCapabilityDescription(const std::vector<EffectInfo> &AllEffects,

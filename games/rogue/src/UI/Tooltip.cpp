@@ -27,7 +27,7 @@ ItemTooltip::ItemTooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
     : Tooltip(Pos, Size, getItemText(It),
               (Equipped ? "Equip: " : "") + It.getName()) {
   static_cast<Frame *>(Comp.get())
-      ->setHeaderColor(getColorForItemType(It.getType()));
+      ->setHeaderColor(getColorForItem(It));
 }
 
 } // namespace rogue::ui

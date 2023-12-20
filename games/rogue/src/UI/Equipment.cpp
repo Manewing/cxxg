@@ -89,7 +89,7 @@ std::string getSelectValue(const EquipmentSlot &ES) {
 
 cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
   if (ES.It) {
-    return getColorForItemType(ES.It->getType());
+    return getColorForItem(*ES.It);
   }
   return cxxg::types::Color::NONE;
 }

@@ -1,19 +1,20 @@
+#include <rogue/Components/Buffs.h>
+#include <rogue/Components/Combat.h>
+#include <rogue/Item.h>
+#include <rogue/ItemEffect.h>
 #include <rogue/UI/Item.h>
 #include <sstream>
-#include <rogue/Components/Buffs.h>
-#include <rogue/Item.h>
-#include <rogue/Components/Combat.h>
-#include <rogue/ItemEffect.h>
 
 namespace rogue::ui {
 
-cxxg::types::TermColor
-getColorForItemType(ItemType Type) {
+static constexpr auto EquipBaseColor = cxxg::types::RgbColor{130, 160, 210};
+
+cxxg::types::TermColor getColorForItemType(ItemType Type) {
   if (Type & ItemType::Quest) {
     return cxxg::types::RgbColor{195, 196, 90};
   }
   if (Type & ItemType::EquipmentMask) {
-    return cxxg::types::RgbColor{227, 175, 91};
+    return EquipBaseColor;
   }
   if (Type & ItemType::Consumable) {
     return cxxg::types::RgbColor{112, 124, 219};
@@ -22,6 +23,42 @@ getColorForItemType(ItemType Type) {
     return cxxg::types::RgbColor{182, 186, 214};
   }
   return cxxg::types::Color::NONE;
+}
+
+namespace {
+
+cxxg::types::TermColor
+getColorForItemEffects(const std::vector<EffectInfo> &Effects,
+                       CapabilityFlags Flags) {
+  unsigned Count = 0;
+  for (const auto &EffInfo : Effects) {
+    if (EffInfo.Flags & Flags) {
+      ++Count;
+    }
+  }
+  if (Count <= 1) {
+    return EquipBaseColor;
+  }
+  if (Count <= 2) {
+    return cxxg::types::RgbColor{50, 150, 50};
+  }
+  if (Count <= 3) {
+    return cxxg::types::RgbColor{185, 215, 50};
+  }
+  if (Count <= 4) {
+    return cxxg::types::RgbColor{240, 125, 50};
+  }
+  return cxxg::types::RgbColor{240, 60, 180};
+}
+
+} // namespace
+
+cxxg::types::TermColor getColorForItem(const Item &It) {
+  const auto AllEffects = It.getAllEffects();
+  if (It.getType() & ItemType::EquipmentMask && AllEffects.size() > 1) {
+    return getColorForItemEffects(AllEffects, CapabilityFlags::Equipment);
+  }
+  return getColorForItemType(It.getType());
 }
 
 std::string getEffectDescription(const EffectInfo &EffInfo) {
@@ -97,4 +134,4 @@ std::string getItemText(const Item &It) {
   return SS.str();
 }
 
-}
+} // namespace rogue::ui
