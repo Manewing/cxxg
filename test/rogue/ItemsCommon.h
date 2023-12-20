@@ -30,6 +30,14 @@ public:
     return std::make_shared<DummyItemEffect<N>>(*this);
   }
 
+  std::string getName() const final {
+    return "DummyItemEffect: Name: " + std::to_string(N);
+  }
+
+  std::string getDescription() const final {
+    return "DummyItemEffect: Desc: " + std::to_string(N);
+  }
+
   bool canAddFrom(const ItemEffect &Other) const final {
     return dynamic_cast<const DummyItemEffect<N> *>(&Other) != nullptr;
   }
@@ -60,6 +68,14 @@ public:
 
   std::shared_ptr<ItemEffect> clone() const final {
     return std::make_shared<OwnType>(*this);
+  }
+
+  std::string getName() const final {
+    return "DummyComponentEffect: Name: " + std::to_string(CompType::Key);
+  }
+
+  std::string getDescription() const final {
+    return "DummyComponentEffect: Desc: " + std::to_string(CompType::Key);
   }
 
   bool canAddFrom(const ItemEffect &Other) const final {
@@ -106,13 +122,33 @@ public:
   CompType Comp;
 };
 
+template <typename ItemEffectType>
+class DummyRemoveEffect : public rogue::RemoveEffect<ItemEffectType> {
+public:
+  using rogue::RemoveEffect<ItemEffectType>::RemoveEffect;
+
+  std::shared_ptr<ItemEffect> clone() const final {
+    return std::make_shared<DummyRemoveEffect<ItemEffectType>>(*this);
+  }
+
+  std::string getName() const final {
+    return "DummyRemoveEffect: Name: " +
+           std::string(typeid(ItemEffectType).name());
+  }
+
+  std::string getDescription() const final {
+    return "DummyRemoveEffect: Desc: " +
+           std::string(typeid(ItemEffectType).name());
+  }
+};
+
 class DummyItems {
 public:
   using ArmorEffectType = DummyItemEffect<0>;
   using DamageEffectType = DummyItemEffect<1>;
   using HealEffectType = DummyItemEffect<2>;
   using PoisonEffectType = DummyItemEffect<3>;
-  using CleansePoisonEffectType = rogue::RemoveEffect<PoisonEffectType>;
+  using CleansePoisonEffectType = DummyRemoveEffect<PoisonEffectType>;
 
 public:
   DummyItems();

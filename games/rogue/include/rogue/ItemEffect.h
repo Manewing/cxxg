@@ -2,12 +2,13 @@
 #define ROGUE_ITEM_EFFECT_H
 
 #include <entt/entt.hpp>
+#include <rogue/ItemType.h>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Stats.h>
-#include <rogue/ItemType.h>
 
 namespace rogue {
 class ItemDatabase;
+struct BuffBase;
 }
 
 namespace rogue {
@@ -25,6 +26,10 @@ public:
   virtual ~ItemEffect() = default;
 
   virtual std::shared_ptr<ItemEffect> clone() const = 0;
+
+  virtual std::string getName() const = 0;
+  virtual std::string getDescription() const = 0;
+
 
   virtual bool canAddFrom(const ItemEffect &) const { return true; }
 
@@ -46,6 +51,8 @@ public:
 class NullEffect : public ItemEffect {
 public:
   std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
 };
 
 class HealItemEffect : public ItemEffect {
@@ -54,6 +61,9 @@ public:
   StatValue getAmount() const { return Amount; }
 
   std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+
   bool canAddFrom(const ItemEffect &Other) const final;
   void addFrom(const ItemEffect &Other) final;
 
@@ -70,6 +80,9 @@ public:
   StatValue getAmount() const { return Amount; }
 
   std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+
   bool canAddFrom(const ItemEffect &Other) const final;
   void addFrom(const ItemEffect &Other) final;
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
@@ -89,7 +102,11 @@ public:
 public:
   explicit DismantleEffect(const ItemDatabase &ItemDb,
                            std::vector<DismantleResult> Results);
+
   std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+
   bool canAddFrom(const ItemEffect &Other) const final;
   void addFrom(const ItemEffect &Other) final;
   bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
@@ -116,10 +133,6 @@ public:
 public:
   SetComponentEffect() = default;
   explicit SetComponentEffect(const CompType &Comp) : Comp(Comp) {}
-
-  std::shared_ptr<ItemEffect> clone() const final {
-    return std::make_shared<OwnType>(Comp);
-  }
 
   /// Adding is possible if the item effect has the identical type
   bool canAddFrom(const ItemEffect &Other) const final {
@@ -158,19 +171,15 @@ public:
     Reg.remove<CompType>(Et);
   }
 
-private:
+protected:
   CompType Comp;
 };
-
-template <typename CompType, typename... RequiredComps>
-static std::shared_ptr<SetComponentEffect<CompType, RequiredComps...>>
-makeSetComponentEffect(const CompType &Comp) {
-  return std::make_shared<SetComponentEffect<CompType, RequiredComps...>>(Comp);
-}
 
 class ApplyBuffItemEffectBase : public ItemEffect {
 public:
   virtual const BuffBase &getBuff() const = 0;
+  std::string getName() const final;
+  std::string getDescription() const final;
 };
 
 template <typename BuffType, typename... RequiredComps>
@@ -219,13 +228,6 @@ private:
   BuffType Buff;
 };
 
-template <typename BuffType, typename... RequiredComps>
-static std::shared_ptr<ApplyBuffItemEffect<BuffType, RequiredComps...>>
-makeApplyBuffItemEffect(const BuffType &Buff) {
-  return std::make_shared<ApplyBuffItemEffect<BuffType, RequiredComps...>>(
-      Buff);
-}
-
 class RemoveEffectBase : public ItemEffect {
 public:
   virtual bool removesEffect(const ItemEffect &Other) const = 0;
@@ -237,10 +239,6 @@ public:
   using OwnType = RemoveEffect<ItemEffectType>;
 
 public:
-  std::shared_ptr<ItemEffect> clone() const final {
-    return std::make_shared<OwnType>();
-  }
-
   /// Adding is possible if the item effect has the identical type. However it
   /// has no effect, only the first component removing the effect is kept
   bool canAddFrom(const ItemEffect &Other) const final {
@@ -260,10 +258,6 @@ public:
 
 public:
   explicit RemoveComponentEffect() {}
-
-  std::shared_ptr<ItemEffect> clone() const final {
-    return std::make_shared<OwnType>();
-  }
 
   /// Adding is possible if the item effect has the identical type. However it
   /// has no effect, only the first component removing the effect is kept

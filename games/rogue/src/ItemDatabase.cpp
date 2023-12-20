@@ -7,6 +7,7 @@
 #include <rogue/ItemPrototype.h>
 #include <rogue/ItemSpecialization.h>
 #include <rogue/JSON.h>
+#include <rogue/ItemEffectImpl.h>
 #include <rogue/JSONHelpers.h>
 
 namespace rogue {
@@ -46,61 +47,58 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
            [](const auto &, const auto &V) {
              PoisonDebuffComp Buff;
              parseReductionBuff(V["buff"], Buff);
-             return makeApplyBuffItemEffect<PoisonDebuffComp, HealthComp>(Buff);
+             return std::make_shared<PoisonDebuffEffect>(Buff);
            }},
           {"health_regen_buff_comp",
            [](const auto &, const auto &V) {
              HealthRegenBuffComp Buff;
              parseRegenerationBuff(V["buff"], Buff);
-             return makeApplyBuffItemEffect<HealthRegenBuffComp, HealthComp>(
-                 Buff);
+             return std::make_shared<HealthRegenBuffEffect>(Buff);
            }},
           {"bleeding_debuff_comp",
            [](const auto &, const auto &V) {
              BleedingDebuffComp Buff;
              parseReductionBuff(V["buff"], Buff);
-             return makeApplyBuffItemEffect<BleedingDebuffComp, HealthComp>(
-                 Buff);
+             return std::make_shared<BleedingDebuffEffect>(Buff);
            }},
           {"stats_buff_comp",
            [](const auto &, const auto &V) {
              StatPoints P = parseStatPoints(V["stats"]);
              StatsBuffComp Buff;
              Buff.Bonus = P;
-             return makeApplyBuffItemEffect<StatsBuffComp, StatsComp>(Buff);
+             return std::make_shared<StatsBuffEffect>(Buff);
            }},
           {"armor_buff_comp",
            [](const auto &, const auto &V) {
              ArmorBuffComp Armor;
              Armor.PhysArmor = V["phys_armor"].GetDouble();
              Armor.MagicArmor = V["magic_armor"].GetDouble();
-             return makeApplyBuffItemEffect<ArmorBuffComp, HealthComp>(Armor);
+             return std::make_shared<ArmorBuffEffect>(Armor);
            }},
           {"block_comp",
            [](const auto &, const auto &V) {
              BlockBuffComp BC;
              BC.BlockChance = V["block_chance"].GetDouble();
-             return makeApplyBuffItemEffect<BlockBuffComp, HealthComp>(BC);
+             return std::make_shared<BlockBuffEffect>(BC);
            }},
           {"blinded_debuff_comp",
            [](const auto &, const auto &V) {
              BlindedDebuffComp BDC;
              BDC.TicksLeft = V["buff"]["ticks"].GetUint();
-             return makeApplyBuffItemEffect<BlindedDebuffComp, LineOfSightComp>(
-                 BDC);
+             return std::make_shared<BlindedDebuffEffect>(BDC);
            }},
           {"mind_vision_buff_comp",
            [](const auto &, const auto &V) {
              MindVisionBuffComp MVBC;
              MVBC.TicksLeft = V["ticks"].GetUint();
              MVBC.Range = V["range"].GetUint();
-             return makeApplyBuffItemEffect<MindVisionBuffComp>(MVBC);
+             return std::make_shared<MindVisionBuffEffect>(MVBC);
            }},
           {"invisibility_buff_comp",
            [](const auto &, const auto &V) {
              InvisibilityBuffComp IBC;
              IBC.TicksLeft = V["ticks"].GetUint();
-             return makeApplyBuffItemEffect<InvisibilityBuffComp>(IBC);
+             return std::make_shared<InvisibilityBuffEffect>(IBC);
            }},
           {"melee_attack_comp",
            [](const auto &, const auto &V) {
@@ -108,7 +106,7 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              MAC.PhysDamage = V["phys_damage"].GetDouble();
              MAC.MagicDamage = V["magic_damage"].GetDouble();
              MAC.APCost = V["ap_cost"].GetUint();
-             return makeSetComponentEffect<MeleeAttackComp>(MAC);
+             return std::make_shared<SetMeleeCompEffect>(MAC);
            }},
           {"ranged_attack_comp",
            [](const auto &, const auto &V) {
@@ -116,7 +114,7 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              RAC.PhysDamage = V["phys_damage"].GetDouble();
              RAC.MagicDamage = V["magic_damage"].GetDouble();
              RAC.APCost = V["ap_cost"].GetUint();
-             return makeSetComponentEffect<RangedAttackComp>(RAC);
+             return std::make_shared<SetRangedCompEffect>(RAC);
            }},
           {"stats_buff_per_hit_comp",
            [](const auto &, const auto &V) {
@@ -126,30 +124,28 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              Buff.TicksLeft = 0;
              Buff.TickPeriodsLeft = 0;
              Buff.MaxStacks = V["max_stacks"].GetUint();
-             return makeApplyBuffItemEffect<StatsBuffPerHitComp, StatsComp>(
-                 Buff);
+             return std::make_shared<StatsBuffPerHitEffect>(Buff);
            }},
           {"chance_on_hit_to_apply_poison",
            [](const auto &, const auto &V) {
              CoHTargetPoisonDebuffComp Effect;
              Effect.Chance = V["chance"].GetDouble();
              parseReductionBuff(V["buff"], Effect.Buff);
-             return makeApplyBuffItemEffect<CoHTargetPoisonDebuffComp>(Effect);
+             return std::make_shared<CoHTargetPoisonDebuffEffect>(Effect);
            }},
           {"chance_on_hit_to_apply_bleeding",
            [](const auto &, const auto &V) {
              CoHTargetBleedingDebuffComp Effect;
              Effect.Chance = V["chance"].GetDouble();
              parseReductionBuff(V["buff"], Effect.Buff);
-             return makeApplyBuffItemEffect<CoHTargetBleedingDebuffComp>(
-                 Effect);
+             return std::make_shared<CoHTargetBleedingDebuffEffect>(Effect);
            }},
           {"chance_on_hit_to_apply_blinded",
            [](const auto &, const auto &V) {
              CoHTargetBlindedDebuffComp Effect;
              Effect.Chance = V["chance"].GetDouble();
              Effect.Buff.TicksLeft = V["buff"]["ticks"].GetUint();
-             return makeApplyBuffItemEffect<CoHTargetBlindedDebuffComp>(Effect);
+             return std::make_shared<CoHTargetBlindedDebuffEffect>(Effect);
            }},
           {"dismantle", [](const auto &DB, const auto &V) {
              std::vector<DismantleEffect::DismantleResult> Results;
@@ -184,15 +180,11 @@ static void addDefaultConstructEffects(
 
 static void addDefaultConstructEffects(
     std::map<std::string, std::shared_ptr<ItemEffect>> &Effects) {
-  using PoisonDebuffEffect = ApplyBuffItemEffect<PoisonDebuffComp, HealthComp>;
-  using RemovePoisonEffect = RemoveEffect<PoisonDebuffEffect>;
-  using RemovePoisonDebuff = RemoveComponentEffect<PoisonDebuffComp>;
-
   addDefaultConstructEffects(Effects, "null", std::make_shared<NullEffect>());
   addDefaultConstructEffects(Effects, "remove_poison_effect",
                              std::make_shared<RemovePoisonEffect>());
   addDefaultConstructEffects(Effects, "remove_poison_debuff",
-                             std::make_shared<RemovePoisonDebuff>());
+                             std::make_shared<RemovePoisonDebuffEffect>());
 }
 
 static std::shared_ptr<ItemSpecialization>
