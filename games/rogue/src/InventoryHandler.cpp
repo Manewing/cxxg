@@ -4,6 +4,8 @@
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Context.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/Equipment.h>
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
@@ -20,8 +22,9 @@ std::string getNameOrNone(const entt::registry &Reg, entt::entity Entity) {
 }
 } // namespace
 
-InventoryHandler::InventoryHandler(entt::entity Entity, entt::registry &Reg)
-    : Entity(Entity), Reg(Reg) {
+InventoryHandler::InventoryHandler(entt::entity Entity, entt::registry &Reg,
+                                   const CraftingHandler &Crafter)
+    : Entity(Entity), Reg(Reg), Crafter(Crafter) {
   refresh();
 }
 
@@ -202,6 +205,24 @@ void InventoryHandler::autoEquipItems() {
       Idx -= 1;
     }
   }
+}
+
+bool InventoryHandler::tryCraftItems() {
+  // Nothing can be crafted if there is no inventory
+  if (!Inv) {
+    return false;
+  }
+
+  // Try crafting all items in the inventory
+  auto NewItemsOrNone = Crafter.tryCraft(Inv->getItems());
+
+  // Add all new items to the inventory
+  if (NewItemsOrNone) {
+    Inv->setItems(*NewItemsOrNone);
+    return true;
+  }
+
+  return false;
 }
 
 } // namespace rogue

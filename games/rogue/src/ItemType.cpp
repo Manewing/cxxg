@@ -5,7 +5,7 @@
 
 namespace rogue {
 
-ItemType getItemType(const std::string &Type) {
+std::optional<ItemType> ItemType::parseString(const std::string &Type) {
   static const std::map<std::string, ItemType> ItemTypes = {
       {"none", ItemType::None}, // Keep top
       {"ring", ItemType::Ring}, //
@@ -17,7 +17,7 @@ ItemType getItemType(const std::string &Type) {
       {"weapon", ItemType::Weapon},
       {"shield", ItemType::Shield},
       {"ranged", ItemType::Ranged},
-      {"generic", ItemType::Generic},
+      {"crafting_base", ItemType::CraftingBase},
       {"consumable", ItemType::Consumable},
       {"quest", ItemType::Quest},
       {"crafting", ItemType::Crafting},
@@ -25,112 +25,128 @@ ItemType getItemType(const std::string &Type) {
   if (const auto It = ItemTypes.find(Type); It != ItemTypes.end()) {
     return It->second;
   }
-  throw std::out_of_range("Unknown item type: " + std::string(Type));
-  return ItemType::None;
+  return std::nullopt;
 }
 
-std::string getItemTypeLabel(ItemType It) {
+ItemType ItemType::fromString(const std::string &Type) {
+  if (const auto It = parseString(Type); It.has_value()) {
+    return It.value();
+  }
+  throw std::out_of_range("Unknown ItemType: " + Type);
+}
+
+std::string ItemType::str() const {
   std::stringstream Label;
   const char *Pred = "";
-  if ((It & ItemType::Ring) != ItemType::None) {
+  if (Value & ItemType::Ring) {
     Label << Pred << "Ring";
     Pred = ", ";
   }
-  if ((It & ItemType::Amulet) != ItemType::None) {
+  if (Value & ItemType::Amulet) {
     Label << Pred << "Amulet";
     Pred = ", ";
   }
-  if ((It & ItemType::Helmet) != ItemType::None) {
+  if (Value & ItemType::Helmet) {
     Label << Pred << "Helmet";
     Pred = ", ";
   }
-  if ((It & ItemType::ChestPlate) != ItemType::None) {
+  if (Value & ItemType::ChestPlate) {
     Label << Pred << "Chest Plate";
     Pred = ", ";
   }
-  if ((It & ItemType::Pants) != ItemType::None) {
+  if (Value & ItemType::Pants) {
     Label << Pred << "Pants";
     Pred = ", ";
   }
-  if ((It & ItemType::Boots) != ItemType::None) {
+  if (Value & ItemType::Boots) {
     Label << Pred << "Boots";
     Pred = ", ";
   }
-  if ((It & ItemType::Weapon) != ItemType::None) {
+  if (Value & ItemType::Weapon) {
     Label << Pred << "Weapon";
     Pred = ", ";
   }
-  if ((It & ItemType::Shield) != ItemType::None) {
+  if (Value & ItemType::Shield) {
     Label << Pred << "Shield";
     Pred = ", ";
   }
-  if ((It & ItemType::Ranged) != ItemType::None) {
+  if (Value & ItemType::Ranged) {
     Label << Pred << "Ranged";
     Pred = ", ";
   }
-  if ((It & ItemType::Generic) != ItemType::None) {
-    Label << Pred << "Generic";
+  if (Value & ItemType::CraftingBase) {
+    Label << Pred << "Crafting Base";
     Pred = ", ";
   }
-  if ((It & ItemType::Consumable) != ItemType::None) {
+  if (Value & ItemType::Consumable) {
     Label << Pred << "Consumable";
     Pred = ", ";
   }
-  if ((It & ItemType::Quest) != ItemType::None) {
+  if (Value & ItemType::Quest) {
     Label << Pred << "Quest";
     Pred = ", ";
   }
-  if ((It & ItemType::Crafting) != ItemType::None) {
+  if (Value & ItemType::Crafting) {
     Label << Pred << "Crafting";
     Pred = ", ";
   }
   auto LabelStr = Label.str();
   if (LabelStr.empty()) {
-    return "<unimp. ItemType>";
+    return "<unimp. ValueemType>";
   }
   return LabelStr;
 }
 
-CapabilityFlags getCapabilityFlag(const std::string &CapabilityFlagStr) {
-  if (CapabilityFlagStr == "use_on") {
+std::ostream &operator<<(std::ostream &Out, const ItemType &Type) {
+  Out << Type.str();
+  return Out;
+}
+std::optional<CapabilityFlags>
+CapabilityFlags::parseString(const std::string &Str) {
+  if (Str == "use_on") {
     return CapabilityFlags::UseOn | CapabilityFlags::Self;
   }
-  if (CapabilityFlagStr == "equipment") {
+  if (Str == "equipment") {
     return CapabilityFlags::Equipment;
   }
-  if (CapabilityFlagStr == "equip_on") {
+  if (Str == "equip_on") {
     return CapabilityFlags::EquipOn;
   }
-  if (CapabilityFlagStr == "unequip_from") {
+  if (Str == "unequip_from") {
     return CapabilityFlags::UnequipFrom;
   }
-  if (CapabilityFlagStr == "dismantle") {
+  if (Str == "dismantle") {
     return CapabilityFlags::Dismantle;
   }
-  if (CapabilityFlagStr == "ranged") {
+  if (Str == "ranged") {
     return CapabilityFlags::Ranged;
   }
-  if (CapabilityFlagStr == "ranged_use") {
+  if (Str == "ranged_use") {
     return CapabilityFlags::Ranged | CapabilityFlags::UseOn;
   }
-  if (CapabilityFlagStr == "adjacent_use") {
+  if (Str == "adjacent_use") {
     return CapabilityFlags::Adjacent | CapabilityFlags::UseOn;
   }
-  throw std::out_of_range("Unknown capability: " + CapabilityFlagStr);
-  return CapabilityFlags::None;
+  return std::nullopt;
+}
+CapabilityFlags CapabilityFlags::fromString(const std::string &Str) {
+  if (const auto It = parseString(Str); It.has_value()) {
+    return It.value();
+  }
+  throw std::out_of_range("Unknown capability: " + Str);
 }
 
-const char *getCapabilityFlagLabel(CapabilityFlags Flags) {
-  if ((CapabilityFlags::UseOn | CapabilityFlags::Self) == Flags) {
+const char *CapabilityFlags::str() const {
+  if ((CapabilityFlags::UseOn | CapabilityFlags::Self) == Value) {
     return "Use";
   }
-  if ((CapabilityFlags::UseOn | CapabilityFlags::Ranged) == Flags) {
+  if ((CapabilityFlags::UseOn | CapabilityFlags::Ranged) == Value) {
     return "Ranged use";
   }
-  if ((CapabilityFlags::UseOn | CapabilityFlags::Adjacent) == Flags) {
+  if ((CapabilityFlags::UseOn | CapabilityFlags::Adjacent) == Value) {
     return "Adjacent use";
   }
-  switch (Flags) {
+  switch (Value) {
   case CapabilityFlags::None:
     return "None";
   case CapabilityFlags::UseOn:
@@ -151,6 +167,11 @@ const char *getCapabilityFlagLabel(CapabilityFlags Flags) {
     break;
   }
   return "<unimp. CapabilityFlags>";
+}
+
+std::ostream &operator<<(std::ostream &Out, const CapabilityFlags &Flags) {
+  Out << Flags.str();
+  return Out;
 }
 
 } // namespace rogue

@@ -6,11 +6,13 @@
 namespace rogue {
 
 Item::Item(const ItemPrototype &Proto, int StackSize,
-           const std::shared_ptr<ItemPrototype> &Spec)
-    : StackSize(StackSize), Proto(&Proto), Specialization(Spec) {}
+           const std::shared_ptr<ItemPrototype> &Spec, bool SpecOverrides)
+    : StackSize(StackSize), Proto(&Proto), Specialization(Spec),
+      SpecOverrides(SpecOverrides) {}
 
 namespace {
 
+// FIXME Move this to UI/Item
 std::string getQualifierName(const StatPoints &P) {
   std::string Prefix = "+" + std::to_string(P.sum()) + " ";
   if (P.Str == P.Dex && P.Str == P.Int && P.Str == P.Vit) {
@@ -58,7 +60,7 @@ std::string getQualifierName(const Item &It) {
 int Item::getId() const { return getProto().ItemId; }
 
 std::string Item::getName() const {
-  if ((getType() & ItemType::EquipmentMask) != ItemType::None) {
+  if (getType() & ItemType::EquipmentMask) {
     return getQualifierName(*this) + getProto().Name;
   }
   return getProto().Name;
@@ -79,6 +81,9 @@ ItemType Item::getType() const {
 int Item::getMaxStackSize() const { return getProto().MaxStackSize; }
 
 std::vector<EffectInfo> Item::getAllEffects() const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->Effects;
+  }
   std::vector<EffectInfo> AllEffects;
   auto NumEffects = getProto().Effects.size();
   NumEffects += Specialization ? Specialization->Effects.size() : 0;
@@ -109,6 +114,9 @@ bool Item::isSameKind(const Item &Other) const {
 
 bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
                       CapabilityFlags Flags) const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->canApplyTo(Entity, Reg, Flags);
+  }
   bool SpecCanUseOn =
       Specialization && Specialization->canApplyTo(Entity, Reg, Flags);
   return getProto().canApplyTo(Entity, Reg, Flags) || SpecCanUseOn;
@@ -116,14 +124,22 @@ bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
 
 void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
                    CapabilityFlags Flags) const {
-  if (Specialization) {
+  if (Specialization && Specialization->canApplyTo(Entity, Reg, Flags)) {
     Specialization->applyTo(Entity, Reg, Flags);
+    if (SpecOverrides) {
+      return;
+    }
   }
-  getProto().applyTo(Entity, Reg, Flags);
+  if (getProto().canApplyTo(Entity, Reg, Flags)) {
+    getProto().applyTo(Entity, Reg, Flags);
+  }
 }
 
 bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
                          CapabilityFlags Flags) const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->canRemoveFrom(Entity, Reg, Flags);
+  }
   bool SpecCanUnequipFrom =
       Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags);
   return getProto().canRemoveFrom(Entity, Reg, Flags) || SpecCanUnequipFrom;
@@ -131,10 +147,15 @@ bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
 
 void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,
                       CapabilityFlags Flags) const {
-  if (Specialization) {
+  if (Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags)) {
     Specialization->removeFrom(Entity, Reg, Flags);
+    if (SpecOverrides) {
+      return;
+    }
   }
-  getProto().removeFrom(Entity, Reg, Flags);
+  if (getProto().canRemoveFrom(Entity, Reg, Flags)) {
+    getProto().removeFrom(Entity, Reg, Flags);
+  }
 }
 
 const ItemPrototype &Item::getProto() const { return *Proto; }

@@ -4,6 +4,7 @@
 #include <rogue/Components/LOS.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
 #include <rogue/Level.h>
@@ -13,28 +14,12 @@
 #include <rogue/UI/Inventory.h>
 #include <rogue/UI/ListSelect.h>
 #include <rogue/UI/Tooltip.h>
+#include <rogue/UI/Item.h>
 
 namespace rogue::ui {
 
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
-
-cxxg::types::TermColor
-InventoryControllerBase::getColorForItemType(ItemType Type) {
-  if ((Type & ItemType::Quest) != ItemType::None) {
-    return cxxg::types::RgbColor{195, 196, 90};
-  }
-  if ((Type & ItemType::EquipmentMask) != ItemType::None) {
-    return cxxg::types::RgbColor{227, 175, 91};
-  }
-  if ((Type & ItemType::Consumable) != ItemType::None) {
-    return cxxg::types::RgbColor{112, 124, 219};
-  }
-  if ((Type & ItemType::Crafting) != ItemType::None) {
-    return cxxg::types::RgbColor{182, 186, 214};
-  }
-  return cxxg::types::Color::NONE;
-}
 
 InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  Inventory &Inv,
@@ -42,7 +27,7 @@ InventoryControllerBase::InventoryControllerBase(Controller &Ctrl,
                                                  Level &Lvl,
                                                  const std::string &Header)
     : BaseRectDecorator({2, 2}, {40, 18}, nullptr), Ctrl(Ctrl), Inv(Inv),
-      Entity(Entity), Lvl(Lvl), InvHandler(Entity, Lvl.Reg) {
+      Entity(Entity), Lvl(Lvl), InvHandler(Entity, Lvl.Reg, CraftingHandler()) {
   InvHandler.setEventHub(Ctrl.getEventHub());
   List = std::make_shared<ListSelect>(Pos, getSize());
   Comp = std::make_shared<Frame>(List, Pos, getSize(), Header);
@@ -93,7 +78,7 @@ void InventoryControllerBase::updateElements() const {
     } else {
       SS << std::setw(3) << Item.StackSize << "x " << Item.getName();
     }
-    Elements.push_back({SS.str(), getColorForItemType(Item.getType())});
+    Elements.push_back({SS.str(), getColorForItem(Item)});
   }
   auto PrevIdx = List->getSelectedElement();
   List->setElements(Elements);
@@ -115,8 +100,7 @@ bool InventoryController::handleInput(int Char) {
     InvHandler.tryEquipItem(ItemIdx);
   } break;
   case Controls::Use.Char: {
-    if ((Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) !=
-        CapabilityFlags::None) {
+    if (Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
       std::optional<unsigned> Range;
       if (auto *LOSComp = Lvl.Reg.try_get<LineOfSightComp>(Entity)) {
@@ -125,19 +109,18 @@ bool InventoryController::handleInput(int Char) {
       Ctrl.setTargetUI(PC.Pos, Range, Lvl,
                        [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
                         ItemIdx](auto TgEt, auto) -> void {
-                         InventoryHandler IH(E, R);
+                         InventoryHandler IH(E, R, CraftingHandler());
                          IH.setEventHub(Hub);
                          IH.tryUseItemOnTarget(ItemIdx, TgEt);
                        });
       return false;
     }
-    if ((Inv.getItem(ItemIdx).getCapabilityFlags() &
-         CapabilityFlags::Adjacent) != CapabilityFlags::None) {
+    if (Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Adjacent) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
       Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
                        [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),
                         ItemIdx](auto TgEt, auto) -> void {
-                         InventoryHandler IH(E, R);
+                         InventoryHandler IH(E, R, CraftingHandler());
                          IH.setEventHub(Hub);
                          IH.tryUseItemOnTarget(ItemIdx, TgEt);
                        });
@@ -151,6 +134,11 @@ bool InventoryController::handleInput(int Char) {
   case Controls::Dismantle.Char: {
     InvHandler.tryDismantleItem(ItemIdx);
   } break;
+  case Controls::StoreOne.Char:
+    if (auto *LUI = Ctrl.getWindowOfType<LootController>()) {
+      LUI->getInventory().addItem(Inv.takeItem(ItemIdx, 1));
+    }
+    break;
   case Controls::Store.Char:
     if (auto *LUI = Ctrl.getWindowOfType<LootController>()) {
       LUI->getInventory().addItem(Inv.takeItem(ItemIdx));
@@ -170,21 +158,22 @@ std::string InventoryController::getInteractMsg() const {
 
   const auto &SelectedItem = Inv.getItem(List->getSelectedElement());
   std::vector<KeyOption> Options = {Controls::Info, Controls::Drop};
-  if ((SelectedItem.getType() & ItemType::EquipmentMask) != ItemType::None) {
+  // FIXME this should all be based on capability flags, not item type
+  if (SelectedItem.getType() & ItemType::EquipmentMask) {
     Options.push_back(Controls::Equip);
   }
-  if ((SelectedItem.getType() & ItemType::Crafting) != ItemType::None) {
+  if (SelectedItem.getType() & ItemType::Crafting) {
     Options.push_back(Controls::Craft);
   }
-  if ((SelectedItem.getType() & ItemType::Consumable) != ItemType::None) {
+  if (SelectedItem.getType() & ItemType::Consumable) {
     Options.push_back(Controls::Use);
   }
-  if ((SelectedItem.getCapabilityFlags() & CapabilityFlags::Dismantle) !=
-      CapabilityFlags::None) {
+  if (SelectedItem.getCapabilityFlags() & CapabilityFlags::Dismantle) {
     Options.push_back(Controls::Dismantle);
   }
   if (Ctrl.hasLootUI()) {
     Options.push_back(Controls::Store);
+    Options.push_back(Controls::StoreOne);
   }
   return KeyOption::getInteractMsg(Options);
 }
@@ -202,6 +191,14 @@ bool LootController::handleInput(int Char) {
     }
     auto &EtInv = Lvl.Reg.get<InventoryComp>(Entity).Inv;
     EtInv.addItem(Inv.takeItem(List->getSelectedElement()));
+    updateElements();
+  } break;
+  case Controls::TakeOne.Char: {
+    if (Inv.empty()) {
+      break;
+    }
+    auto &EtInv = Lvl.Reg.get<InventoryComp>(Entity).Inv;
+    EtInv.addItem(Inv.takeItem(List->getSelectedElement(), 1));
     updateElements();
   } break;
   default:

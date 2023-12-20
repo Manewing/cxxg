@@ -23,6 +23,10 @@
       "type": "string",
       "description": "Relative (to the config) path to the level DB config file"
     },
+    "crafting_db_config": {
+      "type": "string",
+      "description": "Relative (to the config) path to the crafting DB config file"
+    },
     "initial_game_world": {
       "type": "string",
       "description": ""

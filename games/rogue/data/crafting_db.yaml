@@ -1,0 +1,45 @@
+recipes:
+  - ingredients:
+      - Leather Scrap
+    results:
+      - Leather
+  - ingredients:
+      - Wooden Log
+      - Wooden Log
+      - Leather Scrap
+      - Iron Scrap
+      - Wooden Log
+      - Wooden Log
+    results:
+      - Wooden Shield
+  - ingredients:
+      - Wooden Log
+      - Leather Scrap
+      - Leather Scrap
+      - Iron Scrap
+      - Leather Scrap
+      - Leather Scrap
+      - Wooden Log
+    results:
+      - Wooden Bow
+  - ingredients:
+      - Rune Dust
+      - Iron Scrap
+      - Stone
+    results:
+      - Fire Stone
+  - ingredients:
+      - Wooden Log
+      - Wooden Log
+      - Wooden Log
+      - Fire Stone
+    results:
+      - Ash
+      - Ash
+      - Fire Stone
+      - Charcoal
+  - ingredients:
+      - Glass Vial
+      - Arcane Liquid
+    results:
+      - Arcane Potion

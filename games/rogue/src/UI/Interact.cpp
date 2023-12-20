@@ -51,12 +51,17 @@ void Interact::destroyCursor() {
   }
 }
 
-void Interact::updateElements() const {
+void Interact::updateElements() {
   std::vector<ListSelect::Element> Elements;
   Elements.reserve(InteractablesEts.size());
+  Interactions.clear();
+  Interactions.reserve(InteractablesEts.size());
   for (const auto &Entity : InteractablesEts) {
     auto &Interactable = Lvl.Reg.get<InteractableComp>(Entity);
-    Elements.push_back({Interactable.Action.Msg, cxxg::types::Color::NONE});
+    for (const auto &Action : Interactable.Actions) {
+      Elements.push_back({Action.Msg, cxxg::types::Color::NONE});
+      Interactions.push_back({Entity, Action});
+    }
   }
 
   auto PrevIdx = List->getSelectedElement();
@@ -70,18 +75,18 @@ void Interact::updateCursor() {
   }
   auto SelIdx = List->getSelectedElement();
   auto &CursorPos = Lvl.Reg.get<PositionComp>(CursorEt).Pos;
-  CursorPos = Lvl.Reg.get<PositionComp>(InteractablesEts.at(SelIdx)).Pos;
+  CursorPos = Lvl.Reg.get<PositionComp>(Interactions.at(SelIdx).Entity).Pos;
 }
 
 void Interact::handleInteraction() {
-  auto &PC = Lvl.Reg.get<PlayerComp>(SrcEt);
   auto SelIdx = List->getSelectedElement();
-  const auto InteractableEntity = InteractablesEts.at(SelIdx);
-  auto &Interactable = Lvl.Reg.get<InteractableComp>(InteractableEntity);
-  PC.CurrentInteraction = Interactable.Action;
+  const auto &Info = Interactions.at(SelIdx);
+
+  auto &PC = Lvl.Reg.get<PlayerComp>(SrcEt);
+  PC.CurrentInteraction = Info.Action;
 
   // This may switch level so needs to be last thing that is done
-  Interactable.Action.Execute(Lvl, SrcEt, Lvl.Reg);
+  Info.Action.Execute(Lvl, SrcEt, Lvl.Reg);
 }
 
 } // namespace rogue::ui

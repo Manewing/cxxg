@@ -1,3 +1,4 @@
+#include <iostream>
 #include <rogue/Inventory.h>
 
 namespace rogue {
@@ -13,9 +14,14 @@ bool Inventory::applyItemTo(const Item &It, CapabilityFlags Flags,
 
 void Inventory::addItem(Item It) {
   for (auto &InvIt : Items) {
-    if (InvIt.isSameKind(It) && InvIt.StackSize < It.getMaxStackSize()) {
+    if (InvIt.isSameKind(It) && InvIt.StackSize < It.getMaxStackSize() &&
+        (MaxStackSize == 0 ||
+         static_cast<unsigned>(InvIt.StackSize) < MaxStackSize)) {
       auto Stacks =
           std::min(It.getMaxStackSize() - InvIt.StackSize, It.StackSize);
+      if (MaxStackSize > 0) {
+        Stacks = std::min(static_cast<unsigned>(Stacks), MaxStackSize);
+      }
       InvIt.StackSize += Stacks;
       It.StackSize -= Stacks;
 
@@ -24,7 +30,18 @@ void Inventory::addItem(Item It) {
       }
     }
   }
-  Items.push_back(It);
+  if (MaxStackSize == 0) {
+    Items.push_back(It);
+    return;
+  }
+  auto RemainingStacks = It.StackSize;
+  while (RemainingStacks > 0) {
+    auto Stacks =
+        std::min(static_cast<unsigned>(RemainingStacks), MaxStackSize);
+    It.StackSize = Stacks;
+    Items.push_back(It);
+    RemainingStacks -= Stacks;
+  }
 }
 
 Item Inventory::takeItem(std::size_t ItemIdx) {
@@ -67,5 +84,15 @@ std::optional<Item> Inventory::applyItemTo(std::size_t ItemIdx,
 std::size_t Inventory::size() const { return Items.size(); }
 
 bool Inventory::empty() const { return Items.empty(); }
+
+void Inventory::clear() { Items.clear(); }
+
+std::ostream &operator<<(std::ostream &OS, const Inventory &Inv) {
+  OS << "Inventory:\n";
+  for (const auto &It : Inv.getItems()) {
+    OS << " -> " << It.getName() << " x" << It.StackSize << "\n";
+  }
+  return OS;
+}
 
 } // namespace rogue

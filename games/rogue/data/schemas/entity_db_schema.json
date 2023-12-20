@@ -213,6 +213,10 @@
           "loot_table": {
             "type": "string",
             "description": "Name of the loot table to use for creating this inventory"
+          },
+          "max_stack_size": {
+            "type": "integer",
+            "description": "Maximum number of items that can be stacked in a single slot"
           }
         },
         "additionalProperties": false

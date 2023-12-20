@@ -374,19 +374,6 @@
       }
     },
     {
-      "name": "work_bench",
-      "from_template": "base_interact",
-      "display_name": "Work Bench",
-      "description": "A work bench TODO",
-      "assemblers": {
-        "tile": {
-          "color": "#735740",
-          "char": "W"
-        },
-        "work_bench": true
-      }
-    },
-    {
       "name": "level_entry",
       "from_template": "base_interact",
       "display_name": "Level Entry",
@@ -518,6 +505,31 @@
           "char": "<",
           "color": "#ff0000"
         }
+      }
+    },
+    {
+      "name": "work_bench",
+      "from_template": "base_chest",
+      "display_name": "Work Bench",
+      "description": "A work bench TODO",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "null",
+          "max_stack_size": 1
+        },
+        "loot_interact": {
+          "loot_name": "Work Bench",
+          "interact_text": "Use Work Bench",
+          "default_tile": {
+            "color": "#735740",
+            "char": "W"
+          },
+          "looted_tile": {
+            "color": "#735740",
+            "char": "W"
+          }
+        },
+        "work_bench": true
       }
     },
     {

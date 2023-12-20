@@ -17,6 +17,7 @@ struct GameConfig {
   std::filesystem::path ItemDbConfig;
   std::filesystem::path EntityDbConfig;
   std::filesystem::path LevelDbConfig;
+  std::filesystem::path CraftingDbConfig;
   std::string InitialGameWorld;
   std::filesystem::path InitialLevelConfig;
   std::vector<PlayerInitialItemConfig> InitialItems;

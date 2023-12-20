@@ -22,9 +22,6 @@ namespace rogue::ui {
 
 class InventoryControllerBase : public BaseRectDecorator {
 public:
-  static cxxg::types::TermColor getColorForItemType(ItemType Type);
-
-public:
   /// @brief Creates a new inventory UI controller
   /// @param Ctrl The parent UI controller
   /// @param Inv The inventory that is acccessed

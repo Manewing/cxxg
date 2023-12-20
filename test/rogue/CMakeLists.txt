@@ -1,6 +1,7 @@
 set(SOURCES
   Components/BuffsTest.cpp
   Components/HelpersTest.cpp
+  CraftingSystemTest.cpp
   EntityDatabaseHelpersTest.cpp
   EntityDatabaseTest.cpp
   EntityFactoryTest.cpp
@@ -9,7 +10,10 @@ set(SOURCES
   GameWorldTest.cpp
   InventoryHandlerTest.cpp
   InventoryTest.cpp
+  ItemsCommon.cpp
   ItemDatabaseTest.cpp
+  ItemPrototypeTest.cpp
+  ItemTest.cpp
   LevelDatabaseTest.cpp
   LevelGeneratorTest.cpp
   LootTableTest.cpp
@@ -78,6 +82,18 @@ add_schema_test(
   NAME build_item_db
   JSON_FILES ${BUILD_DATA_DIR}/item_db.json
   SCHEMA ${BUILD_SCHEMAS_DIR}/item_db_schema.json
+)
+
+add_schema_test(
+  NAME crafting_db
+  JSON_FILES ${BUILD_DATA_DIR}/crafting_db.json
+  SCHEMA ${SCHEMAS_DIR}/crafting_db_schema.json
+)
+
+add_schema_test(
+  NAME build_crafting_db
+  JSON_FILES ${BUILD_DATA_DIR}/crafting_db.json
+  SCHEMA ${BUILD_SCHEMAS_DIR}/crafting_db_schema.json
 )
 
 add_schema_test(

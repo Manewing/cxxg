@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <rogue/Context.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/EntityDatabase.h>
 #include <rogue/GameWorld.h>
 #include <rogue/ItemDatabase.h>
@@ -15,12 +16,14 @@ public:
     ItemDb = rogue::ItemDatabase();
     EntityDb = rogue::EntityDatabase();
     LevelDb = rogue::LevelDatabase();
+    Crafter = rogue::CraftingHandler(ItemDb);
   }
 
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
   rogue::LevelDatabase LevelDb;
-  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb};
+  rogue::CraftingHandler Crafter;
+  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb, Crafter};
 };
 
 TEST_F(GameWorldTest, MultiLevelDungeonEmpty) {

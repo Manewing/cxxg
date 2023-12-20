@@ -8,6 +8,7 @@
 
 namespace rogue {
 class Level;
+struct Interaction;
 } // namespace rogue
 
 namespace rogue::ui {
@@ -19,6 +20,12 @@ namespace rogue::ui {
 
 class Interact : public BaseRectDecorator {
 public:
+  struct InteractionInfo {
+    const entt::entity Entity;
+    const Interaction &Action;
+  };
+
+public:
   Interact(entt::entity SrcEt, ymir::Point2d<int> StartPos, Level &Lvl);
 
   bool handleInput(int) override;
@@ -28,7 +35,7 @@ public:
   void destroyCursor();
 
 private:
-  void updateElements() const;
+  void updateElements();
   void updateCursor();
   void handleInteraction();
 
@@ -39,6 +46,7 @@ private:
   entt::entity CursorEt = entt::null;
   std::vector<entt::entity> InteractablesEts;
   std::shared_ptr<ListSelect> List;
+  std::vector<InteractionInfo> Interactions;
 };
 
 } // namespace rogue::ui

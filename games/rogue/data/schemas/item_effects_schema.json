@@ -59,6 +59,15 @@
           },
           {
             "$ref": "#/defs/effect/dismantle"
+          },
+          {
+            "const": "null"
+          },
+          {
+            "const": "remove_poison_effect"
+          },
+          {
+            "const": "remove_poison_debuff"
           }
         ]
       },

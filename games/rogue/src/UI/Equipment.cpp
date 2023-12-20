@@ -1,13 +1,14 @@
 #include <cxxg/Utils.h>
 #include <rogue/Components/Items.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/Item.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/Frame.h>
-#include <rogue/UI/Inventory.h>
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/Tooltip.h>
+#include <rogue/UI/Item.h>
 
 namespace rogue::ui {
 
@@ -19,7 +20,7 @@ EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
                                          entt::registry &Reg,
                                          cxxg::types::Position Pos)
     : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip),
-      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg) {
+      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg, CraftingHandler()) {
   InvHandler.setEventHub(Ctrl.getEventHub());
   ItSel = std::make_shared<ItemSelect>(Pos);
   Comp = std::make_shared<Frame>(ItSel, Pos, getSize(), "Equipment");
@@ -88,7 +89,7 @@ std::string getSelectValue(const EquipmentSlot &ES) {
 
 cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
   if (ES.It) {
-    return InventoryControllerBase::getColorForItemType(ES.It->getType());
+    return getColorForItem(*ES.It);
   }
   return cxxg::types::Color::NONE;
 }
@@ -98,9 +99,8 @@ cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
 void EquipmentController::addSelect(const EquipmentSlot &ES,
                                     cxxg::types::Position Pos) {
   constexpr const auto NoColor = cxxg::types::Color::NONE;
-  ItSel->addSelect<LabeledSelect>(getItemTypeLabel(ES.BaseTypeFilter),
-                                  getSelectValue(ES), Pos, 25, NoColor,
-                                  getSelectColor(ES));
+  ItSel->addSelect<LabeledSelect>(ES.BaseTypeFilter.str(), getSelectValue(ES),
+                                  Pos, 25, NoColor, NoColor);
 }
 
 void EquipmentController::updateSelectValues() const {

@@ -225,11 +225,15 @@
       "name": "Blueberry",
       "description": "A blue berry that can be eaten",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": ["crafting", "consumable"],
       "capabilities": [
         {
           "type": "use_on",
           "effect": "minor_quick_health_regen_effect"
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_health_effect"
         }
       ]
     },
@@ -237,7 +241,7 @@
       "name": "Green Goo",
       "description": "It may not win any culinary awards for taste, but it holds a unique restorative power.",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": ["crafting", "consumable"],
       "capabilities": [
         {
           "type": "use_on",
@@ -253,7 +257,7 @@
       "name": "Sewer Meat",
       "description": "Obtained from the unsavory denizens of the sewers, this dubious food source offers a double-edged benefit.",
       "max_stack_size": 99,
-      "types": ["consumable"],
+      "types": ["crafting", "consumable"],
       "capabilities": [
         {
           "type": "use_on",
@@ -300,10 +304,6 @@
         },
         {
           "type": "equipment",
-          "effect": "stats_buff_effect_str_1"
-        },
-        {
-          "type": "equipment",
           "effect": "melee_2"
         }
       ]
@@ -321,6 +321,10 @@
         {
           "type": "equipment",
           "effect": "melee_5"
+        },
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_poison"
         }
       ],
       "specializations": [
@@ -344,8 +348,7 @@
           "type": "equipment",
           "effect": "low_chance_to_apply_poison"
         }
-      ],
-      "specializations": []
+      ]
     },
     {
       "name": "Fire Wand",
@@ -440,6 +443,30 @@
       ]
     },
     {
+      "name": "Arcane Potion",
+      "description": "Base for potions brewing",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting_base"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "null"
+        }
+      ]
+    },
+    {
+      "name": "Armor Plating",
+      "description": "Can be used to enhance equipment with armor",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_2"
+        }
+      ]
+    },
+    {
       "name": "Wooden Shield",
       "description": "A shield of wood",
       "max_stack_size": 1,
@@ -478,12 +505,6 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
-        }
-      ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "minor_stats_buff_effect"
         }
       ]
     },
@@ -566,12 +587,6 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
-        }
-      ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "minor_stats_buff_effect"
         }
       ]
     },
@@ -782,6 +797,57 @@
       "max_stack_size": 99,
       "types": ["crafting"],
       "capabilities": []
+    },
+    {
+      "name": "Leather",
+      "description": "A sheet of leather",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Fire Stone",
+      "description": "A stone enchanted with fire magic",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Ash",
+      "description": "A pile of ash",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Glass Vial",
+      "description": "A glas vial TODO",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Arcane Liquid",
+      "description": "An arcane liquid TODO",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Charcoal",
+      "description": "A piece of charcoal",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "remove_poison_effect"
+        },
+        {
+          "type": "use_on",
+          "effect": "remove_poison_debuff"
+        }
+      ]
     },
     {
       "name": "Rune Dust",
@@ -1010,6 +1076,40 @@
         }
       ]
     },
+    "common_crafting": {
+      "rolls": 3,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Wooden Log",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Stone",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Iron Scrap",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Rune Dust",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        }
+
+      ]
+    },
     "l1_key": {
       "rolls": 1,
       "slots": [
@@ -1046,6 +1146,15 @@
         }
       ]
     },
+    "null": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "null",
+          "weight": -1
+        }
+      ]
+    },
     "final_key": {
       "rolls": 1,
       "slots": [
@@ -1071,6 +1180,11 @@
         {
           "type": "table",
           "ref": "common_equip",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "common_crafting",
           "weight": 20
         },
         {

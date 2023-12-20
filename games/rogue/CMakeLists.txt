@@ -18,6 +18,8 @@ set(HEADER_FILES
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h
   include/rogue/Context.h
+  include/rogue/CraftingDatabase.h
+  include/rogue/CraftingHandler.h
   include/rogue/EntityAssemblers.h
   include/rogue/EntityDatabase.h
   include/rogue/Equipment.h
@@ -31,10 +33,11 @@ set(HEADER_FILES
   include/rogue/Item.h
   include/rogue/ItemDatabase.h
   include/rogue/ItemEffect.h
-  include/rogue/LevelDatabase.h
+  include/rogue/ItemEffectImpl.h
   include/rogue/ItemPrototype.h
   include/rogue/ItemSpecialization.h
   include/rogue/ItemType.h
+  include/rogue/LevelDatabase.h
   include/rogue/JSON.h
   include/rogue/JSONHelpers.h
   include/rogue/Level.h
@@ -63,6 +66,7 @@ set(HEADER_FILES
   include/rogue/UI/History.h
   include/rogue/UI/Interact.h
   include/rogue/UI/Inventory.h
+  include/rogue/UI/Item.h
   include/rogue/UI/ItemSelect.h
   include/rogue/UI/ListSelect.h
   include/rogue/UI/Menu.h
@@ -85,6 +89,8 @@ set(SOURCE_FILES
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
   src/Components/Visual.cpp
+  src/CraftingDatabase.cpp
+  src/CraftingHandler.cpp
   src/EntityAssemblers.cpp
   src/EntityDatabase.cpp
   src/Equipment.cpp
@@ -98,6 +104,7 @@ set(SOURCE_FILES
   src/Item.cpp
   src/ItemDatabase.cpp
   src/ItemEffect.cpp
+  src/ItemEffectImpl.cpp
   src/ItemPrototype.cpp
   src/LevelDatabase.cpp
   src/ItemSpecialization.cpp
@@ -130,6 +137,7 @@ set(SOURCE_FILES
   src/UI/History.cpp
   src/UI/Interact.cpp
   src/UI/Inventory.cpp
+  src/UI/Item.cpp
   src/UI/ItemSelect.cpp
   src/UI/ListSelect.cpp
   src/UI/Menu.cpp
@@ -191,7 +199,7 @@ add_custom_target(
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/data/
 )
 
-file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json)
+file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json ${CMAKE_CURRENT_SOURCE_DIR}/data/*.yaml)
 file(GLOB SCHEMA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/*.json)
 file(GLOB LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/levels/*.json)
 add_custom_command(
@@ -208,6 +216,13 @@ add_custom_command(
         ${SCHEMA_FILES}
     --output-dir
       ${CMAKE_CURRENT_BINARY_DIR}/data/schemas
+
+  # Post-process all YAML data files
+  COMMAND
+    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/yaml_json.py
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/crafting_db.yaml
+      ${CMAKE_CURRENT_BINARY_DIR}/data/crafting_db.json
+
 
   # Post-process JSON configurations
   COMMAND

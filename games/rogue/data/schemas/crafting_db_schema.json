@@ -1,0 +1,37 @@
+{
+  "$id": "https://rogue-todo.com/crafting-db-schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "JSON Schema the item database",
+  "type": "object",
+  "required": ["recipes"],
+  "properties": {
+    "recipes": {
+      "type": "array",
+      "description": "A list of crafting recipes",
+      "items": {
+        "description": "A crafting recipe, consisting of required ingredients and the resulting items",
+        "type": "object",
+        "required": ["ingredients", "results"],
+        "properties": {
+          "ingredients": {
+            "$ref": "#/defs/item_list"
+          },
+          "results": {
+            "$ref": "#/defs/item_list"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "defs": {
+    "item_list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "The identifier of the item"
+      }
+    }
+  },
+  "additionalProperties": false
+}

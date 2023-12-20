@@ -21,7 +21,7 @@ struct Interaction {
 
 // FIXME allow having multiple action being caused by one interaction
 struct InteractableComp {
-  Interaction Action;
+  std::vector<Interaction> Actions;
 };
 
 struct PlayerComp {

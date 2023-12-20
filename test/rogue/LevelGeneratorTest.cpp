@@ -3,6 +3,7 @@
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/EntityDatabase.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/LevelDatabase.h>
@@ -33,12 +34,14 @@ public:
     ItemDb = rogue::ItemDatabase();
     EntityDb = rogue::EntityDatabase();
     LevelDb = rogue::LevelDatabase();
+    Crafter = rogue::CraftingHandler(ItemDb);
   }
 
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
   rogue::LevelDatabase LevelDb;
-  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb};
+  rogue::CraftingHandler Crafter{ItemDb};
+  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb, Crafter};
 };
 
 TEST_F(LevelGeneratorTest, EmptyLevelGenerator) {

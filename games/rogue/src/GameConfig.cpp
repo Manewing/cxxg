@@ -23,6 +23,9 @@ GameConfig GameConfig::load(const std::filesystem::path &ConfigFile) {
   const auto LevelDbConfig = Doc["level_db_config"].GetString();
   Config.LevelDbConfig = ConfigDir / LevelDbConfig;
 
+  const auto CraftingDbConfig = Doc["crafting_db_config"].GetString();
+  Config.CraftingDbConfig = ConfigDir / CraftingDbConfig;
+
   Config.InitialGameWorld = Doc["initial_game_world"].GetString();
 
   auto InitialLevelConfig = Doc["initial_level_config"].GetString();
