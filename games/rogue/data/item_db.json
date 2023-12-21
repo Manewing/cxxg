@@ -134,29 +134,19 @@
       "magic_damage": 0,
       "ap_cost": 10
     },
-    "ranged_2": {
-      "type": "ranged_attack_comp",
-      "phys_damage": 2,
-      "magic_damage": 0,
-      "ap_cost": 20
-    },
     "ranged_5": {
       "type": "ranged_attack_comp",
       "phys_damage": 5,
       "magic_damage": 0,
-      "ap_cost": 20
-    },
-    "ranged_10": {
-      "type": "ranged_attack_comp",
-      "phys_damage": 10,
-      "magic_damage": 0,
-      "ap_cost": 20
+      "ap_cost": 20,
+      "mana_cost": 5
     },
     "ranged_magic_5": {
       "type": "ranged_attack_comp",
       "phys_damage": 0,
       "magic_damage": 5,
-      "ap_cost": 20
+      "ap_cost": 15,
+      "mana_cost": 10
     },
     "low_chance_to_apply_poison": {
       "type": "chance_on_hit_to_apply_poison",
@@ -165,7 +155,7 @@
         "ticks": 5,
         "tick_period": 20
       },
-      "chance": 60.0
+      "chance": 10.0
     },
     "dismantle_iron_equip": {
       "type": "dismantle",
@@ -321,10 +311,6 @@
         {
           "type": "equipment",
           "effect": "melee_5"
-        },
-        {
-          "type": "equipment",
-          "effect": "low_chance_to_apply_poison"
         }
       ],
       "specializations": [

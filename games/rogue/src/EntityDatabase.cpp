@@ -93,6 +93,7 @@ EntityAssemblerCache getDefaultEntityAssemblerCache() {
   Cache.add<DropEquipAssembler>("drop_equipment");
   Cache.add<EquipmentCompAssembler>("equipment");
   Cache.add<HealthCompAssembler>("health");
+  Cache.add<ManaCompAssembler>("mana");
   Cache.add<PlayerCompAssembler>("player");
   Cache.add<PositionCompAssembler>("position");
   Cache.add<VisibleCompAssembler>("visible");

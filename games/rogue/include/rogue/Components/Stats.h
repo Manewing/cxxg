@@ -90,6 +90,8 @@ struct ValueRegenCompBase {
   unsigned TicksLeft = 1;
   StatValue RegenAmount = 0.05;
 
+  bool hasAmount(StatValue Value);
+  bool tryReduce(StatValue Amount);
   StatValue restore(StatValue Amount);
   StatValue reduce(StatValue Amount);
 };

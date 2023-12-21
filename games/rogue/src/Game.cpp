@@ -445,12 +445,13 @@ ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
                                            entt::registry &Reg,
                                            Interaction *Interact) {
   const auto &Health = Reg.get<HealthComp>(Player);
-  const auto &AGC = Reg.get<AgilityComp>(Player);
+  const auto &Mana = Reg.get<ManaComp>(Player);
 
   ui::Controller::PlayerInfo PI;
   PI.Health = Health.Value;
   PI.MaxHealth = Health.MaxValue;
-  PI.AP = AGC.AP;
+  PI.Mana = Mana.Value;
+  PI.MaxMana = Mana.MaxValue;
   if (Interact) {
     PI.InteractStr = "[e] " + Interact->Msg;
   }

@@ -154,6 +154,7 @@ using CollisionCompAssembler = DefaultConstructEntityAssembler<CollisionComp>;
 using DropEquipAssembler = DefaultConstructEntityAssembler<DropEquipmentComp>;
 using EquipmentCompAssembler = DefaultConstructEntityAssembler<EquipmentComp>;
 using HealthCompAssembler = DefaultConstructEntityAssembler<HealthComp>;
+using ManaCompAssembler = DefaultConstructEntityAssembler<ManaComp>;
 using PlayerCompAssembler = DefaultConstructEntityAssembler<PlayerComp>;
 using PositionCompAssembler = DefaultConstructEntityAssembler<PositionComp>;
 using VisibleCompAssembler = DefaultConstructEntityAssembler<VisibleComp>;

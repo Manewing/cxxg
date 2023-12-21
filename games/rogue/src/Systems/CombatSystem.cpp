@@ -1,6 +1,7 @@
 #include <random>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
+#include <rogue/Components/Player.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
@@ -83,9 +84,22 @@ bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
     MA = *AMA;
   }
 
+  // Check if the attacker has enough AP
   auto *AG = Reg.try_get<AgilityComp>(Attacker);
   if (AG && !AG->trySpendAP(MA.APCost)) {
     return false;
+  }
+
+  // If there is a mana cost, check if the attacker has enough mana. This if not
+  // remove the combat component, we still consume AP for trying the action
+  if (MA.ManaCost > 0) {
+    auto *MC = Reg.try_get<ManaComp>(Attacker);
+    if (!MC || !MC->tryReduce(MA.ManaCost)) {
+      if (Reg.any_of<PlayerComp>(Attacker)) {
+        EHC.publish(PlayerInfoMessageEvent() << "Not enough mana");
+      }
+      return true;
+    }
   }
 
   // Compute the effective damage and apply it
@@ -122,7 +136,7 @@ bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
 /// damage for the attacker
 /// \return true if the combat component can be removed
 bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
-                         ymir::Point2d<int> TargetPos) {
+                         ymir::Point2d<int> TargetPos, EventHubConnector &EHC) {
   auto *AttackerPC = Reg.try_get<PositionComp>(Attacker);
   if (!AttackerPC) {
     return true;
@@ -133,9 +147,22 @@ bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
     return true;
   }
 
+  // Check if the attacker has enough AP
   auto *AG = Reg.try_get<AgilityComp>(Attacker);
   if (AG && !AG->trySpendAP(RAC->APCost)) {
     return false;
+  }
+
+  // If there is a mana cost, check if the attacker has enough mana. This if not
+  // remove the combat component, we still consume AP for trying the action
+  if (RAC->ManaCost > 0) {
+    auto *MC = Reg.try_get<ManaComp>(Attacker);
+    if (!MC || !MC->tryReduce(RAC->ManaCost)) {
+      if (Reg.any_of<PlayerComp>(Attacker)) {
+        EHC.publish(PlayerInfoMessageEvent() << "Not enough mana");
+      }
+      return true;
+    }
   }
 
   // Compute the effective damage and apply it
@@ -164,7 +191,7 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
   assert(CC.Target != entt::null || CC.RangedPos.has_value());
   bool CanRemove = false;
   if (CC.RangedPos) {
-    CanRemove = performRangedAttack(Reg, Attacker, *CC.RangedPos);
+    CanRemove = performRangedAttack(Reg, Attacker, *CC.RangedPos, EHC);
   } else {
     CanRemove = performMeleeAttack(Reg, Attacker, CC.Target, EHC);
   }

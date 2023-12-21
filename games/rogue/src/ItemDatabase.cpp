@@ -106,6 +106,9 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              MAC.PhysDamage = V["phys_damage"].GetDouble();
              MAC.MagicDamage = V["magic_damage"].GetDouble();
              MAC.APCost = V["ap_cost"].GetUint();
+             if (V.HasMember("mana_cost")) {
+               MAC.ManaCost = V["mana_cost"].GetUint();
+             }
              return std::make_shared<SetMeleeCompEffect>(MAC);
            }},
           {"ranged_attack_comp",
@@ -114,6 +117,9 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              RAC.PhysDamage = V["phys_damage"].GetDouble();
              RAC.MagicDamage = V["magic_damage"].GetDouble();
              RAC.APCost = V["ap_cost"].GetUint();
+             if (V.HasMember("mana_cost")) {
+               RAC.ManaCost = V["mana_cost"].GetUint();
+             }
              return std::make_shared<SetRangedCompEffect>(RAC);
            }},
           {"stats_buff_per_hit_comp",

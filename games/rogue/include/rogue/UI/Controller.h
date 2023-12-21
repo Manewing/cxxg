@@ -29,7 +29,8 @@ public:
   struct PlayerInfo {
     int Health;
     int MaxHealth;
-    int AP;
+    int Mana;
+    int MaxMana;
     std::string InteractStr;
   };
 

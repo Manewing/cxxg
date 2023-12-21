@@ -20,6 +20,8 @@ namespace rogue::ui {
 
 namespace {
 
+/// Returns color for health bar, based on current health and max health. From
+/// red to green (full life).
 cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
   if (Health <= 0) {
     return {145, 10, 10};
@@ -32,6 +34,22 @@ cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
     return {225, 140, 10};
   }
   return {245, 30, 30};
+}
+
+/// Returns color for mana bar, based on current mana and max mana. From grey to
+/// blue (full mana).
+cxxg::types::RgbColor getManaColor(int Mana, int MaxMana) {
+  if (Mana <= 0) {
+    return {145, 145, 145};
+  }
+  int Percent = (Mana * 100) / MaxMana;
+  if (Percent >= 66) {
+    return {10, 140, 250};
+  }
+  if (Percent >= 33) {
+    return {80, 150, 200};
+  }
+  return {145, 145, 200};
 }
 
 cxxg::types::Size getWindowContainerSize(cxxg::Screen &Scr) {
@@ -51,6 +69,7 @@ void Controller::draw(int LevelIdx, const PlayerInfo &PI,
   const auto NoInterColor = cxxg::types::Color::GREY;
   const auto HasInterColor = cxxg::types::RgbColor{80, 200, 145};
   const auto HealthColor = getHealthColor(PI.Health, PI.MaxHealth);
+  const auto ManaColor = getManaColor(PI.Mana, PI.MaxMana);
 
   auto InteractStr = PI.InteractStr;
   if (WdwContainer.hasActiveWindow()) {
@@ -66,8 +85,9 @@ void Controller::draw(int LevelIdx, const PlayerInfo &PI,
   auto Acc = Scr[0][0];
   Acc << NoColor.underline() << "[FLOOR]:" << NoColor << " " << std::setw(3)
       << (LevelIdx + 1) << " | " << HealthColor << std::setw(4) << PI.Health
-      << " HP" << NoColor << " | " << PI.AP << " AP | " << NoColor.underline()
-      << "[T]:" << NoColor << " ";
+      << " HP" << NoColor << " | " << ManaColor << std::setw(4) << PI.Mana
+      << " MP" << NoColor << " | " << NoColor.underline() << "[T]:" << NoColor
+      << " ";
   if (TI) {
     Acc << TI->Name << " | " << getHealthColor(TI->Health, TI->MaxHealth)
         << std::setw(4) << TI->Health << " HP" << NoColor;
