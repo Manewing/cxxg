@@ -2,6 +2,7 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/Item.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/ItemPrototype.h>
 #include <rogue/UI/Item.h>
 #include <sstream>
 
@@ -61,7 +62,8 @@ cxxg::types::TermColor getColorForItem(const Item &It) {
   return getColorForItemType(It.getType());
 }
 
-std::string getCapabilityDescription(const std::vector<EffectInfo> &AllEffects,
+std::string getCapabilityDescription(const ItemType &ItType,
+                                     const std::vector<EffectInfo> &AllEffects,
                                      CapabilityFlags Flag) {
   std::stringstream SS;
   SS << Flag << ":\n";
@@ -76,28 +78,36 @@ std::string getCapabilityDescription(const std::vector<EffectInfo> &AllEffects,
   if (!HasAny) {
     return "";
   }
-  SS << "\n";
+  if (!ItemPrototype::canApply(ItType, Flag)) {
+    return "Crafting only: " + SS.str();
+  }
   return SS.str();
 }
 
 std::string getItemEffectDescription(const Item &It) {
   std::stringstream SS;
   const auto AllEffects = It.getAllEffects();
+
   SS << getCapabilityDescription(
-            AllEffects, (CapabilityFlags::Self | CapabilityFlags::UseOn))
+            It.getType(), AllEffects,
+            (CapabilityFlags::Self | CapabilityFlags::UseOn))
      << getCapabilityDescription(
-            AllEffects, (CapabilityFlags::Ranged | CapabilityFlags::UseOn))
+            It.getType(), AllEffects,
+            (CapabilityFlags::Ranged | CapabilityFlags::UseOn))
      << getCapabilityDescription(
-            AllEffects, (CapabilityFlags::Adjacent | CapabilityFlags::UseOn))
-     << getCapabilityDescription(AllEffects, CapabilityFlags::EquipOn);
+            It.getType(), AllEffects,
+            (CapabilityFlags::Adjacent | CapabilityFlags::UseOn))
+     << getCapabilityDescription(It.getType(), AllEffects,
+                                 CapabilityFlags::EquipOn)
+     << getCapabilityDescription(It.getType(), AllEffects,
+                                 CapabilityFlags::Dismantle);
   return SS.str();
 }
 
 std::string getItemText(const Item &It) {
   std::stringstream SS;
-  SS << "Type: " << It.getType() << "\n---\n"
-     << getItemEffectDescription(It) << "---\n"
-     << It.getDescription();
+  SS << "Type: " << It.getType() << "\n---\n";
+  SS << getItemEffectDescription(It) << "---\n" << It.getDescription();
   return SS.str();
 }
 
