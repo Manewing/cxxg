@@ -267,6 +267,10 @@
           "ap_cost": {
             "type": "integer",
             "minimum": 10
+          },
+          "mana_cost": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": ["phys_damage", "magic_damage", "ap_cost", "type"],
@@ -289,6 +293,10 @@
           "ap_cost": {
             "type": "integer",
             "minimum": 10
+          },
+          "mana_cost": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": ["phys_damage", "magic_damage", "ap_cost", "type"],

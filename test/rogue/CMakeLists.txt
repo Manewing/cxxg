@@ -97,18 +97,6 @@ add_schema_test(
 )
 
 add_schema_test(
-  NAME creature_db
-  JSON_FILES ${BUILD_DATA_DIR}/creature_db.json
-  SCHEMA ${SCHEMAS_DIR}/creature_db_schema.json
-)
-
-add_schema_test(
-  NAME build_creature_db
-  JSON_FILES ${BUILD_DATA_DIR}/creature_db.json
-  SCHEMA ${BUILD_SCHEMAS_DIR}/creature_db_schema.json
-)
-
-add_schema_test(
   NAME level_db
   JSON_FILES ${BUILD_DATA_DIR}/level_db.json
   SCHEMA ${SCHEMAS_DIR}/level_db_schema.json
