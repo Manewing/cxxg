@@ -1,6 +1,7 @@
 #include <rogue/Components/Items.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
+#include <sstream>
 
 namespace rogue {
 
@@ -147,9 +148,7 @@ std::string ApplyBuffItemEffectBase::getName() const {
 }
 
 std::string ApplyBuffItemEffectBase::getDescription() const {
-  std::stringstream SS;
-  SS << getBuff().getDescription();
-  return SS.str();
+  return getBuff().getDescription();
 }
 
 } // namespace rogue
