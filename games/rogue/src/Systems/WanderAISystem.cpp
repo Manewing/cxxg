@@ -162,8 +162,8 @@ WanderAISystem::findTarget(entt::entity Entity,
   entt::entity TargetEt = entt::null;
   Reg.view<PositionComp, FactionComp, VisibleComp>().each(
       [this, &TargetEt, &LOSComp, &FacComp, AtPos](
-          entt::entity TEt, const auto &TPC, const auto &TFC, const auto &) {
-        if (TFC.Faction == FacComp->Faction) {
+          entt::entity TEt, const auto &TPC, const auto &TFC, const auto &VC) {
+        if (!VC.IsVisible || TFC.Faction == FacComp->Faction) {
           return;
         }
 
