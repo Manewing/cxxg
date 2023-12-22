@@ -93,16 +93,18 @@ void StatsController::draw(cxxg::Screen &Scr) const {
 
   // Add health info
   if (const auto *HC = Reg.try_get<HealthComp>(Entity)) {
-    Scr[Pos.Y + getSize().Y - 6][Pos.X + 2] << "HP: " << std::setprecision(2)
-                                            << HC->Value << "/" << HC->MaxValue;
+    Scr[Pos.Y + getSize().Y - 6][Pos.X + 2]
+        << "HP: " << std::fixed << std::setprecision(1) << std::setw(6) << HC->Value << "/"
+        << std::setprecision(1) << std::setw(6) << HC->MaxValue;
   } else {
     Scr[Pos.Y + getSize().Y - 6][Pos.X + 2] << "HP: ---";
   }
 
   // Add mana info
   if (const auto *MC = Reg.try_get<ManaComp>(Entity)) {
-    Scr[Pos.Y + getSize().Y - 5][Pos.X + 2] << "MP: " << std::setprecision(2)
-                                            << MC->Value << "/" << MC->MaxValue;
+    Scr[Pos.Y + getSize().Y - 5][Pos.X + 2]
+        << "MP: " << std::fixed << std::setprecision(1) << std::setw(6) << MC->Value << "/"
+        << std::setprecision(1) << std::setw(6) << MC->MaxValue;
   } else {
     Scr[Pos.Y + getSize().Y - 5][Pos.X + 2] << "MP: ---";
   }
@@ -110,7 +112,7 @@ void StatsController::draw(cxxg::Screen &Scr) const {
   // Add agility info
   if (const auto *AC = Reg.try_get<AgilityComp>(Entity)) {
     Scr[Pos.Y + getSize().Y - 4][Pos.X + 2]
-        << "Agility: " << std::setprecision(2) << AC->Agility
+        << "Agility: " << std::fixed << std::setprecision(1) << AC->Agility
         << ", AP: " << AC->AP;
   } else {
     Scr[Pos.Y + getSize().Y - 4][Pos.X + 2] << "MP: ---";

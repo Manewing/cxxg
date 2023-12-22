@@ -211,7 +211,8 @@ std::string LootController::getInteractMsg() const {
   if (Inv.empty()) {
     return "";
   }
-  std::vector<KeyOption> Options = {Controls::Info, Controls::Take};
+  std::vector<KeyOption> Options = {Controls::Info, Controls::Take,
+                                    Controls::TakeOne};
   return KeyOption::getInteractMsg(Options);
 }
 
