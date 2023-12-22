@@ -238,6 +238,13 @@ void CombatSystem::update(UpdateType Type) {
     return;
   }
 
+  // Remove expired damage components
+  Reg.view<DamageComp>().each([this](const auto &Et, auto &DC) {
+    if (DC.Ticks-- == 0) {
+      Reg.destroy(Et);
+    }
+  });
+
   // Deal with melee attacks
   Reg.view<CombatActionComp>().each([this](const auto &AttackerEt, auto &CC) {
     performAttack(Reg, AttackerEt, CC, *this);

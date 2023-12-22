@@ -389,6 +389,18 @@
       ]
     },
     {
+      "name": "Scroll of striking",
+      "description": "A scroll TODO",
+      "max_stack_size": 1,
+      "types": ["consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "sweeping_strike_effect"
+        }
+      ]
+    },
+    {
       "name": "Scroll of blinding",
       "description": "A scroll that blinds the target",
       "max_stack_size": 1,
@@ -1066,6 +1078,13 @@
         {
           "type": "item",
           "name": "Scroll of pain",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of striking",
           "min_count": 1,
           "max_count": 1,
           "weight": 5

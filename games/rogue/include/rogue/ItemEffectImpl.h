@@ -81,6 +81,17 @@ public:
   std::string getDescription() const final;
 };
 
+// Combat
+
+class SweepingStrikeEffect : public ItemEffect {
+public:
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
+  void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
+};
+
 } // namespace rogue
 
 #endif // ROGUE_ITEM_EFFECT_IMPL_H

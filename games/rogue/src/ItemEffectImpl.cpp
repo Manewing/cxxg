@@ -1,3 +1,4 @@
+#include <rogue/Components/Transform.h>
 #include <rogue/ItemEffectImpl.h>
 #include <sstream>
 
@@ -70,6 +71,50 @@ std::string RemovePoisonDebuffEffect::getName() const {
 
 std::string RemovePoisonDebuffEffect::getDescription() const {
   return "Removes poison debuff";
+}
+
+std::shared_ptr<ItemEffect> SweepingStrikeEffect::clone() const {
+  return std::make_shared<SweepingStrikeEffect>(*this);
+}
+
+std::string SweepingStrikeEffect::getName() const { return "Sweeping Strike"; }
+
+std::string SweepingStrikeEffect::getDescription() const {
+  return "Hits all surrounding enemies.";
+}
+
+bool SweepingStrikeEffect::canApplyTo(const entt::entity &Et,
+                                      entt::registry &Reg) const {
+  return Reg.all_of<PositionComp, MeleeAttackComp>(Et);
+}
+
+void SweepingStrikeEffect::applyTo(const entt::entity &Et,
+                                   entt::registry &Reg) const {
+  auto &PC= Reg.get<PositionComp>(Et);
+
+  // Melee is always possible, used default values for damage if not set
+  const MeleeAttackComp DefaultMA = {
+      .PhysDamage = 1, .MagicDamage = 0, .APCost = 10};
+  MeleeAttackComp MA = DefaultMA;
+  auto *AMA = Reg.try_get<MeleeAttackComp>(Et);
+  if (AMA) {
+    MA = *AMA;
+  }
+
+  DamageComp DC;
+  DC.Source = Et;
+  if (auto *SC = Reg.try_get<StatsComp>(Et)) {
+    auto SP = SC->effective();
+    DC.PhysDamage = MA.getPhysEffectiveDamage(&SP);
+    DC.MagicDamage = MA.getMagicEffectiveDamage(&SP);
+  } else {
+    DC.PhysDamage = MA.getPhysEffectiveDamage();
+    DC.MagicDamage = MA.getMagicEffectiveDamage();
+  }
+
+  for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
+    createTempDamage(Reg, DC, PC.Pos + Dir);
+  }
 }
 
 } // namespace rogue

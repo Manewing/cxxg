@@ -187,6 +187,8 @@ static void addDefaultConstructEffects(
 static void addDefaultConstructEffects(
     std::map<std::string, std::shared_ptr<ItemEffect>> &Effects) {
   addDefaultConstructEffects(Effects, "null", std::make_shared<NullEffect>());
+  addDefaultConstructEffects(Effects, "sweeping_strike_effect",
+                             std::make_shared<SweepingStrikeEffect>());
   addDefaultConstructEffects(Effects, "remove_poison_effect",
                              std::make_shared<RemovePoisonEffect>());
   addDefaultConstructEffects(Effects, "remove_poison_debuff",

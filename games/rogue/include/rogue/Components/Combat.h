@@ -60,8 +60,14 @@ struct DamageComp {
   StatValue MagicDamage = 0;
   int Hits = 1;
 
+  /// Number of ticks before the damage component will be removed
+  unsigned Ticks = -1U;
+
   StatValue total() const { return PhysDamage + MagicDamage; }
 };
+
+void createTempDamage(entt::registry &Reg, const DamageComp &DC,
+                      ymir::Point2d<int> Pos);
 
 void createProjectile(entt::registry &Reg, const DamageComp &DC,
                       ymir::Point2d<int> Pos, ymir::Point2d<int> TargetPos,
