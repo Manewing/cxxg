@@ -1,6 +1,7 @@
 #include <rogue/Components/Items.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
+#include <sstream>
 
 namespace rogue {
 
