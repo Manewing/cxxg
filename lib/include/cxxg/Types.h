@@ -2,6 +2,7 @@
 #define CXXG_TYPES_H
 
 #include <iosfwd>
+#include <stdint.h>
 #include <string>
 #include <tuple>
 #include <variant>

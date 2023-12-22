@@ -1,11 +1,5 @@
 set(TARGET rogue)
 
-set(YMIR_INSTALL "" CACHE STRING "ymir install location")
-message("YMIR_INSTALL: ${YMIR_INSTALL}")
-
-if(EXISTS "${YMIR_INSTALL}/include/ymir")
-
-
 set(HEADER_FILES
   include/rogue/Components/AI.h
   include/rogue/Components/Combat.h
@@ -163,12 +157,8 @@ add_executable(${TARGET}
 
 target_include_directories(lib${TARGET} PUBLIC include)
 
-## YMIR
-find_library(LIBYMIR NAMES ymir HINTS "${YMIR_INSTALL}/lib")
-##
-
 target_link_libraries(lib${TARGET}
-  cxxg ${LIBYMIR} EnTT::EnTT
+  cxxg ymir EnTT::EnTT
 )
 
 target_include_directories(lib${TARGET}
@@ -185,13 +175,6 @@ target_link_libraries(${TARGET}
 )
 
 add_subdirectory(test)
-
-else()
-
-message("Skipping target '${TARGET}' missing libymir")
-
-endif()
-
 
 add_custom_target(
   rogue_create_data_dir

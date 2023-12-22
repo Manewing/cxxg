@@ -11,4 +11,5 @@ add_cxxg_unittest(
   NAME 2048
   SOURCES ${SOURCES}
   INCLUDES ${INCLUDES}
+  LIBRARIES cxxg
 )
