@@ -10,9 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(WIN32)
-  set(CMAKE_CXX_FLAGS
-    "${CMAKE_CXX_FLAGS} -Wall -Werror"
-  )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 else()
   set(CMAKE_CXX_FLAGS
     "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -ggdb"
