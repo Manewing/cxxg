@@ -11,8 +11,8 @@
     "minor_poison_effect": {
       "type": "poison_debuff_comp",
       "buff": {
-        "reduce_amount": 0.5,
-        "ticks": 5,
+        "reduce_amount": 1.0,
+        "ticks": 10,
         "tick_period": 20
       }
     },
@@ -20,7 +20,7 @@
       "type": "poison_debuff_comp",
       "buff": {
         "reduce_amount": 5.0,
-        "ticks": 5,
+        "ticks": 10,
         "tick_period": 10
       }
     },
@@ -28,7 +28,7 @@
       "type": "health_regen_buff_comp",
       "buff": {
         "regen_amount": 1.0,
-        "ticks": 4,
+        "ticks": 8,
         "tick_period": 10
       }
     },
@@ -36,7 +36,7 @@
       "type": "health_regen_buff_comp",
       "buff": {
         "regen_amount": 0.5,
-        "ticks": 10,
+        "ticks": 20,
         "tick_period": 20
       }
     },
@@ -151,8 +151,8 @@
     "low_chance_to_apply_poison": {
       "type": "chance_on_hit_to_apply_poison",
       "buff": {
-        "reduce_amount": 0.5,
-        "ticks": 5,
+        "reduce_amount": 1.0,
+        "ticks": 10,
         "tick_period": 20
       },
       "chance": 10.0
@@ -184,10 +184,6 @@
         },
         {
           "name": "Rune Dust",
-          "amount": 1
-        },
-        {
-          "name": "Leather Scrap",
           "amount": 1
         }
       ]
@@ -828,7 +824,15 @@
         {
           "type": "use_on",
           "effect": "remove_poison_effect"
-        },
+        }
+      ]
+    },
+    {
+      "name": "Elder Flower",
+      "description": "A flower of elder TODO",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
         {
           "type": "use_on",
           "effect": "remove_poison_debuff"
@@ -885,6 +889,18 @@
       ]
     },
     {
+      "name": "Spider Venom Oil",
+      "description": "An oil that can be applied to a weapon, adding a possibility to poison",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_poison"
+        }
+      ]
+    },
+    {
       "name": "Key",
       "description": "A key for a lock. Who knows what it opens...",
       "max_stack_size": 1,
@@ -896,21 +912,36 @@
       "description": "The key that unlocks the first level",
       "max_stack_size": 1,
       "types": ["quest"],
-      "capabilities": []
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
+        }
+      ]
     },
     {
       "name": "L2 Key",
       "description": "The key that unlocks the second level",
       "max_stack_size": 1,
       "types": ["quest"],
-      "capabilities": []
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
+        }
+      ]
     },
     {
       "name": "L3 Key",
       "description": "The key that unlocks the third level",
       "max_stack_size": 1,
       "types": ["quest"],
-      "capabilities": []
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
+        }
+      ]
     },
     {
       "name": "Final Key",
@@ -1092,8 +1123,21 @@
           "min_count": 1,
           "max_count": 3,
           "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Glass Vial",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Arcane Liquid",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 5
         }
-
       ]
     },
     "l1_key": {
@@ -1153,70 +1197,87 @@
         }
       ]
     },
-    "common_chest": {
-      "rolls": 4,
+    "common_consumables": {
+      "rolls": 2,
       "slots": [
         {
           "type": "item",
           "name": "Blueberry",
           "min_count": 1,
           "max_count": 2,
-          "weight": 20
+          "weight": 30
         },
+        {
+          "type": "item",
+          "name": "Poison Berry",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Elder Flower",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        }
+      ]
+    },
+    "common_chest": {
+      "rolls": 4,
+      "slots": [
         {
           "type": "table",
           "ref": "common_equip",
-          "weight": 20
+          "weight": 30
+        },
+        {
+          "type": "table",
+          "ref": "common_consumables",
+          "weight": 30
         },
         {
           "type": "table",
           "ref": "common_crafting",
-          "weight": 20
+          "weight": 30
         },
         {
           "type": "null",
-          "weight": 20
+          "weight": 30
         },
         {
           "type": "null",
-          "weight": 20
+          "weight": 30
         },
         {
           "type": "null",
-          "weight": 20
+          "weight": 30
         },
         {
           "type": "table",
           "ref": "common_equip",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "common_scroll",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "l2_key",
           "weight": 10
         },
         {
           "type": "table",
           "ref": "rare_equip",
           "weight": 5
-        },
-        {
-          "type": "table",
-          "ref": "common_scroll",
-          "weight": 5
-        },
-        {
-          "type": "table",
-          "ref": "l2_key",
-          "weight": 2
         }
       ]
     },
     "rare_chest": {
       "rolls": 5,
       "slots": [
-        {
-          "type": "item",
-          "name": "Blueberry",
-          "min_count": 5,
-          "max_count": 10,
-          "weight": 20
-        },
         {
           "type": "table",
           "ref": "rare_equip",
@@ -1255,11 +1316,14 @@
           "weight": 5
         },
         {
-          "type": "item",
-          "name": "Iron Scrap",
-          "min_count": 3,
-          "max_count": 3,
-          "weight": -1
+          "type": "table",
+          "ref": "common_crafting",
+          "weight": 5
+        },
+        {
+          "type": "table",
+          "ref": "common_crafting",
+          "weight": 5
         }
       ]
     },
@@ -1433,6 +1497,21 @@
         {
           "type": "table",
           "ref": "common_chest",
+          "weight": -1
+        }
+      ]
+    },
+    "rare_silk_cocoon": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "table",
+          "ref": "common_spider",
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "mixed_chest",
           "weight": -1
         }
       ]

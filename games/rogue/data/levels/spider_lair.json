@@ -6,7 +6,7 @@
   "entities": {
     "<": "level_entry",
     "H": "level_exit",
-    "0": "silk_cocoon",
+    "0": "large_silk_cocoon",
     "h": "arachnoth_hatchling",
     "b": "arachnoth_burrower",
     "B": "arachnoth_broodguard"

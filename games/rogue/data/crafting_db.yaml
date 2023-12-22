@@ -43,3 +43,21 @@ recipes:
       - Arcane Liquid
     results:
       - Arcane Potion
+  - ingredients:
+      - Rune Dust
+      - Rune Dust
+      - Arachnid Chitin Shard
+      - Arachnid Chitin Shard
+      - Arachnid Chitin Shard
+    results:
+      - Armor Plating
+  - ingredients:
+      - Arcane Liquid
+      - Venomous Fang
+      - Venomous Fang
+      - Venomous Fang
+      - Spiderling Venom Sac
+      - Spiderling Venom Sac
+      - Spiderling Venom Sac
+    results:
+      - Spider Venom Oil

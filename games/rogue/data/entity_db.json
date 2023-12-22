@@ -102,6 +102,26 @@
       }
     },
     {
+      "name": "large_silk_cocoon",
+      "from_template": "silk_cocoon",
+      "display_name": "Large Silk Cocoon",
+      "assemblers": {
+        "tile": {
+          "color": "#e0e0a0",
+          "char": "O"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 3
+        },
+        "inventory": {
+          "loot_table": "rare_silk_cocoon"
+        }
+      }
+    },
+    {
       "name": "hostile_creature",
       "assemblers": {
         "attack_ai": true,
@@ -262,7 +282,7 @@
           "char": "b"
         },
         "stats": {
-          "str": 4,
+          "str": 7,
           "dex": 1,
           "int": 0,
           "vit": 7
@@ -458,6 +478,10 @@
           "loot_name": "Vase",
           "interact_text": "Look into Vase",
           "default_tile": {
+            "char": "V",
+            "color": "#77412c"
+          },
+          "looted_tile": {
             "char": "v",
             "color": "#77412c"
           }
@@ -474,7 +498,11 @@
         "loot_interact": {
           "default_tile": {
             "char": "C",
-            "color": "#ff0000"
+            "color": "#fac43c"
+          },
+          "looted_tile": {
+            "char": "c",
+            "color": "#c49a31"
           }
         }
       }
@@ -489,7 +517,11 @@
         "loot_interact": {
           "default_tile": {
             "char": "C",
-            "color": "#ff0000"
+            "color": "#e0884f"
+          },
+          "looted_tile": {
+            "char": "c",
+            "color": "#a65c2d"
           }
         }
       }
