@@ -11,4 +11,5 @@ add_cxxg_unittest(
   NAME mastermind
   SOURCES ${SOURCES}
   INCLUDES ${INCLUDES}
+  LIBRARIES cxxg
 )

@@ -21,8 +21,6 @@ add_executable(${TARGET}
 add_test(unittest_${ARGS_NAME} ${TARGET})
 
 target_link_libraries(${TARGET}
-  cxxg
-  gtest
   gtest_main
   gmock
   ${ARGS_LIBRARIES}

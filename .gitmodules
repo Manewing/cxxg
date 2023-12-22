@@ -7,3 +7,6 @@
 [submodule "third-party/rapidjson"]
 	path = third-party/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
+[submodule "third-party/ymir"]
+	path = third-party/ymir
+	url = https://github.com/Manewing/ymir.git
