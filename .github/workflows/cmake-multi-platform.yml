@@ -87,30 +87,37 @@ jobs:
       run: cmake --install build --prefix install --strip
 
     - name: Pack
-      run: cmake -E tar cJfv ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.tar.xz install
+      run: cmake -E tar cJfv  --format=zip ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.zip install
+
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.zip
+        path: ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.zip
+
 
     # FIXME get version from file
-    - name: version
-      run: echo "::set-output name=version::1.0"
-      id: version
-
-    - name: release
-      uses: actions/create-release@v1
-      id: create_release
-      with:
-        draft: false
-        prerelease: false
-        release_name: ${{ steps.version.outputs.version }}
-        tag_name: ${{ github.ref }}
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-
-    - name: Upload
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.tar.xz
-        asset_name: ${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.tar.xz
-        asset_content_type: application/x-xz
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+#    - name: Set Version
+#      run: echo "::set-output name=version::1.0"
+#      id: version
+#
+#    - name: Create Release
+#      uses: actions/create-release@v1
+#      id: create_release
+#      with:
+#        draft: false
+#        prerelease: false
+#        release_name: ${{ steps.version.outputs.version }}
+#        tag_name: ${{ github.ref }}
+#      env:
+#        GITHUB_TOKEN: ${{ github.token }}
+#
+#    - name: Upload
+#      uses: actions/upload-release-asset@v1
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        asset_path: ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.tar.xz
+#        asset_name: ${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.tar.xz
+#        asset_content_type: application/x-xz
+#      env:
+#        GITHUB_TOKEN: ${{ github.token }}
