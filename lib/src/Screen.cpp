@@ -41,11 +41,13 @@ void Screen::setColor(types::Position Top, types::Position Bottom,
 }
 
 void Screen::update() const {
-  Out << ClearScreenStr << HideCursorStr;
+  std::stringstream SS;
+  SS << ClearScreenStr << HideCursorStr;
   for (auto &Row : Rows) {
-    Out << Row;
+    SS << Row;
   }
-  Out << ShowCursorStr << ::std::flush;
+  SS << ShowCursorStr ;
+  Out << SS.str()<< ::std::flush;
 }
 
 void Screen::clear() {
