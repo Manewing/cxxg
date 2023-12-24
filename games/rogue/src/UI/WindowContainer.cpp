@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cxxg/Screen.h>
 #include <optional>
 #include <rogue/UI/Controls.h>
@@ -6,7 +7,6 @@
 #include <rogue/UI/WindowContainer.h>
 #include <variant>
 #include <ymir/Types.hpp>
-#include <algorithm>
 
 namespace rogue::ui {
 
@@ -194,11 +194,10 @@ namespace {
 
 ymir::Rect2d<unsigned long> getRect(const WindowContainer::WindowInfo &WdwInfo,
                                     bool Spacing = false) {
-  return {
-      {static_cast<unsigned long>(WdwInfo.Pos.X),
-       static_cast<unsigned long>(WdwInfo.Pos.Y)},
-      {static_cast<unsigned long>(WdwInfo.Size.X + (Spacing ? 1 : 0)),
-       static_cast<unsigned long>(WdwInfo.Size.Y + (Spacing ? 1 : 0))}};
+  return {{static_cast<unsigned long>(WdwInfo.Pos.X),
+           static_cast<unsigned long>(WdwInfo.Pos.Y)},
+          {static_cast<unsigned long>(WdwInfo.Size.X + (Spacing ? 1 : 0)),
+           static_cast<unsigned long>(WdwInfo.Size.Y + (Spacing ? 1 : 0))}};
 }
 
 bool isOverlapping(const WindowContainer::WindowInfo &WdwInfo,

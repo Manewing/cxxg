@@ -2,11 +2,11 @@
 #define CXXG_UTILS_HH
 
 #include <ctime>
+#include <filesystem>
 #include <functional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <filesystem>
 
 #define THROW_CXXG_ERROR(msg)                                                  \
   {                                                                            \

@@ -6,9 +6,9 @@
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/Frame.h>
+#include <rogue/UI/Item.h>
 #include <rogue/UI/ItemSelect.h>
 #include <rogue/UI/Tooltip.h>
-#include <rogue/UI/Item.h>
 
 namespace rogue::ui {
 

@@ -7,8 +7,8 @@
 
 #ifndef WIN32
 
-#include <unistd.h>
 #include <execinfo.h>
+#include <unistd.h>
 
 void handler(int) {
   void *StackFrames[40];
@@ -19,16 +19,13 @@ void handler(int) {
   exit(139);
 }
 
-void setup_main() {
-  signal(SIGSEGV, handler);
-}
+void setup_main() { signal(SIGSEGV, handler); }
 
 #else
 
 void setup_main() {}
 
 #endif
-
 
 int wrapped_main(int Argc, char *Argv[]) {
   if (Argc != 2 && Argc != 4) {
@@ -66,12 +63,10 @@ int main(int Argc, char *Argv[]) {
   setup_main();
   try {
     return wrapped_main(Argc, Argv);
-  }
-  catch (std::exception const &E) {
+  } catch (std::exception const &E) {
     std::cerr << "ERROR: " << E.what() << std::endl;
     return 1;
-  }
-  catch (...) {
+  } catch (...) {
     std::cerr << "ERROR: Unknown exception" << std::endl;
     return 1;
   }

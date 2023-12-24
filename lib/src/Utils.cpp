@@ -13,7 +13,6 @@ void handleSigint(int) { SigintHandler(); }
 
 } // namespace
 
-
 std::string getCharTxt(int Char) {
   if (32 <= Char && Char < 127) {
     std::string Str = "' '";

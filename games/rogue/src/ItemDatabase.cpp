@@ -4,10 +4,10 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/ItemEffectImpl.h>
 #include <rogue/ItemPrototype.h>
 #include <rogue/ItemSpecialization.h>
 #include <rogue/JSON.h>
-#include <rogue/ItemEffectImpl.h>
 #include <rogue/JSONHelpers.h>
 
 namespace rogue {

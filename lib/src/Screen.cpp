@@ -1,12 +1,11 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
 
-
 namespace cxxg {
 
 types::Size Screen::getTerminalSize() {
-    auto [W, H] = ::cxxg::utils::getTerminalSize();
-    return { W, H };
+  auto [W, H] = ::cxxg::utils::getTerminalSize();
+  return {W, H};
 }
 
 Screen::Screen(types::Size Size, ::std::ostream &Out)
@@ -46,8 +45,8 @@ void Screen::update() const {
   for (auto &Row : Rows) {
     SS << Row;
   }
-  SS << ShowCursorStr ;
-  Out << SS.str()<< ::std::flush;
+  SS << ShowCursorStr;
+  Out << SS.str() << ::std::flush;
 }
 
 void Screen::clear() {

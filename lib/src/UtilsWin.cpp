@@ -20,7 +20,8 @@ int getCharNonBlocking() {
     return KEY_INVALID;
   }
 
-  if (GetNumberOfConsoleInputEvents(Handle, &NumRead) == FALSE || NumRead == 0) {
+  if (GetNumberOfConsoleInputEvents(Handle, &NumRead) == FALSE ||
+      NumRead == 0) {
     return KEY_INVALID;
   }
 
@@ -29,27 +30,33 @@ int getCharNonBlocking() {
   }
   if (InputRecord.EventType != KEY_EVENT ||
       InputRecord.Event.KeyEvent.bKeyDown == FALSE) {
-        return KEY_INVALID;
+    return KEY_INVALID;
   }
 
   if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_ESCAPE) {
     return KEY_ESC;
-  } if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_UP) {
+  }
+  if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_UP) {
     return KEY_UP;
-  } if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_DOWN) {
+  }
+  if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_DOWN) {
     return KEY_DOWN;
-  } if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_LEFT) {
+  }
+  if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_LEFT) {
     return KEY_LEFT;
-  } if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_RIGHT) {
+  }
+  if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_RIGHT) {
     return KEY_RIGHT;
-  } if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_DELETE) {
+  }
+  if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_DELETE) {
     return KEY_DEL_C;
-  } if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_RETURN) {
+  }
+  if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_RETURN) {
     return KEY_ENTER;
-  } if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_BACK) {
+  }
+  if (InputRecord.Event.KeyEvent.wVirtualKeyCode == VK_BACK) {
     return KEY_DEL;
   }
-  
 
   if (InputRecord.Event.KeyEvent.uChar.AsciiChar == 0) {
     return KEY_INVALID;
@@ -72,7 +79,6 @@ int getCharBlocking() {
 
 } // namespace
 
-
 int getChar(bool Blocking) {
   if (Blocking) {
     return getCharBlocking();
@@ -85,9 +91,7 @@ void clearStdin() {
   }
 }
 
-bool hasBufferedInput() {
-  return BufferedInputEnabled;
-}
+bool hasBufferedInput() { return BufferedInputEnabled; }
 
 void switchBufferedInput() {
   if (BufferedInputEnabled) {
@@ -108,9 +112,7 @@ std::filesystem::path getHomeDir() {
   return "";
 }
 
-void sleep(size_t MicroSeconds) {
-  Sleep(MicroSeconds / 1000 / 1000);
-}
+void sleep(size_t MicroSeconds) { Sleep(MicroSeconds / 1000 / 1000); }
 
 std::pair<unsigned, unsigned> getTerminalSize() {
   CONSOLE_SCREEN_BUFFER_INFO CSBI;
@@ -118,6 +120,5 @@ std::pair<unsigned, unsigned> getTerminalSize() {
   return {CSBI.srWindow.Right - CSBI.srWindow.Left + 1,
           CSBI.srWindow.Bottom - CSBI.srWindow.Top + 1};
 }
-
 
 } // namespace cxxg::utils

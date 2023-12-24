@@ -12,9 +12,9 @@
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/Inventory.h>
+#include <rogue/UI/Item.h>
 #include <rogue/UI/ListSelect.h>
 #include <rogue/UI/Tooltip.h>
-#include <rogue/UI/Item.h>
 
 namespace rogue::ui {
 
