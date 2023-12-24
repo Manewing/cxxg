@@ -84,16 +84,16 @@ jobs:
       run: ctest --build-config ${{ matrix.build_type }} --output-on-failure
 
     - name: Install Strip
-      run: cmake --install build --prefix install --strip
+      run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --prefix install --strip
 
     - name: Pack
-      run: cmake -E tar cJfv  --format=zip ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.zip install
+      run: cmake -E tar cJfv  --format=zip ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.cpp_compiler }}.zip install
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.zip
-        path: ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.zip
+        name: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.cpp_compiler }}.zip
+        path: ./${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.cpp_compiler }}.zip
 
 
     # FIXME get version from file

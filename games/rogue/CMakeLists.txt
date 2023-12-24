@@ -228,3 +228,18 @@ add_custom_command(
       ${LEVEL_FILES}
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
 )
+
+install(
+  TARGETS ${TARGET}
+  RUNTIME DESTINATION bin
+)
+
+install(
+  TARGETS lib${TARGET}
+  ARCHIVE DESTINATION lib
+)
+
+install(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/
+  DESTINATION shared/data
+)
