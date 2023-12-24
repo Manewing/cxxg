@@ -82,3 +82,35 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }} --output-on-failure
+
+    - name: Install Strip
+      run: cmake --install build --prefix install --strip
+
+    - name: Pack
+      run: cmake -E tar cJfv ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.tar.xz install
+
+    # FIXME get version from file
+    - name: version
+      run: echo "::set-output name=version::1.0"
+      id: version
+
+    - name: release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: ${{ steps.version.outputs.version }}
+        tag_name: ${{ github.ref }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Upload
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ../${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.tar.xz
+        asset_name: ${{ matrix.config.os }}-${{ matrix.config.build_type }}-${{ matrix.cpp_compiler }}.tar.xz
+        asset_content_type: application/x-xz
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
