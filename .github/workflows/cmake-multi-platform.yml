@@ -87,7 +87,7 @@ jobs:
       run: cmake --install ${{ steps.strings.outputs.build-output-dir }} --prefix install --strip
 
     - name: Pack
-      run: cmake -E tar cJfv  --format=zip ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.cpp_compiler }}.zip install
+      run: cmake -E tar cfv ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.cpp_compiler }}.zip  --format=zip install
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v3
