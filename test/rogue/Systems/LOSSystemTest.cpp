@@ -21,7 +21,7 @@ public:
 
 TEST_F(LOSSystemTest, ResetLOS) {
   auto &LOS = Reg.emplace<rogue::LineOfSightComp>(
-      Et, rogue::LineOfSightComp{.LOSRange = 10, .MaxLOSRange = 20});
+      Et, rogue::LineOfSightComp{/*LOSRange = */10, /*MaxLOSRange =*/20});
   Reg.emplace<rogue::VisibleLOSComp>(Et).Temporary = true;
   Sys->update(rogue::System::UpdateType::NoTick);
 
@@ -32,7 +32,7 @@ TEST_F(LOSSystemTest, ResetLOS) {
 
 TEST_F(LOSSystemTest, BlindedDebuff) {
   auto &LOS = Reg.emplace<rogue::LineOfSightComp>(
-      Et, rogue::LineOfSightComp{.LOSRange = 100, .MaxLOSRange = 100});
+      Et, rogue::LineOfSightComp{/*LOSRange =*/ 100, /*MaxLOSRange = */100});
   Reg.emplace<rogue::BlindedDebuffComp>(Et, rogue::BlindedDebuffComp{});
 
   Sys->update(rogue::System::UpdateType::NoTick);

@@ -184,6 +184,8 @@ add_custom_target(
 
 file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json ${CMAKE_CURRENT_SOURCE_DIR}/data/*.yaml)
 file(GLOB SCHEMA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/*.json)
+message(STATUS "Schema files: ${SCHEMA_FILES}")
+message(STATUS "Python: ${PYTHON_EXECUTABLE}")
 file(GLOB LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/levels/*.json)
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/data/
@@ -194,7 +196,7 @@ add_custom_command(
 
   # Post-process all JSON schemas
   COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
+    ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
     --schema-files
         ${SCHEMA_FILES}
     --output-dir
@@ -202,14 +204,14 @@ add_custom_command(
 
   # Post-process all YAML data files
   COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/yaml_json.py
+    ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/yaml_json.py
       ${CMAKE_CURRENT_SOURCE_DIR}/data/crafting_db.yaml
       ${CMAKE_CURRENT_BINARY_DIR}/data/crafting_db.json
 
 
   # Post-process JSON configurations
   COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/entity_db_post_process.py
+   ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/entity_db_post_process.py
     --entity-db
       ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db.json
     --output

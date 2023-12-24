@@ -97,7 +97,7 @@ TEST_F(LevelGeneratorTest, DesignedMapLevelGeneratorSimpleMapWithEntities) {
   Cfg.CharInfoMap['T'].Layer = "entities";
   Cfg.CharInfoMap['C'].T = rogue::Tile{{'C'}};
   Cfg.CharInfoMap['C'].Layer = "entities";
-  Cfg.EntityConfig = {.Entities = {
+  Cfg.EntityConfig = {/*Entities =*/ {
                           {'s', "dummy_s"},
                           {'T', "dummy_t"},
                           {'C', "dummy_c"},

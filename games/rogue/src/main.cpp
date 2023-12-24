@@ -1,11 +1,14 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
-#include <execinfo.h>
 #include <rogue/Game.h>
 #include <rogue/GameConfig.h>
 #include <signal.h>
 #include <stdexcept>
+
+#ifndef WIN32
+
 #include <unistd.h>
+#include <execinfo.h>
 
 void handler(int) {
   void *StackFrames[40];
@@ -16,9 +19,18 @@ void handler(int) {
   exit(139);
 }
 
-int main(int Argc, char *Argv[]) {
+void setup_main() {
   signal(SIGSEGV, handler);
+}
 
+#else
+
+void setup_main() {}
+
+#endif
+
+
+int wrapped_main(int Argc, char *Argv[]) {
   if (Argc != 2 && Argc != 4) {
     std::cout << "Usage: " << Argv[0] << " <game_config.json> (--seed <value>)"
               << std::endl;
@@ -43,9 +55,25 @@ int main(int Argc, char *Argv[]) {
     GameInstance.initialize();
     GameInstance.run();
   } catch (std::exception const &E) {
-    std::cerr << "ERROR: " << E.what() << std::endl;
+    std::cerr << "ERROR: Running game:" << E.what() << std::endl;
     return 1;
   }
 
+  return 0;
+}
+
+int main(int Argc, char *Argv[]) {
+  setup_main();
+  try {
+    return wrapped_main(Argc, Argv);
+  }
+  catch (std::exception const &E) {
+    std::cerr << "ERROR: " << E.what() << std::endl;
+    return 1;
+  }
+  catch (...) {
+    std::cerr << "ERROR: Unknown exception" << std::endl;
+    return 1;
+  }
   return 0;
 }

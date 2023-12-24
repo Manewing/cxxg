@@ -1,17 +1,12 @@
 #include <cxxg/Screen.h>
+#include <cxxg/Utils.h>
 
-#include <sys/ioctl.h>
-#include <unistd.h>
 
 namespace cxxg {
 
 types::Size Screen::getTerminalSize() {
-  winsize Ws;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &Ws);
-  if (!Ws.ws_col || !Ws.ws_row) {
-    return {80, 24};
-  }
-  return {Ws.ws_col, Ws.ws_row};
+    auto [W, H] = ::cxxg::utils::getTerminalSize();
+    return { W, H };
 }
 
 Screen::Screen(types::Size Size, ::std::ostream &Out)

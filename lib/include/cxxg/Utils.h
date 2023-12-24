@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <filesystem>
 
 #define THROW_CXXG_ERROR(msg)                                                  \
   {                                                                            \
@@ -59,13 +60,15 @@ void switchBufferedInput();
 
 /// Returns the path to the home directory if it could be acquired or
 /// empty string if not.
-::std::string getHomeDir();
+std::filesystem::path getHomeDir();
 
 /// Returns the time stamp in nano seconds since the start of the epoch.
 std::time_t getTimeStamp();
 
 /// Sleeps for the given amount of micro-seconds.
 void sleep(size_t MicroSeconds);
+
+std::pair<unsigned, unsigned> getTerminalSize();
 
 } // namespace utils
 
