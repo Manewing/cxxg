@@ -131,7 +131,7 @@ std::filesystem::path getHomeDir() {
 
 void sleep(size_t MicroSeconds) { usleep(MicroSeconds); }
 
-std::pair<unsigned, unsigned> getTerminalSize() {
+cxxg::types::Size getTerminalSize() {
   winsize Ws;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &Ws);
   if (!Ws.ws_col || !Ws.ws_row) {

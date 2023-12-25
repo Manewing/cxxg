@@ -114,7 +114,7 @@ std::filesystem::path getHomeDir() {
 
 void sleep(size_t MicroSeconds) { Sleep(MicroSeconds / 1000); }
 
-std::pair<unsigned, unsigned> getTerminalSize() {
+cxxg::types::Size getTerminalSize() {
   CONSOLE_SCREEN_BUFFER_INFO CSBI;
   GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &CSBI);
   return {CSBI.srWindow.Right - CSBI.srWindow.Left + 1,

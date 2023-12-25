@@ -11,6 +11,13 @@ namespace {
 
 void handleSigint(int) { SigintHandler(); }
 
+::std::function<void(cxxg::types::Size)> WindowResizeHandler;
+
+void handleWindowResize(int) {
+  auto Size = ::cxxg::utils::getTerminalSize();
+  WindowResizeHandler(Size);
+}
+
 } // namespace
 
 std::string getCharTxt(int Char) {
@@ -51,6 +58,12 @@ std::string getCharTxt(int Char) {
 void registerSigintHandler(::std::function<void()> const &Handler) {
   SigintHandler = Handler;
   signal(SIGINT, handleSigint);
+}
+
+void registerWindowResizeHandler(
+    ::std::function<void(cxxg::types::Size)> const &Handler) {
+  WindowResizeHandler = Handler;
+  signal(SIGWINCH, handleWindowResize);
 }
 
 std::time_t getTimeStamp() {
