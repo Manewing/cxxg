@@ -1,17 +1,11 @@
 #include <cxxg/Screen.h>
-
-#include <sys/ioctl.h>
-#include <unistd.h>
+#include <cxxg/Utils.h>
 
 namespace cxxg {
 
 types::Size Screen::getTerminalSize() {
-  winsize Ws;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &Ws);
-  if (!Ws.ws_col || !Ws.ws_row) {
-    return {80, 24};
-  }
-  return {Ws.ws_col, Ws.ws_row};
+  auto [W, H] = ::cxxg::utils::getTerminalSize();
+  return {W, H};
 }
 
 Screen::Screen(types::Size Size, ::std::ostream &Out)
@@ -46,11 +40,13 @@ void Screen::setColor(types::Position Top, types::Position Bottom,
 }
 
 void Screen::update() const {
-  Out << ClearScreenStr << HideCursorStr;
+  std::stringstream SS;
+  SS << ClearScreenStr << HideCursorStr;
   for (auto &Row : Rows) {
-    Out << Row;
+    SS << Row;
   }
-  Out << ShowCursorStr << ::std::flush;
+  SS << ShowCursorStr;
+  Out << SS.str() << ::std::flush;
 }
 
 void Screen::clear() {

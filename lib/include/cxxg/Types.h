@@ -63,10 +63,10 @@ inline bool operator!=(const Position &Lhs, const Position &Rhs) {
 /// Size in rows and columns
 struct Size {
   /// Size X, Columns
-  size_t X;
+  std::size_t X;
 
   /// Size Y, Rows
-  size_t Y;
+  std::size_t Y;
 
   // allow implicit conversion to position
   operator Position() const {

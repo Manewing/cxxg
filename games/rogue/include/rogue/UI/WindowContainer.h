@@ -14,7 +14,7 @@ public:
   struct WindowInfo {
     cxxg::types::Position Pos{};
     cxxg::types::Size Size{};
-    unsigned long Area = 0;
+    std::size_t Area = 0;
     Widget *Wdw = nullptr;
 
     static std::optional<WindowInfo> getWindowInfo(Widget *Wdw);

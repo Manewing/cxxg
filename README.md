@@ -1,5 +1,5 @@
 # cxxg
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE) ![GitHub CI](https://img.shields.io/github/actions/workflow/status/Manewing/cxxg/build.yml)
 
 A set of C++ console games for Unix systems together with a small library for accessing and modifiying the terminal screen.
 
