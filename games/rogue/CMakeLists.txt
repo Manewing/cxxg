@@ -194,7 +194,7 @@ add_custom_command(
 
   # Post-process all JSON schemas
   COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
+    ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
     --schema-files
         ${SCHEMA_FILES}
     --output-dir
@@ -202,14 +202,14 @@ add_custom_command(
 
   # Post-process all YAML data files
   COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/yaml_json.py
+    ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/yaml_json.py
       ${CMAKE_CURRENT_SOURCE_DIR}/data/crafting_db.yaml
       ${CMAKE_CURRENT_BINARY_DIR}/data/crafting_db.json
 
 
   # Post-process JSON configurations
   COMMAND
-    ${CMAKE_CURRENT_SOURCE_DIR}/scripts/entity_db_post_process.py
+   ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/entity_db_post_process.py
     --entity-db
       ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db.json
     --output
@@ -225,4 +225,19 @@ add_custom_command(
       ${DATA_FILES}
       ${LEVEL_FILES}
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
+)
+
+install(
+  TARGETS ${TARGET}
+  RUNTIME DESTINATION bin
+)
+
+install(
+  TARGETS lib${TARGET}
+  ARCHIVE DESTINATION lib
+)
+
+install(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/
+  DESTINATION shared/data
 )

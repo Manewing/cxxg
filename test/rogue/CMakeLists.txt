@@ -51,7 +51,7 @@ function(add_schema_test)
   add_cxxg_test(
     NAME rogue_json_schema_${ARGS_NAME}
     COMMAND
-      ${SCHEMA_VALIDATOR}
+      ${PYTHON_EXECUTABLE} ${SCHEMA_VALIDATOR}
         --json ${ARGS_JSON_FILES}
         --schema ${ARGS_SCHEMA}
         --url "https://rogue-todo.com/"

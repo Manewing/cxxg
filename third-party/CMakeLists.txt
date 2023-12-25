@@ -1,11 +1,11 @@
-message("Adding entt")
-add_subdirectory(entt)
+message(STATUS "cxxg: Adding entt")
+add_subdirectory(entt EXCLUDE_FROM_ALL)
 
 if (BUILD_TESTS)
-message("Adding googletest")
-add_subdirectory(googletest)
+message(STATUS "cxxg: Adding googletest")
+add_subdirectory(googletest EXCLUDE_FROM_ALL)
 endif()
 
-message("Adding ymir")
+message(STATUS "cxxg: Adding ymir")
 set(BUILD_TESTS OFF)
-add_subdirectory(ymir)
+add_subdirectory(ymir EXCLUDE_FROM_ALL)

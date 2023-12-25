@@ -290,7 +290,7 @@ bool MasterMind::isComplete(Pins const &Guess) {
 }
 
 bool MasterMind::isValidGuess(Pins const &Guess) {
-  return not hasDuplicates(Guess) and isComplete(Guess);
+  return !hasDuplicates(Guess) && isComplete(Guess);
 }
 
 size_t MasterMind::getBlacks(Pins const &Code, Pins const &Guess) {

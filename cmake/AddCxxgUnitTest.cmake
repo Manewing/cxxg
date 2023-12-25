@@ -24,7 +24,6 @@ target_link_libraries(${TARGET}
   gtest_main
   gmock
   ${ARGS_LIBRARIES}
-  pthread
 )
 
 target_include_directories(${TARGET}

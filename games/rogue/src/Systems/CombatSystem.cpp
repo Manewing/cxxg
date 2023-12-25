@@ -75,8 +75,8 @@ bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
   }
 
   // Melee is always possible, used default values for damage if not set
-  const MeleeAttackComp DefaultMA = {
-      .PhysDamage = 1, .MagicDamage = 0, .APCost = 10};
+  const MeleeAttackComp DefaultMA = {/*PhysDamage = */ 1, /*MagicDamage = */ 0,
+                                     /*APCost = */ 10};
   MeleeAttackComp MA = DefaultMA;
   auto *AMA = Reg.try_get<MeleeAttackComp>(Attacker);
   if (AMA) {

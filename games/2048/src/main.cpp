@@ -10,10 +10,10 @@ int main() {
 
   // get path to highscore file
   auto HighScoreFile = ::cxxg::utils::getHomeDir();
-  HighScoreFile += "/.cxxg.2048.h.s";
+  HighScoreFile /= ".cxxg.2048.h.s";
 
   // create gane instance
-  Game2048 Game(Scr, HighScoreFile);
+  Game2048 Game(Scr, HighScoreFile.string());
 
   // register handler for Ctrl+C
   ::cxxg::utils::registerSigintHandler([&Game]() {

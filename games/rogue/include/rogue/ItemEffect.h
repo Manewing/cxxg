@@ -2,14 +2,14 @@
 #define ROGUE_ITEM_EFFECT_H
 
 #include <entt/entt.hpp>
-#include <rogue/ItemType.h>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Stats.h>
+#include <rogue/ItemType.h>
 
 namespace rogue {
 class ItemDatabase;
 struct BuffBase;
-}
+} // namespace rogue
 
 namespace rogue {
 
@@ -29,7 +29,6 @@ public:
 
   virtual std::string getName() const = 0;
   virtual std::string getDescription() const = 0;
-
 
   virtual bool canAddFrom(const ItemEffect &) const { return true; }
 

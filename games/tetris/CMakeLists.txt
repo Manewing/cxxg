@@ -22,3 +22,5 @@ target_link_libraries(${TARGET}
 )
 
 target_include_directories(${TARGET} PUBLIC include)
+
+install(TARGETS ${TARGET} DESTINATION bin)
