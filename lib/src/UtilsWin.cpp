@@ -112,7 +112,7 @@ std::filesystem::path getHomeDir() {
   return "";
 }
 
-void sleep(size_t MicroSeconds) { Sleep(MicroSeconds / 1000 / 1000); }
+void sleep(size_t MicroSeconds) { Sleep(MicroSeconds / 1000); }
 
 std::pair<unsigned, unsigned> getTerminalSize() {
   CONSOLE_SCREEN_BUFFER_INFO CSBI;
