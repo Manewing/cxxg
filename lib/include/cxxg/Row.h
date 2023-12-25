@@ -2,6 +2,7 @@
 #define CXXG_ROW_H
 
 #include <cxxg/Types.h>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -11,6 +12,12 @@ namespace cxxg {
 
 // Forward declaration
 class Row;
+
+class RWidth {
+public:
+  RWidth(std::size_t Width) : Width(Width) {}
+  std::size_t Width;
+};
 
 /// Helper class for handling access to a row created from an access
 /// with a given offset to a row.
@@ -70,6 +77,10 @@ public:
   /// Dumps the given row to the current row
   RowAccessor &operator<<(const Row &Rw);
 
+  /// Handles the given width object, will set the maximum number of
+  /// characters before cutting off until the next flush
+  RowAccessor &operator<<(RWidth const &W);
+
   /// Outputs the given type to the row, first the the type will be converted
   /// to string via a string stream, the resulting string will the be output
   /// @param[in] T - The variable with type 'T' to output
@@ -81,6 +92,10 @@ public:
   /// @brief Flushes the current character buffer to the row, note that
   /// colors are written without buffering
   void flushBuffer();
+
+  /// @brief Sets the maximum number of characters before cutting off until
+  /// the next flush
+  RowAccessor &width(std::size_t Width);
 
 protected:
   /// Outputs the given string to the row, will increase the access offset
@@ -103,6 +118,9 @@ private:
 
   // If the accessor is still valid
   bool Valid = true;
+
+  // The maximum number of characters before cutting off until the next flush
+  std::optional<std::size_t> MaxWidth;
 };
 
 /// Class for representing a row in the screen (terminal), provides

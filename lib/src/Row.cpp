@@ -57,13 +57,28 @@ RowAccessor &RowAccessor::operator<<(const Row &OtherRw) {
   return *this;
 }
 
+RowAccessor &RowAccessor::operator<<(const RWidth &W) {
+  MaxWidth = W.Width;
+  return *this;
+}
+
 void RowAccessor::flushBuffer() {
   if (!Valid) {
     return;
   }
-  output(SS.str());
+  auto Str = SS.str();
+  if (MaxWidth) {
+    Str = Str.substr(0, *MaxWidth);
+  }
+  output(Str);
+  MaxWidth = std::nullopt;
   SS.str("");
   SS.clear();
+}
+
+RowAccessor &RowAccessor::width(std::size_t Width) {
+  this->MaxWidth = Width;
+  return *this;
 }
 
 void RowAccessor::output(::std::string const &Str) {

@@ -5,6 +5,10 @@
 
 namespace rogue::ui {
 
+ListSelect::ListSelect(cxxg::types::Position Pos, cxxg::types::Size Size,
+                       cxxg::types::Size Padding)
+    : BaseRect(Pos, Size), Padding(Padding) {}
+
 void ListSelect::setElements(const std::vector<Element> &Elements) {
   this->Elements = Elements;
   SelectedElemIdx = 0;
@@ -53,13 +57,26 @@ void ListSelect::draw(cxxg::Screen &Scr) const {
   // Fill rect
   BaseRect::draw(Scr);
 
+  // Compute available size for elements (number of rows)
+  const auto AvailableSize = cxxg::types::Size::clamp(getSize() - Padding * 2);
+
+  // Compute the first and last element to draw in the list based on the
+  // selected element and the available size
+  unsigned FirstElemIdx = 0, LastElemIdx = 0;
+  if (SelectedElemIdx >= AvailableSize.Y) {
+    FirstElemIdx = SelectedElemIdx - AvailableSize.Y + 1;
+  }
+  LastElemIdx = FirstElemIdx + AvailableSize.Y;
+
   // Draw elements
-  for (unsigned ElemIdx = 0; ElemIdx < Size.Y && ElemIdx < Elements.size();
-       ElemIdx++) {
+  unsigned ElemNum = 0;
+  for (unsigned ElemIdx = FirstElemIdx;
+       ElemIdx < LastElemIdx && ElemIdx < Elements.size(); ElemIdx++) {
     const auto &Element = Elements.at(ElemIdx);
     drawFrameElement(Scr, Element,
-                     {Pos.X, Pos.Y + static_cast<int>(ElemIdx) + 1}, Size.X,
-                     ElemIdx == SelectedElemIdx);
+                     {static_cast<int>(Pos.X + Padding.X),
+                      static_cast<int>(Pos.Y + ElemNum++ + Padding.Y)},
+                     AvailableSize.X, ElemIdx == SelectedElemIdx);
   }
 }
 
@@ -67,10 +84,10 @@ void ListSelect::drawFrameElement(cxxg::Screen &Scr, const Element &Elem,
                                   cxxg::types::Position Pos, unsigned Width,
                                   bool IsSelected) {
   if (IsSelected) {
-    Scr[Pos.Y][Pos.X + 1] << ">";
+    Scr[Pos.Y][Pos.X] << ">";
   }
-  (void)Width;
-  Scr[Pos.Y][Pos.X + 2] << Elem.Color << Elem.Text << cxxg::types::Color::NONE;
+  Scr[Pos.Y][Pos.X + 1] << Elem.Color << cxxg::RWidth(Width - 1) << Elem.Text
+                        << cxxg::types::Color::NONE;
 }
 
 } // namespace rogue::ui

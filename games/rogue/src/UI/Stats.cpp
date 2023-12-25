@@ -94,8 +94,9 @@ void StatsController::draw(cxxg::Screen &Scr) const {
   // Add health info
   if (const auto *HC = Reg.try_get<HealthComp>(Entity)) {
     Scr[Pos.Y + getSize().Y - 6][Pos.X + 2]
-        << "HP: " << std::fixed << std::setprecision(1) << std::setw(6) << HC->Value << "/"
-        << std::setprecision(1) << std::setw(6) << HC->MaxValue;
+        << "HP: " << std::fixed << std::setprecision(1) << std::setw(6)
+        << HC->Value << "/" << std::setprecision(1) << std::setw(6)
+        << HC->MaxValue;
   } else {
     Scr[Pos.Y + getSize().Y - 6][Pos.X + 2] << "HP: ---";
   }
@@ -103,8 +104,9 @@ void StatsController::draw(cxxg::Screen &Scr) const {
   // Add mana info
   if (const auto *MC = Reg.try_get<ManaComp>(Entity)) {
     Scr[Pos.Y + getSize().Y - 5][Pos.X + 2]
-        << "MP: " << std::fixed << std::setprecision(1) << std::setw(6) << MC->Value << "/"
-        << std::setprecision(1) << std::setw(6) << MC->MaxValue;
+        << "MP: " << std::fixed << std::setprecision(1) << std::setw(6)
+        << MC->Value << "/" << std::setprecision(1) << std::setw(6)
+        << MC->MaxValue;
   } else {
     Scr[Pos.Y + getSize().Y - 5][Pos.X + 2] << "MP: ---";
   }
