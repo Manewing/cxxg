@@ -138,8 +138,8 @@ void sleep(size_t MicroSeconds) { Sleep(MicroSeconds / 1000); }
 cxxg::types::Size getTerminalSize() {
   CONSOLE_SCREEN_BUFFER_INFO CSBI;
   GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &CSBI);
-  return {CSBI.srWindow.Right - CSBI.srWindow.Left + 1,
-          CSBI.srWindow.Bottom - CSBI.srWindow.Top + 1};
+  return {static_cast<cxxg::types::Size::ValueType>(CSBI.srWindow.Right - CSBI.srWindow.Left + 1),
+          static_cast<cxxg::types::Size::ValueType>(CSBI.srWindow.Bottom - CSBI.srWindow.Top + 1)};
 }
 
 } // namespace cxxg::utils
