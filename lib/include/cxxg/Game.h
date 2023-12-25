@@ -28,7 +28,7 @@ public:
   virtual void initialize(bool BufferedInput = false, unsigned TickDelayUs = 0);
 
   /// Game loop, while flag 'GameRunning' is true calls 'handleInput'
-  /// and 'handleDraw' continously.
+  /// and 'handleDraw' continuously.
   virtual void run(bool Blocking = true);
 
   /// Callback for handling new character input, called from game loop.

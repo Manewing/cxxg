@@ -1,12 +1,12 @@
 #ifndef CXXG_SCREEN_H
 #define CXXG_SCREEN_H
 
+#include <cxxg/Row.h>
+#include <cxxg/Types.h>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include <cxxg/Row.h>
-#include <cxxg/Types.h>
 
 namespace cxxg {
 
@@ -31,6 +31,10 @@ public:
   /// @param[in] Size - Size of the screen in rows and columns
   /// @param[in] Out  - Output stream (default = ::std::cout)
   Screen(types::Size Size, ::std::ostream &Out = ::std::cout);
+
+  /// Resets the screen to the new size
+  /// @param[in] Size - New size of the screen
+  void resize(types::Size Size);
 
   /// Returns the size of the screen
   inline types::Size getSize() const { return Size; }
@@ -64,6 +68,11 @@ public:
   /// needs to follow.
   void clear();
 
+  /// Register a handler for screen resize events
+  /// @param[in] Handler - Handler to register
+  void
+  registerResizeHandler(::std::function<void(const Screen &)> const &Handler);
+
 private:
   /// The output stream to write to
   ::std::ostream &Out;
@@ -76,6 +85,9 @@ private:
 
   /// The screen size
   types::Size Size;
+
+  /// Handler for screen resize events
+  ::std::function<void(const Screen &)> ResizeHandler;
 };
 
 } // namespace cxxg

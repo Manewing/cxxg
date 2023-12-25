@@ -6,7 +6,9 @@
 namespace cxxg {
 
 Game::Game(Screen &Scr)
-    : Scr(Scr), GameRunning(true), RndEngine(utils::getTimeStamp()) {}
+    : Scr(Scr), GameRunning(true), RndEngine(utils::getTimeStamp()) {
+  Scr.registerResizeHandler([this](const auto &) { handleDraw(); });
+}
 
 void Game::initialize(bool BufferedInput, unsigned TDU) {
   // switch input if requested input type buffered/un-buffered does not match

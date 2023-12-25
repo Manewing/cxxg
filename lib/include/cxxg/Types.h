@@ -22,11 +22,13 @@ using EnableIfOfType =
 
 /// Position in rows and columns
 struct Position {
+  using ValueType = int;
+
   /// X-Position (Column)
-  int X;
+  ValueType X;
 
   /// Y-Position (Row)
-  int Y;
+  ValueType Y;
 
   /// Adds other position to this
   inline Position &operator+=(Position const P) {
@@ -62,11 +64,13 @@ inline bool operator!=(const Position &Lhs, const Position &Rhs) {
 
 /// Size in rows and columns
 struct Size {
+  using ValueType = std::size_t;
+
   /// Size X, Columns
-  std::size_t X;
+  ValueType X;
 
   /// Size Y, Rows
-  std::size_t Y;
+  ValueType Y;
 
   // allow implicit conversion to position
   operator Position() const {

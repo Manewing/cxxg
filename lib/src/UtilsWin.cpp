@@ -9,6 +9,7 @@ namespace {
 
 bool BufferedInputEnabled = true;
 DWORD ConsoleModeOld = 0;
+::std::function<void(cxxg::types::Size)> WindowResizeHandler;
 
 int getCharNonBlocking() {
   INPUT_RECORD InputRecord = {0};
@@ -28,6 +29,13 @@ int getCharNonBlocking() {
   if (ReadConsoleInput(Handle, &InputRecord, 1, &NumRead) == FALSE) {
     return KEY_INVALID;
   }
+
+  if (InputRecord.EventType == WINDOW_BUFFER_SIZE_EVENT && WindowResizeHandler) {
+    auto Size = ::cxxg::utils::getTerminalSize();
+    WindowResizeHandler(Size);
+    return KEY_INVALID;
+  }
+
   if (InputRecord.EventType != KEY_EVENT ||
       InputRecord.Event.KeyEvent.bKeyDown == FALSE) {
     return KEY_INVALID;
@@ -79,6 +87,19 @@ int getCharBlocking() {
 
 } // namespace
 
+void setupTerminal() {
+  auto Handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  DWORD Mode = 0;
+  GetConsoleMode(Handle, &Mode);
+  Mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  SetConsoleMode(Handle, Mode);
+}
+
+void registerWindowResizeHandler(
+    const ::std::function<void(cxxg::types::Size)> &Handler) {
+  WindowResizeHandler = Handler;
+}
+
 int getChar(bool Blocking) {
   if (Blocking) {
     return getCharBlocking();
@@ -114,11 +135,11 @@ std::filesystem::path getHomeDir() {
 
 void sleep(size_t MicroSeconds) { Sleep(MicroSeconds / 1000); }
 
-std::pair<unsigned, unsigned> getTerminalSize() {
+cxxg::types::Size getTerminalSize() {
   CONSOLE_SCREEN_BUFFER_INFO CSBI;
   GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &CSBI);
-  return {CSBI.srWindow.Right - CSBI.srWindow.Left + 1,
-          CSBI.srWindow.Bottom - CSBI.srWindow.Top + 1};
+  return {static_cast<cxxg::types::Size::ValueType>(CSBI.srWindow.Right - CSBI.srWindow.Left + 1),
+          static_cast<cxxg::types::Size::ValueType>(CSBI.srWindow.Bottom - CSBI.srWindow.Top + 1)};
 }
 
 } // namespace cxxg::utils

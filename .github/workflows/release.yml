@@ -31,6 +31,18 @@ jobs:
             ${{ steps.Changelog.outputs.changelog }}
           draft: false
           prerelease: false
+      - name: Download Artifact for Windows
+        uses: actions/download-artifact@v3
+        with:
+          name: cxxg-windows-latest-Release-cl.zip
+      - name: Download Artifact for Linux
+        uses: actions/download-artifact@v3
+        with:
+          name: cxxg-ubuntu-latest-Release-clang++.zip
+      - name: Download Artifact for MacOS
+        uses: actions/download-artifact@v3
+        with:
+          name: cxxg-macos-latest-Release-clang++.zip
       - name: Upload Windows artifact
         uses: actions/upload-release-asset@v1
         env:
