@@ -9,6 +9,7 @@ namespace {
 
 bool BufferedInputEnabled = true;
 DWORD ConsoleModeOld = 0;
+::std::function<void(cxxg::types::Size)> WindowResizeHandler;
 
 int getCharNonBlocking() {
   INPUT_RECORD InputRecord = {0};
@@ -28,6 +29,13 @@ int getCharNonBlocking() {
   if (ReadConsoleInput(Handle, &InputRecord, 1, &NumRead) == FALSE) {
     return KEY_INVALID;
   }
+
+  if (InputRecord.EventType == WINDOW_BUFFER_SIZE_EVENT && WindowResizeHandler) {
+    auto Size = ::cxxg::utils::getTerminalSize();
+    WindowResizeHandler(Size);
+    return KEY_INVALID;
+  }
+
   if (InputRecord.EventType != KEY_EVENT ||
       InputRecord.Event.KeyEvent.bKeyDown == FALSE) {
     return KEY_INVALID;
@@ -85,6 +93,11 @@ void setupTerminal() {
   GetConsoleMode(Handle, &Mode);
   Mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   SetConsoleMode(Handle, Mode);
+}
+
+void registerWindowResizeHandler(
+    const ::std::function<void(cxxg::types::Size)> &Handler) {
+  WindowResizeHandler = Handler;
 }
 
 int getChar(bool Blocking) {
