@@ -1,7 +1,5 @@
-#include "cxxg/Types.h"
+#include <cxxg/Types.h>
 #include <cxxg/Row.h>
-
-#include <stdexcept>
 
 namespace cxxg {
 

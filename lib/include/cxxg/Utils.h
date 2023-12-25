@@ -51,7 +51,8 @@ void registerSigintHandler(::std::function<void()> const &Handler);
 /// a SIGWINCH signal (after terminal resize). Note that only one handler can
 /// be registered.
 /// @param[in] Handler - Handler to register
-void registerWindowResizeHandler(::std::function<void(cxxg::types::Size)> const &Handler);
+void registerWindowResizeHandler(
+    ::std::function<void(cxxg::types::Size)> const &Handler);
 
 /// Helper function to check for keyboard input, returning single character.
 /// @param[in] Blocking If true waits until key is pressed

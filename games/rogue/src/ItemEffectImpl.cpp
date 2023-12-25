@@ -90,7 +90,7 @@ bool SweepingStrikeEffect::canApplyTo(const entt::entity &Et,
 
 void SweepingStrikeEffect::applyTo(const entt::entity &Et,
                                    entt::registry &Reg) const {
-  auto &PC= Reg.get<PositionComp>(Et);
+  auto &PC = Reg.get<PositionComp>(Et);
 
   // Melee is always possible, used default values for damage if not set
   const MeleeAttackComp DefaultMA = {

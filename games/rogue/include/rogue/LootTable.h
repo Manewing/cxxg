@@ -60,7 +60,8 @@ public:
   LootTable();
   explicit LootTable(unsigned NumRolls, const std::vector<LootSlot> &Slots,
                      bool PickAndReturn = false);
-  void reset(unsigned NumRolls, const std::vector<LootSlot> &Slots, bool PickAndReturn = false);
+  void reset(unsigned NumRolls, const std::vector<LootSlot> &Slots,
+             bool PickAndReturn = false);
 
   const std::vector<LootSlot> &getSlots() const;
   const std::vector<LootSlot> &getGuaranteedSlots() const;
