@@ -20,8 +20,10 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Python3 COMPONENTS Interpreter)
-set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+if (NOT PYTHON_EXECUTABLE)
+  find_package(Python3 COMPONENTS Interpreter)
+  set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+endif()
 message(STATUS "Python executable: ${PYTHON_EXECUTABLE}")
 
 add_subdirectory(games)
