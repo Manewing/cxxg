@@ -2,6 +2,7 @@
 #define CXXG_UTILS_HH
 
 #include <ctime>
+#include <cxxg/Types.h>
 #include <filesystem>
 #include <functional>
 #include <sstream>
@@ -32,6 +33,9 @@ constexpr int KEY_RIGHT = 1003;
 constexpr int KEY_LEFT = 1004;
 constexpr int KEY_DEL_C = 1005;
 
+/// Deals with the setup of the terminal screen
+void setupTerminal();
+
 /// @brief Returns a string representation of the given character, in alignment
 /// with the constants listed above
 /// @param Char The character to get the text for
@@ -42,6 +46,12 @@ std::string getCharTxt(int Char);
 /// be registered.
 /// @param[in] Handler - Handler to register
 void registerSigintHandler(::std::function<void()> const &Handler);
+
+/// Helper function for registering a handler (e.g. a lambda) for
+/// a SIGWINCH signal (after terminal resize). Note that only one handler can
+/// be registered.
+/// @param[in] Handler - Handler to register
+void registerWindowResizeHandler(::std::function<void(cxxg::types::Size)> const &Handler);
 
 /// Helper function to check for keyboard input, returning single character.
 /// @param[in] Blocking If true waits until key is pressed
@@ -68,7 +78,8 @@ std::time_t getTimeStamp();
 /// Sleeps for the given amount of micro-seconds.
 void sleep(size_t MicroSeconds);
 
-std::pair<unsigned, unsigned> getTerminalSize();
+/// Returns the current terminal size
+cxxg::types::Size getTerminalSize();
 
 } // namespace utils
 

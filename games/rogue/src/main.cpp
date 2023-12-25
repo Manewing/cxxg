@@ -2,12 +2,13 @@
 #include <cxxg/Utils.h>
 #include <rogue/Game.h>
 #include <rogue/GameConfig.h>
-#include <signal.h>
 #include <stdexcept>
+#include <string_view>
 
 #ifndef WIN32
 
 #include <execinfo.h>
+#include <signal.h>
 #include <unistd.h>
 
 void handler(int) {
@@ -28,12 +29,20 @@ void setup_main() {}
 #endif
 
 int wrapped_main(int Argc, char *Argv[]) {
-  if (Argc != 2 && Argc != 4) {
+  if (Argc == 2 && (std::string_view(Argv[1]) == "--help" ||
+                    std::string_view(Argv[1]) == "-h")) {
     std::cout << "Usage: " << Argv[0] << " <game_config.json> (--seed <value>)"
               << std::endl;
     return 0;
   }
-  auto Cfg = rogue::GameConfig::load(Argv[1]);
+  std::filesystem::path CfgFile;
+  if (Argc >= 2) {
+    CfgFile = Argv[1];
+  } else {
+    CfgFile = std::filesystem::path(Argv[0]).parent_path() / ".." / "shared" /
+              "data" / "game_config.json";
+  }
+  auto Cfg = rogue::GameConfig::load(CfgFile);
   if (Argc == 4) {
     assert(std::string(Argv[2]) == "--seed");
     Cfg.Seed = std::stoi(Argv[3]);

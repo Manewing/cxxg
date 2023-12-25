@@ -7,14 +7,19 @@
 #include <termios.h>
 #include <unistd.h>
 
-namespace cxxg {
-
-namespace utils {
+namespace cxxg::utils {
 
 namespace {
 
 bool BufferedInputEnabled = true;
 termios TermAttrOld;
+
+::std::function<void(cxxg::types::Size)> WindowResizeHandler;
+
+void handleWindowResize(int) {
+  auto Size = ::cxxg::utils::getTerminalSize();
+  WindowResizeHandler(Size);
+}
 
 bool setStdinBlocking(bool Enabled) {
   int Flags = fcntl(STDIN_FILENO, F_GETFL, 0);
@@ -85,6 +90,14 @@ int getCharBlockHandleEscape() {
 
 } // namespace
 
+void setupTerminal() {}
+
+void registerWindowResizeHandler(
+    ::std::function<void(cxxg::types::Size)> const &Handler) {
+  WindowResizeHandler = Handler;
+  signal(SIGWINCH, handleWindowResize);
+}
+
 int getChar(bool Blocking) {
   if (Blocking) {
     return getCharBlockHandleEscape();
@@ -131,7 +144,7 @@ std::filesystem::path getHomeDir() {
 
 void sleep(size_t MicroSeconds) { usleep(MicroSeconds); }
 
-std::pair<unsigned, unsigned> getTerminalSize() {
+cxxg::types::Size getTerminalSize() {
   winsize Ws;
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &Ws);
   if (!Ws.ws_col || !Ws.ws_row) {
@@ -140,6 +153,4 @@ std::pair<unsigned, unsigned> getTerminalSize() {
   return {Ws.ws_col, Ws.ws_row};
 }
 
-} // namespace utils
-
-} // namespace cxxg
+} // namespace cxxg::utils

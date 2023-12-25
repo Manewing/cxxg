@@ -4,15 +4,30 @@
 namespace cxxg {
 
 types::Size Screen::getTerminalSize() {
-  auto [W, H] = ::cxxg::utils::getTerminalSize();
-  return {W, H};
+  return ::cxxg::utils::getTerminalSize();
 }
 
-Screen::Screen(types::Size Size, ::std::ostream &Out)
-    : Out(Out), DummyRow(0), Size(Size) {
-  Rows.reserve(Size.Y);
+Screen::Screen(types::Size S, ::std::ostream &Out)
+    : Out(Out), DummyRow(0), Size({0, 0}) {
+  utils::setupTerminal();
+
+  resize(S);
+
+  utils::registerWindowResizeHandler(
+      [this](types::Size NewSize) { resize(NewSize); });
+}
+
+void Screen::resize(types::Size S) {
+  if (S == Size) {
+    return;
+  }
+  Size = S;
+  Rows.clear();
   for (size_t Y = 0; Y < Size.Y; Y++) {
     Rows.push_back(Row(Size.X));
+  }
+  if (ResizeHandler) {
+    ResizeHandler(*this);
   }
 }
 
@@ -53,6 +68,11 @@ void Screen::clear() {
   for (auto &Row : Rows) {
     Row.clear();
   }
+}
+
+void Screen::registerResizeHandler(
+    ::std::function<void(const Screen &)> const &Handler) {
+  ResizeHandler = Handler;
 }
 
 } // namespace cxxg
