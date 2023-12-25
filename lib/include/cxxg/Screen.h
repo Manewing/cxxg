@@ -1,12 +1,12 @@
 #ifndef CXXG_SCREEN_H
 #define CXXG_SCREEN_H
 
+#include <cxxg/Row.h>
+#include <cxxg/Types.h>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include <cxxg/Row.h>
-#include <cxxg/Types.h>
 
 namespace cxxg {
 
@@ -70,7 +70,8 @@ public:
 
   /// Register a handler for screen resize events
   /// @param[in] Handler - Handler to register
-  void registerResizeHandler(::std::function<void(const Screen &)> const &Handler);
+  void
+  registerResizeHandler(::std::function<void(const Screen &)> const &Handler);
 
 private:
   /// The output stream to write to
