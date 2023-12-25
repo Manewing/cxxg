@@ -31,3 +31,30 @@ jobs:
             ${{ steps.Changelog.outputs.changelog }}
           draft: false
           prerelease: false
+      - name: Upload Windows artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./cxxg-windows-latest-Release-cl.zip
+          asset_name: cxxg-windows-latest-Release-cl.zip
+          asset_content_type: application/zip
+      - name: Upload Linux artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./cxxg-ubuntu-latest-Release-clang++.zip
+          asset_name: cxxg-ubuntu-latest-Release-clang++.zip
+          asset_content_type: application/zip
+      - name: Upload MacOS artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./cxxg-macos-latest-Release-clang++.zip
+          asset_name: cxxg-macos-latest-Release-clang++.zip
+          asset_content_type: application/zip
