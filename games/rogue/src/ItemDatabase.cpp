@@ -245,6 +245,10 @@ static LootTable::LootSlot createLootNullSlot(const rapidjson::Value &V) {
 static void fillLootTable(const ItemDatabase &DB, const rapidjson::Value &V,
                           LootTable &LootTb) {
   const auto NumRolls = V["rolls"].GetUint();
+  bool PickAndReturn = false;
+  if (V.HasMember("pick_and_return")) {
+    PickAndReturn = V["pick_and_return"].GetBool();
+  }
   std::vector<LootTable::LootSlot> Slots;
   for (const auto &SlotJson : V["slots"].GetArray()) {
     const auto Type = std::string(SlotJson["type"].GetString());
@@ -259,7 +263,7 @@ static void fillLootTable(const ItemDatabase &DB, const rapidjson::Value &V,
     }
   }
 
-  LootTb.reset(NumRolls, Slots);
+  LootTb.reset(NumRolls, Slots, PickAndReturn);
 }
 
 ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {

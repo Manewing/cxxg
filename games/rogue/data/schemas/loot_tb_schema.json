@@ -9,8 +9,13 @@
       "properties": {
         "rolls": {
           "type": "integer",
-          "description": "The number of times to roll the loot table for rewards picking and removing a slot",
+          "description": "The number of times to roll the loot table for rewards picking and removing a slot. Items with a weight of -1 do not take up a roll.",
           "minimum": 1
+        },
+        "pick_and_return": {
+          "type": "boolean",
+          "description": "Whether to pick and return a slot or pick and remove a slot",
+          "default": false
         },
         "slots": {
           "type": "array",
@@ -57,7 +62,7 @@
         },
         "weight": {
           "type": "integer",
-          "description": "The weight of the slot, used to determine the probability of the slot being picked"
+          "description": "The weight of the slot, used to determine the probability of the slot being picked. A weight of -1 indicates a slot that will always be picked."
         }
       },
       "required": ["name", "weight", "min_count", "max_count", "type"],
