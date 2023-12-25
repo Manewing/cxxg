@@ -184,8 +184,6 @@ add_custom_target(
 
 file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json ${CMAKE_CURRENT_SOURCE_DIR}/data/*.yaml)
 file(GLOB SCHEMA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/*.json)
-message(STATUS "Schema files: ${SCHEMA_FILES}")
-message(STATUS "Python: ${PYTHON_EXECUTABLE}")
 file(GLOB LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/levels/*.json)
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/data/
