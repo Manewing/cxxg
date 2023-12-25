@@ -79,6 +79,14 @@ int getCharBlocking() {
 
 } // namespace
 
+void setupTerminal() {
+  auto Handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  DWORD Mode = 0;
+  GetConsoleMode(Handle, &Mode);
+  Mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  SetConsoleMode(Handle, Mode);
+}
+
 int getChar(bool Blocking) {
   if (Blocking) {
     return getCharBlocking();

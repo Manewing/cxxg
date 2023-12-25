@@ -9,6 +9,8 @@ types::Size Screen::getTerminalSize() {
 
 Screen::Screen(types::Size S, ::std::ostream &Out)
     : Out(Out), DummyRow(0), Size({0, 0}) {
+  utils::setupTerminal();
+
   resize(S);
 
   utils::registerWindowResizeHandler(

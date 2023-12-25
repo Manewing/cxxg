@@ -33,6 +33,9 @@ constexpr int KEY_RIGHT = 1003;
 constexpr int KEY_LEFT = 1004;
 constexpr int KEY_DEL_C = 1005;
 
+/// Deals with the setup of the terminal screen
+void setupTerminal();
+
 /// @brief Returns a string representation of the given character, in alignment
 /// with the constants listed above
 /// @param Char The character to get the text for

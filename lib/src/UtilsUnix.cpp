@@ -85,6 +85,8 @@ int getCharBlockHandleEscape() {
 
 } // namespace
 
+void setupTerminal() {}
+
 int getChar(bool Blocking) {
   if (Blocking) {
     return getCharBlockHandleEscape();
