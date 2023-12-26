@@ -65,11 +65,15 @@ void RowAccessor::flushBuffer() {
     return;
   }
   auto Str = SS.str();
-  if (MaxWidth) {
-    Str = Str.substr(0, *MaxWidth);
+  if (MaxWidth && NumCharactersWritten + Str.size() > *MaxWidth) {
+    auto Length = *MaxWidth - NumCharactersWritten;
+    if (Length > 0) {
+      Str = Str.substr(0, Length);
+    } else {
+      Str = "";
+    }
   }
   output(Str);
-  MaxWidth = std::nullopt;
   SS.str("");
   SS.clear();
 }
@@ -123,6 +127,7 @@ void RowAccessor::output(::std::string const &Str) {
   }
 
   Offset += Str.size();
+  NumCharactersWritten += Str.size();
 }
 
 Row::Row(size_t Size) {

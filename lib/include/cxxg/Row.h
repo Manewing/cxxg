@@ -78,7 +78,7 @@ public:
   RowAccessor &operator<<(const Row &Rw);
 
   /// Handles the given width object, will set the maximum number of
-  /// characters before cutting off until the next flush
+  /// characters before cutting off
   RowAccessor &operator<<(RWidth const &W);
 
   /// Outputs the given type to the row, first the the type will be converted
@@ -93,8 +93,7 @@ public:
   /// colors are written without buffering
   void flushBuffer();
 
-  /// @brief Sets the maximum number of characters before cutting off until
-  /// the next flush
+  /// @brief Sets the maximum number of characters before cutting off
   RowAccessor &width(std::size_t Width);
 
 protected:
@@ -121,6 +120,9 @@ private:
 
   // The maximum number of characters before cutting off until the next flush
   std::optional<std::size_t> MaxWidth;
+
+  // Current number of characters written
+  std::size_t NumCharactersWritten = 0;
 };
 
 /// Class for representing a row in the screen (terminal), provides
