@@ -67,6 +67,7 @@ public:
   void selectNextWindow();
   void selectPrevWindow();
 
+  void centerSingleWindow();
   void autoLayoutWindows();
   void autoLayoutWindows(cxxg::types::Position StartPos,
                          cxxg::types::Size Size);

@@ -236,11 +236,21 @@ std::optional<cxxg::types::Position> findPositionForWindow(
 
 } // namespace
 
+void WindowContainer::centerSingleWindow() {
+  if (Windows.size() != 1) {
+    return;
+  }
+  if (auto WI = WindowInfo::getWindowInfo(Windows.front().get())) {
+    Windows.front()->setPos(Pos + Size / 2 - WI->Size / 2);
+  }
+}
+
 void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
                                         cxxg::types::Size Size) {
   if (Windows.empty()) {
     return;
   }
+
   std::vector<WindowInfo> WdwInfos;
   WdwInfos.reserve(Windows.size());
 

@@ -119,6 +119,7 @@ void Controller::addWindow(std::shared_ptr<Widget> Wdw,
 
 void Controller::setMenuUI(Level &Lvl) {
   WdwContainer.addWindow<MenuController>(*this, Lvl);
+  WdwContainer.centerSingleWindow();
 }
 
 bool Controller::hasMenuUI() const {
