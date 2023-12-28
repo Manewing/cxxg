@@ -33,6 +33,9 @@ public:
   Item takeItem(std::size_t ItemIdx);
   Item takeItem(std::size_t ItemIdx, unsigned Count);
 
+  /// Returns true if the inventory contains an item with the given id and count
+  bool hasItem(int Id, unsigned Count = 1) const;
+
   std::optional<std::size_t> getItemIndexForId(int Id) const;
 
   std::optional<Item> applyItemTo(std::size_t ItemIdx, CapabilityFlags Flags,

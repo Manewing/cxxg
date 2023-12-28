@@ -62,6 +62,22 @@ Item Inventory::takeItem(std::size_t ItemIdx, unsigned Count) {
   return takeItem(ItemIdx);
 }
 
+bool Inventory::hasItem(int Id, unsigned Count) const {
+  if (Count == 0) {
+    return false;
+  }
+  unsigned FoundCount = 0;
+  for (const auto &It : Items) {
+    if (It.getId() == Id) {
+      FoundCount += It.StackSize;
+      if (FoundCount >= Count) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 std::optional<std::size_t> Inventory::getItemIndexForId(int Id) const {
   for (std::size_t Idx = 0; Idx < Items.size(); ++Idx) {
     if (Items.at(Idx).getId() == Id) {

@@ -89,6 +89,26 @@ TEST(InventoryTest, TakeItem) {
   EXPECT_EQ(Inv.size(), 1);
 }
 
+TEST(InventoryTest, HasItem) {
+  rogue::Inventory Inv;
+  rogue::Item It(DummyConsumable, 5);
+  Inv.addItem(It);
+  ASSERT_EQ(Inv.size(), 1);
+
+  EXPECT_TRUE(Inv.hasItem(1, 5));
+  EXPECT_TRUE(Inv.hasItem(1, 3));
+  EXPECT_TRUE(Inv.hasItem(1, 1));
+  EXPECT_FALSE(Inv.hasItem(1, 6));
+  EXPECT_FALSE(Inv.hasItem(1, 0));
+  EXPECT_FALSE(Inv.hasItem(2, 5));
+
+
+  Inv.addItem(It);
+  ASSERT_EQ(Inv.size(), 2);
+
+  EXPECT_TRUE(Inv.hasItem(1, 10));
+}
+
 TEST(InventoryTest, ApplyItemToUseConsumable) {
   rogue::Item It(DummyConsumable);
   entt::registry Reg;
