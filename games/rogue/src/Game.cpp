@@ -147,6 +147,8 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   // We could update the level here, but we want to draw the initial state.
   handleUpdates(/*IsTick=*/false);
 
+  UICtrl.setMenuUI(World->getCurrentLevelOrFail());
+
   handleDraw();
 }
 

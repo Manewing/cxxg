@@ -110,10 +110,13 @@ void Controller::handleInput(int Char) {
 }
 
 void Controller::addWindow(std::shared_ptr<Widget> Wdw,
-                           bool AutoLayoutWindows) {
-  WdwContainer.addWindow(std::move(Wdw));
+                           bool AutoLayoutWindows, bool CenterWindow) {
+  WdwContainer.addWindow(Wdw);
   if (AutoLayoutWindows) {
     WdwContainer.autoLayoutWindows();
+  }
+  if (CenterWindow) {
+    WdwContainer.centerWindow(*Wdw);
   }
 }
 

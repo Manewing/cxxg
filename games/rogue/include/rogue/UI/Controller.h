@@ -49,7 +49,8 @@ public:
   bool isUIActive() const;
   void handleInput(int Char);
 
-  void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false);
+  void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false,
+                 bool CenterWindow = false);
 
   template <typename T> T *getWindowOfType() {
     return WdwContainer.getWindowOfType<T>();

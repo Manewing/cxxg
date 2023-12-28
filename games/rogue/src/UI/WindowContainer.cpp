@@ -238,13 +238,17 @@ std::optional<cxxg::types::Position> findPositionForWindow(
 
 } // namespace
 
+void WindowContainer::centerWindow(Widget &Wdw) {
+  if (auto WI = WindowInfo::getWindowInfo(&Wdw)) {
+    Wdw.setPos(Pos + Size / 2 - WI->Size / 2);
+  }
+}
+
 void WindowContainer::centerSingleWindow() {
   if (Windows.size() != 1) {
     return;
   }
-  if (auto WI = WindowInfo::getWindowInfo(Windows.front().get())) {
-    Windows.front()->setPos(Pos + Size / 2 - WI->Size / 2);
-  }
+  centerWindow(*Windows.front());
 }
 
 void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
