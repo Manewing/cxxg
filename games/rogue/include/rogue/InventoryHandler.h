@@ -9,6 +9,7 @@
 namespace rogue {
 class Inventory;
 class Equipment;
+class CraftingRecipe;
 class CraftingHandler;
 } // namespace rogue
 
@@ -56,6 +57,12 @@ public:
 
   /// Tries to craft the items in the inventory
   bool tryCraftItems();
+
+  /// Checks if the inventory has all items to craft the recipe
+  bool canCraft(const CraftingRecipe &Recipe) const;
+
+  /// Tries to craft the recipe from the inventory
+  bool tryCraft(const CraftingRecipe &Recipe);
 
 private:
   entt::entity Entity;

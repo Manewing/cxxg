@@ -225,4 +225,56 @@ bool InventoryHandler::tryCraftItems() {
   return false;
 }
 
+bool InventoryHandler::canCraft(const CraftingRecipe &Recipe) const {
+  // Nothing can be crafted if there is no inventory
+  if (!Inv) {
+    return false;
+  }
+
+  std::map<int, unsigned> ItemCounts;
+  for (const auto &ItId : Recipe.getRequiredItems()) {
+    ItemCounts[ItId] += 1;
+  }
+
+  for (const auto [ItId, Count] : ItemCounts) {
+    if (!Inv->hasItem(ItId, Count)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool InventoryHandler::tryCraft(const CraftingRecipe &Recipe) {
+  // Nothing can be crafted if there is no inventory
+  if (!Inv) {
+    return false;
+  }
+
+  if (!canCraft(Recipe)) {
+    return false;
+  }
+
+  std::vector<Item> CraftItems;
+  for (const auto &ItId : Recipe.getRequiredItems()) {
+    if (auto IdxOrNone = Inv->getItemIndexForId(ItId)) {
+      CraftItems.push_back(Inv->takeItem(*IdxOrNone, 1));
+    }
+  }
+
+  auto NewItemsOrNone = Crafter.tryCraft(CraftItems);
+  if (!NewItemsOrNone) {
+    for (auto &It : CraftItems) {
+      Inv->addItem(std::move(It));
+    }
+    return false;
+  }
+
+  for (auto &It : *NewItemsOrNone) {
+    Inv->addItem(std::move(It));
+  }
+
+  return true;
+}
+
 } // namespace rogue

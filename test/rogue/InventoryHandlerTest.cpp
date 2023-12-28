@@ -328,8 +328,6 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
       "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
       {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
 
-  rogue::EventHub Hub;
-
   Inv.addItem(rogue::Item(DummyItems.CraftingA));
   Inv.addItem(rogue::Item(DummyItems.CraftingC));
 
@@ -350,6 +348,65 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
   ASSERT_EQ(Inv.size(), 2);
   EXPECT_EQ(Inv.getItem(0).getName(), "crafting_c");
   EXPECT_EQ(Inv.getItem(1).getName(), "crafting_d");
+}
+
+TEST_F(InventoryHandlerTest, CanCraft) {
+  Reg.emplace<rogue::NameComp>(Entity, "Entity");
+  rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
+
+  auto Recipe = rogue::CraftingRecipe(
+      "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+      {DummyItems.CraftingC.ItemId});
+
+  EXPECT_FALSE(InvHandler.canCraft(Recipe))
+      << "Expect not to be able to craft if there is no inventory";
+
+  auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
+  InvHandler.refresh();
+  EXPECT_FALSE(InvHandler.canCraft(Recipe))
+      << "Expect not to be able to craft if the inventory is empty";
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingA));
+  EXPECT_FALSE(InvHandler.canCraft(Recipe))
+      << "Expect not to be able to craft if the inventory is missing required "
+         "items";
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingB));
+
+  EXPECT_TRUE(InvHandler.canCraft(Recipe))
+      << "Expect to be able to craft if the inventory has all required items";
+}
+
+TEST_F(InventoryHandlerTest, TryCraft) {
+  Reg.emplace<rogue::NameComp>(Entity, "Entity");
+  rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
+
+  auto Recipe = rogue::CraftingRecipe(
+      "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+      {DummyItems.CraftingC.ItemId});
+  Crafter.addRecipe(Recipe);
+
+  EXPECT_FALSE(InvHandler.tryCraft(Recipe))
+      << "Expect not to be able to craft if there is no inventory";
+
+  auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
+  InvHandler.refresh();
+  EXPECT_FALSE(InvHandler.tryCraft(Recipe))
+      << "Expect not to be able to craft if the inventory is empty";
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingA));
+
+  EXPECT_FALSE(InvHandler.tryCraft(Recipe))
+      << "Expect not to be able to craft if the inventory is missing required "
+         "items";
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingB));
+
+  EXPECT_TRUE(InvHandler.tryCraft(Recipe))
+      << "Expect to be able to craft if the inventory has all required items";
+
+  ASSERT_EQ(Inv.size(), 1);
+  EXPECT_EQ(Inv.getItem(0).getName(), "crafting_c");
 }
 
 } // namespace
