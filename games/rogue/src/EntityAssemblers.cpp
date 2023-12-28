@@ -271,18 +271,14 @@ void ShopAssembler::assemble(entt::registry &Reg, entt::entity Entity) const {
 void WorkbenchAssembler::assemble(entt::registry &Reg,
                                   entt::entity Entity) const {
   auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
-  ITC.Actions.push_back(
-      {"Craft", [Entity](auto &EHC, auto SrcEt, auto &Reg) {
-         (void)Reg;
-         auto &Crafter = Reg.ctx().template get<GameContext>().Crafter;
-         InventoryHandler InvHandler(Entity, Reg, Crafter);
-         InvHandler.setEventHub(EHC.getEventHub());
-         if (InvHandler.tryCraftItems(SrcEt)) {
-           EHC.publish(PlayerInfoMessageEvent() << "Crafting successful");
-         } else {
-           EHC.publish(PlayerInfoMessageEvent() << "Crafting failed");
-         }
-       }});
+  ITC.Actions.push_back({"Craft", [Entity](auto &EHC, auto SrcEt, auto &Reg) {
+                           (void)Reg;
+                           auto &Crafter =
+                               Reg.ctx().template get<GameContext>().Crafter;
+                           InventoryHandler InvHandler(Entity, Reg, Crafter);
+                           InvHandler.setEventHub(EHC.getEventHub());
+                           InvHandler.tryCraftItems(SrcEt);
+                         }});
   ITC.Actions.push_back({"Known Recipes", [](auto &EHC, auto SrcEt, auto &Reg) {
                            CraftEvent CE;
                            CE.Entity = SrcEt;

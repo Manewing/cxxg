@@ -239,7 +239,22 @@ bool InventoryHandler::tryCraftItems(entt::entity SrcEt) {
       Inv->setItems(*NewItemsOrNone);
     }
 
+    if (Reg.any_of<PlayerComp>(SrcEt) || IsPlayer) {
+      std::stringstream SS;
+      SS << "Crafted ";
+      const char *Pred = "";
+      for (const auto &It : *NewItemsOrNone) {
+        SS << Pred << It.getName();
+        Pred = ", ";
+      }
+      publish(PlayerInfoMessageEvent() << SS.str());
+    }
+
     return true;
+  }
+
+  if (Reg.any_of<PlayerComp>(SrcEt) || IsPlayer) {
+    publish(PlayerInfoMessageEvent() << "Crafting failed");
   }
 
   return false;
