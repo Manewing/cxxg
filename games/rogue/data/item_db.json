@@ -920,6 +920,18 @@
       "capabilities": []
     },
     {
+      "name": "Book of crafting",
+      "description": "A book that teaches crafting. It can be used to learn crafting recipes",
+      "max_stack_size": 1,
+      "types": ["quest", "consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "learn_crafting_recipe"
+        }
+      ]
+    },
+    {
       "name": "L1 Key",
       "description": "The key that unlocks the first level",
       "max_stack_size": 1,
@@ -1120,42 +1132,49 @@
           "name": "Wooden Log",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
         },
         {
           "type": "item",
           "name": "Stone",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
         },
         {
           "type": "item",
           "name": "Iron Scrap",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
         },
         {
           "type": "item",
           "name": "Rune Dust",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
         },
         {
           "type": "item",
           "name": "Glass Vial",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
         },
         {
           "type": "item",
           "name": "Arcane Liquid",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
+        },
+        {
+          "type": "item",
+          "name": "Book of crafting",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 3
         }
       ]
     },

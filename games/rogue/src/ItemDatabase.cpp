@@ -173,7 +173,7 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
   return It->second(DB, V);
 }
 
-static void addDefaultConstructEffects(
+static void addDefaultConstructEffect(
     std::map<std::string, std::shared_ptr<ItemEffect>> &Effects,
     const std::string &EffectName, const std::shared_ptr<ItemEffect> &Effect) {
   const auto It = Effects.find(EffectName);
@@ -186,13 +186,15 @@ static void addDefaultConstructEffects(
 
 static void addDefaultConstructEffects(
     std::map<std::string, std::shared_ptr<ItemEffect>> &Effects) {
-  addDefaultConstructEffects(Effects, "null", std::make_shared<NullEffect>());
-  addDefaultConstructEffects(Effects, "sweeping_strike_effect",
-                             std::make_shared<SweepingStrikeEffect>());
-  addDefaultConstructEffects(Effects, "remove_poison_effect",
-                             std::make_shared<RemovePoisonEffect>());
-  addDefaultConstructEffects(Effects, "remove_poison_debuff",
-                             std::make_shared<RemovePoisonDebuffEffect>());
+  addDefaultConstructEffect(Effects, "null", std::make_shared<NullEffect>());
+  addDefaultConstructEffect(Effects, "sweeping_strike_effect",
+                            std::make_shared<SweepingStrikeEffect>());
+  addDefaultConstructEffect(Effects, "remove_poison_effect",
+                            std::make_shared<RemovePoisonEffect>());
+  addDefaultConstructEffect(Effects, "remove_poison_debuff",
+                            std::make_shared<RemovePoisonDebuffEffect>());
+  addDefaultConstructEffect(Effects, "learn_crafting_recipe",
+                            std::make_shared<LearnRecipeEffect>());
 }
 
 static std::shared_ptr<ItemSpecialization>
@@ -321,8 +323,12 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       const auto &CapInfo = CapJson.GetObject();
       const auto Flag =
           CapabilityFlags::fromString(CapInfo["type"].GetString());
-      const auto Effect = Effects.at(CapJson["effect"].GetString());
-      EffectInfos.push_back({Flag, Effect});
+      const auto EffectName = std::string(CapInfo["effect"].GetString());
+      const auto It = Effects.find(EffectName);
+      if (It == Effects.end()) {
+        throw std::out_of_range("Unknown item effect: " + EffectName);
+      }
+      EffectInfos.push_back({Flag, It->second});
     }
 
     std::unique_ptr<ItemSpecializations> Specialization;

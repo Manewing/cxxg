@@ -74,11 +74,13 @@ int main(int Argc, char *Argv[]) {
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
+  rogue::EventHub Hub;
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
   rogue::LevelDatabase LevelDb;
+  rogue::CraftingDatabase CraftingDb;
   rogue::CraftingHandler Crafter(ItemDb);
-  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb, Crafter};
+  rogue::GameContext Ctx{Hub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter};
 
   LevelGeneratorLoader LvlGenLoader(Ctx);
   auto LG = LvlGenLoader.load(0, Argv[1]);

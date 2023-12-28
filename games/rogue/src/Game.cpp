@@ -92,7 +92,8 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
       EntityDb(EntityDatabase::load(ItemDb, Cfg.EntityDbConfig)),
       LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)),
       CraftingDb(CraftingDatabase::load(ItemDb, Cfg.CraftingDbConfig)),
-      Crafter(ItemDb), Ctx({ItemDb, EntityDb, LevelDb, Crafter}),
+      Crafter(ItemDb),
+      Ctx({EvHub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
       UICtrl(Scr) {

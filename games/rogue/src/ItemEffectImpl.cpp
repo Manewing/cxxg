@@ -1,4 +1,9 @@
+#include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
+#include <rogue/Context.h>
+#include <rogue/CraftingDatabase.h>
+#include <rogue/Event.h>
+#include <rogue/EventHub.h>
 #include <rogue/ItemEffectImpl.h>
 #include <sstream>
 
@@ -115,6 +120,54 @@ void SweepingStrikeEffect::applyTo(const entt::entity &Et,
   for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
     createTempDamage(Reg, DC, PC.Pos + Dir);
   }
+}
+
+std::shared_ptr<ItemEffect> LearnRecipeEffect::clone() const {
+  return std::make_shared<LearnRecipeEffect>(*this);
+}
+
+std::string LearnRecipeEffect::getName() const { return "Learn Recipe"; }
+
+std::string LearnRecipeEffect::getDescription() const {
+  return "Learns a random recipe";
+}
+
+bool LearnRecipeEffect::canApplyTo(const entt::entity &Et,
+                                   entt::registry &Reg) const {
+  return Reg.all_of<PlayerComp>(Et);
+}
+
+void LearnRecipeEffect::applyTo(const entt::entity &Et,
+                                entt::registry &Reg) const {
+  auto *PC = Reg.try_get<PlayerComp>(Et);
+  if (!PC) {
+    return;
+  }
+  auto &CraftingDb = Reg.ctx().get<GameContext>().CraftingDb;
+  auto &EvHub = Reg.ctx().get<GameContext>().EvHub;
+
+  auto &Recipes = CraftingDb.getRecipes();
+  if (Recipes.empty()) {
+    return;
+  }
+
+  std::vector<CraftingRecipeId> AvailableRecipes;
+  for (const auto &[RecipeId, Recipe] : Recipes) {
+    if (!PC->KnownRecipes.count(RecipeId)) {
+      AvailableRecipes.push_back(RecipeId);
+    }
+  }
+
+  if (AvailableRecipes.empty()) {
+    return;
+  }
+
+  auto Idx = std::rand() % AvailableRecipes.size();
+  const auto &RecipeId = AvailableRecipes[Idx];
+
+  PC->KnownRecipes.insert(RecipeId);
+  EvHub.publish(PlayerInfoMessageEvent()
+                << "You learned: " << Recipes.at(RecipeId).getName());
 }
 
 } // namespace rogue
