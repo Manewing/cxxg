@@ -20,6 +20,8 @@ class Inventory;
 class Equipment;
 struct StatsComp;
 class Level;
+class CraftingDatabase;
+class CraftingHandler;
 } // namespace rogue
 
 namespace rogue::ui {
@@ -92,6 +94,15 @@ public:
                  const std::string &Header);
   bool hasLootUI() const;
   void closeLootUI();
+
+  /// Creates a crafting UI
+  /// \param Entity The entity that is crafting
+  /// \param Reg The registry
+  void setCraftingUI(entt::entity Entity, entt::registry &Reg,
+                     const CraftingDatabase &CraftingDb,
+                     const CraftingHandler &Crafter);
+  bool hasCraftingUI() const;
+  void closeCraftingUI();
 
   void setHistoryUI(History &Hist);
   bool hasHistoryUI() const;

@@ -27,4 +27,8 @@ bool LootEvent::isPlayerAffected() const {
   return isValidAndPlayer(Registry, Entity);
 }
 
+bool CraftEvent::isPlayerAffected() const {
+  return isValidAndPlayer(Registry, Entity);
+}
+
 } // namespace rogue

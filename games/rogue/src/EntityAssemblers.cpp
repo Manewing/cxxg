@@ -272,17 +272,23 @@ void WorkbenchAssembler::assemble(entt::registry &Reg,
                                   entt::entity Entity) const {
   auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
   ITC.Actions.push_back(
-      {"Transmute", [Entity](auto &EHC, auto SrcEt, auto &Reg) {
-         (void)SrcEt;
+      {"Craft", [Entity](auto &EHC, auto SrcEt, auto &Reg) {
          (void)Reg;
          auto &Crafter = Reg.ctx().template get<GameContext>().Crafter;
          InventoryHandler InvHandler(Entity, Reg, Crafter);
-         if (InvHandler.tryCraftItems()) {
-           EHC.publish(PlayerInfoMessageEvent() << "Transmutation successful");
+         InvHandler.setEventHub(EHC.getEventHub());
+         if (InvHandler.tryCraftItems(SrcEt)) {
+           EHC.publish(PlayerInfoMessageEvent() << "Crafting successful");
          } else {
-           EHC.publish(PlayerInfoMessageEvent() << "Transmutation failed");
+           EHC.publish(PlayerInfoMessageEvent() << "Crafting failed");
          }
        }});
+  ITC.Actions.push_back({"Known Recipes", [](auto &EHC, auto SrcEt, auto &Reg) {
+                           CraftEvent CE;
+                           CE.Entity = SrcEt;
+                           CE.Registry = &Reg;
+                           EHC.publish(CE);
+                         }});
 }
 
 bool WorkbenchAssembler::isPostProcess() const { return true; }

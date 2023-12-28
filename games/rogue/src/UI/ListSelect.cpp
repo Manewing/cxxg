@@ -14,6 +14,10 @@ void ListSelect::setElements(const std::vector<Element> &Elements) {
   SelectedElemIdx = 0;
 }
 
+const std::vector<ListSelect::Element> &ListSelect::getElements() const {
+  return Elements;
+}
+
 void ListSelect::selectElement(std::size_t ElemIdx) {
   SelectedElemIdx = ElemIdx;
   if (SelectedElemIdx >= Elements.size()) {

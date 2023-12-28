@@ -79,6 +79,13 @@ struct LootEvent : public BaseEvent {
   bool isPlayerAffected() const;
 };
 
+struct CraftEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
+  entt::registry *Registry = nullptr;
+
+  bool isPlayerAffected() const;
+};
+
 struct DetectTargetEvent : public BaseEvent {
   entt::entity Entity = entt::null;
   entt::entity Target = entt::null;

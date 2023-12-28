@@ -25,6 +25,7 @@ struct EntityDiedEvent;
 struct SwitchLevelEvent;
 struct SwitchGameWorldEvent;
 struct LootEvent;
+struct CraftEvent;
 struct EntityAttackEvent;
 struct DetectTargetEvent;
 struct LostTargetEvent;
@@ -81,6 +82,7 @@ private:
   void onSwitchLevelEvent(const SwitchLevelEvent &E);
   void onSwitchGameWorldEvent(const SwitchGameWorldEvent &E);
   void onLootEvent(const LootEvent &E);
+  void onCraftEvent(const CraftEvent &E);
 
   void handleDrawLevel(bool UpdateScreen);
   void handleDrawGameOver();
@@ -96,6 +98,7 @@ private:
   ItemDatabase ItemDb;
   EntityDatabase EntityDb;
   LevelDatabase LevelDb;
+  CraftingDatabase CraftingDb;
   CraftingHandler Crafter;
 
   GameContext Ctx;

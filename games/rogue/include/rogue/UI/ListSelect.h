@@ -34,6 +34,7 @@ public:
              cxxg::types::Size Padding = {1, 1});
 
   void setElements(const std::vector<Element> &Elements);
+  const std::vector<Element> &getElements() const;
   void selectElement(std::size_t ElemIdx);
   std::size_t getSelectedElement() const;
   void selectNext();

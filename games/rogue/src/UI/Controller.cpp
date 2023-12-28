@@ -11,6 +11,7 @@
 #include <rogue/UI/Menu.h>
 #include <rogue/UI/Stats.h>
 #include <rogue/UI/TargetUI.h>
+#include <rogue/UI/Crafting.h>
 
 // FIXME get rid of dep
 #include <rogue/Components/Items.h>
@@ -228,6 +229,22 @@ void Controller::closeLootUI() {
   while (auto *Wdw = WdwContainer.getWindowOfType<LootController>()) {
     WdwContainer.closeWindow(Wdw);
   }
+}
+
+void Controller::setCraftingUI(entt::entity Entity, entt::registry &Reg,
+                               const CraftingDatabase &CraftingDb,
+                               const CraftingHandler &Crafter) {
+  WdwContainer.addWindow<CraftingController>(*this, Entity, Reg, CraftingDb,
+                                             Crafter);
+  WdwContainer.autoLayoutWindows();
+}
+
+bool Controller::hasCraftingUI() const {
+  return WdwContainer.hasWindowOfType<CraftingController>();
+}
+
+void Controller::closeCraftingUI() {
+  WdwContainer.closeWindow(WdwContainer.getWindowOfType<CraftingController>());
 }
 
 void Controller::setHistoryUI(History &Hist) {

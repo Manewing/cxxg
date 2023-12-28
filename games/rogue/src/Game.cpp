@@ -90,14 +90,14 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
       ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)),
       EntityDb(EntityDatabase::load(ItemDb, Cfg.EntityDbConfig)),
-      LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)), Crafter(ItemDb),
-      Ctx({ItemDb, EntityDb, LevelDb, Crafter}),
+      LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)),
+      CraftingDb(CraftingDatabase::load(ItemDb, Cfg.CraftingDbConfig)),
+      Crafter(ItemDb), Ctx({ItemDb, EntityDb, LevelDb, Crafter}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
       UICtrl(Scr) {
-  auto CraftDb = CraftingDatabase::load(ItemDb, Cfg.CraftingDbConfig);
-  for (const auto &Recipe : CraftDb.getRecipes()) {
-    Crafter.addRecipe(Recipe);
+  for (const auto &[RecipeId, Recipe] : CraftingDb.getRecipes()) {
+    Crafter.addRecipe(RecipeId, Recipe);
   }
 }
 
@@ -130,6 +130,7 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.subscribe(*this, &Game::onSwitchLevelEvent);
   EHW.subscribe(*this, &Game::onSwitchGameWorldEvent);
   EHW.subscribe(*this, &Game::onLootEvent);
+  EHW.subscribe(*this, &Game::onCraftEvent);
   REC.setEventHub(&EvHub);
   World->setEventHub(&EvHub);
   UICtrl.setEventHub(&EvHub);
@@ -437,6 +438,15 @@ void Game::onLootEvent(const LootEvent &E) {
   }
   UICtrl.setLootUI(E.Entity, E.LootedEntity, World->getCurrentLevelOrFail(),
                    E.LootName);
+}
+
+void Game::onCraftEvent(const CraftEvent &E) {
+  if (!E.isPlayerAffected() ||
+      &World->getCurrentLevelOrFail().Reg != E.Registry) {
+    return;
+  }
+  UICtrl.setCraftingUI(E.Entity, World->getCurrentLevelOrFail().Reg, CraftingDb,
+                       Crafter);
 }
 
 namespace {

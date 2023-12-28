@@ -31,10 +31,10 @@ set(HEADER_FILES
   include/rogue/ItemPrototype.h
   include/rogue/ItemSpecialization.h
   include/rogue/ItemType.h
-  include/rogue/LevelDatabase.h
   include/rogue/JSON.h
   include/rogue/JSONHelpers.h
   include/rogue/Level.h
+  include/rogue/LevelDatabase.h
   include/rogue/LevelGenerator.h
   include/rogue/LootTable.h
   include/rogue/Parser.h
@@ -54,6 +54,7 @@ set(HEADER_FILES
   include/rogue/UI/CommandLine.h
   include/rogue/UI/Controller.h
   include/rogue/UI/Controls.h
+  include/rogue/UI/Crafting.h
   include/rogue/UI/Decorator.h
   include/rogue/UI/Equipment.h
   include/rogue/UI/Frame.h
@@ -100,12 +101,12 @@ set(SOURCE_FILES
   src/ItemEffect.cpp
   src/ItemEffectImpl.cpp
   src/ItemPrototype.cpp
-  src/LevelDatabase.cpp
   src/ItemSpecialization.cpp
   src/ItemType.cpp
   src/JSON.cpp
   src/JSONHelpers.cpp
   src/Level.cpp
+  src/LevelDatabase.cpp
   src/LevelGenerator.cpp
   src/LootTable.cpp
   src/Parser.cpp
@@ -125,6 +126,7 @@ set(SOURCE_FILES
   src/UI/CommandLine.cpp
   src/UI/Controller.cpp
   src/UI/Controls.cpp
+  src/UI/Crafting.cpp
   src/UI/Decorator.cpp
   src/UI/Equipment.cpp
   src/UI/Frame.cpp
