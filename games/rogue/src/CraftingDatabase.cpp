@@ -14,6 +14,8 @@ CraftingDatabase::load(const ItemDatabase &ItemDb,
   auto [DocStr, Doc] = loadJSON(CraftingDbConfig, &SchemaPath);
 
   for (const auto &Recipe : Doc["recipes"].GetArray()) {
+    auto Name = Recipe["name"].GetString();
+
     std::vector<CraftingRecipe::ItemId> RequiredItems;
     for (const auto &RequiredItem : Recipe["ingredients"].GetArray()) {
       RequiredItems.push_back(ItemDb.getItemId(RequiredItem.GetString()));
@@ -25,7 +27,7 @@ CraftingDatabase::load(const ItemDatabase &ItemDb,
     }
 
     CraftingDb.addRecipe(
-        CraftingRecipe(std::move(RequiredItems), std::move(ResultItems)));
+        CraftingRecipe(Name, std::move(RequiredItems), std::move(ResultItems)));
   }
 
   return CraftingDb;

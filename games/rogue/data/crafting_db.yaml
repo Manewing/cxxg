@@ -1,9 +1,11 @@
 recipes:
-  - ingredients:
+  - name: Leather
+    ingredients:
       - Leather Scrap
     results:
       - Leather
-  - ingredients:
+  - name: Wooden Shield
+    ingredients:
       - Wooden Log
       - Wooden Log
       - Leather Scrap
@@ -12,7 +14,8 @@ recipes:
       - Wooden Log
     results:
       - Wooden Shield
-  - ingredients:
+  - name: Wooden Bow
+    ingredients:
       - Wooden Log
       - Leather Scrap
       - Leather Scrap
@@ -22,13 +25,15 @@ recipes:
       - Wooden Log
     results:
       - Wooden Bow
-  - ingredients:
+  - name: Fire Stone
+    ingredients:
       - Rune Dust
       - Iron Scrap
       - Stone
     results:
       - Fire Stone
-  - ingredients:
+  - name: Burn Wooden Logs
+    ingredients:
       - Wooden Log
       - Wooden Log
       - Wooden Log
@@ -38,12 +43,14 @@ recipes:
       - Ash
       - Fire Stone
       - Charcoal
-  - ingredients:
+  - name: Arcane Potion
+    ingredients:
       - Glass Vial
       - Arcane Liquid
     results:
       - Arcane Potion
-  - ingredients:
+  - name: Armor Plating
+    ingredients:
       - Rune Dust
       - Rune Dust
       - Arachnid Chitin Shard
@@ -51,7 +58,8 @@ recipes:
       - Arachnid Chitin Shard
     results:
       - Armor Plating
-  - ingredients:
+  - name: Spider Venom Oil
+    ingredients:
       - Arcane Liquid
       - Venomous Fang
       - Venomous Fang

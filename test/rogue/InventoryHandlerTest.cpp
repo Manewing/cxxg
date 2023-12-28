@@ -325,7 +325,7 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   Crafter.addRecipe(rogue::CraftingRecipe(
-      {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+      "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
       {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
 
   rogue::EventHub Hub;

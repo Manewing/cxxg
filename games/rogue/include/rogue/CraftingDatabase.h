@@ -15,15 +15,17 @@ public:
   using ItemId = int;
 
 public:
-  CraftingRecipe(std::vector<ItemId> RequiredItems,
+  CraftingRecipe(std::string Name, std::vector<ItemId> RequiredItems,
                  std::vector<ItemId> ResultItems)
-      : RequiredItems(std::move(RequiredItems)),
+      : Name(std::move(Name)), RequiredItems(std::move(RequiredItems)),
         ResultItems(std::move(ResultItems)) {}
 
+  const std::string &getName() const { return Name; }
   const std::vector<ItemId> &getRequiredItems() const { return RequiredItems; }
   const std::vector<ItemId> &getResultItems() const { return ResultItems; }
 
 private:
+  std::string Name;
   std::vector<ItemId> RequiredItems;
   std::vector<ItemId> ResultItems;
 };
