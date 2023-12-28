@@ -43,6 +43,7 @@ bool CraftingController::handleInput(int Char) {
 }
 
 void CraftingController::draw(cxxg::Screen &Scr) const {
+  updateElements();
   BaseRectDecorator::draw(Scr);
 }
 
@@ -97,11 +98,18 @@ void CraftingController::updateElements() const {
 
   std::vector<ListSelect::Element> Elements;
   Elements.reserve(PC->KnownRecipes.size());
+  InventoryHandler InvHandler(Entity, Reg, Crafter);
   for (const auto &RecipeId : PC->KnownRecipes) {
     const auto &Recipe = Recipes.at(RecipeId);
-    Elements.push_back({Recipe.getName(), cxxg::types::Color::NONE});
+    auto Color = cxxg::types::RgbColor{200, 80, 55};
+    if (InvHandler.canCraft(Recipe)) {
+      Color = cxxg::types::RgbColor{40, 130, 40};
+    }
+    Elements.push_back({Recipe.getName(), Color});
   }
+  auto PrevIdx = List->getSelectedElement();
   List->setElements(Elements);
+  List->selectElement(PrevIdx);
 }
 
 } // namespace rogue::ui

@@ -217,9 +217,11 @@ bool InventoryHandler::tryCraftItems(entt::entity SrcEt) {
   if (SrcEt == entt::null) {
     SrcEt = Entity;
   }
+  bool IsRecipe = false;
   if (auto *PC = Reg.try_get<PlayerComp>(SrcEt)) {
     if (auto Result = Crafter.getCraftingRecipeResultOrNone(Items)) {
       PC->KnownRecipes.insert(Result->RecipeId);
+      IsRecipe = true;
     }
   }
 
@@ -241,7 +243,7 @@ bool InventoryHandler::tryCraftItems(entt::entity SrcEt) {
 
     if (Reg.any_of<PlayerComp>(SrcEt) || IsPlayer) {
       std::stringstream SS;
-      SS << "Crafted ";
+      SS << (IsRecipe ? "Crafted " : "Enhanced ");
       const char *Pred = "";
       for (const auto &It : *NewItemsOrNone) {
         SS << Pred << It.getName();
