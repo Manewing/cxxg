@@ -126,7 +126,9 @@ bool InventoryController::handleInput(int Char) {
                        });
       return false;
     }
-    InvHandler.tryUseItem(ItemIdx);
+    if (InvHandler.tryUseItem(ItemIdx)) {
+      return false;
+    }
   } break;
   case Controls::Drop.Char: {
     InvHandler.tryDropItem(ItemIdx);
