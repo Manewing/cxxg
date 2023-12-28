@@ -73,7 +73,7 @@ void InventoryControllerBase::updateElements() const {
   Elements.reserve(Inv.getItems().size());
   for (const auto &Item : Inv.getItems()) {
     std::stringstream SS;
-    if (Item.getMaxStackSize() == 1) {
+    if (Item.getMaxStackSize() == 1 || Inv.getMaxStackSize() == 1) {
       SS << "     " << Item.getName();
     } else {
       SS << std::setw(3) << Item.StackSize << "x " << Item.getName();

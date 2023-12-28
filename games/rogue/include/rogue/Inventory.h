@@ -22,9 +22,12 @@ public:
 public:
   Inventory() = default;
   Inventory(unsigned MaxStackSize) : MaxStackSize(MaxStackSize) {}
+
   const Item &getItem(std::size_t ItemIdx) const { return Items.at(ItemIdx); }
   void setItems(std::vector<Item> Items) { this->Items = std::move(Items); }
   const std::vector<Item> &getItems() const { return Items; }
+
+  unsigned getMaxStackSize() const { return MaxStackSize; }
 
   void addItem(Item It);
   Item takeItem(std::size_t ItemIdx);
