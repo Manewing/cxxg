@@ -15,10 +15,16 @@ namespace rogue {
 struct CraftingNode {
   using ItemId = int;
 
-  std::optional<std::vector<ItemId>> ResultItems;
+  struct CraftingResult {
+    CraftingRecipeId RecipeId;
+    std::vector<ItemId> Items;
+  };
+
+  std::optional<CraftingResult> Result;
+
   std::map<ItemId, CraftingNode> Children;
 
-  const std::optional<std::vector<ItemId>> &
+  const std::optional<CraftingResult> &
   search(const std::vector<Item> &Items) const;
 };
 
@@ -26,10 +32,19 @@ class CraftingHandler {
 public:
   CraftingHandler() = default;
   explicit CraftingHandler(const ItemDatabase &ItemDb);
-  void addRecipe(const CraftingRecipe &Recipe);
+  void addRecipe(CraftingRecipeId RecipeId, const CraftingRecipe &Recipe);
+
+  const ItemDatabase *getItemDb() const;
+  const ItemDatabase &getItemDbOrFail() const;
+
+  const std::optional<CraftingNode::CraftingResult> &
+  getCraftingRecipeResultOrNone(const std::vector<Item> &Items) const;
 
   std::optional<std::vector<Item>>
   tryCraft(const std::vector<Item> &Items) const;
+
+  std::optional<std::vector<Item>>
+  tryCraftAsRecipe(const std::vector<Item> &Items) const;
   Item craftEnhancedItem(const std::vector<Item> &Items) const;
 
 private:

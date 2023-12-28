@@ -56,7 +56,9 @@ public:
   void autoEquipItems();
 
   /// Tries to craft the items in the inventory
-  bool tryCraftItems();
+  /// \param SrcEt The entity to craft the items for, defaults to \p Entity
+  /// \return True if the items were crafted, false otherwise
+  bool tryCraftItems(entt::entity SrcEt = entt::null);
 
   /// Checks if the inventory has all items to craft the recipe
   bool canCraft(const CraftingRecipe &Recipe) const;

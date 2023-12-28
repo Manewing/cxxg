@@ -324,9 +324,11 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
-  Crafter.addRecipe(rogue::CraftingRecipe(
-      "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
-      {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
+  Crafter.addRecipe(
+      0,
+      rogue::CraftingRecipe(
+          "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+          {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
 
   Inv.addItem(rogue::Item(DummyItems.CraftingA));
   Inv.addItem(rogue::Item(DummyItems.CraftingC));
@@ -348,6 +350,35 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
   ASSERT_EQ(Inv.size(), 2);
   EXPECT_EQ(Inv.getItem(0).getName(), "crafting_c");
   EXPECT_EQ(Inv.getItem(1).getName(), "crafting_d");
+}
+
+TEST_F(InventoryHandlerTest, TryCraftItemsForPlayer) {
+  Reg.emplace<rogue::NameComp>(Entity, "Entity");
+  auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
+
+  auto PlayerEt = Reg.create();
+  Reg.emplace<rogue::NameComp>(PlayerEt, "Player");
+  auto &PC = Reg.emplace<rogue::PlayerComp>(PlayerEt);
+  auto &PlayerInv = Reg.emplace<rogue::InventoryComp>(PlayerEt).Inv;
+
+  rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
+  Crafter.addRecipe(
+      0,
+      rogue::CraftingRecipe(
+          "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+          {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingA));
+  Inv.addItem(rogue::Item(DummyItems.CraftingB));
+
+  InvHandler.tryCraftItems(PlayerEt);
+  ASSERT_EQ(Inv.size(), 0);
+  ASSERT_EQ(PlayerInv.size(), 2);
+
+  EXPECT_EQ(PlayerInv.getItem(0).getName(), "crafting_c");
+  EXPECT_EQ(PlayerInv.getItem(1).getName(), "crafting_d");
+
+  EXPECT_EQ(PC.KnownRecipes, std::set<rogue::CraftingRecipeId>{0});
 }
 
 TEST_F(InventoryHandlerTest, CanCraft) {
@@ -384,7 +415,7 @@ TEST_F(InventoryHandlerTest, TryCraft) {
   auto Recipe = rogue::CraftingRecipe(
       "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
       {DummyItems.CraftingC.ItemId});
-  Crafter.addRecipe(Recipe);
+  Crafter.addRecipe(0, Recipe);
 
   EXPECT_FALSE(InvHandler.tryCraft(Recipe))
       << "Expect not to be able to craft if there is no inventory";

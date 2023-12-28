@@ -3,12 +3,15 @@
 
 #include <filesystem>
 #include <vector>
+#include <map>
 
 namespace rogue {
 class ItemDatabase;
 }
 
 namespace rogue {
+
+using CraftingRecipeId = int;
 
 class CraftingRecipe {
 public:
@@ -37,14 +40,18 @@ public:
 
 public:
   CraftingDatabase() = default;
-  explicit CraftingDatabase(std::vector<CraftingRecipe> Recipes)
+  explicit CraftingDatabase(std::map<CraftingRecipeId, CraftingRecipe> Recipes)
       : Recipes(std::move(Recipes)) {}
 
-  const std::vector<CraftingRecipe> &getRecipes() const;
+  CraftingRecipeId getRecipeId(const std::string &Name) const;
+  const CraftingRecipe &getRecipe(CraftingRecipeId Id) const;
+
+  const std::map<CraftingRecipeId, CraftingRecipe> &getRecipes() const;
   void addRecipe(const CraftingRecipe &Recipe);
 
 private:
-  std::vector<CraftingRecipe> Recipes;
+  std::map<std::string, CraftingRecipeId> RecipeNameToId;
+  std::map<CraftingRecipeId, CraftingRecipe> Recipes;
 };
 
 } // namespace rogue

@@ -247,7 +247,7 @@ TEST_F(CraftingSystemTest, SimpleRecipe) {
   rogue::CraftingRecipe Recipe(
       "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
       {DummyItems.CraftingC.ItemId});
-  System.addRecipe(Recipe);
+  System.addRecipe(0, Recipe);
 
   auto A = Db.createItem(DummyItems.CraftingA.ItemId);
   auto B = Db.createItem(DummyItems.CraftingB.ItemId);
@@ -272,7 +272,7 @@ TEST_F(CraftingSystemTest, RecipeOverrides) {
   rogue::CraftingRecipe Recipe(
       "dummy", {DummyItems.Potion.ItemId, DummyItems.HealConsumable.ItemId},
       {DummyItems.CraftingA.ItemId});
-  System.addRecipe(Recipe);
+  System.addRecipe(0, Recipe);
 
   ResultVec = System.tryCraft({Potion, Heal});
   ASSERT_TRUE(ResultVec.has_value());
@@ -294,9 +294,9 @@ TEST_F(CraftingSystemTest, MultipleRecipes) {
       "dummy_ac",
       {DummyItems.CraftingA.ItemId, DummyItems.CraftingC.ItemId},
       {DummyItems.Potion.ItemId});
-  System.addRecipe(RecipeAB);
-  System.addRecipe(RecipeABC);
-  System.addRecipe(RecipeAC);
+  System.addRecipe(0, RecipeAB);
+  System.addRecipe(1, RecipeABC);
+  System.addRecipe(2, RecipeAC);
 
   auto A = Db.createItem(DummyItems.CraftingA.ItemId);
   auto B = Db.createItem(DummyItems.CraftingB.ItemId);

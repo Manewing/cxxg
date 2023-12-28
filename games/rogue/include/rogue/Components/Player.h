@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include <ymir/Types.hpp>
+#include <rogue/CraftingDatabase.h>
 
 namespace rogue {
 class EventHubConnector;
@@ -38,6 +39,7 @@ public:
   std::optional<Interaction> CurrentInteraction;
   ymir::Dir2d MoveDir = ymir::Dir2d::NONE;
   bool IsReady = false;
+  std::set<CraftingRecipeId> KnownRecipes;
 };
 
 } // namespace rogue

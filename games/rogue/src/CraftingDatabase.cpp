@@ -33,12 +33,42 @@ CraftingDatabase::load(const ItemDatabase &ItemDb,
   return CraftingDb;
 }
 
-const std::vector<CraftingRecipe> &CraftingDatabase::getRecipes() const {
+CraftingRecipeId CraftingDatabase::getRecipeId(const std::string &Name) const {
+  auto It = RecipeNameToId.find(Name);
+  if (It == RecipeNameToId.end()) {
+    throw std::runtime_error("CraftingDatabase::getRecipeId: Unknown recipe: " +
+                             Name);
+  }
+  return It->second;
+}
+
+const CraftingRecipe &CraftingDatabase::getRecipe(CraftingRecipeId Id) const {
+  auto It = Recipes.find(Id);
+  if (It == Recipes.end()) {
+    throw std::runtime_error(
+        "CraftingDatabase::getRecipe: Unknown recipe id: " +
+        std::to_string(Id));
+  }
+  return It->second;
+}
+
+const std::map<CraftingRecipeId, CraftingRecipe> &
+CraftingDatabase::getRecipes() const {
   return Recipes;
 }
 
 void CraftingDatabase::addRecipe(const CraftingRecipe &Recipe) {
-  Recipes.push_back(Recipe);
+  if (Recipe.getRequiredItems().size() < 2) {
+    throw std::runtime_error("CraftingDatabase::addRecipe: Invalid recipe");
+  }
+  if (RecipeNameToId.count(Recipe.getName()) != 0) {
+    throw std::runtime_error(
+        "CraftingDatabase::addRecipe: Duplicate recipe name: " +
+        Recipe.getName());
+  }
+  auto RecipeId = Recipes.size();
+  RecipeNameToId[Recipe.getName()] = RecipeId;
+  Recipes.emplace(RecipeId, Recipe);
 }
 
 } // namespace rogue

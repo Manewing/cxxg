@@ -207,18 +207,38 @@ void InventoryHandler::autoEquipItems() {
   }
 }
 
-bool InventoryHandler::tryCraftItems() {
+bool InventoryHandler::tryCraftItems(entt::entity SrcEt) {
   // Nothing can be crafted if there is no inventory
   if (!Inv) {
     return false;
   }
+  const auto &Items = Inv->getItems();
+
+  if (SrcEt == entt::null) {
+    SrcEt = Entity;
+  }
+  if (auto *PC = Reg.try_get<PlayerComp>(SrcEt)) {
+    if (auto Result = Crafter.getCraftingRecipeResultOrNone(Items)) {
+      PC->KnownRecipes.insert(Result->RecipeId);
+    }
+  }
 
   // Try crafting all items in the inventory
-  auto NewItemsOrNone = Crafter.tryCraft(Inv->getItems());
+  auto NewItemsOrNone = Crafter.tryCraft(Items);
 
   // Add all new items to the inventory
   if (NewItemsOrNone) {
-    Inv->setItems(*NewItemsOrNone);
+    if (SrcEt != Entity && Reg.valid(SrcEt) &&
+        Reg.all_of<InventoryComp>(SrcEt)) {
+      auto &SrcInv = Reg.get<InventoryComp>(SrcEt).Inv;
+      for (auto &It : *NewItemsOrNone) {
+        SrcInv.addItem(std::move(It));
+      }
+      Inv->clear();
+    } else {
+      Inv->setItems(*NewItemsOrNone);
+    }
+
     return true;
   }
 

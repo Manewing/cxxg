@@ -5,29 +5,31 @@
 #include <iostream>
 namespace rogue {
 
-const std::optional<std::vector<CraftingNode::ItemId>> &
+static const std::optional<CraftingNode::CraftingResult> EmptyResult;
+
+const std::optional<CraftingNode::CraftingResult> &
 CraftingNode::search(const std::vector<Item> &Items) const {
-  static const std::optional<std::vector<ItemId>> Empty;
   if (Items.empty()) {
-    return Empty;
+    return EmptyResult;
   }
 
   const CraftingNode *Node = this;
   for (auto &It : Items) {
     auto ItNode = Node->Children.find(It.getId());
     if (ItNode == Node->Children.end()) {
-      return Empty;
+      return EmptyResult;
     }
     Node = &ItNode->second;
   }
 
-  return Node->ResultItems;
+  return Node->Result;
 }
 
 CraftingHandler::CraftingHandler(const ItemDatabase &ItemDb)
     : ItemDb(&ItemDb) {}
 
-void CraftingHandler::addRecipe(const CraftingRecipe &Recipe) {
+void CraftingHandler::addRecipe(CraftingRecipeId RecipeId,
+                                const CraftingRecipe &Recipe) {
   if (Recipe.getResultItems().empty() || Recipe.getRequiredItems().empty()) {
     throw std::runtime_error("CraftingHandler::addRecipe: Empty recipe");
   }
@@ -37,10 +39,39 @@ void CraftingHandler::addRecipe(const CraftingRecipe &Recipe) {
     Node = &Node->Children[Id];
   }
 
-  if (Node->ResultItems) {
+  if (Node->Result) {
     throw std::runtime_error("CraftingHandler::addRecipe: Duplicate recipe");
   }
-  Node->ResultItems = Recipe.getResultItems();
+  Node->Result =
+      CraftingNode::CraftingResult{RecipeId, Recipe.getResultItems()};
+}
+
+const ItemDatabase *CraftingHandler::getItemDb() const { return ItemDb; }
+
+const ItemDatabase &CraftingHandler::getItemDbOrFail() const {
+  if (!ItemDb) {
+    throw std::runtime_error("CraftingHandler::getItemDbOrFail: No ItemDb");
+  }
+  return *ItemDb;
+}
+
+const std::optional<CraftingNode::CraftingResult> &
+CraftingHandler::getCraftingRecipeResultOrNone(
+    const std::vector<Item> &Items) const {
+  if (Items.size() < 2) {
+    return EmptyResult;
+  }
+  auto &First = Items.at(0);
+  auto &Second = Items.at(1);
+
+  // If both items are crafting items this indicates a crafting recipe,
+  // otherwise it's a modification of an item or invalid combination
+  if (!(First.getType() & (ItemType::Crafting | ItemType::CraftingBase)) ||
+      !(Second.getType() & ItemType::Crafting)) {
+    return EmptyResult;
+  }
+
+  return Tree.search(Items);
 }
 
 std::optional<std::vector<Item>>
@@ -53,16 +84,8 @@ CraftingHandler::tryCraft(const std::vector<Item> &Items) const {
 
   // If both items are crafting items this indicates a crafting recipe,
   // otherwise it's a modification of an item or invalid combination
-  if ((First.getType() & (ItemType::Crafting | ItemType::CraftingBase)) &&
-      (Second.getType() & ItemType::Crafting)) {
-    auto Result = Tree.search(Items);
-    if (Result) {
-      std::vector<Item> CraftedItems;
-      for (auto &Id : *Result) {
-        CraftedItems.push_back(ItemDb->createItem(Id));
-      }
-      return CraftedItems;
-    }
+  if (auto CraftedOrNone = tryCraftAsRecipe(Items)) {
+    return CraftedOrNone;
   }
 
   // Filter out any invalid combinations
@@ -75,6 +98,20 @@ CraftingHandler::tryCraft(const std::vector<Item> &Items) const {
   }
 
   return std::vector<Item>{craftEnhancedItem(Items)};
+}
+
+std::optional<std::vector<Item>>
+CraftingHandler::tryCraftAsRecipe(const std::vector<Item> &Items) const {
+  auto Result = getCraftingRecipeResultOrNone(Items);
+  if (!Result) {
+    return std::nullopt;
+  }
+
+  std::vector<Item> CraftedItems;
+  for (auto &Id : Result->Items) {
+    CraftedItems.push_back(ItemDb->createItem(Id));
+  }
+  return CraftedItems;
 }
 
 namespace {
