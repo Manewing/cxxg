@@ -52,15 +52,14 @@ cxxg::types::RgbColor getManaColor(int Mana, int MaxMana) {
   return {145, 145, 200};
 }
 
-cxxg::types::Size getWindowContainerSize(cxxg::Screen &Scr) {
-  auto S = Scr.getSize();
-  return {S.X - 1, S.Y - 2};
+cxxg::types::Size getWindowContainerSize(const cxxg::types::Size &Size) {
+  return {Size.X - 1, Size.Y - 2};
 }
 
 } // namespace
 
 Controller::Controller(cxxg::Screen &Scr)
-    : Scr(Scr), WdwContainer({1, 2}, getWindowContainerSize(Scr)) {}
+    : Scr(Scr), WdwContainer({1, 2}, getWindowContainerSize(Scr.getSize())) {}
 
 void Controller::draw(int LevelIdx, const PlayerInfo &PI,
                       const std::optional<TargetInfo> &TI) {
@@ -286,6 +285,11 @@ void Controller::closeAll() {
   while (WdwContainer.hasActiveWindow()) {
     WdwContainer.closeWindow(&WdwContainer.getActiveWindow());
   }
+}
+
+void Controller::handleResize(cxxg::types::Size Size) {
+  WdwContainer.setSize(getWindowContainerSize(Size));
+  WdwContainer.autoLayoutWindows();
 }
 
 } // namespace rogue::ui

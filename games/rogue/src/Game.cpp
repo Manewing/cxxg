@@ -516,4 +516,9 @@ void Game::handleDrawGameOver() {
   // TODO
 }
 
+void Game::handleResize(cxxg::types::Size Size) {
+  cxxg::Game::handleResize(Size);
+  UICtrl.handleResize(Size);
+}
+
 } // namespace rogue

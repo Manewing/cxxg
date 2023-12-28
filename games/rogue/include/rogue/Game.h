@@ -85,6 +85,8 @@ private:
   void handleDrawLevel(bool UpdateScreen);
   void handleDrawGameOver();
 
+  void handleResize(cxxg::types::Size Size) final;
+
 private:
   const GameConfig &Cfg;
   EventHub EvHub;

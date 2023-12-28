@@ -35,6 +35,8 @@ WindowContainer::WindowContainer(cxxg::types::Position Pos,
                                  cxxg::types::Size Size)
     : Widget(Pos), Size(Size) {}
 
+void WindowContainer::setSize(cxxg::types::Size Size) { this->Size = Size; }
+
 bool WindowContainer::handleInput(int Char) {
   switch (Char) {
   case Controls::MoveWindow.Char:

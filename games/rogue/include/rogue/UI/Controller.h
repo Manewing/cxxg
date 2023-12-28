@@ -113,6 +113,8 @@ public:
   /// Closes all windows
   void closeAll();
 
+  void handleResize(cxxg::types::Size Size);
+
 private:
   cxxg::Screen &Scr;
   WindowContainer WdwContainer;

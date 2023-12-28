@@ -77,6 +77,10 @@ public:
   void setRandomSeed(size_t Seed);
 
 protected:
+  /// Callback for handling resize events of the screen
+  virtual void handleResize(types::Size GameSize);
+
+protected:
   /// Screen on which the game will be displayed
   Screen &Scr;
 

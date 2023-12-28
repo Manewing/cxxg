@@ -7,7 +7,8 @@ namespace cxxg {
 
 Game::Game(Screen &Scr)
     : Scr(Scr), GameRunning(true), RndEngine(utils::getTimeStamp()) {
-  Scr.registerResizeHandler([this](const auto &) { handleDraw(); });
+  Scr.registerResizeHandler(
+      [this](const auto &Scr) { handleResize(Scr.getSize()); });
 }
 
 void Game::initialize(bool BufferedInput, unsigned TDU) {
@@ -99,5 +100,7 @@ types::Size Game::getOffset(types::Size GameSize) const {
 void Game::setRandomSeed(size_t Seed) {
   RndEngine = ::std::default_random_engine(Seed);
 }
+
+void Game::handleResize(types::Size) { handleDraw(); }
 
 }; // namespace cxxg

@@ -26,6 +26,8 @@ public:
 public:
   WindowContainer(cxxg::types::Position Pos, cxxg::types::Size Size);
 
+  void setSize(cxxg::types::Size Size);
+
   bool handleInput(int Char) override;
   std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
