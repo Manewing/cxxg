@@ -113,6 +113,17 @@ public:
                entt::registry &Reg) const final;
 };
 
+class SmiteEffect : public ItemEffect {
+public:
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+};
+
 // Knowledge
 
 class LearnRecipeEffect : public ItemEffect {

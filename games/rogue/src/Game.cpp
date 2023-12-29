@@ -16,6 +16,7 @@
 #include <rogue/Renderer.h>
 #include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controls.h>
+#include <rogue/UI/Equipment.h>
 #include <rogue/UI/TargetUI.h>
 
 namespace rogue {
@@ -324,11 +325,9 @@ bool Game::handleInput(int Char) {
     auto Player = getPlayer();
     auto &EC = getLvlReg().get<EquipmentComp>(Player);
     if (EC.Equip.all().at(Idx)->It) {
-      InventoryHandler InvHandler(Player, getLvlReg(), Crafter);
-      InvHandler.setEventHub(&EvHub);
-      if (InvHandler.tryUseSkill(EC.Equip.all().at(Idx)->BaseTypeFilter)) {
-        return handleUpdates(/*IsTick=*/true);
-      }
+      ui::EquipmentController::handleUseSkill(UICtrl,
+                                              World->getCurrentLevelOrFail(),
+                                              Player, *EC.Equip.all().at(Idx));
     } else {
       Hist.warn() << "No item equipped in slot "
                   << EC.Equip.all().at(Idx)->BaseTypeFilter;

@@ -201,6 +201,8 @@ static void addDefaultConstructEffects(
   addDefaultConstructEffect(Effects, "null", std::make_shared<NullEffect>());
   addDefaultConstructEffect(Effects, "sweeping_strike_effect",
                             std::make_shared<SweepingStrikeEffect>());
+  addDefaultConstructEffect(Effects, "smite_effect",
+                            std::make_shared<SmiteEffect>());
   addDefaultConstructEffect(Effects, "remove_poison_effect",
                             std::make_shared<RemovePoisonEffect>());
   addDefaultConstructEffect(Effects, "remove_poison_debuff",

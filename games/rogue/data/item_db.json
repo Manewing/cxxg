@@ -456,8 +456,27 @@
         {
           "type": "skill",
           "effect": "sweeping_strike_effect",
-          "mana_cost": 15,
+          "mana_cost": 25,
           "ap_cost": 20
+        }
+      ]
+    },
+    {
+      "name": "Scroll of smiting",
+      "description": "A scroll TODO",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "adjacent_use",
+          "effect": "smite_effect",
+          "mana_cost": 10
+        },
+        {
+          "type": "skill_adjacent",
+          "effect": "smite_effect",
+          "mana_cost": 10,
+          "ap_cost": 15
         }
       ]
     },
@@ -1275,6 +1294,13 @@
         {
           "type": "item",
           "name": "Scroll of striking",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of smiting",
           "min_count": 1,
           "max_count": 1,
           "weight": 5

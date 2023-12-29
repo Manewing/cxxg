@@ -18,6 +18,50 @@ namespace rogue::ui {
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
+bool EquipmentController::handleUseSkill(Controller &Ctrl, Level &Lvl,
+                                         entt::entity Entity,
+                                         const EquipmentSlot &ES) {
+  if (!ES.It) {
+    return true;
+  }
+  auto &Reg = Lvl.Reg;
+  const auto &It = *ES.It;
+  const auto ItType = ES.BaseTypeFilter;
+  if (It.getCapabilityFlags().isRanged(CapabilityFlags::Skill)) {
+    auto &PC = Reg.get<PositionComp>(Entity);
+    std::optional<unsigned> Range;
+    if (auto *LOSComp = Reg.try_get<LineOfSightComp>(Entity)) {
+      Range = LOSComp->LOSRange;
+    }
+    Ctrl.setTargetUI(PC.Pos, Range, Lvl,
+                     [&R = Reg, E = Entity, Hub = Ctrl.getEventHub(),
+                      ItType](auto TgEt, auto) -> void {
+                       InventoryHandler IH(E, R, CraftingHandler());
+                       IH.setEventHub(Hub);
+                       IH.tryUseSkillOnTarget(ItType, TgEt);
+                     });
+    return false;
+  }
+  if (It.getCapabilityFlags().isAdjacent(CapabilityFlags::Skill)) {
+    auto &PC = Reg.get<PositionComp>(Entity);
+    Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
+                     [&R = Reg, E = Entity, Hub = Ctrl.getEventHub(),
+                      ItType](auto TgEt, auto) -> void {
+                       InventoryHandler IH(E, R, CraftingHandler());
+                       IH.setEventHub(Hub);
+                       IH.tryUseSkillOnTarget(ItType, TgEt);
+                     });
+    return false;
+  }
+
+  InventoryHandler InvHandler(Entity, Reg, CraftingHandler());
+  if (InvHandler.tryUseSkill(ItType)) {
+    return false;
+  }
+
+  return true;
+}
+
 EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
                                          entt::entity Entity, Level &Lvl,
                                          cxxg::types::Position Pos)
@@ -50,41 +94,8 @@ bool EquipmentController::handleInput(int Char) {
   case Controls::Skill.Char: {
     auto SelIdx = ItSel->getSelectedIdx();
     auto *ES = Equip.all().at(SelIdx);
-    if (!ES->It) {
-      break;
-    }
-    const auto &It = *ES->It;
-    const auto ItType = ES->BaseTypeFilter;
-    if (It.getCapabilityFlags().isRanged(CapabilityFlags::Skill)) {
-      auto &PC = Reg.get<PositionComp>(Entity);
-      std::optional<unsigned> Range;
-      if (auto *LOSComp = Reg.try_get<LineOfSightComp>(Entity)) {
-        Range = LOSComp->LOSRange;
-      }
-      Ctrl.setTargetUI(PC.Pos, Range, Lvl,
-                       [&R = Reg, E = Entity, Hub = Ctrl.getEventHub(),
-                        ItType](auto TgEt, auto) -> void {
-                         InventoryHandler IH(E, R, CraftingHandler());
-                         IH.setEventHub(Hub);
-                         IH.tryUseSkillOnTarget(ItType, TgEt);
-                       });
-      return false;
-    }
-    if (It.getCapabilityFlags().isAdjacent(CapabilityFlags::Skill)) {
-      auto &PC = Reg.get<PositionComp>(Entity);
-      Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
-                       [&R = Reg, E = Entity, Hub = Ctrl.getEventHub(),
-                        ItType](auto TgEt, auto) -> void {
-                         InventoryHandler IH(E, R, CraftingHandler());
-                         IH.setEventHub(Hub);
-                         IH.tryUseSkillOnTarget(ItType, TgEt);
-                       });
-      return false;
-    }
-    if (InvHandler.tryUseSkill(ItType)) {
-      return false;
-    }
-  } break;
+    return handleUseSkill(Ctrl, Lvl, Entity, *ES);
+  }
   case Controls::Unequip.Char: {
     const auto SelIdx = ItSel->getSelectedIdx();
     const auto *ES = Equip.all().at(SelIdx);

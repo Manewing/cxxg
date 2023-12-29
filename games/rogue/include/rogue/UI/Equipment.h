@@ -20,6 +20,9 @@ namespace rogue::ui {
 
 class EquipmentController : public BaseRectDecorator {
 public:
+  static bool handleUseSkill(Controller &Ctrl, Level &Lvl,
+                             entt::entity Entity, const EquipmentSlot &ES);
+public:
   EquipmentController(Controller &Ctrl, Equipment &Equip, entt::entity Entity,
                       Level &Lvl, cxxg::types::Position Pos);
   bool handleInput(int Char) final;

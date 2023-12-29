@@ -5,6 +5,7 @@
 #include <rogue/Event.h>
 #include <rogue/EventHub.h>
 #include <rogue/ItemEffectImpl.h>
+#include <rogue/Systems/CombatSystem.h>
 #include <sstream>
 
 namespace rogue {
@@ -150,6 +151,29 @@ void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
 
   // Make sure effect will be rendered
   Reg.ctx().get<GameContext>().EvHub.publish(EffectDelayEvent{});
+}
+
+std::shared_ptr<ItemEffect> SmiteEffect::clone() const {
+  return std::make_shared<SmiteEffect>(*this);
+}
+
+std::string SmiteEffect::getName() const { return "Smite"; }
+
+std::string SmiteEffect::getDescription() const {
+  return "Smite a single target with 250% melee damage.";
+}
+
+bool SmiteEffect::canApplyTo(const entt::entity &SrcEt,
+                             const entt::entity &DstEt,
+                             entt::registry &Reg) const {
+  return Reg.all_of<MeleeAttackComp>(SrcEt) && Reg.all_of<HealthComp>(DstEt);
+}
+
+void SmiteEffect::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                          entt::registry &Reg) const {
+  EventHubConnector EHC;
+  EHC.setEventHub(&Reg.ctx().get<GameContext>().EvHub);
+  CombatSystem::handleMeleeAttack(Reg, SrcEt, DstEt, EHC, 2.5);
 }
 
 std::shared_ptr<ItemEffect> LearnRecipeEffect::clone() const {
