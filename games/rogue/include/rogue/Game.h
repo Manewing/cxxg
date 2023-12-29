@@ -29,6 +29,10 @@ struct CraftEvent;
 struct EntityAttackEvent;
 struct DetectTargetEvent;
 struct LostTargetEvent;
+struct EffectDelayEvent;
+struct BuffAppliedEvent;
+struct BuffExpiredEvent;
+struct BuffApplyEffectEvent;
 class Renderer;
 } // namespace rogue
 
@@ -40,6 +44,10 @@ public:
   void onEntityAttackEvent(const EntityAttackEvent &E);
   void onDetectTargetEvent(const DetectTargetEvent &E);
   void onLostTargetEvent(const LostTargetEvent &E);
+  void onEffectDelayEvent(const EffectDelayEvent &E);
+  void onBuffAppliedEvent(const BuffAppliedEvent &E);
+  void onBuffExpiredEvent(const BuffExpiredEvent &E);
+  void onBuffApplyEffectEvent(const BuffApplyEffectEvent &E);
   void apply(Renderer &R);
   void clear();
   bool hasEvents() const;

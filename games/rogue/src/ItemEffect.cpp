@@ -1,5 +1,8 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Context.h>
+#include <rogue/Event.h>
+#include <rogue/EventHub.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 #include <sstream>
@@ -160,6 +163,15 @@ std::string ApplyBuffItemEffectBase::getName() const {
 
 std::string ApplyBuffItemEffectBase::getDescription() const {
   return getBuff().getDescription();
+}
+
+void ApplyBuffItemEffectBase::publishBuffAppliedEvent(
+    const entt::entity &SrcEt, const entt::entity &DstEt, bool IsCombat,
+    entt::registry &Reg) const {
+  if (auto *Ctx = Reg.ctx().find<GameContext>()) {
+    Ctx->EvHub.publish(
+        BuffAppliedEvent{{}, SrcEt, DstEt, &Reg, IsCombat, &getBuff()});
+  }
 }
 
 } // namespace rogue

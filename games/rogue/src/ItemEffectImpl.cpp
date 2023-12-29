@@ -122,6 +122,9 @@ void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
   for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
     createTempDamage(Reg, DC, PC.Pos + Dir);
   }
+
+  // Make sure effect will be rendered
+  Reg.ctx().get<GameContext>().EvHub.publish(EffectDelayEvent{});
 }
 
 std::shared_ptr<ItemEffect> LearnRecipeEffect::clone() const {

@@ -13,6 +13,8 @@ class History;
 struct DebugMessageEvent;
 struct EntityAttackEvent;
 struct EntityDiedEvent;
+struct BuffAppliedEvent;
+struct BuffApplyEffectEvent;
 struct BuffExpiredEvent;
 struct PlayerInfoMessageEvent;
 struct WarningMessageEvent;
@@ -72,6 +74,8 @@ public:
 private:
   void onEntityAttackEvent(const EntityAttackEvent &EAE);
   void onEntityDiedEvent(const EntityDiedEvent &EDE);
+  void onBuffAppliedEvent(const BuffAppliedEvent &BAE);
+  void onBuffApplyEffectEvent(const BuffApplyEffectEvent &BAEE);
   void onBuffExpiredEvent(const BuffExpiredEvent &BEE);
   void onPlayerInfoMessageEvent(const PlayerInfoMessageEvent &PIME);
   void onWarningMessageEvent(const WarningMessageEvent &WarnEv);

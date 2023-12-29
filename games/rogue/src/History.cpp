@@ -44,6 +44,8 @@ void EventHistoryWriter::setEventHub(EventHub *Hub) {
   EventHubConnector::setEventHub(Hub);
   subscribe(*this, &EventHistoryWriter::onEntityAttackEvent);
   subscribe(*this, &EventHistoryWriter::onEntityDiedEvent);
+  subscribe(*this, &EventHistoryWriter::onBuffAppliedEvent);
+  subscribe(*this, &EventHistoryWriter::onBuffApplyEffectEvent);
   subscribe(*this, &EventHistoryWriter::onBuffExpiredEvent);
   subscribe(*this, &EventHistoryWriter::onPlayerInfoMessageEvent);
   subscribe(*this, &EventHistoryWriter::onWarningMessageEvent);
@@ -82,12 +84,56 @@ void EventHistoryWriter::onEntityDiedEvent(const EntityDiedEvent &EDE) {
   Hist.warn() << cxxg::types::Color::RED << "You died!";
 }
 
-void EventHistoryWriter::onBuffExpiredEvent(const BuffExpiredEvent &BEE) {
-  if (BEE.Entity == entt::null || !BEE.Buff) {
+void EventHistoryWriter::onBuffAppliedEvent(const BuffAppliedEvent &BAE) {
+  if ((!BAE.isPlayerAffected() && !Debug) || !BAE.Buff || !BAE.Registry) {
     return;
   }
-  Hist.info() << "Buff expired: " << cxxg::types::RgbColor{201, 198, 139}
-              << BEE.Buff->getName();
+  const auto *SrcNC = BAE.Registry->try_get<NameComp>(BAE.SrcEt);
+  const auto *TargetNC = BAE.Registry->try_get<NameComp>(BAE.TargetEt);
+  if (!SrcNC || !TargetNC) {
+    return;
+  }
+  cxxg::types::TermColor BuffColor = cxxg::types::Color::GREEN;
+  if (BAE.IsCombat) {
+    BuffColor = cxxg::types::Color::RED;
+  }
+  Hist.info() << cxxg::types::RgbColor{140, 130, 72} << SrcNC->Name
+              << cxxg::types::Color::NONE << " applied " << BuffColor
+              << BAE.Buff->getName() << cxxg::types::Color::NONE << " to "
+              << cxxg::types::RgbColor{140, 130, 72} << TargetNC->Name
+              << cxxg::types::Color::NONE;
+}
+
+void EventHistoryWriter::onBuffApplyEffectEvent(
+    const BuffApplyEffectEvent &BAEE) {
+  if ((!BAEE.isPlayerAffected() && !Debug) || !BAEE.Buff) {
+    return;
+  }
+  const auto *NC = BAEE.Registry->try_get<NameComp>(BAEE.Entity);
+  if (!NC) {
+    return;
+  }
+  cxxg::types::TermColor BuffColor = cxxg::types::Color::GREEN;
+  if (BAEE.IsReduce) {
+    BuffColor = cxxg::types::Color::RED;
+  }
+  Hist.info() << BuffColor << BAEE.Buff->getApplyDesc()
+              << cxxg::types::Color::NONE << " on "
+              << cxxg::types::RgbColor{140, 130, 72} << NC->Name;
+}
+
+void EventHistoryWriter::onBuffExpiredEvent(const BuffExpiredEvent &BEE) {
+  if ((!BEE.isPlayerAffected() && !Debug) || !BEE.Buff) {
+    return;
+  }
+  const auto *NC = BEE.Registry->try_get<NameComp>(BEE.Entity);
+  if (!NC) {
+    return;
+  }
+  Hist.info() << "Buff " << cxxg::types::RgbColor{201, 198, 139}
+              << BEE.Buff->getName() << cxxg::types::Color::NONE
+              << " expired on " << cxxg::types::RgbColor{140, 130, 72}
+              << NC->Name << cxxg::types::Color::NONE;
 }
 
 void EventHistoryWriter::onPlayerInfoMessageEvent(

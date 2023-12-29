@@ -235,6 +235,9 @@ public:
   virtual const BuffBase &getBuff() const = 0;
   std::string getName() const final;
   std::string getDescription() const final;
+  void publishBuffAppliedEvent(const entt::entity &SrcEt,
+                               const entt::entity &DstEt, bool IsCombat,
+                               entt::registry &Reg) const;
 };
 
 template <typename BuffType, bool IsCombat, typename... RequiredComps>
@@ -260,6 +263,7 @@ public:
     if constexpr (IsCombat) {
       markCombat(SrcEt, DstEt, Reg);
     }
+    publishBuffAppliedEvent(SrcEt, DstEt, IsCombat, Reg);
   }
 
   bool canRemoveFrom(const entt::entity &, const entt::entity &DstEt,

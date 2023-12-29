@@ -40,10 +40,7 @@ runDimRetValueGenBuff(System &Sys, entt::registry &Reg, bool Reduce) {
     // Post decrement to match count
     auto St = B.tick();
     if (St == TimedBuff::State::Expired) {
-      BuffExpiredEvent BEE;
-      BEE.Entity = Entity;
-      BEE.Buff = &B;
-      Sys.publish(BEE);
+      Sys.publish(BuffExpiredEvent{{}, Entity, &Reg, &B});
       Reg.erase<Buff>(Entity);
       return;
     }
@@ -51,7 +48,7 @@ runDimRetValueGenBuff(System &Sys, entt::registry &Reg, bool Reduce) {
       return;
     }
     // Reduce the given amount
-    Sys.publish(DebugMessageEvent() << B.getApplyDesc());
+    Sys.publish(BuffApplyEffectEvent{{}, Entity, &Reg, Reduce, &B});
     if (Reduce) {
       C.reduce(B.TickAmount);
     } else {
