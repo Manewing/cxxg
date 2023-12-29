@@ -706,14 +706,13 @@
         {
           "type": "equipment",
           "effect": "melee_10"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_melee_weapon_enhancements"
     },
     {
       "name": "Chain Mail",
@@ -728,14 +727,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_armor_enhancements"
     },
     {
       "name": "Plate Boots",
@@ -750,14 +748,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_armor_enhancements"
     },
     {
       "name": "Great Helm",
@@ -772,14 +769,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_armor_enhancements"
     },
     {
       "name": "Plate Greaves",
@@ -794,14 +790,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_armor_enhancements"
     },
     {
       "name": "Sword of the Slayer",
@@ -1270,6 +1265,33 @@
         }
       ]
     },
+    "rare_armor_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "item",
+          "name": "Great Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Armor Plating",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
+      ]
+    },
     "common_melee_weapon_enhancements": {
       "rolls": 2,
       "slots": [
@@ -1280,6 +1302,51 @@
         {
           "type": "item",
           "name": "Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Spider Venom Oil",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of striking",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of smiting",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
+      ]
+    },
+    "rare_melee_weapon_enhancements": {
+      "rolls": 3,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "null",
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Great Orb of Upgrade",
           "min_count": 1,
           "max_count": 1,
           "weight": 10
