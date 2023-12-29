@@ -47,44 +47,113 @@ TEST_F(ItemPrototypeTest, CanApply) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
-  EXPECT_FALSE(Proto.canApplyTo(Entity, Reg, rogue::CapabilityFlags::None))
+  EXPECT_FALSE(
+      Proto.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::None))
       << "Can't apply with no flags";
-  EXPECT_TRUE(Proto.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn))
+  EXPECT_TRUE(
+      Proto.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn))
       << "Can apply with matching flag";
-  EXPECT_FALSE(Proto.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment))
+  EXPECT_FALSE(
+      Proto.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment))
       << "Can't apply with non-matching flag";
+}
+
+TEST_F(ItemPrototypeTest, CanApplyCostHP) {
+  rogue::ItemPrototype Proto(1, "Name", "Description",
+                             rogue::ItemType::Consumable, 1,
+                             {{{rogue::CapabilityFlags::UseOn, 0, 0, 10},
+                               rogue::test::DummyItems::NullEffect}});
+  auto SrcEt = Reg.create();
+  EXPECT_FALSE(
+      Proto.canApplyTo(SrcEt, Entity, Reg, rogue::CapabilityFlags::UseOn))
+      << "Can't apply with no health component";
+  auto &HC = Reg.emplace<rogue::HealthComp>(SrcEt);
+  HC.Value = 5;
+  EXPECT_FALSE(
+      Proto.canApplyTo(SrcEt, Entity, Reg, rogue::CapabilityFlags::UseOn))
+      << "Can't apply with not enough HP";
+  HC.Value = 15;
+  EXPECT_TRUE(
+      Proto.canApplyTo(SrcEt, Entity, Reg, rogue::CapabilityFlags::UseOn))
+      << "Can apply with enough HP";
+}
+
+TEST_F(ItemPrototypeTest, CanApplyCostAP) {
+  rogue::ItemPrototype Proto(1, "Name", "Description",
+                             rogue::ItemType::Consumable, 1,
+                             {{{rogue::CapabilityFlags::UseOn, 10, 0, 0},
+                               rogue::test::DummyItems::NullEffect}});
+  auto SrcEt = Reg.create();
+  EXPECT_FALSE(
+      Proto.canApplyTo(SrcEt, Entity, Reg, rogue::CapabilityFlags::UseOn))
+      << "Can't apply with no agility component";
+  auto &AC = Reg.emplace<rogue::AgilityComp>(SrcEt);
+  AC.AP = 5;
+  EXPECT_TRUE(
+      Proto.getAttributes(rogue::CapabilityFlags::UseOn).checkCosts(SrcEt, Reg))
+      << "Can apply with enough AP";
+  EXPECT_TRUE(Proto.Effects.at(0).canApplyTo(SrcEt, Entity, Reg,
+                                             rogue::CapabilityFlags::UseOn))
+      << "Can apply with enough AP";
+  EXPECT_TRUE(
+      Proto.canApplyTo(SrcEt, Entity, Reg, rogue::CapabilityFlags::UseOn))
+      << "Can apply with not enough AP";
 }
 
 TEST_F(ItemPrototypeTest, Apply) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
-  EXPECT_THROW(Proto.applyTo(Entity, Reg, rogue::CapabilityFlags::None),
+  EXPECT_THROW(Proto.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::None),
                std::runtime_error)
       << "Can't apply with no flags";
-  EXPECT_NO_THROW(Proto.applyTo(Entity, Reg, rogue::CapabilityFlags::UseOn))
+  EXPECT_NO_THROW(
+      Proto.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn))
       << "Can apply with matching flag";
   try {
-    Proto.applyTo(Entity, Reg, rogue::CapabilityFlags::Equipment);
+    Proto.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
     FAIL() << "Can't apply with non-matching flag";
   } catch (const std::runtime_error &E) {
     EXPECT_EQ(
         E.what(),
         std::string("Can't apply item 'Name' to entity with flags Equipment "
-                    "(item flags: Use, item type: Consumable)"));
+                    "(item flags: Use, item type: Consumable, attrs: "
+                    "EffectAttributes{Flags: Use})"));
   }
+}
+
+TEST_F(ItemPrototypeTest, ApplyCost) {
+  rogue::ItemPrototype Proto(1, "Name", "Description",
+                             rogue::ItemType::Consumable, 1,
+                             {{{rogue::CapabilityFlags::UseOn, 10, 10, 10},
+                               rogue::test::DummyItems::NullEffect}});
+  auto SrcEt = Reg.create();
+  auto &AC = Reg.emplace<rogue::AgilityComp>(SrcEt);
+  AC.AP = 5;
+  auto &HC = Reg.emplace<rogue::HealthComp>(SrcEt);
+  HC.Value = 15;
+  auto &MC = Reg.emplace<rogue::ManaComp>(SrcEt);
+  MC.Value = 15;
+  EXPECT_NO_THROW(
+      Proto.applyTo(SrcEt, Entity, Reg, rogue::CapabilityFlags::UseOn))
+      << "Can apply with enough HP/MP/AP";
+  EXPECT_EQ(AC.AP, -5) << "AP not reduced by cost";
+  EXPECT_EQ(HC.Value, 5) << "HP reduced by cost";
+  EXPECT_EQ(MC.Value, 5) << "MP reduced by cost";
 }
 
 TEST_F(ItemPrototypeTest, CanRemove) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
-  EXPECT_FALSE(Proto.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::None))
-      << "Can't remove with no flags";
-  EXPECT_TRUE(Proto.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn))
-      << "Can remove with matching flag";
   EXPECT_FALSE(
-      Proto.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment))
+      Proto.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::None))
+      << "Can't remove with no flags";
+  EXPECT_TRUE(
+      Proto.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn))
+      << "Can remove with matching flag";
+  EXPECT_FALSE(Proto.canRemoveFrom(Entity, Entity, Reg,
+                                   rogue::CapabilityFlags::Equipment))
       << "Can't remove with non-matching flag";
 }
 
@@ -92,19 +161,22 @@ TEST_F(ItemPrototypeTest, Remove) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
-  EXPECT_THROW(Proto.removeFrom(Entity, Reg, rogue::CapabilityFlags::None),
-               std::runtime_error)
+  EXPECT_THROW(
+      Proto.removeFrom(Entity, Entity, Reg, rogue::CapabilityFlags::None),
+      std::runtime_error)
       << "Can't remove with no flags";
-  EXPECT_NO_THROW(Proto.removeFrom(Entity, Reg, rogue::CapabilityFlags::UseOn))
+  EXPECT_NO_THROW(
+      Proto.removeFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn))
       << "Can remove with matching flag";
   try {
-    Proto.removeFrom(Entity, Reg, rogue::CapabilityFlags::Equipment);
+    Proto.removeFrom(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
     FAIL() << "Can't remove with non-matching flag";
   } catch (const std::runtime_error &E) {
     EXPECT_EQ(
         E.what(),
         std::string("Can't remove item 'Name' from entity with flags Equipment "
-                    "(item flags: Use, item type: Consumable)"));
+                    "(item flags: Use, item type: Consumable, attrs: "
+                    "EffectAttributes{Flags: Use})"));
   }
 }
 

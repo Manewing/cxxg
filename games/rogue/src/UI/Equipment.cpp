@@ -65,7 +65,8 @@ std::string EquipmentController::getInteractMsg() const {
 
   if (ES->It) {
     Options.push_back(Controls::Info);
-    if (ES->It->canRemoveFrom(Entity, Reg, CapabilityFlags::UnequipFrom)) {
+    if (ES->It->canRemoveFrom(Entity, Entity, Reg,
+                              CapabilityFlags::UnequipFrom)) {
       Options.push_back(Controls::Unequip);
     }
   }

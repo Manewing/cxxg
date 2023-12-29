@@ -113,7 +113,7 @@ TEST(InventoryTest, ApplyItemToUseConsumable) {
   entt::registry Reg;
   entt::entity Entity = Reg.create();
   EXPECT_TRUE(rogue::Inventory::applyItemTo(It, rogue::CapabilityFlags::UseOn,
-                                            Entity, Reg));
+                                            Entity, Entity, Reg));
 }
 
 TEST(InventoryTest, ApplyItemToUseConsumableFromInv) {
@@ -121,7 +121,8 @@ TEST(InventoryTest, ApplyItemToUseConsumableFromInv) {
   Inv.addItem(rogue::Item(DummyConsumable, 4));
   entt::registry Reg;
   entt::entity Entity = Reg.create();
-  EXPECT_TRUE(Inv.applyItemTo(0, rogue::CapabilityFlags::UseOn, Entity, Reg));
+  EXPECT_TRUE(
+      Inv.applyItemTo(0, rogue::CapabilityFlags::UseOn, Entity, Entity, Reg));
 
   ASSERT_EQ(Inv.size(), 1);
   EXPECT_EQ(Inv.getItem(0).StackSize, 3);

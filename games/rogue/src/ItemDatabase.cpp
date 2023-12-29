@@ -244,6 +244,21 @@ static LootTable::LootSlot createLootNullSlot(const rapidjson::Value &V) {
   return LootTable::LootSlot{nullptr, Weight};
 }
 
+static EffectAttributes createEffectAttrs(const rapidjson::Value &V) {
+  EffectAttributes Attrs;
+  Attrs.Flags = CapabilityFlags::fromString(V["type"].GetString());
+  if (V.HasMember("ap_cost")) {
+    Attrs.APCost = V["ap_cost"].GetUint();
+  }
+  if (V.HasMember("mana_cost")) {
+    Attrs.ManaCost = V["mana_cost"].GetUint();
+  }
+  if (V.HasMember("health_cost")) {
+    Attrs.HealthCost = V["health_cost"].GetUint();
+  }
+  return Attrs;
+}
+
 static void fillLootTable(const ItemDatabase &DB, const rapidjson::Value &V,
                           LootTable &LootTb) {
   const auto NumRolls = V["rolls"].GetUint();
@@ -321,15 +336,12 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     std::vector<EffectInfo> EffectInfos;
     for (const auto &CapJson : ItemProtoJson["capabilities"].GetArray()) {
       const auto &CapInfo = CapJson.GetObject();
-      const auto Flags =
-          CapabilityFlags::fromString(CapInfo["type"].GetString());
+      const auto Attrs = createEffectAttrs(CapJson);
       const auto EffectName = std::string(CapInfo["effect"].GetString());
       const auto It = Effects.find(EffectName);
       if (It == Effects.end()) {
         throw std::out_of_range("Unknown item effect: " + EffectName);
       }
-      // FIXME parse the costs
-      EffectAttributes Attrs{Flags, 0, 0, 0};
       EffectInfos.push_back({Attrs, It->second});
     }
 
@@ -338,12 +350,9 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       Specialization = std::make_unique<ItemSpecializations>();
       for (const auto &SpecJson : ItemProtoJson["specializations"].GetArray()) {
         const auto &SpecInfo = SpecJson.GetObject();
-        const auto Flags =
-            CapabilityFlags::fromString(SpecInfo["type"].GetString());
+        const auto Attrs = createEffectAttrs(SpecJson);
         const auto Spec =
             Specializations.at(SpecInfo["specialization"].GetString());
-      // FIXME parse the costs
-      EffectAttributes Attrs{Flags, 0, 0, 0};
         Specialization->addSpecialization(Attrs, Spec);
       }
     }

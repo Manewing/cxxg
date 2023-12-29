@@ -13,11 +13,13 @@ public:
   /// Applies the item to the entity if possible
   /// @param It The item to apply
   /// @param Flags The capability flags used for applying
-  /// @param Entity The entity to apply the item to
+  /// @param SrcEt The entity that applies the item to
+  /// @param DstEt The entity to apply the item to
   /// @param Reg The registry the entity belongs to
   /// @return True if the item was applied, false otherwise
   static bool applyItemTo(const Item &It, CapabilityFlags Flags,
-                          entt::entity Entity, entt::registry &Reg);
+                          entt::entity SrcEt, entt::entity DstEt,
+                          entt::registry &Reg);
 
 public:
   Inventory() = default;
@@ -39,7 +41,8 @@ public:
   std::optional<std::size_t> getItemIndexForId(int Id) const;
 
   std::optional<Item> applyItemTo(std::size_t ItemIdx, CapabilityFlags Flags,
-                                  entt::entity Entity, entt::registry &Reg);
+                                  entt::entity SrcEt, entt::entity DstEt,
+                                  entt::registry &Reg);
 
   std::size_t size() const;
   bool empty() const;

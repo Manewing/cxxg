@@ -132,8 +132,8 @@ bool InventoryHandler::tryDismantleItem(std::size_t InvItemIdx) {
   if (!Inv) {
     return false;
   }
-  auto ItOrNone =
-      Inv->applyItemTo(InvItemIdx, CapabilityFlags::Dismantle, Entity, Reg);
+  auto ItOrNone = Inv->applyItemTo(InvItemIdx, CapabilityFlags::Dismantle,
+                                   Entity, Entity, Reg);
   if (ItOrNone) {
     // FIXME add information on result of dismantle
     if (IsPlayer) {
@@ -164,11 +164,12 @@ bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
     return false;
   }
 
-  auto ItOrNone =
-      Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, TargetEt, Reg);
+  auto ItOrNone = Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, Entity,
+                                   TargetEt, Reg);
   if (ItOrNone) {
     if (Entity != TargetEt) {
-      // FIXME check if it is actually an attack
+      // FIXME check if it is actually an attack, this could be handled
+      // in the item effect if we propagate the source entity to the effect
       Reg.get_or_emplace<CombatAttackComp>(Entity).Target = TargetEt;
       Reg.get_or_emplace<CombatTargetComp>(TargetEt).Attacker = Entity;
     }

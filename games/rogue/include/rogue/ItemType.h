@@ -2,10 +2,8 @@
 #define ROGUE_ITEM_TYPE_H
 
 #include <iosfwd>
-#include <memory>
 #include <optional>
 #include <rogue/BitOps.h>
-#include <rogue/Types.h>
 #include <string>
 #include <ymir/Enum.hpp>
 
@@ -133,31 +131,6 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &Out, const CapabilityFlags &Flags);
-
-class ItemEffect;
-
-/// Attributes to attach to an effect, determines how the effect is applied
-struct EffectAttributes {
-  /// Flags determining how the effect is applied
-  CapabilityFlags Flags = CapabilityFlags::None;
-
-  /// Action point cost to use the effect, if non-zero
-  StatValue APCost = 0;
-
-  /// Mana cost to use the effect, if non-zero
-  StatValue ManaCost = 0;
-
-  /// Health cost to use the effect, if non-zero
-  StatValue HealthCost = 0;
-
-  /// Computes new costs from the combination of this and other attributes
-  void updateCostsFrom(const EffectAttributes &Other);
-};
-
-struct EffectInfo {
-  EffectAttributes Attributes;
-  std::shared_ptr<ItemEffect> Effect;
-};
 
 } // namespace rogue
 

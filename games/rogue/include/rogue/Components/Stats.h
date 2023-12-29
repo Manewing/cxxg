@@ -112,8 +112,12 @@ struct AgilityComp {
     if (!hasEnoughAP(APAmount)) {
       return false;
     }
-    AP -= APAmount;
+    spendAP(APAmount);
     return true;
+  }
+
+  void spendAP(StatValue APAmount) {
+    AP -= APAmount;
   }
 };
 

@@ -384,7 +384,8 @@
       "capabilities": [
         {
           "type": "ranged_use",
-          "effect": "damage_effect_10"
+          "effect": "damage_effect_10",
+          "health_cost": 10
         }
       ]
     },
@@ -396,7 +397,8 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "sweeping_strike_effect"
+          "effect": "sweeping_strike_effect",
+          "mana_cost": 10
         }
       ]
     },
@@ -408,7 +410,8 @@
       "capabilities": [
         {
           "type": "ranged_use",
-          "effect": "blinded_debuff_comp"
+          "effect": "blinded_debuff_comp",
+          "mana_cost": 10
         }
       ]
     },
@@ -420,7 +423,10 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "mind_vision_buff_comp"
+          "effect": "mind_vision_buff_comp",
+          "mana_cost": 10,
+          "health_cost": 10,
+          "ap_cost": 20
         }
       ]
     },
@@ -432,7 +438,8 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "invisibility_buff_comp"
+          "effect": "invisibility_buff_comp",
+          "mana_cost": 10
         }
       ]
     },

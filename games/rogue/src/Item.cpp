@@ -113,49 +113,63 @@ bool Item::isSameKind(const Item &Other) const {
   return Proto == Other.Proto && Specialization == Other.Specialization;
 }
 
-bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
-                      CapabilityFlags Flags) const {
+bool Item::canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                      entt::registry &Reg, CapabilityFlags Flags) const {
   if (Specialization && SpecOverrides) {
-    return Specialization->canApplyTo(Entity, Reg, Flags);
+    return Specialization->canApplyTo(SrcEt, DstEt, Reg, Flags);
   }
-  bool SpecCanUseOn =
-      Specialization && Specialization->canApplyTo(Entity, Reg, Flags);
-  return getProto().canApplyTo(Entity, Reg, Flags) || SpecCanUseOn;
+
+  // Compute overall attributes to check overall costs
+  bool SpecCanUseOn = false;
+  auto Attrs = getProto().getAttributes(Flags);
+  if (Specialization) {
+    SpecCanUseOn = Specialization->canApplyTo(SrcEt, DstEt, Reg, Flags);
+    if (SpecCanUseOn) {
+      Attrs.addFrom(Specialization->getAttributes(Flags));
+    }
+  }
+  if (!Attrs.checkCosts(SrcEt, Reg)) {
+    return false;
+  }
+
+  return getProto().canApplyTo(SrcEt, DstEt, Reg, Flags) || SpecCanUseOn;
 }
 
-void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
-                   CapabilityFlags Flags) const {
-  if (Specialization && Specialization->canApplyTo(Entity, Reg, Flags)) {
-    Specialization->applyTo(Entity, Reg, Flags);
+void Item::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                   entt::registry &Reg, CapabilityFlags Flags) const {
+  if (Specialization && Specialization->canApplyTo(SrcEt, DstEt, Reg, Flags)) {
+    Specialization->applyTo(SrcEt, DstEt, Reg, Flags);
     if (SpecOverrides) {
       return;
     }
   }
-  if (getProto().canApplyTo(Entity, Reg, Flags)) {
-    getProto().applyTo(Entity, Reg, Flags);
+  if (getProto().canApplyTo(SrcEt, DstEt, Reg, Flags)) {
+    getProto().applyTo(SrcEt, DstEt, Reg, Flags);
   }
 }
 
-bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
-                         CapabilityFlags Flags) const {
+bool Item::canRemoveFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                         entt::registry &Reg, CapabilityFlags Flags) const {
   if (Specialization && SpecOverrides) {
-    return Specialization->canRemoveFrom(Entity, Reg, Flags);
+    return Specialization->canRemoveFrom(SrcEt, DstEt, Reg, Flags);
   }
   bool SpecCanUnequipFrom =
-      Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags);
-  return getProto().canRemoveFrom(Entity, Reg, Flags) || SpecCanUnequipFrom;
+      Specialization && Specialization->canRemoveFrom(SrcEt, DstEt, Reg, Flags);
+  return getProto().canRemoveFrom(SrcEt, DstEt, Reg, Flags) ||
+         SpecCanUnequipFrom;
 }
 
-void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,
-                      CapabilityFlags Flags) const {
-  if (Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags)) {
-    Specialization->removeFrom(Entity, Reg, Flags);
+void Item::removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                      entt::registry &Reg, CapabilityFlags Flags) const {
+  if (Specialization &&
+      Specialization->canRemoveFrom(SrcEt, DstEt, Reg, Flags)) {
+    Specialization->removeFrom(SrcEt, DstEt, Reg, Flags);
     if (SpecOverrides) {
       return;
     }
   }
-  if (getProto().canRemoveFrom(Entity, Reg, Flags)) {
-    getProto().removeFrom(Entity, Reg, Flags);
+  if (getProto().canRemoveFrom(SrcEt, DstEt, Reg, Flags)) {
+    getProto().removeFrom(SrcEt, DstEt, Reg, Flags);
   }
 }
 

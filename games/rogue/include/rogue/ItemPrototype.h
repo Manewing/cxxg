@@ -3,6 +3,7 @@
 
 #include <entt/entt.hpp>
 #include <memory>
+#include <rogue/EffectInfo.h>
 #include <rogue/ItemType.h>
 #include <vector>
 
@@ -25,17 +26,19 @@ public:
                 ItemType Type, int MaxStackSize,
                 std::vector<EffectInfo> Effects);
 
+  EffectAttributes getAttributes() const;
+  EffectAttributes getAttributes(CapabilityFlags Flags) const;
   CapabilityFlags getCapabilityFlags() const;
   bool checkCapabilityFlags(CapabilityFlags Flags) const;
 
-  bool canApplyTo(const entt::entity &Entity, entt::registry &Reg,
-                  CapabilityFlags Flags) const;
-  void applyTo(const entt::entity &Entity, entt::registry &Reg,
-               CapabilityFlags Flags) const;
-  bool canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
-                     CapabilityFlags Flags) const;
-  void removeFrom(const entt::entity &Entity, entt::registry &Reg,
-                  CapabilityFlags Flags) const;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg, CapabilityFlags Flags) const;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg, CapabilityFlags Flags) const;
+  bool canRemoveFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                     entt::registry &Reg, CapabilityFlags Flags) const;
+  void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg, CapabilityFlags Flags) const;
 
 public:
   int ItemId;

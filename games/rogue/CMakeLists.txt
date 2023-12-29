@@ -20,6 +20,7 @@ set(HEADER_FILES
   include/rogue/Event.h
   include/rogue/EventHub.h
   include/rogue/Game.h
+  include/rogue/EffectInfo.h
   include/rogue/GameWorld.h
   include/rogue/History.h
   include/rogue/Inventory.h
@@ -87,6 +88,7 @@ set(SOURCE_FILES
   src/Components/Visual.cpp
   src/CraftingDatabase.cpp
   src/CraftingHandler.cpp
+  src/EffectInfo.cpp
   src/EntityAssemblers.cpp
   src/EntityDatabase.cpp
   src/Equipment.cpp

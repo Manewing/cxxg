@@ -65,18 +65,37 @@ cxxg::types::TermColor getColorForItem(const Item &It) {
 std::string getCapabilityDescription(const ItemType &ItType,
                                      const std::vector<EffectInfo> &AllEffects,
                                      CapabilityFlags Flag) {
-  std::stringstream SS;
-  SS << Flag << ":\n";
+
   bool HasAny = false;
+  EffectAttributes Attrs;
   for (const auto &EffInfo : AllEffects) {
     if ((EffInfo.Attributes.Flags & Flag) != Flag) {
       continue;
     }
     HasAny = true;
-    SS << "- " << EffInfo.Effect->getDescription() << "\n";
+    Attrs.addFrom(EffInfo.Attributes);
   }
   if (!HasAny) {
     return "";
+  }
+
+  std::stringstream SS;
+  SS << Flag << ":";
+  if (Attrs.APCost > 0) {
+    SS << " " << Attrs.APCost << "AP";
+  }
+  if (Attrs.ManaCost > 0) {
+    SS << " " << Attrs.ManaCost << "MP";
+  }
+  if (Attrs.HealthCost > 0) {
+    SS << " " << Attrs.HealthCost << "HP";
+  }
+  SS << "\n";
+  for (const auto &EffInfo : AllEffects) {
+    if ((EffInfo.Attributes.Flags & Flag) != Flag) {
+      continue;
+    }
+    SS << "- " << EffInfo.Effect->getDescription() << "\n";
   }
   if (!ItemPrototype::canApply(ItType, Flag)) {
     return "Crafting only: " + SS.str();
