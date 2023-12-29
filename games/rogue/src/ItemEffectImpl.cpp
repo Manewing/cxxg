@@ -18,8 +18,8 @@ std::string SetMeleeCompEffect::getName() const { return "Melee Attack"; }
 
 namespace {
 
-std::string getDmgDescription(StatValue Phys, StatValue Magic,
-                              const std::string &Type) {
+std::string getDmgDescription(StatValue Phys, StatValue Magic, StatValue APCost,
+                              StatValue ManaCost, const std::string &Type) {
   if (Phys == 0 && Magic == 0) {
     return "no dmg.";
   }
@@ -36,13 +36,20 @@ std::string getDmgDescription(StatValue Phys, StatValue Magic,
     Pred = " ";
   }
   SS << " dmg.";
+  if (APCost > 0) {
+    SS << " " << APCost << "AP";
+  }
+  if (ManaCost > 0) {
+    SS << " " << ManaCost << "MP";
+  }
   return SS.str();
 }
 
 } // namespace
 
 std::string SetMeleeCompEffect::getDescription() const {
-  return getDmgDescription(Comp.PhysDamage, Comp.MagicDamage, "melee");
+  return getDmgDescription(Comp.PhysDamage, Comp.MagicDamage, Comp.APCost,
+                           Comp.ManaCost, "melee");
 }
 
 std::shared_ptr<ItemEffect> SetRangedCompEffect::clone() const {
@@ -52,7 +59,8 @@ std::shared_ptr<ItemEffect> SetRangedCompEffect::clone() const {
 std::string SetRangedCompEffect::getName() const { return "Ranged Attack"; }
 
 std::string SetRangedCompEffect::getDescription() const {
-  return getDmgDescription(Comp.PhysDamage, Comp.MagicDamage, "ranged");
+  return getDmgDescription(Comp.PhysDamage, Comp.MagicDamage, Comp.APCost,
+                           Comp.ManaCost, "ranged");
 }
 
 std::shared_ptr<ItemEffect> RemovePoisonEffect::clone() const {
