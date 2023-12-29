@@ -12,46 +12,33 @@ Item::Item(const ItemPrototype &Proto, int StackSize,
 
 namespace {
 
-// FIXME Move this to UI/Item
-std::string getQualifierName(const StatPoints &P) {
-  std::string Prefix = "+" + std::to_string(P.sum()) + " ";
-  if (P.Str == P.Dex && P.Str == P.Int && P.Str == P.Vit) {
-    return Prefix + "Bal. ";
+std::string getQualifierNameForHash(std::size_t Hash) {
+  static constexpr std::array Runes = {"f", "u", "t", "o", "r", "k", "o",
+                                       "n", "i", "s", "x", "v", "y", "z"};
+  std::string Name;
+  Name.reserve(6);
+  for (std::size_t I = 0; I < 5; ++I) {
+    Name += Runes[Hash % Runes.size()];
+    Hash /= Runes.size();
   }
-  if (P.Str >= P.Dex && P.Str >= P.Int && P.Str >= P.Vit) {
-    return Prefix + "Str. ";
-  }
-  if (P.Dex >= P.Str && P.Dex >= P.Int && P.Dex >= P.Vit) {
-    return Prefix + "Fast ";
-  }
-  if (P.Int >= P.Str && P.Int >= P.Dex && P.Int >= P.Vit) {
-    return Prefix + "Wise ";
-  }
-  if (P.Vit >= P.Str && P.Vit >= P.Dex && P.Vit >= P.Int) {
-    return Prefix + "Tgh. ";
-  }
-  return Prefix;
+  Name[0] = std::toupper(Name[0]);
+  Name += ' ';
+  return Name;
 }
 
-std::string getQualifierName(const Item &It) {
+std::string getQualifierNameForItem(const Item &It) {
   // Check for stats buff effect and return name based strongest
   // stat point boost
+  std::size_t Hash = 0;
   for (const auto &ItEff : It.getAllEffects()) {
-    if ((ItEff.Attributes.Flags & CapabilityFlags::Equipment) ==
-        CapabilityFlags::None) {
+    if (!(ItEff.Attributes.Flags &
+          (CapabilityFlags::Equipment | CapabilityFlags::Skill))) {
       continue;
     }
-    const auto *StatEff =
-        dynamic_cast<const ApplyBuffItemEffectBase *>(ItEff.Effect.get());
-    if (!StatEff) {
-      continue;
-    }
-    const auto *StatBuff =
-        dynamic_cast<const StatsBuffComp *>(&StatEff->getBuff());
-    if (!StatBuff) {
-      continue;
-    }
-    return getQualifierName(StatBuff->Bonus);
+    Hash ^= std::hash<std::string>{}(ItEff.Effect->getDescription());
+  }
+  if (Hash != 0) {
+    return getQualifierNameForHash(Hash);
   }
   return "";
 }
@@ -60,9 +47,11 @@ std::string getQualifierName(const Item &It) {
 
 int Item::getId() const { return getProto().ItemId; }
 
-std::string Item::getName() const {
+const std::string &Item::getName() const { return getProto().Name; }
+
+std::string Item::getQualifierName() const {
   if (getType() & ItemType::EquipmentMask) {
-    return getQualifierName(*this) + getProto().Name;
+    return getQualifierNameForItem(*this) + getProto().Name;
   }
   return getProto().Name;
 }

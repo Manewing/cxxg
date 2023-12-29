@@ -74,9 +74,9 @@ void InventoryControllerBase::updateElements() const {
   for (const auto &Item : Inv.getItems()) {
     std::stringstream SS;
     if (Item.getMaxStackSize() == 1 || Inv.getMaxStackSize() == 1) {
-      SS << "     " << Item.getName();
+      SS << "     " << Item.getQualifierName();
     } else {
-      SS << std::setw(3) << Item.StackSize << "x " << Item.getName();
+      SS << std::setw(3) << Item.StackSize << "x " << Item.getQualifierName();
     }
     Elements.push_back({SS.str(), getColorForItem(Item)});
   }

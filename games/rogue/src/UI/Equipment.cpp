@@ -138,7 +138,7 @@ namespace {
 
 std::string getSelectValue(const EquipmentSlot &ES, int Idx) {
   if (ES.It) {
-    return "[" + std::to_string(Idx) + "] " + ES.It->getName();
+    return "[" + std::to_string(Idx) + "] " + ES.It->getQualifierName();
   }
   return "[" + std::to_string(Idx) + "] ---";
 }

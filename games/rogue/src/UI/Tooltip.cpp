@@ -27,7 +27,7 @@ bool Tooltip::handleInput(int Char) {
 ItemTooltip::ItemTooltip(cxxg::types::Position Pos, cxxg::types::Size Size,
                          const Item &It, bool Equipped)
     : Tooltip(Pos, Size, getItemText(It),
-              (Equipped ? "Equip: " : "") + It.getName()) {
+              (Equipped ? "Equip: " : "") + It.getQualifierName()) {
   static_cast<Frame *>(Comp.get())->setHeaderColor(getColorForItem(It));
 }
 

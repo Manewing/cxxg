@@ -23,7 +23,8 @@ public:
   virtual ~Item() = default;
 
   int getId() const;
-  std::string getName() const;
+  const std::string &getName() const;
+  std::string getQualifierName() const;
   std::string getDescription() const;
   ItemType getType() const;
   int getMaxStackSize() const;
