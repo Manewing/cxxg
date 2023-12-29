@@ -29,7 +29,7 @@ public:
   std::string getInteractMsg() const final;
 
 private:
-	const CraftingRecipe &getSelectedRecipe() const;
+  const CraftingRecipe &getSelectedRecipe() const;
   void handleCreateTooltip();
   void handleCraft();
   void updateElements() const;

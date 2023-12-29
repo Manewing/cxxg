@@ -24,7 +24,7 @@ using BlockBuffEffect = ApplyBuffItemEffect<BlockBuffComp, false, HealthComp>;
 using HealthRegenBuffEffect =
     ApplyBuffItemEffect<HealthRegenBuffComp, false, HealthComp>;
 
-using ManaRegenBuffEffect  =
+using ManaRegenBuffEffect =
     ApplyBuffItemEffect<ManaRegenBuffComp, false, ManaComp>;
 
 using BlindedDebuffEffect =

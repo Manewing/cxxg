@@ -2,8 +2,8 @@
 #define ROGUE_CRAFTING_DATABASE_H
 
 #include <filesystem>
-#include <vector>
 #include <map>
+#include <vector>
 
 namespace rogue {
 class ItemDatabase;

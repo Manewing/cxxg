@@ -38,7 +38,7 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              const auto HealthValue = V["health_value"].GetDouble();
              return std::make_shared<HealItemEffect>(HealthValue);
            }},
-           {"mana_item_effect",
+          {"mana_item_effect",
            [](const auto &, const auto &V) {
              const auto ManaValue = V["mana_value"].GetDouble();
              return std::make_shared<ManaItemEffect>(ManaValue);

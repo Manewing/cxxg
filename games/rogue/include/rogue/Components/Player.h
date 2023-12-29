@@ -4,9 +4,9 @@
 #include <entt/entt.hpp>
 #include <functional>
 #include <optional>
+#include <rogue/CraftingDatabase.h>
 #include <string>
 #include <ymir/Types.hpp>
-#include <rogue/CraftingDatabase.h>
 
 namespace rogue {
 class EventHubConnector;

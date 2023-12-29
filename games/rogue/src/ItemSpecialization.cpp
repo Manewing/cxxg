@@ -1,8 +1,8 @@
 #include <rogue/Components/Buffs.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/ItemEffectImpl.h>
 #include <rogue/ItemPrototype.h>
 #include <rogue/ItemSpecialization.h>
-#include <rogue/ItemEffectImpl.h>
 
 namespace rogue {
 

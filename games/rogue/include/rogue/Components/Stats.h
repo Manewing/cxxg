@@ -116,9 +116,7 @@ struct AgilityComp {
     return true;
   }
 
-  void spendAP(StatValue APAmount) {
-    AP -= APAmount;
-  }
+  void spendAP(StatValue APAmount) { AP -= APAmount; }
 };
 
 } // namespace rogue

@@ -4,6 +4,7 @@
 #include <rogue/UI/Buffs.h>
 #include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controller.h>
+#include <rogue/UI/Crafting.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/History.h>
 #include <rogue/UI/Interact.h>
@@ -11,7 +12,6 @@
 #include <rogue/UI/Menu.h>
 #include <rogue/UI/Stats.h>
 #include <rogue/UI/TargetUI.h>
-#include <rogue/UI/Crafting.h>
 
 // FIXME get rid of dep
 #include <rogue/Components/Items.h>
@@ -109,8 +109,8 @@ void Controller::handleInput(int Char) {
   WdwContainer.handleInput(Char);
 }
 
-void Controller::addWindow(std::shared_ptr<Widget> Wdw,
-                           bool AutoLayoutWindows, bool CenterWindow) {
+void Controller::addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows,
+                           bool CenterWindow) {
   WdwContainer.addWindow(Wdw);
   if (AutoLayoutWindows) {
     WdwContainer.autoLayoutWindows();

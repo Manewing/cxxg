@@ -1,3 +1,4 @@
+#include <rogue/Components/Player.h>
 #include <rogue/CraftingDatabase.h>
 #include <rogue/CraftingHandler.h>
 #include <rogue/Event.h>
@@ -8,7 +9,6 @@
 #include <rogue/UI/Frame.h>
 #include <rogue/UI/ListSelect.h>
 #include <rogue/UI/Tooltip.h>
-#include <rogue/Components/Player.h>
 
 namespace rogue::ui {
 

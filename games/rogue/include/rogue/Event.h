@@ -9,7 +9,7 @@
 namespace rogue {
 struct BuffBase;
 struct DiminishingReturnsValueGenBuff;
-}
+} // namespace rogue
 
 namespace rogue {
 
