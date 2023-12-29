@@ -78,6 +78,31 @@ std::string RemovePoisonDebuffEffect::getDescription() const {
   return "Removes poison debuff";
 }
 
+ManaItemEffect::ManaItemEffect(StatValue Amount) : Amount(Amount) {}
+
+std::shared_ptr<ItemEffect> ManaItemEffect::clone() const {
+  return std::make_shared<ManaItemEffect>(*this);
+}
+
+std::string ManaItemEffect::getName() const { return "Mana"; }
+
+std::string ManaItemEffect::getDescription() const {
+  std::stringstream SS;
+  SS << "Restores " << Amount << " mana.";
+  return SS.str();
+}
+
+bool ManaItemEffect::canApplyTo(const entt::entity &, const entt::entity &DstEt,
+                                entt::registry &Reg) const {
+  return Reg.all_of<ManaComp>(DstEt);
+}
+
+void ManaItemEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
+                             entt::registry &Reg) const {
+  auto &MC = Reg.get<ManaComp>(DstEt);
+  MC.restore(Amount);
+}
+
 std::shared_ptr<ItemEffect> SweepingStrikeEffect::clone() const {
   return std::make_shared<SweepingStrikeEffect>(*this);
 }

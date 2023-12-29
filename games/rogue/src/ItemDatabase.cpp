@@ -38,6 +38,11 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              const auto HealthValue = V["health_value"].GetDouble();
              return std::make_shared<HealItemEffect>(HealthValue);
            }},
+           {"mana_item_effect",
+           [](const auto &, const auto &V) {
+             const auto ManaValue = V["mana_value"].GetDouble();
+             return std::make_shared<ManaItemEffect>(ManaValue);
+           }},
           {"damage_item_effect",
            [](const auto &, const auto &V) {
              const auto DamageValue = V["damage_value"].GetDouble();
@@ -54,6 +59,12 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              HealthRegenBuffComp Buff;
              parseRegenerationBuff(V["buff"], Buff);
              return std::make_shared<HealthRegenBuffEffect>(Buff);
+           }},
+          {"mana_regen_buff_comp",
+           [](const auto &, const auto &V) {
+             ManaRegenBuffComp Buff;
+             parseRegenerationBuff(V["buff"], Buff);
+             return std::make_shared<ManaRegenBuffEffect>(Buff);
            }},
           {"bleeding_debuff_comp",
            [](const auto &, const auto &V) {

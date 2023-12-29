@@ -24,6 +24,9 @@ using BlockBuffEffect = ApplyBuffItemEffect<BlockBuffComp, false, HealthComp>;
 using HealthRegenBuffEffect =
     ApplyBuffItemEffect<HealthRegenBuffComp, false, HealthComp>;
 
+using ManaRegenBuffEffect  =
+    ApplyBuffItemEffect<ManaRegenBuffComp, false, ManaComp>;
+
 using BlindedDebuffEffect =
     ApplyBuffItemEffect<BlindedDebuffComp, true, LineOfSightComp>;
 
@@ -83,6 +86,21 @@ public:
 };
 
 // Combat
+
+class ManaItemEffect : public ItemEffect {
+public:
+  explicit ManaItemEffect(StatValue Amount);
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &Et, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+
+private:
+  StatValue Amount;
+};
 
 class SweepingStrikeEffect : public ItemEffect {
 public:

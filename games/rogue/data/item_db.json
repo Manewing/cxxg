@@ -4,6 +4,10 @@
       "type": "health_item_effect",
       "health_value": 5
     },
+    "minor_mana_effect": {
+      "type": "mana_item_effect",
+      "mana_value": 5
+    },
     "damage_effect_10": {
       "type": "damage_item_effect",
       "damage_value": 10
@@ -26,6 +30,14 @@
     },
     "minor_quick_health_regen_effect": {
       "type": "health_regen_buff_comp",
+      "buff": {
+        "regen_amount": 1.0,
+        "ticks": 8,
+        "tick_period": 10
+      }
+    },
+    "minor_quick_mana_regen_effect": {
+      "type": "mana_regen_buff_comp",
       "buff": {
         "regen_amount": 1.0,
         "ticks": 8,
@@ -220,6 +232,22 @@
         {
           "type": "use_on",
           "effect": "minor_health_effect"
+        }
+      ]
+    },
+    {
+      "name": "Dragon Fruit",
+      "description": "Fruit of the dragon, it has a unique restorative power.",
+      "max_stack_size": 99,
+      "types": ["crafting", "consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "minor_quick_mana_regen_effect"
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_mana_effect"
         }
       ]
     },
@@ -1254,6 +1282,13 @@
         {
           "type": "item",
           "name": "Blueberry",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Dragon Fruit",
           "min_count": 1,
           "max_count": 2,
           "weight": 30
