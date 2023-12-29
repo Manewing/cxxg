@@ -124,6 +124,12 @@ public:
     return Value != Other.Value;
   }
 
+  /// Checks if both adjacent and \p Other flags are set
+  bool isAdjacent(CapabilityFlags Other) const;
+
+  /// Checks if both ranged and \p Other flags are set
+  bool isRanged(CapabilityFlags Other) const;
+
   bool operator==(ValueType Other) const { return Value == Other; }
   bool operator!=(ValueType Other) const { return Value != Other; }
 

@@ -190,7 +190,7 @@ bool Game::handleInput(int Char) {
       UICtrl.closeEquipmentUI();
       handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
     } else {
-      UICtrl.setEquipmentUI(getPlayerOrNull(), getLvlReg());
+      UICtrl.setEquipmentUI(getPlayerOrNull(), World->getCurrentLevelOrFail());
     }
     return true;
   }

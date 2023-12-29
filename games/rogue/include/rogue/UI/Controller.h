@@ -68,7 +68,7 @@ public:
   bool hasCommandLineUI() const;
   void closeCommandLineUI();
 
-  void setEquipmentUI(entt::entity Entity, entt::registry &Reg);
+  void setEquipmentUI(entt::entity Entity, Level &Lvl);
   bool hasEquipmentUI() const;
   void closeEquipmentUI();
 

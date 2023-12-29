@@ -100,7 +100,8 @@ bool InventoryController::handleInput(int Char) {
     InvHandler.tryEquipItem(ItemIdx);
   } break;
   case Controls::Use.Char: {
-    if (Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Ranged) {
+    if (Inv.getItem(ItemIdx).getCapabilityFlags().isRanged(
+            CapabilityFlags::UseOn)) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
       std::optional<unsigned> Range;
       if (auto *LOSComp = Lvl.Reg.try_get<LineOfSightComp>(Entity)) {
@@ -115,7 +116,8 @@ bool InventoryController::handleInput(int Char) {
                        });
       return false;
     }
-    if (Inv.getItem(ItemIdx).getCapabilityFlags() & CapabilityFlags::Adjacent) {
+    if (Inv.getItem(ItemIdx).getCapabilityFlags().isAdjacent(
+            CapabilityFlags::UseOn)) {
       auto &PC = Lvl.Reg.get<PositionComp>(Entity);
       Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
                        [&R = Lvl.Reg, E = Entity, Hub = Ctrl.getEventHub(),

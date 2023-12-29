@@ -52,6 +52,12 @@ public:
   /// @return True if the item was used, false otherwise
   bool tryUseItemOnTarget(std::size_t InvItemIdx, entt::entity TargetEt);
 
+  /// Try using skill of item from equipment
+  bool tryUseSkill(ItemType SlotType);
+
+  /// Try using skill of item from equipment on target entity
+  bool tryUseSkillOnTarget(ItemType SlotType, entt::entity TargetEt);
+
   /// Auto equip items from inventory
   void autoEquipItems();
 

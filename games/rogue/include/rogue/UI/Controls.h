@@ -66,6 +66,8 @@ struct Controls {
                                          "Store one item of selected stack"};
   static constexpr KeyOption Use = {
       'u', "Use", "Use the selected item, only works for consumables."};
+  static constexpr KeyOption Skill = {
+      's', "Skill", "Uses the skill of the selected item."};
   static constexpr KeyOption SelectTarget = {' ', "Sel.",
                                              "Select the current target"};
   static constexpr KeyOption Craft = {'x', "Craft",

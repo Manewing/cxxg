@@ -10,6 +10,7 @@
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
 #include <rogue/InventoryHandler.h>
+#include <rogue/ItemEffect.h>
 
 namespace rogue {
 
@@ -183,6 +184,55 @@ bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
   }
 
   return false;
+}
+
+bool InventoryHandler::tryUseSkill(ItemType SlotType) {
+  return tryUseSkillOnTarget(SlotType, Entity);
+}
+
+bool InventoryHandler::tryUseSkillOnTarget(ItemType SlotType,
+                                           entt::entity TargetEt) {
+  // Nothing can be used if there is no equipment
+  if (!Equip || !Reg.valid(TargetEt)) {
+    return false;
+  }
+
+  const auto &Slot = Equip->getSlot(SlotType);
+  if (!Slot.It) {
+    return false;
+  }
+  const auto &It = *Slot.It;
+
+  if (!It.canApplyTo(Entity, TargetEt, Reg, CapabilityFlags::Skill)) {
+    if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
+      std::stringstream SS;
+      SS << "Can not use skill ";
+      for (const auto &Info : It.getAllEffects()) {
+        if (Info.Attributes.Flags & CapabilityFlags::Skill) {
+          SS << Info.Effect->getName() << " ";
+        }
+      }
+      SS << "of " << It.getName() << " on " << getNameOrNone(Reg, TargetEt);
+      publish(PlayerInfoMessageEvent() << SS.str());
+    }
+    return false;
+  }
+
+  It.applyTo(Entity, TargetEt, Reg, CapabilityFlags::Skill);
+
+  if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
+    std::stringstream SS;
+    SS << "Used skill ";
+    for (const auto &Info : It.getAllEffects()) {
+      if (Info.Attributes.Flags & CapabilityFlags::Skill) {
+        SS << Info.Effect->getName() << " ";
+      }
+    }
+    SS << "of " << It.getName() << " on " << getNameOrNone(Reg, TargetEt);
+    publish(PlayerInfoMessageEvent() << SS.str());
+  }
+
+  return true;
 }
 
 void InventoryHandler::autoEquipItems() {

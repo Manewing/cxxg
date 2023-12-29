@@ -101,6 +101,7 @@ std::ostream &operator<<(std::ostream &Out, const ItemType &Type) {
   Out << Type.str();
   return Out;
 }
+
 std::optional<CapabilityFlags>
 CapabilityFlags::parseString(const std::string &Str) {
   if (Str == "use_on") {
@@ -138,6 +139,7 @@ CapabilityFlags::parseString(const std::string &Str) {
   }
   return std::nullopt;
 }
+
 CapabilityFlags CapabilityFlags::fromString(const std::string &Str) {
   if (const auto It = parseString(Str); It.has_value()) {
     return It.value();
@@ -189,6 +191,14 @@ const char *CapabilityFlags::str() const {
     break;
   }
   return "<unimp. CapabilityFlags>";
+}
+
+bool CapabilityFlags::isAdjacent(CapabilityFlags Other) const {
+  return (Value & (Adjacent | Other)) == (Adjacent | Other);
+}
+
+bool CapabilityFlags::isRanged(CapabilityFlags Other) const {
+  return (Value & (Ranged | Other)) == (Ranged | Other);
 }
 
 std::ostream &operator<<(std::ostream &Out, const CapabilityFlags &Flags) {

@@ -42,8 +42,9 @@ TargetInfo::TargetInfo(Controller &C, entt::entity TEt, Level &L)
   }
 
   ItSel->registerOnSelectCallback([this](const auto &Sel) {
+    // FIXME equip and inventory should only be allowed in debug mode
     if (Sel.getValue() == "Equip") {
-      Ctrl.setEquipmentUI(TargetEt, Lvl.Reg);
+      Ctrl.setEquipmentUI(TargetEt, Lvl);
     }
     if (Sel.getValue() == "Buffs") {
       Ctrl.setBuffUI(TargetEt, Lvl.Reg);

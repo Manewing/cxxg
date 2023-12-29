@@ -147,14 +147,14 @@ void Controller::closeCommandLineUI() {
       WdwContainer.getWindowOfType<CommandLineController>());
 }
 
-void Controller::setEquipmentUI(entt::entity Entity, entt::registry &Reg) {
+void Controller::setEquipmentUI(entt::entity Entity, Level &Lvl) {
   if (Entity == entt::null) {
     return;
   }
-  auto &EquipComp = Reg.get<EquipmentComp>(Entity);
+  auto &EquipComp = Lvl.Reg.get<EquipmentComp>(Entity);
 
   WdwContainer.addWindow<EquipmentController>(*this, EquipComp.Equip, Entity,
-                                              Reg, cxxg::types::Position{2, 2});
+                                              Lvl, cxxg::types::Position{2, 2});
   WdwContainer.autoLayoutWindows();
 }
 

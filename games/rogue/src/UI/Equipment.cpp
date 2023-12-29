@@ -1,7 +1,10 @@
 #include <cxxg/Utils.h>
 #include <rogue/Components/Items.h>
+#include <rogue/Components/LOS.h>
+#include <rogue/Components/Transform.h>
 #include <rogue/CraftingHandler.h>
 #include <rogue/Item.h>
+#include <rogue/Level.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
@@ -16,11 +19,11 @@ constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {4, 4};
 
 EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
-                                         entt::entity Entity,
-                                         entt::registry &Reg,
+                                         entt::entity Entity, Level &Lvl,
                                          cxxg::types::Position Pos)
     : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip),
-      Entity(Entity), Reg(Reg), InvHandler(Entity, Reg, CraftingHandler()) {
+      Entity(Entity), Lvl(Lvl), Reg(Lvl.Reg),
+      InvHandler(Entity, Reg, CraftingHandler()) {
   InvHandler.setEventHub(Ctrl.getEventHub());
   ItSel = std::make_shared<ItemSelect>(Pos);
   Comp = std::make_shared<Frame>(ItSel, Pos, getSize(), "Equipment");
@@ -42,6 +45,44 @@ bool EquipmentController::handleInput(int Char) {
     if (ES->It) {
       Ctrl.addWindow(std::make_shared<ItemTooltip>(
           Pos + TooltipOffset, TooltipSize, *ES->It, /*Equipped=*/true));
+    }
+  } break;
+  case Controls::Skill.Char: {
+    auto SelIdx = ItSel->getSelectedIdx();
+    auto *ES = Equip.all().at(SelIdx);
+    if (!ES->It) {
+      break;
+    }
+    const auto &It = *ES->It;
+    const auto ItType = ES->BaseTypeFilter;
+    if (It.getCapabilityFlags().isRanged(CapabilityFlags::Skill)) {
+      auto &PC = Reg.get<PositionComp>(Entity);
+      std::optional<unsigned> Range;
+      if (auto *LOSComp = Reg.try_get<LineOfSightComp>(Entity)) {
+        Range = LOSComp->LOSRange;
+      }
+      Ctrl.setTargetUI(PC.Pos, Range, Lvl,
+                       [&R = Reg, E = Entity, Hub = Ctrl.getEventHub(),
+                        ItType](auto TgEt, auto) -> void {
+                         InventoryHandler IH(E, R, CraftingHandler());
+                         IH.setEventHub(Hub);
+                         IH.tryUseSkillOnTarget(ItType, TgEt);
+                       });
+      return false;
+    }
+    if (It.getCapabilityFlags().isAdjacent(CapabilityFlags::Skill)) {
+      auto &PC = Reg.get<PositionComp>(Entity);
+      Ctrl.setTargetUI(PC.Pos, /*Range=*/2, Lvl,
+                       [&R = Reg, E = Entity, Hub = Ctrl.getEventHub(),
+                        ItType](auto TgEt, auto) -> void {
+                         InventoryHandler IH(E, R, CraftingHandler());
+                         IH.setEventHub(Hub);
+                         IH.tryUseSkillOnTarget(ItType, TgEt);
+                       });
+      return false;
+    }
+    if (InvHandler.tryUseSkill(ItType)) {
+      return false;
     }
   } break;
   case Controls::Unequip.Char: {
@@ -68,6 +109,9 @@ std::string EquipmentController::getInteractMsg() const {
     if (ES->It->canRemoveFrom(Entity, Entity, Reg,
                               CapabilityFlags::UnequipFrom)) {
       Options.push_back(Controls::Unequip);
+    }
+    if (ES->It->getCapabilityFlags() & CapabilityFlags::Skill) {
+      Options.push_back(Controls::Skill);
     }
   }
 
