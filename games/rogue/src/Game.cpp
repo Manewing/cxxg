@@ -325,9 +325,11 @@ bool Game::handleInput(int Char) {
     auto Player = getPlayer();
     auto &EC = getLvlReg().get<EquipmentComp>(Player);
     if (EC.Equip.all().at(Idx)->It) {
-      ui::EquipmentController::handleUseSkill(UICtrl,
-                                              World->getCurrentLevelOrFail(),
-                                              Player, *EC.Equip.all().at(Idx));
+      if (ui::EquipmentController::handleUseSkill(
+              UICtrl, World->getCurrentLevelOrFail(), Player,
+              *EC.Equip.all().at(Idx))) {
+        return handleUpdates(/*IsTick=*/true);
+      }
     } else {
       Hist.warn() << "No item equipped in slot "
                   << EC.Equip.all().at(Idx)->BaseTypeFilter;
