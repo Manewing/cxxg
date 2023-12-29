@@ -290,7 +290,7 @@
           },
           "ap_cost": {
             "type": "integer",
-            "minimum": 10
+            "minimum": 1
           },
           "mana_cost": {
             "type": "integer",
@@ -316,7 +316,7 @@
           },
           "ap_cost": {
             "type": "integer",
-            "minimum": 10
+            "minimum": 1
           },
           "mana_cost": {
             "type": "integer",

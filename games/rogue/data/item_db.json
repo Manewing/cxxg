@@ -134,6 +134,12 @@
       "magic_damage": 0,
       "ap_cost": 10
     },
+    "melee_fast_3": {
+      "type": "melee_attack_comp",
+      "phys_damage": 3,
+      "magic_damage": 0,
+      "ap_cost": 5
+    },
     "melee_5": {
       "type": "melee_attack_comp",
       "phys_damage": 5,
@@ -361,6 +367,27 @@
         {
           "type": "equipment",
           "effect": "melee_5"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
+        }
+      ],
+      "enhancements": "common_melee_weapon_enhancements"
+    },
+    {
+      "name": "Eternal Dagger",
+      "description": "A slender weapon, its blade shimmering as though forged from the essence of time itself. ",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "melee_fast_3"
         },
         {
           "type": "skill",
@@ -1042,6 +1069,13 @@
         {
           "type": "item",
           "name": "Small Sword",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Eternal Dagger",
           "min_count": 1,
           "max_count": 1,
           "weight": 5
