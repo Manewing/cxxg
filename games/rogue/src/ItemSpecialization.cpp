@@ -2,6 +2,7 @@
 #include <rogue/ItemEffect.h>
 #include <rogue/ItemPrototype.h>
 #include <rogue/ItemSpecialization.h>
+#include <rogue/ItemEffectImpl.h>
 
 namespace rogue {
 
@@ -21,7 +22,7 @@ std::shared_ptr<ItemEffect> StatsBuffSpecialization::createEffect() const {
 
   StatsBuffComp Buff;
   Buff.Bonus = Stats;
-  return std::make_shared<ApplyBuffItemEffect<StatsBuffComp, StatsComp>>(Buff);
+  return std::make_shared<StatsBuffEffect>(Buff);
 }
 
 void ItemSpecializations::addSpecialization(

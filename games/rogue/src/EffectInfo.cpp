@@ -94,7 +94,7 @@ bool EffectInfo::canApplyTo(const entt::entity &SrcEt,
     return false;
   }
 
-  return Effect->canApplyTo(DstEt, Reg);
+  return Effect->canApplyTo(SrcEt, DstEt, Reg);
 }
 
 void EffectInfo::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
@@ -105,7 +105,7 @@ void EffectInfo::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
     throw std::runtime_error(SS.str());
   }
   Attributes.applyCosts(SrcEt, Reg);
-  Effect->applyTo(DstEt, Reg);
+  Effect->applyTo(SrcEt, DstEt, Reg);
 }
 
 bool EffectInfo::canRemoveFrom(const entt::entity &SrcEt,
@@ -114,8 +114,7 @@ bool EffectInfo::canRemoveFrom(const entt::entity &SrcEt,
   if (!(Attributes.Flags & Flags)) {
     return false;
   }
-  (void)SrcEt;
-  return Effect->canRemoveFrom(DstEt, Reg);
+  return Effect->canRemoveFrom(SrcEt, DstEt, Reg);
 }
 
 void EffectInfo::removeFrom(const entt::entity &SrcEt,
@@ -126,7 +125,7 @@ void EffectInfo::removeFrom(const entt::entity &SrcEt,
     SS << "Can't remove: " << *this;
     throw std::runtime_error(SS.str());
   }
-  Effect->removeFrom(DstEt, Reg);
+  Effect->removeFrom(SrcEt, DstEt, Reg);
 }
 
 std::ostream &operator<<(std::ostream &OS, const EffectInfo &Info) {

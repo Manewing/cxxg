@@ -88,27 +88,29 @@ std::string SweepingStrikeEffect::getDescription() const {
   return "Hits all surrounding enemies.";
 }
 
-bool SweepingStrikeEffect::canApplyTo(const entt::entity &Et,
+bool SweepingStrikeEffect::canApplyTo(const entt::entity &SrcEt,
+                                      const entt::entity &,
                                       entt::registry &Reg) const {
-  return Reg.all_of<PositionComp, MeleeAttackComp>(Et);
+  return Reg.all_of<PositionComp, MeleeAttackComp>(SrcEt);
 }
 
-void SweepingStrikeEffect::applyTo(const entt::entity &Et,
+void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
+                                   const entt::entity &,
                                    entt::registry &Reg) const {
-  auto &PC = Reg.get<PositionComp>(Et);
+  auto &PC = Reg.get<PositionComp>(SrcEt);
 
   // Melee is always possible, used default values for damage if not set
   const MeleeAttackComp DefaultMA = {
       .PhysDamage = 1, .MagicDamage = 0, .APCost = 10};
   MeleeAttackComp MA = DefaultMA;
-  auto *AMA = Reg.try_get<MeleeAttackComp>(Et);
+  auto *AMA = Reg.try_get<MeleeAttackComp>(SrcEt);
   if (AMA) {
     MA = *AMA;
   }
 
   DamageComp DC;
-  DC.Source = Et;
-  if (auto *SC = Reg.try_get<StatsComp>(Et)) {
+  DC.Source = SrcEt;
+  if (auto *SC = Reg.try_get<StatsComp>(SrcEt)) {
     auto SP = SC->effective();
     DC.PhysDamage = MA.getPhysEffectiveDamage(&SP);
     DC.MagicDamage = MA.getMagicEffectiveDamage(&SP);
@@ -132,14 +134,15 @@ std::string LearnRecipeEffect::getDescription() const {
   return "Learns a random recipe";
 }
 
-bool LearnRecipeEffect::canApplyTo(const entt::entity &Et,
+bool LearnRecipeEffect::canApplyTo(const entt::entity &,
+                                   const entt::entity &DstEt,
                                    entt::registry &Reg) const {
-  return Reg.all_of<PlayerComp>(Et);
+  return Reg.all_of<PlayerComp>(DstEt);
 }
 
-void LearnRecipeEffect::applyTo(const entt::entity &Et,
+void LearnRecipeEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
                                 entt::registry &Reg) const {
-  auto *PC = Reg.try_get<PlayerComp>(Et);
+  auto *PC = Reg.try_get<PlayerComp>(DstEt);
   if (!PC) {
     return;
   }

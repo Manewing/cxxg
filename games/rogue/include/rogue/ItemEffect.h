@@ -34,17 +34,56 @@ public:
 
   virtual void addFrom(const ItemEffect &) {}
 
-  virtual bool canApplyTo(const entt::entity &, entt::registry &) const {
+  /// Checks if the effect can be applied to the given target entity
+  /// @param SrcEt The entity that applies the effect
+  /// @param DstEt The entity to apply the effect to
+  /// @param Reg The registry the entities belong to
+  virtual bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                          entt::registry &Reg) const {
+    (void)SrcEt;
+    (void)DstEt;
+    (void)Reg;
     return true;
   }
 
-  virtual void applyTo(const entt::entity &, entt::registry &) const {}
+  /// Applies the effect to the given target entity
+  /// @param SrcEt The entity that applies the effect
+  /// @param DstEt The entity to apply the effect to
+  /// @param Reg The registry the entities belong to
+  virtual void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                       entt::registry &Reg) const {
+    (void)SrcEt;
+    (void)DstEt;
+    (void)Reg;
+  }
 
-  virtual bool canRemoveFrom(const entt::entity &, entt::registry &) const {
+  /// Checks if the effect can be removed from the given target entity
+  /// @param SrcEt The entity that removes the effect
+  /// @param DstEt The entity to remove the effect from
+  /// @param Reg The registry the entities belong to
+  virtual bool canRemoveFrom(const entt::entity &SrcEt,
+                             const entt::entity &DstEt,
+                             entt::registry &Reg) const {
+    (void)SrcEt;
+    (void)DstEt;
+    (void)Reg;
     return true;
   }
 
-  virtual void removeFrom(const entt::entity &, entt::registry &) const {}
+  /// Removes the effect from the given target entity
+  /// @param SrcEt The entity that removes the effect
+  /// @param DstEt The entity to remove the effect from
+  /// @param Reg The registry the entities belong to
+  virtual void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                          entt::registry &Reg) const {
+    (void)SrcEt;
+    (void)DstEt;
+    (void)Reg;
+  }
+
+  /// Marks the entities as in combat
+  static void markCombat(const entt::entity &SrcEt, const entt::entity &DstEt,
+                         entt::registry &Reg);
 };
 
 class NullEffect : public ItemEffect {
@@ -66,8 +105,11 @@ public:
   bool canAddFrom(const ItemEffect &Other) const final;
   void addFrom(const ItemEffect &Other) final;
 
-  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
-  void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
 
 private:
   StatValue Amount;
@@ -84,8 +126,10 @@ public:
 
   bool canAddFrom(const ItemEffect &Other) const final;
   void addFrom(const ItemEffect &Other) final;
-  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
-  void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
 
 private:
   StatValue Amount;
@@ -108,18 +152,20 @@ public:
 
   bool canAddFrom(const ItemEffect &Other) const final;
   void addFrom(const ItemEffect &Other) final;
-  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final;
-  void applyTo(const entt::entity &Et, entt::registry &Reg) const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
 
 private:
   const ItemDatabase &ItemDb;
   std::vector<DismantleResult> Results;
 };
 
-template <typename CompType, typename... RequiredComps>
+template <typename CompType, bool IsCombat, typename... RequiredComps>
 class SetComponentEffect : public ItemEffect {
 public:
-  using OwnType = SetComponentEffect<CompType, RequiredComps...>;
+  using OwnType = SetComponentEffect<CompType, IsCombat, RequiredComps...>;
 
 public:
   static const CompType *getOrNull(const ItemEffect &It) {
@@ -141,33 +187,43 @@ public:
   /// Adding has no effect, only the first component setting effect is kept
   void addFrom(const ItemEffect &) final {}
 
-  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
+  bool canApplyTo(const entt::entity &, const entt::entity &DstEt,
+                  entt::registry &Reg) const final {
     if constexpr (sizeof...(RequiredComps) == 0) {
       return true;
     } else {
-      return Reg.all_of<RequiredComps...>(Et);
+      return Reg.all_of<RequiredComps...>(DstEt);
     }
   }
 
-  void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
-    auto *Existing = Reg.try_get<CompType>(Et);
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final {
+    auto *Existing = Reg.try_get<CompType>(DstEt);
     if (Existing) {
       *Existing = Comp;
     } else {
-      Reg.emplace<CompType>(Et, Comp);
+      Reg.emplace<CompType>(DstEt, Comp);
+    }
+    if constexpr (IsCombat) {
+      markCombat(SrcEt, DstEt, Reg);
     }
   }
 
-  bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) const final {
+  bool canRemoveFrom(const entt::entity &, const entt::entity &DstEt,
+                     entt::registry &Reg) const final {
     if constexpr (sizeof...(RequiredComps) == 0) {
       return true;
     } else {
-      return Reg.all_of<RequiredComps...>(Et);
+      return Reg.all_of<RequiredComps...>(DstEt);
     }
   }
 
-  void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    Reg.remove<CompType>(Et);
+  void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final {
+    Reg.remove<CompType>(DstEt);
+    if constexpr (IsCombat) {
+      markCombat(SrcEt, DstEt, Reg);
+    }
   }
 
 protected:
@@ -181,10 +237,10 @@ public:
   std::string getDescription() const final;
 };
 
-template <typename BuffType, typename... RequiredComps>
+template <typename BuffType, bool IsCombat, typename... RequiredComps>
 class ApplyBuffItemEffect : public ApplyBuffItemEffectBase {
 public:
-  using OwnType = ApplyBuffItemEffect<BuffType, RequiredComps...>;
+  using OwnType = ApplyBuffItemEffect<BuffType, IsCombat, RequiredComps...>;
 
 public:
   explicit ApplyBuffItemEffect(const BuffType &Buff) : Buff(Buff) {}
@@ -193,20 +249,31 @@ public:
 
   const BuffType &getBuffCasted() const { return Buff; }
 
-  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
-    return BuffApplyHelper<BuffType, RequiredComps...>::canApplyTo(Et, Reg);
+  bool canApplyTo(const entt::entity &, const entt::entity &DstEt,
+                  entt::registry &Reg) const final {
+    return BuffApplyHelper<BuffType, RequiredComps...>::canApplyTo(DstEt, Reg);
   }
 
-  void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
-    BuffApplyHelper<BuffType, RequiredComps...>::applyTo(Buff, Et, Reg);
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final {
+    BuffApplyHelper<BuffType, RequiredComps...>::applyTo(Buff, DstEt, Reg);
+    if constexpr (IsCombat) {
+      markCombat(SrcEt, DstEt, Reg);
+    }
   }
 
-  bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    return BuffApplyHelper<BuffType, RequiredComps...>::canRemoveFrom(Et, Reg);
+  bool canRemoveFrom(const entt::entity &, const entt::entity &DstEt,
+                     entt::registry &Reg) const final {
+    return BuffApplyHelper<BuffType, RequiredComps...>::canRemoveFrom(DstEt,
+                                                                      Reg);
   }
 
-  void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    BuffApplyHelper<BuffType, RequiredComps...>::removeFrom(Buff, Et, Reg);
+  void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final {
+    BuffApplyHelper<BuffType, RequiredComps...>::removeFrom(Buff, DstEt, Reg);
+    if constexpr (IsCombat) {
+      markCombat(SrcEt, DstEt, Reg);
+    }
   }
 
   std::shared_ptr<ItemEffect> clone() const final {
@@ -250,10 +317,10 @@ public:
   }
 };
 
-template <typename CompType, typename... RequiredComps>
+template <typename CompType, bool IsCombat, typename... RequiredComps>
 class RemoveComponentEffect : public ItemEffect {
 public:
-  using OwnType = RemoveComponentEffect<CompType, RequiredComps...>;
+  using OwnType = RemoveComponentEffect<CompType, IsCombat, RequiredComps...>;
 
 public:
   explicit RemoveComponentEffect() {}
@@ -264,24 +331,35 @@ public:
     return dynamic_cast<const OwnType *>(&Other) != nullptr;
   }
 
-  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
+  bool canApplyTo(const entt::entity &, const entt::entity &DstEt,
+                  entt::registry &Reg) const final {
     if constexpr (sizeof...(RequiredComps) == 0) {
       return true;
     } else {
-      return Reg.all_of<CompType, RequiredComps...>(Et);
+      return Reg.all_of<CompType, RequiredComps...>(DstEt);
     }
   }
 
-  void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
-    Reg.remove<CompType>(Et);
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final {
+    Reg.remove<CompType>(DstEt);
+    if constexpr (IsCombat) {
+      markCombat(SrcEt, DstEt, Reg);
+    }
   }
 
   /// Removing the effect does nothing
-  bool canRemoveFrom(const entt::entity &, entt::registry &) const final {
+  bool canRemoveFrom(const entt::entity &, const entt::entity &,
+                     entt::registry &) const final {
     return true;
   }
 
-  void removeFrom(const entt::entity &, entt::registry &) const final {}
+  void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final {
+    if constexpr (IsCombat) {
+      markCombat(SrcEt, DstEt, Reg);
+    }
+  }
 };
 
 } // namespace rogue

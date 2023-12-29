@@ -167,13 +167,6 @@ bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
   auto ItOrNone = Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, Entity,
                                    TargetEt, Reg);
   if (ItOrNone) {
-    if (Entity != TargetEt) {
-      // FIXME check if it is actually an attack, this could be handled
-      // in the item effect if we propagate the source entity to the effect
-      Reg.get_or_emplace<CombatAttackComp>(Entity).Target = TargetEt;
-      Reg.get_or_emplace<CombatTargetComp>(TargetEt).Attacker = Entity;
-    }
-
     // FIXME add information on result of use
     if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
       publish(PlayerInfoMessageEvent() << "Used " + ItOrNone->getName() +

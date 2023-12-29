@@ -1,9 +1,16 @@
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Items.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 #include <sstream>
 
 namespace rogue {
+
+void ItemEffect::markCombat(const entt::entity &SrcEt,
+                            const entt::entity &DstEt, entt::registry &Reg) {
+  Reg.get_or_emplace<CombatAttackComp>(SrcEt).Target = DstEt;
+  Reg.get_or_emplace<CombatTargetComp>(DstEt).Attacker = SrcEt;
+}
 
 std::shared_ptr<ItemEffect> NullEffect::clone() const {
   return std::make_shared<NullEffect>(*this);
@@ -42,14 +49,14 @@ void HealItemEffect::addFrom(const ItemEffect &Other) {
   }
 }
 
-bool HealItemEffect::canApplyTo(const entt::entity &Et,
+bool HealItemEffect::canApplyTo(const entt::entity &, const entt::entity &DstEt,
                                 entt::registry &Reg) const {
-  return Reg.any_of<HealthComp>(Et);
+  return Reg.any_of<HealthComp>(DstEt);
 }
 
-void HealItemEffect::applyTo(const entt::entity &Et,
+void HealItemEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
                              entt::registry &Reg) const {
-  Reg.get<HealthComp>(Et).restore(Amount);
+  Reg.get<HealthComp>(DstEt).restore(Amount);
 }
 
 DamageItemEffect::DamageItemEffect(StatValue Amount) : Amount(Amount) {}
@@ -81,14 +88,17 @@ void DamageItemEffect::addFrom(const ItemEffect &Other) {
   }
 }
 
-bool DamageItemEffect::canApplyTo(const entt::entity &Et,
+bool DamageItemEffect::canApplyTo(const entt::entity &,
+                                  const entt::entity &DstEt,
                                   entt::registry &Reg) const {
-  return Reg.any_of<HealthComp>(Et);
+  return Reg.any_of<HealthComp>(DstEt);
 }
 
-void DamageItemEffect::applyTo(const entt::entity &Et,
+void DamageItemEffect::applyTo(const entt::entity &SrcEt,
+                               const entt::entity &DstEt,
                                entt::registry &Reg) const {
-  Reg.get<HealthComp>(Et).reduce(Amount);
+  Reg.get<HealthComp>(DstEt).reduce(Amount);
+  markCombat(SrcEt, DstEt, Reg);
 }
 
 DismantleEffect::DismantleEffect(const ItemDatabase &DB,
@@ -128,14 +138,15 @@ void DismantleEffect::addFrom(const ItemEffect &Other) {
   }
 }
 
-bool DismantleEffect::canApplyTo(const entt::entity &Et,
+bool DismantleEffect::canApplyTo(const entt::entity &,
+                                 const entt::entity &DstEt,
                                  entt::registry &Reg) const {
-  return Reg.all_of<InventoryComp>(Et);
+  return Reg.all_of<InventoryComp>(DstEt);
 }
 
-void DismantleEffect::applyTo(const entt::entity &Et,
+void DismantleEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
                               entt::registry &Reg) const {
-  auto &Inv = Reg.get<InventoryComp>(Et);
+  auto &Inv = Reg.get<InventoryComp>(DstEt);
   for (const auto &Result : Results) {
     Inv.Inv.addItem(ItemDb.createItem(Result.ItemId, Result.Amount));
   }
