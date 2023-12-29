@@ -57,7 +57,8 @@ getColorForItemEffects(const std::vector<EffectInfo> &Effects,
 cxxg::types::TermColor getColorForItem(const Item &It) {
   const auto AllEffects = It.getAllEffects();
   if (It.getType() & ItemType::EquipmentMask && AllEffects.size() > 1) {
-    return getColorForItemEffects(AllEffects, CapabilityFlags::Equipment);
+    return getColorForItemEffects(AllEffects, CapabilityFlags::Equipment |
+                                                  CapabilityFlags::Skill);
   }
   return getColorForItemType(It.getType());
 }
@@ -95,7 +96,12 @@ std::string getCapabilityDescription(const ItemType &ItType,
     if ((EffInfo.Attributes.Flags & Flag) != Flag) {
       continue;
     }
-    SS << "- " << EffInfo.Effect->getDescription() << "\n";
+    if (Flag & CapabilityFlags::Skill) {
+      SS << "- " << EffInfo.Effect->getName() << ": "
+         << EffInfo.Effect->getDescription() << "\n";
+    } else {
+      SS << "- " << EffInfo.Effect->getDescription() << "\n";
+    }
   }
   if (!ItemPrototype::canApply(ItType, Flag)) {
     return "Crafting only: " + SS.str();
@@ -116,6 +122,15 @@ std::string getItemEffectDescription(const Item &It) {
      << getCapabilityDescription(
             It.getType(), AllEffects,
             (CapabilityFlags::Adjacent | CapabilityFlags::UseOn))
+     << getCapabilityDescription(
+            It.getType(), AllEffects,
+            (CapabilityFlags::Self | CapabilityFlags::Skill))
+     << getCapabilityDescription(
+            It.getType(), AllEffects,
+            (CapabilityFlags::Ranged | CapabilityFlags::Skill))
+     << getCapabilityDescription(
+            It.getType(), AllEffects,
+            (CapabilityFlags::Adjacent | CapabilityFlags::Skill))
      << getCapabilityDescription(It.getType(), AllEffects,
                                  CapabilityFlags::EquipOn)
      << getCapabilityDescription(It.getType(), AllEffects,

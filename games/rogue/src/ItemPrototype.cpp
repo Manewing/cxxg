@@ -8,7 +8,7 @@ bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
   // FIXME this should be moved to ItemType
   return
       // Equipment
-      ((Flags & CapabilityFlags::Equipment) &&
+      ((Flags & (CapabilityFlags::Equipment | CapabilityFlags::Skill)) &&
        (Type & ItemType::EquipmentMask)) ||
       // Consumable
       ((Flags & CapabilityFlags::UseOn) && (Type & ItemType::Consumable))

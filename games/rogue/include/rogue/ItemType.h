@@ -95,6 +95,9 @@ public:
 
     // Self, indicates that the item can be used on the entity using the item
     Self = 0x40,
+
+    // Skill, indicates that the item can be used to cast a skill
+    Skill = 0x80,
   };
   using value_type = ValueType;
 

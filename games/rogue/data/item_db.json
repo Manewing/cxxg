@@ -307,6 +307,11 @@
         {
           "type": "equipment",
           "effect": "melee_5"
+        },
+        {
+          "type": "skill",
+          "effect": "sweeping_strike_effect",
+          "mana_cost": 15
         }
       ],
       "specializations": [

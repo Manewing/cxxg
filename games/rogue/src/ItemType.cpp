@@ -127,6 +127,15 @@ CapabilityFlags::parseString(const std::string &Str) {
   if (Str == "adjacent_use") {
     return CapabilityFlags::Adjacent | CapabilityFlags::UseOn;
   }
+  if (Str == "skill") {
+    return CapabilityFlags::Skill | CapabilityFlags::Self;
+  }
+  if (Str == "skill_ranged") {
+    return CapabilityFlags::Skill | CapabilityFlags::Ranged;
+  }
+  if (Str == "skill_adjacent") {
+    return CapabilityFlags::Skill | CapabilityFlags::Adjacent;
+  }
   return std::nullopt;
 }
 CapabilityFlags CapabilityFlags::fromString(const std::string &Str) {
@@ -146,6 +155,15 @@ const char *CapabilityFlags::str() const {
   if ((CapabilityFlags::UseOn | CapabilityFlags::Adjacent) == Value) {
     return "Adjacent use";
   }
+  if ((CapabilityFlags::Skill | CapabilityFlags::Self) == Value) {
+    return "Skill";
+  }
+  if ((CapabilityFlags::Skill | CapabilityFlags::Ranged) == Value) {
+    return "Ranged skill";
+  }
+  if ((CapabilityFlags::Skill | CapabilityFlags::Adjacent) == Value) {
+    return "Adjacent skill";
+  }
   switch (Value) {
   case CapabilityFlags::None:
     return "None";
@@ -163,6 +181,10 @@ const char *CapabilityFlags::str() const {
     return "Ranged";
   case CapabilityFlags::Adjacent:
     return "Adjacent";
+  case CapabilityFlags::Self:
+    return "Self";
+  case CapabilityFlags::Skill:
+    return "Skill";
   default:
     break;
   }
