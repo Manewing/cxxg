@@ -311,7 +311,8 @@
         {
           "type": "skill",
           "effect": "sweeping_strike_effect",
-          "mana_cost": 15
+          "mana_cost": 15,
+          "ap_cost": 20
         }
       ],
       "specializations": [

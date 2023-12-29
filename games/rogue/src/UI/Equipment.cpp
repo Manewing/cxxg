@@ -125,11 +125,11 @@ void EquipmentController::draw(cxxg::Screen &Scr) const {
 
 namespace {
 
-std::string getSelectValue(const EquipmentSlot &ES) {
+std::string getSelectValue(const EquipmentSlot &ES, int Idx) {
   if (ES.It) {
-    return ES.It->getName();
+    return "[" + std::to_string(Idx) + "] " + ES.It->getName();
   }
-  return "---";
+  return "[" + std::to_string(Idx) + "] ---";
 }
 
 cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
@@ -142,17 +142,18 @@ cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
 } // namespace
 
 void EquipmentController::addSelect(const EquipmentSlot &ES,
-                                    cxxg::types::Position Pos) {
+                                    cxxg::types::Position AtPos) {
   constexpr const auto NoColor = cxxg::types::Color::NONE;
-  ItSel->addSelect<LabeledSelect>(ES.BaseTypeFilter.str(), getSelectValue(ES),
-                                  Pos, 25, NoColor, NoColor);
+  ItSel->addSelect<LabeledSelect>(ES.BaseTypeFilter.str(),
+                                  getSelectValue(ES, AtPos.Y - Pos.Y + 1),
+                                  AtPos, getSize().X - 2, NoColor, NoColor);
 }
 
 void EquipmentController::updateSelectValues() const {
   std::size_t Count = 0;
   for (const auto *ES : Equip.all()) {
     auto &Sel = ItSel->getSelect(Count++);
-    Sel.setValue(getSelectValue(*ES));
+    Sel.setValue(getSelectValue(*ES, Count));
     Sel.setValueColor(getSelectColor(*ES));
   }
 }

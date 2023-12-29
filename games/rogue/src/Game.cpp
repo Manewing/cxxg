@@ -319,6 +319,22 @@ bool Game::handleInput(int Char) {
     return true;
   }
 
+  if (Char >= '0' && Char <= '9') {
+    auto Idx = Char == '0' ? 10 : Char - '1';
+    auto Player = getPlayer();
+    auto &EC = getLvlReg().get<EquipmentComp>(Player);
+    if (EC.Equip.all().at(Idx)->It) {
+      InventoryHandler InvHandler(Player, getLvlReg(), Crafter);
+      InvHandler.setEventHub(&EvHub);
+      if (InvHandler.tryUseSkill(EC.Equip.all().at(Idx)->BaseTypeFilter)) {
+        return handleUpdates(/*IsTick=*/true);
+      }
+    } else {
+      Hist.warn() << "No item equipped in slot "
+                  << EC.Equip.all().at(Idx)->BaseTypeFilter;
+    }
+  }
+
   // FIXME add user input to context and process input in player system
   // FIXME play move and attack needs to be handled in update
   switch (Char) {
