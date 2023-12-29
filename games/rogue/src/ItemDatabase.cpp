@@ -2,6 +2,7 @@
 #include <ranges>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 #include <rogue/ItemEffectImpl.h>
@@ -331,6 +332,14 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     Specializations.emplace(SpecName, Spec);
   }
 
+  // Create loot tables
+  const auto &LootTablesJson = Doc["loot_tables"].GetObject();
+  for (const auto &[K, V] : LootTablesJson) {
+    const auto Name = std::string(K.GetString());
+    // Check if already registered
+    DB.addLootTable(Name);
+  }
+
   // Create item prototypes
   const auto &ItemProtosJson = Doc["item_prototypes"].GetArray();
   for (const auto &ItemProtoJson : ItemProtosJson) {
@@ -368,18 +377,19 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       }
     }
 
+    std::shared_ptr<LootTable> Enhancements = nullptr;
+    if (ItemProtoJson.HasMember("enhancements")) {
+      const auto &LootTbName = ItemProtoJson["enhancements"].GetString();
+      const auto &LootTb = DB.getLootTable(LootTbName);
+      Enhancements = LootTb;
+    }
+
     ItemPrototype Proto(DB.getNewItemId(), Name, Description, ItType,
                         MaxStackSize, std::move(EffectInfos));
-    DB.addItemProto(Proto, Specialization.get());
+    DB.addItemProto(Proto, Specialization.get(), Enhancements);
   }
 
-  // Create loot tables
-  const auto &LootTablesJson = Doc["loot_tables"].GetObject();
-  for (const auto &[K, V] : LootTablesJson) {
-    const auto Name = std::string(K.GetString());
-    // Check if already registered
-    DB.addLootTable(Name);
-  }
+  // Fill loot tables
   for (const auto &[K, V] : LootTablesJson) {
     const auto Name = std::string(K.GetString());
     auto &LootTb = DB.getLootTable(Name);
@@ -415,13 +425,17 @@ const ItemSpecializations *ItemDatabase::getItemSpec(int ItemId) const {
   return &It->second;
 }
 
-void ItemDatabase::addItemProto(const ItemPrototype &ItemProto,
-                                const ItemSpecializations *ItemSpec) {
+void ItemDatabase::addItemProto(
+    const ItemPrototype &ItemProto, const ItemSpecializations *ItemSpec,
+    const std::shared_ptr<LootTable> &Enhancements) {
   // FIXME ID not yet taken
   assert(ItemProtos.count(ItemProto.ItemId) == 0);
   ItemProtos.emplace(ItemProto.ItemId, ItemProto);
   if (ItemSpec) {
     ItemSpecs.emplace(ItemProto.ItemId, *ItemSpec);
+  }
+  if (Enhancements) {
+    ItemEnhancements.emplace(ItemProto.ItemId, Enhancements);
   }
 }
 
@@ -435,7 +449,37 @@ Item ItemDatabase::createItem(int ItemId, int StackSize) const {
   if (auto SpecIt = ItemSpecs.find(ItemId); SpecIt != ItemSpecs.end()) {
     Spec = SpecIt->second.actualize(It->second);
   }
-  return Item(It->second, StackSize, Spec);
+
+  auto NewItem = Item(It->second, StackSize, Spec);
+
+  // Craft enhancements
+  if (auto EnhIt = ItemEnhancements.find(ItemId);
+      EnhIt != ItemEnhancements.end() && EnhIt->second) {
+    auto LootRewards = EnhIt->second->generateLoot();
+    std::vector<Item> LootItems;
+    for (const auto &Reward : LootRewards) {
+      for (unsigned I = 0; I < Reward.Count; ++I) {
+        LootItems.push_back(createItem(Reward.ItId, 1));
+      }
+    }
+    CraftingHandler Crafter;
+    while (!LootItems.empty()) {
+      auto NextEnhancement = LootItems.back();
+      LootItems.pop_back();
+
+      // Try to craft, if it does not succeed abort (invalid combination)
+      auto Result = Crafter.tryCraft({NewItem, NextEnhancement});
+      if (!Result || Result->size() != 1) {
+        throw std::runtime_error("Invalid crafting result for " +
+                                 NewItem.getName() + " and " +
+                                 NextEnhancement.getName());
+      }
+
+      NewItem = Result->at(0);
+    }
+  }
+
+  return NewItem;
 }
 
 int ItemDatabase::getRandomItemId() const {

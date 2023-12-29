@@ -95,6 +95,10 @@
               "additionalProperties": false
             }
           },
+          "enhancements": {
+            "type": "string",
+            "description": "Optional loot table referencing optional enhancements to be crafted onto the item"
+          },
           "additionalProperties": false
         }
       }

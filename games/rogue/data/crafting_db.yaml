@@ -71,3 +71,29 @@ recipes:
       - Spiderling Venom Sac
     results:
       - Spider Venom Oil
+  - name: Orb of Upgrade
+    ingredients:
+      - Glass Vial
+      - Rune Dust
+      - Rune Dust
+      - Rune Dust
+      - Rune Dust
+      - Rune Dust
+      - Arcane Liquid
+      - Arcane Liquid
+      - Arcane Liquid
+      - Arcane Liquid
+      - Arcane Liquid
+      - Fire Stone
+    results:
+      - Orb of Upgrade
+      - Fire Stone
+  - name: Great Orb of Upgrade
+    ingredients:
+      - Orb of Upgrade
+      - Orb of Upgrade
+      - Orb of Upgrade
+      - Fire Stone
+    results:
+      - Great Orb of Upgrade
+      - Fire Stone

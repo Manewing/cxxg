@@ -323,6 +323,32 @@
       ]
     },
     {
+      "name": "Orb of Upgrade",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Great Orb of Upgrade",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
+        }
+      ]
+    },
+    {
       "name": "Small Sword",
       "description": "A small sword",
       "max_stack_size": 1,
@@ -341,12 +367,7 @@
           "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_melee_weapon_enhancements"
     },
     {
       "name": "Toxic Claws",
@@ -562,12 +583,7 @@
           "effect": "dismantle_leather_equip"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_armor_enhancements"
     },
     {
       "name": "Leather Boots",
@@ -584,12 +600,7 @@
           "effect": "dismantle_leather_equip"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_armor_enhancements"
     },
     {
       "name": "Leather Pants",
@@ -606,12 +617,7 @@
           "effect": "dismantle_leather_equip"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_armor_enhancements"
     },
     {
       "name": "Linen Pants",
@@ -644,12 +650,7 @@
           "effect": "dismantle_leather_equip"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_armor_enhancements"
     },
     {
       "name": "Iron Ring",
@@ -1220,6 +1221,67 @@
           "min_count": 1,
           "max_count": 1,
           "weight": 3
+        }
+      ]
+    },
+    "common_armor_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "item",
+          "name": "Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Armor Plating",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
+      ]
+    },
+    "common_melee_weapon_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "item",
+          "name": "Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Spider Venom Oil",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of striking",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
         }
       ]
     },
