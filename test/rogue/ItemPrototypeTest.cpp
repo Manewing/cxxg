@@ -29,12 +29,12 @@ TEST_F(ItemPrototypeTest, Properties) {
 TEST_F(ItemPrototypeTest, GetCapabilityFlags) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, rogue::test::DummyItems::NullEffect}});
+      {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_EQ(Proto.getCapabilityFlags(), rogue::CapabilityFlags::UseOn);
 
   rogue::ItemPrototype Proto2(1, "Name", "Description", rogue::ItemType::Ring,
                               1,
-                              {{rogue::CapabilityFlags::Equipment,
+                              {{{rogue::CapabilityFlags::Equipment},
                                 rogue::test::DummyItems::NullEffect}});
   EXPECT_EQ(Proto2.getCapabilityFlags(), rogue::CapabilityFlags::Equipment);
 
@@ -46,7 +46,7 @@ TEST_F(ItemPrototypeTest, GetCapabilityFlags) {
 TEST_F(ItemPrototypeTest, CanApply) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, rogue::test::DummyItems::NullEffect}});
+      {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_FALSE(Proto.canApplyTo(Entity, Reg, rogue::CapabilityFlags::None))
       << "Can't apply with no flags";
   EXPECT_TRUE(Proto.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn))
@@ -58,7 +58,7 @@ TEST_F(ItemPrototypeTest, CanApply) {
 TEST_F(ItemPrototypeTest, Apply) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, rogue::test::DummyItems::NullEffect}});
+      {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_THROW(Proto.applyTo(Entity, Reg, rogue::CapabilityFlags::None),
                std::runtime_error)
       << "Can't apply with no flags";
@@ -78,7 +78,7 @@ TEST_F(ItemPrototypeTest, Apply) {
 TEST_F(ItemPrototypeTest, CanRemove) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, rogue::test::DummyItems::NullEffect}});
+      {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_FALSE(Proto.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::None))
       << "Can't remove with no flags";
   EXPECT_TRUE(Proto.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn))
@@ -91,7 +91,7 @@ TEST_F(ItemPrototypeTest, CanRemove) {
 TEST_F(ItemPrototypeTest, Remove) {
   rogue::ItemPrototype Proto(
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, rogue::test::DummyItems::NullEffect}});
+      {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_THROW(Proto.removeFrom(Entity, Reg, rogue::CapabilityFlags::None),
                std::runtime_error)
       << "Can't remove with no flags";

@@ -28,12 +28,12 @@ struct StatsBuffSpecialization : public ItemSpecialization {
 class ItemSpecializations {
 public:
   struct SpecializationInfo {
-    CapabilityFlags Flags;
+    EffectAttributes Attributes;
     std::shared_ptr<ItemSpecialization> Specialization;
   };
 
 public:
-  void addSpecialization(CapabilityFlags Flags,
+  void addSpecialization(EffectAttributes Attributes,
                          std::shared_ptr<ItemSpecialization> Spec);
   std::shared_ptr<ItemPrototype> actualize(const ItemPrototype &Proto) const;
 

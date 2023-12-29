@@ -321,14 +321,16 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     std::vector<EffectInfo> EffectInfos;
     for (const auto &CapJson : ItemProtoJson["capabilities"].GetArray()) {
       const auto &CapInfo = CapJson.GetObject();
-      const auto Flag =
+      const auto Flags =
           CapabilityFlags::fromString(CapInfo["type"].GetString());
       const auto EffectName = std::string(CapInfo["effect"].GetString());
       const auto It = Effects.find(EffectName);
       if (It == Effects.end()) {
         throw std::out_of_range("Unknown item effect: " + EffectName);
       }
-      EffectInfos.push_back({Flag, It->second});
+      // FIXME parse the costs
+      EffectAttributes Attrs{Flags, 0, 0, 0};
+      EffectInfos.push_back({Attrs, It->second});
     }
 
     std::unique_ptr<ItemSpecializations> Specialization;
@@ -340,7 +342,9 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
             CapabilityFlags::fromString(SpecInfo["type"].GetString());
         const auto Spec =
             Specializations.at(SpecInfo["specialization"].GetString());
-        Specialization->addSpecialization(Flags, Spec);
+      // FIXME parse the costs
+      EffectAttributes Attrs{Flags, 0, 0, 0};
+        Specialization->addSpecialization(Attrs, Spec);
       }
     }
 

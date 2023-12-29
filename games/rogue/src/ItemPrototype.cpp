@@ -25,7 +25,7 @@ ItemPrototype::ItemPrototype(int ItemId, std::string N, std::string D,
 CapabilityFlags ItemPrototype::getCapabilityFlags() const {
   CapabilityFlags Flags = CapabilityFlags::None;
   for (const auto &Info : Effects) {
-    Flags = Flags | Info.Flags;
+    Flags = Flags | Info.Attributes.Flags;
   }
   return Flags;
 }
@@ -41,7 +41,7 @@ bool ItemPrototype::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
   }
   bool CanApply = true;
   for (const auto &Info : Effects) {
-    if (Info.Flags & Flags) {
+    if (Info.Attributes.Flags & Flags) {
       CanApply = CanApply && Info.Effect->canApplyTo(Entity, Reg);
     }
   }
@@ -58,7 +58,7 @@ void ItemPrototype::applyTo(const entt::entity &Entity, entt::registry &Reg,
     throw std::runtime_error(SS.str());
   }
   for (const auto &Info : Effects) {
-    if (Info.Flags & Flags) {
+    if (Info.Attributes.Flags & Flags) {
       Info.Effect->applyTo(Entity, Reg);
     }
   }
@@ -72,7 +72,7 @@ bool ItemPrototype::canRemoveFrom(const entt::entity &Entity,
   }
   bool CanRemove = true;
   for (const auto &Info : Effects) {
-    if (Info.Flags & Flags) {
+    if (Info.Attributes.Flags & Flags) {
       CanRemove = CanRemove && Info.Effect->canRemoveFrom(Entity, Reg);
     }
   }
@@ -89,7 +89,7 @@ void ItemPrototype::removeFrom(const entt::entity &Entity, entt::registry &Reg,
     throw std::runtime_error(SS.str());
   }
   for (const auto &Info : Effects) {
-    if (Info.Flags & Flags) {
+    if (Info.Attributes.Flags & Flags) {
       Info.Effect->removeFrom(Entity, Reg);
     }
   }

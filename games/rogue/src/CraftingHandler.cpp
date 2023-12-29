@@ -116,13 +116,14 @@ CraftingHandler::tryCraftAsRecipe(const std::vector<Item> &Items) const {
 
 namespace {
 
+/// Return all effects with an non-empty subset of the given flags
 std::vector<EffectInfo> getAllEffects(const std::vector<Item> &Items,
                                       CapabilityFlags Flags) {
   std::vector<EffectInfo> AllEffects = Items.front().getAllEffects();
   for (std::size_t Idx = 1; Idx < Items.size(); ++Idx) {
     auto &It = Items.at(Idx);
     for (const auto &Info : It.getAllEffects()) {
-      if (Info.Flags & Flags) {
+      if (Info.Attributes.Flags & Flags) {
         AllEffects.push_back(Info);
       }
     }
@@ -135,7 +136,10 @@ std::vector<EffectInfo>
 computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
   std::vector<EffectInfo> NewEffects;
   std::optional<EffectInfo> NullInfo;
-  CapabilityFlags EffectFlags = CapabilityFlags::None;
+
+  // Keep track of the overall flags of all effects
+  CapabilityFlags AllEffectFlags = CapabilityFlags::None;
+
   for (const auto &Info : AllEffects) {
     auto Effect = Info.Effect.get();
 
@@ -143,7 +147,7 @@ computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
     // effect has the same flags
     if (dynamic_cast<NullEffect *>(Info.Effect.get())) {
       if (NullInfo) {
-        NullInfo->Flags |= Info.Flags;
+        NullInfo->Attributes.Flags |= Info.Attributes.Flags;
       } else {
         NullInfo = Info;
       }
@@ -153,10 +157,10 @@ computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
     // Handle RemoveEffectBase separately, we remove all newly added effects
     // that are removed by this effect
     if (auto *RM = dynamic_cast<const RemoveEffectBase *>(Effect)) {
-      auto RMFlags = Info.Flags;
+      auto RMFlags = Info.Attributes.Flags;
       auto It = std::remove_if(NewEffects.begin(), NewEffects.end(),
                                [RM, RMFlags](const EffectInfo &Info) {
-                                 if (Info.Flags != RMFlags) {
+                                 if (Info.Attributes.Flags != RMFlags) {
                                    return false;
                                  }
                                  return RM->removesEffect(*Info.Effect);
@@ -165,24 +169,32 @@ computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
       continue;
     }
 
-    EffectFlags |= Info.Flags;
+    // Update all flags with the effect info flags
+    AllEffectFlags |= Info.Attributes.Flags;
 
+    // Try to combine the effect with any existing effect
     for (auto &NewInfo : NewEffects) {
-      if (NewInfo.Flags != Info.Flags) {
+      if (NewInfo.Attributes.Flags != Info.Attributes.Flags) {
         continue;
       }
       auto NewEffect = NewInfo.Effect.get();
       if (NewEffect->canAddFrom(*Effect)) {
         NewEffect->addFrom(*Effect);
+        NewInfo.Attributes.updateCostsFrom(Info.Attributes);
         Effect = nullptr;
         break;
       }
     }
+
+    // If effect was not combined with any existing effect, add it as a new one
     if (Effect) {
-      NewEffects.push_back({Info.Flags, Effect->clone()});
+      NewEffects.push_back({Info.Attributes, Effect->clone()});
     }
   }
-  if (NullInfo && (NullInfo->Flags & ~EffectFlags)) {
+
+  // Add NullEffect if there are any flags that are not covered by any other
+  // effect
+  if (NullInfo && (NullInfo->Attributes.Flags & ~AllEffectFlags)) {
     NewEffects.push_back(*NullInfo);
   }
   return NewEffects;

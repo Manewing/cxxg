@@ -37,7 +37,8 @@ std::string getQualifierName(const Item &It) {
   // Check for stats buff effect and return name based strongest
   // stat point boost
   for (const auto &ItEff : It.getAllEffects()) {
-    if ((ItEff.Flags & CapabilityFlags::Equipment) == CapabilityFlags::None) {
+    if ((ItEff.Attributes.Flags & CapabilityFlags::Equipment) ==
+        CapabilityFlags::None) {
       continue;
     }
     const auto *StatEff =

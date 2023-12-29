@@ -50,6 +50,7 @@ set(HEADER_FILES
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
+  include/rogue/Types.h
   include/rogue/UI/Buffs.h
   include/rogue/UI/CommandLine.h
   include/rogue/UI/Controller.h

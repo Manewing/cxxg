@@ -33,7 +33,7 @@ getColorForItemEffects(const std::vector<EffectInfo> &Effects,
                        CapabilityFlags Flags) {
   unsigned Count = 0;
   for (const auto &EffInfo : Effects) {
-    if (EffInfo.Flags & Flags) {
+    if (EffInfo.Attributes.Flags & Flags) {
       ++Count;
     }
   }
@@ -69,7 +69,7 @@ std::string getCapabilityDescription(const ItemType &ItType,
   SS << Flag << ":\n";
   bool HasAny = false;
   for (const auto &EffInfo : AllEffects) {
-    if ((EffInfo.Flags & Flag) != Flag) {
+    if ((EffInfo.Attributes.Flags & Flag) != Flag) {
       continue;
     }
     HasAny = true;

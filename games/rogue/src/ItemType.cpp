@@ -174,4 +174,10 @@ std::ostream &operator<<(std::ostream &Out, const CapabilityFlags &Flags) {
   return Out;
 }
 
+void EffectAttributes::updateCostsFrom(const EffectAttributes &Other) {
+  APCost = std::max(APCost, Other.APCost);
+  ManaCost = std::max(ManaCost, Other.ManaCost);
+  HealthCost = std::max(HealthCost, Other.HealthCost);
+}
+
 } // namespace rogue

@@ -5,12 +5,10 @@
 #include <array>
 #include <iosfwd>
 #include <numeric>
+#include <rogue/Types.h>
 #include <tuple>
 
 namespace rogue {
-
-using StatPoint = int;
-using StatValue = double;
 
 struct StatPoints {
   StatPoint Int = 0;
