@@ -166,6 +166,42 @@
       "ap_cost": 15,
       "mana_cost": 10
     },
+    "str_5": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 5,
+        "dex": 0,
+        "int": 0,
+        "vit": 0
+      }
+    },
+    "dex_5": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 0,
+        "dex": 5,
+        "int": 0,
+        "vit": 0
+      }
+    },
+    "int_5": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 0,
+        "dex": 0,
+        "int": 5,
+        "vit": 0
+      }
+    },
+    "vit_5": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "vit": 5
+      }
+    },
     "low_chance_to_apply_poison": {
       "type": "chance_on_hit_to_apply_poison",
       "buff": {
@@ -325,6 +361,54 @@
         {
           "type": "equipment",
           "effect": "melee_2"
+        }
+      ]
+    },
+    {
+      "name": "Orb of Strength",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "str_5"
+        }
+      ]
+    },
+    {
+      "name": "Orb of Dexterity",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "dex_5"
+        }
+      ]
+    },
+    {
+      "name": "Orb of Intelligence",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "int_5"
+        }
+      ]
+    },
+    {
+      "name": "Orb of Vitality",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "vit_5"
         }
       ]
     },
@@ -908,6 +992,13 @@
       "capabilities": []
     },
     {
+      "name": "Nature Brew",
+      "description": "A brew of the treats of nature, it is not safe to consume",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
       "name": "Arcane Liquid",
       "description": "An arcane liquid TODO",
       "max_stack_size": 99,
@@ -946,8 +1037,22 @@
       "capabilities": []
     },
     {
+      "name": "Rune Stone",
+      "description": "A stone enchanted with rune magic",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
       "name": "Silk Thread",
       "description": "Lightweight crafting material spun from spider silk, known for its incredible strength.",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Silk Cloth",
+      "description": "Lightweight crafting material webbed from spider silk, known for its incredible strength.",
       "max_stack_size": 99,
       "types": ["crafting"],
       "capabilities": []
@@ -1272,6 +1377,39 @@
         }
       ]
     },
+    "common_stat_orb": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Orb of Strength",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Orb of Dexterity",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Orb of Intelligence",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Orb of Vitality",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        }
+      ]
+    },
     "common_armor_enhancements": {
       "rolls": 2,
       "slots": [
@@ -1287,6 +1425,11 @@
           "weight": 10
         },
         {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
+        },
+        {
           "type": "item",
           "name": "Armor Plating",
           "min_count": 1,
@@ -1300,11 +1443,15 @@
       ]
     },
     "rare_armor_enhancements": {
-      "rolls": 2,
+      "rolls": 3,
       "slots": [
         {
           "type": "null",
           "weight": 50
+        },
+        {
+          "type": "null",
+          "weight": 10
         },
         {
           "type": "item",
@@ -1312,6 +1459,11 @@
           "min_count": 1,
           "max_count": 1,
           "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
         },
         {
           "type": "item",
@@ -1339,6 +1491,11 @@
           "min_count": 1,
           "max_count": 1,
           "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
         },
         {
           "type": "item",
@@ -1384,6 +1541,11 @@
           "min_count": 1,
           "max_count": 1,
           "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
         },
         {
           "type": "item",

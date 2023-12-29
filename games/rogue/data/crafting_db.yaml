@@ -71,6 +71,81 @@ recipes:
       - Spiderling Venom Sac
     results:
       - Spider Venom Oil
+  - name: Nature Brew
+    ingredients:
+      - Glass Vial
+      - Arcane Liquid
+      - Blueberry
+      - Poison Berry
+      - Dragon Fruit
+      - Elder Flower
+    results:
+      - Nature Brew
+  - name: Rune Stone
+    ingredients:
+      - Rune Dust
+      - Rune Dust
+      - Stone
+      - Rune Dust
+      - Rune Dust
+    results:
+      - Rune Stone
+  - name: Orb of Strength
+    ingredients:
+      - Glass Vial
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
+      - Armor Plating
+      - Fire Stone
+    results:
+      - Orb of Strength
+      - Fire Stone
+  - name: Orb of Dexterity
+    ingredients:
+      - Glass Vial
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
+      - Silk Cloth
+      - Silk Cloth
+      - Silk Cloth
+      - Silk Cloth
+      - Silk Cloth
+      - Fire Stone
+    results:
+      - Orb of Dexterity
+      - Fire Stone
+  - name: Orb of Vitality
+    ingredients:
+      - Glass Vial
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
+      - Nature Brew
+      - Nature Brew
+      - Nature Brew
+      - Nature Brew
+      - Nature Brew
+      - Fire Stone
+    results:
+      - Orb of Vitality
+      - Fire Stone
+  - name: Orb of Intelligence
+    ingredients:
+      - Glass Vial
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
+      - Arcane Potion
+      - Arcane Potion
+      - Arcane Potion
+      - Arcane Potion
+      - Arcane Potion
+      - Fire Stone
+    results:
+      - Orb of Intelligence
+      - Fire Stone
   - name: Orb of Upgrade
     ingredients:
       - Glass Vial
@@ -97,3 +172,13 @@ recipes:
     results:
       - Great Orb of Upgrade
       - Fire Stone
+  - name: Silk Cloth
+    ingredients:
+      - Silk Thread
+      - Silk Thread
+      - Silk Thread
+      - Silk Thread
+      - Silk Thread
+      - Silk Thread
+    results:
+      - Silk Cloth
