@@ -193,6 +193,11 @@ const char *CapabilityFlags::str() const {
   return "<unimp. CapabilityFlags>";
 }
 
+CapabilityFlags::operator bool() const {
+  // Filter out capability flags that are not valid on their own
+  return (Value & ~(Self | Ranged | Adjacent)) != None;
+}
+
 bool CapabilityFlags::isAdjacent(CapabilityFlags Other) const {
   return (Value & (Adjacent | Other)) == (Adjacent | Other);
 }

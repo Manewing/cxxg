@@ -115,7 +115,7 @@ public:
   CapabilityFlags &operator=(CapabilityFlags &&) = default;
 
   operator ValueType() const { return Value; }
-  explicit operator bool() const { return Value != None; }
+  explicit operator bool() const;
 
   bool operator==(const CapabilityFlags &Other) const {
     return Value == Other.Value;

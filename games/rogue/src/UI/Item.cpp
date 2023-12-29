@@ -33,6 +33,9 @@ getColorForItemEffects(const std::vector<EffectInfo> &Effects,
                        CapabilityFlags Flags) {
   unsigned Count = 0;
   for (const auto &EffInfo : Effects) {
+    if (dynamic_cast<const NullEffect *>(EffInfo.Effect.get())) {
+      continue;
+    }
     if (EffInfo.Attributes.Flags & Flags) {
       ++Count;
     }
@@ -70,6 +73,9 @@ std::string getCapabilityDescription(const ItemType &ItType,
   bool HasAny = false;
   EffectAttributes Attrs;
   for (const auto &EffInfo : AllEffects) {
+    if (dynamic_cast<const NullEffect *>(EffInfo.Effect.get())) {
+      continue;
+    }
     if ((EffInfo.Attributes.Flags & Flag) != Flag) {
       continue;
     }
@@ -93,6 +99,9 @@ std::string getCapabilityDescription(const ItemType &ItType,
   }
   SS << "\n";
   for (const auto &EffInfo : AllEffects) {
+    if (dynamic_cast<const NullEffect *>(EffInfo.Effect.get())) {
+      continue;
+    }
     if ((EffInfo.Attributes.Flags & Flag) != Flag) {
       continue;
     }

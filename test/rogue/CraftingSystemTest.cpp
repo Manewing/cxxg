@@ -160,6 +160,25 @@ TEST_F(CraftingSystemTest, SimpleEquipmentEnhancement) {
   EXPECT_EQ(ArmorBuff->Value, 2);
 }
 
+TEST_F(CraftingSystemTest, CapabilityMismatchEnhancement) {
+  rogue::CraftingHandler System(Db);
+  auto Potion = Db.createItem(DummyItems.Potion.ItemId);
+  auto Plate = Db.createItem(DummyItems.PlateCrafting.ItemId);
+
+  auto ResultVec = System.tryCraft({Potion, Plate});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  const auto &Result = ResultVec->at(0);
+
+  EXPECT_EQ(Result.getType(), DummyItems.Potion.Type);
+  EXPECT_EQ(Result.getName(), "potion");
+  EXPECT_EQ(Result.StackSize, 1);
+  EXPECT_EQ(Result.getMaxStackSize(), 5);
+  ASSERT_EQ(Result.getAllEffects().size(), 1);
+  EXPECT_EQ(Result.getAllEffects().at(0).Effect.get(),
+            DummyItems.NullEffect.get());
+}
+
 TEST_F(CraftingSystemTest, MultiComponentPotionCrafting) {
   rogue::CraftingHandler System(Db);
   auto Potion = Db.createItem(DummyItems.Potion.ItemId);
@@ -291,8 +310,7 @@ TEST_F(CraftingSystemTest, MultipleRecipes) {
                                    DummyItems.CraftingC.ItemId},
                                   {DummyItems.HelmetB.ItemId});
   rogue::CraftingRecipe RecipeAC(
-      "dummy_ac",
-      {DummyItems.CraftingA.ItemId, DummyItems.CraftingC.ItemId},
+      "dummy_ac", {DummyItems.CraftingA.ItemId, DummyItems.CraftingC.ItemId},
       {DummyItems.Potion.ItemId});
   System.addRecipe(0, RecipeAB);
   System.addRecipe(1, RecipeABC);

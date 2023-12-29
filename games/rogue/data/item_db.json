@@ -338,9 +338,7 @@
         },
         {
           "type": "skill",
-          "effect": "sweeping_strike_effect",
-          "mana_cost": 15,
-          "ap_cost": 20
+          "effect": "null"
         }
       ],
       "specializations": [
@@ -427,12 +425,18 @@
       "name": "Scroll of striking",
       "description": "A scroll TODO",
       "max_stack_size": 1,
-      "types": ["consumable"],
+      "types": ["consumable", "crafting"],
       "capabilities": [
         {
           "type": "use_on",
           "effect": "sweeping_strike_effect",
           "mana_cost": 10
+        },
+        {
+          "type": "skill",
+          "effect": "sweeping_strike_effect",
+          "mana_cost": 15,
+          "ap_cost": 20
         }
       ]
     },
