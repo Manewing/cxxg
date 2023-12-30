@@ -4,13 +4,25 @@
       "type": "health_item_effect",
       "health_value": 5
     },
+    "health_effect": {
+      "type": "health_item_effect",
+      "health_value": 5
+    },
     "minor_mana_effect": {
       "type": "mana_item_effect",
       "mana_value": 5
     },
+    "major_mana_effect": {
+      "type": "mana_item_effect",
+      "mana_value": 25
+    },
     "damage_effect_10": {
       "type": "damage_item_effect",
       "damage_value": 10
+    },
+    "major_damage_effect": {
+      "type": "damage_item_effect",
+      "damage_value": 50
     },
     "minor_poison_effect": {
       "type": "poison_debuff_comp",
@@ -52,6 +64,14 @@
         "tick_period": 20
       }
     },
+    "major_health_regen_effect": {
+      "type": "health_regen_buff_comp",
+      "buff": {
+        "regen_amount": 1.5,
+        "ticks": 20,
+        "tick_period": 20
+      }
+    },
     "bleeding_debuff_effect": {
       "type": "bleeding_debuff_comp",
       "buff": {
@@ -60,22 +80,12 @@
         "tick_period": 10
       }
     },
-    "stats_buff_effect": {
-      "type": "stats_buff_comp",
-      "stats": {
-        "str": 10,
-        "dex": 1,
-        "int": 1,
-        "vit": 5
-      }
-    },
-    "stats_buff_effect_str_1": {
-      "type": "stats_buff_comp",
-      "stats": {
-        "str": 1,
-        "dex": 0,
-        "int": 0,
-        "vit": 0
+    "major_bleeding_debuff_effect": {
+      "type": "bleeding_debuff_comp",
+      "buff": {
+        "reduce_amount": 7.0,
+        "ticks": 5,
+        "tick_period": 10
       }
     },
     "str_5_per_hit_buff": {
@@ -549,13 +559,13 @@
         {
           "type": "ranged_use",
           "effect": "damage_effect_10",
-          "health_cost": 10
+          "mana_cost": 10
         }
       ]
     },
     {
       "name": "Scroll of striking",
-      "description": "A scroll TODO",
+      "description": "Strikes targets in the surrounding area",
       "max_stack_size": 1,
       "types": ["consumable", "crafting"],
       "capabilities": [
@@ -574,7 +584,7 @@
     },
     {
       "name": "Scroll of smiting",
-      "description": "A scroll TODO",
+      "description": "Smite the target with enormous power",
       "max_stack_size": 1,
       "types": ["consumable", "crafting"],
       "capabilities": [
@@ -592,6 +602,55 @@
       ]
     },
     {
+      "name": "Scroll of holy sacrifice",
+      "description": "Sacrifice health to deal damage to the target",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "ranged_use",
+          "effect": "major_damage_effect",
+          "health_cost": 10
+        },
+        {
+          "type": "skill_ranged",
+          "effect": "major_damage_effect",
+          "health_cost": 10
+        }
+      ]
+    },
+    {
+      "name": "Scroll of poison",
+      "description": "A scroll that poisons the target",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "ranged_use",
+          "effect": "minor_poison_effect",
+          "mana_cost": 5
+        }
+      ]
+    },
+    {
+      "name": "Scroll of sacrificial restoration",
+      "description": "Sacrifice health to restore health over time",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "major_health_regen_effect",
+          "health_cost": 10
+        },
+        {
+          "type": "skill",
+          "effect": "major_health_regen_effect",
+          "health_cost": 10
+        }
+      ]
+    },
+    {
       "name": "Scroll of blinding",
       "description": "A scroll that blinds the target",
       "max_stack_size": 1,
@@ -601,6 +660,73 @@
           "type": "ranged_use",
           "effect": "blinded_debuff_comp",
           "mana_cost": 10
+        }
+      ]
+    },
+    {
+      "name": "Scroll of bleeding",
+      "description": "A cluster of small cuts causes strong bleeding on the target",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "adjacent_use",
+          "effect": "major_bleeding_debuff_effect",
+          "mana_cost": 10
+        },
+        {
+          "type": "skill_adjacent",
+          "effect": "major_bleeding_debuff_effect",
+          "mana_cost": 10,
+          "ap_cost": 15
+        }
+      ]
+    },
+    {
+      "name": "Scroll of restoration",
+      "description": "A scroll that restores health",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "health_effect",
+          "mana_cost": 5
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_quick_health_regen_effect",
+          "mana_cost": 5
+        },
+        {
+          "type": "skill",
+          "effect": "health_effect",
+          "mana_cost": 5,
+          "ap_cost": 8
+        },
+        {
+          "type": "skill",
+          "effect": "minor_quick_health_regen_effect",
+          "mana_cost": 5,
+          "ap_cost": 8
+        }
+      ]
+    },
+    {
+      "name": "Scroll of life tap",
+      "description": "A scroll that mana by sacrificing health",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "major_mana_effect",
+          "health_cost": 10
+        },
+        {
+          "type": "skill",
+          "effect": "major_mana_effect",
+          "health_cost": 10
         }
       ]
     },
@@ -1120,6 +1246,10 @@
         {
           "type": "use_on",
           "effect": "learn_crafting_recipe"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
         }
       ]
     },
@@ -1316,6 +1446,62 @@
         },
         {
           "type": "item",
+          "name": "Scroll of poison",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of bleeding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of smiting",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of sacrificial restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of holy sacrifice",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of bleeding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of life tap",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
           "name": "Scroll of mind vision",
           "min_count": 1,
           "max_count": 1,
@@ -1431,6 +1617,34 @@
         },
         {
           "type": "item",
+          "name": "Scroll of restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of life tap",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of poison",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of bleeding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
           "name": "Armor Plating",
           "min_count": 1,
           "max_count": 1,
@@ -1463,6 +1677,48 @@
         {
           "type": "table",
           "ref": "common_stat_orb",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of sacrificial restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of poison",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of holy sacrifice",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of bleeding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of life tap",
+          "min_count": 1,
+          "max_count": 1,
           "weight": 5
         },
         {
