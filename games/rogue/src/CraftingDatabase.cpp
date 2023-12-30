@@ -66,7 +66,7 @@ void CraftingDatabase::addRecipe(const CraftingRecipe &Recipe) {
         "CraftingDatabase::addRecipe: Duplicate recipe name: " +
         Recipe.getName());
   }
-  auto RecipeId = Recipes.size();
+  auto RecipeId = static_cast<CraftingRecipeId>(Recipes.size());
   RecipeNameToId[Recipe.getName()] = RecipeId;
   Recipes.emplace(RecipeId, Recipe);
 }

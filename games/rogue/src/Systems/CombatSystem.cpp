@@ -64,7 +64,7 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
 
   THealth.reduce(NewDC.PhysDamage);
   THealth.reduce(NewDC.MagicDamage);
-  return NewDC.total();
+  return static_cast<unsigned>(NewDC.total());
 }
 
 bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,

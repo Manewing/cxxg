@@ -134,8 +134,8 @@ void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
   auto &PC = Reg.get<PositionComp>(SrcEt);
 
   // Melee is always possible, used default values for damage if not set
-  const MeleeAttackComp DefaultMA = {
-      .PhysDamage = 1, .MagicDamage = 0, .APCost = 10};
+  const MeleeAttackComp DefaultMA = {/*PhysDamage =*/1, /*MagicDamage = */ 0,
+                                     /*APCost = */ 10};
   MeleeAttackComp MA = DefaultMA;
   auto *AMA = Reg.try_get<MeleeAttackComp>(SrcEt);
   if (AMA) {
