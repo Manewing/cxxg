@@ -31,8 +31,8 @@ template <typename ChanceOnHitBuffType>
 void tryApplyChanceOnHitBuff(entt::registry &Reg, entt::entity Target,
                              entt::entity Source) {
   if (auto *COHB = Reg.try_get<ChanceOnHitBuffType>(Source)) {
-    if (COHB->canApplyTo(Target, Reg)) {
-      COHB->applyTo(Target, Reg);
+    if (COHB->canApplyTo(Source, Target, Reg)) {
+      COHB->applyTo(Source, Target, Reg);
     }
   }
 }

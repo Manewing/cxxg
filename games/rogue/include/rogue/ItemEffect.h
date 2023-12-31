@@ -235,15 +235,13 @@ public:
   virtual const BuffBase &getBuff() const = 0;
   std::string getName() const final;
   std::string getDescription() const final;
-  void publishBuffAppliedEvent(const entt::entity &SrcEt,
-                               const entt::entity &DstEt, bool IsCombat,
-                               entt::registry &Reg) const;
 };
 
 template <typename BuffType, bool IsCombat, typename... RequiredComps>
 class ApplyBuffItemEffect : public ApplyBuffItemEffectBase {
 public:
   using OwnType = ApplyBuffItemEffect<BuffType, IsCombat, RequiredComps...>;
+  using Helper = BuffApplyHelper<BuffType, IsCombat, RequiredComps...>;
 
 public:
   explicit ApplyBuffItemEffect(const BuffType &Buff) : Buff(Buff) {}
@@ -252,32 +250,24 @@ public:
 
   const BuffType &getBuffCasted() const { return Buff; }
 
-  bool canApplyTo(const entt::entity &, const entt::entity &DstEt,
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                   entt::registry &Reg) const final {
-    return BuffApplyHelper<BuffType, RequiredComps...>::canApplyTo(DstEt, Reg);
+    return Helper::canApplyTo(SrcEt, DstEt, Reg);
   }
 
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final {
-    BuffApplyHelper<BuffType, RequiredComps...>::applyTo(Buff, DstEt, Reg);
-    if constexpr (IsCombat) {
-      markCombat(SrcEt, DstEt, Reg);
-    }
-    publishBuffAppliedEvent(SrcEt, DstEt, IsCombat, Reg);
+    Helper::applyTo(Buff, SrcEt, DstEt, Reg);
   }
 
-  bool canRemoveFrom(const entt::entity &, const entt::entity &DstEt,
+  bool canRemoveFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
                      entt::registry &Reg) const final {
-    return BuffApplyHelper<BuffType, RequiredComps...>::canRemoveFrom(DstEt,
-                                                                      Reg);
+    return Helper::canRemoveFrom(SrcEt, DstEt, Reg);
   }
 
   void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
                   entt::registry &Reg) const final {
-    BuffApplyHelper<BuffType, RequiredComps...>::removeFrom(Buff, DstEt, Reg);
-    if constexpr (IsCombat) {
-      markCombat(SrcEt, DstEt, Reg);
-    }
+    Helper::removeFrom(Buff, SrcEt, DstEt, Reg);
   }
 
   std::shared_ptr<ItemEffect> clone() const final {

@@ -1,8 +1,4 @@
-#include <rogue/Components/Combat.h>
 #include <rogue/Components/Items.h>
-#include <rogue/Context.h>
-#include <rogue/Event.h>
-#include <rogue/EventHub.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 #include <sstream>
@@ -11,8 +7,7 @@ namespace rogue {
 
 void ItemEffect::markCombat(const entt::entity &SrcEt,
                             const entt::entity &DstEt, entt::registry &Reg) {
-  Reg.get_or_emplace<CombatAttackComp>(SrcEt).Target = DstEt;
-  Reg.get_or_emplace<CombatTargetComp>(DstEt).Attacker = SrcEt;
+  BuffApplyHelperBase::markCombat(SrcEt, DstEt, Reg);
 }
 
 std::shared_ptr<ItemEffect> NullEffect::clone() const {
@@ -163,15 +158,6 @@ std::string ApplyBuffItemEffectBase::getName() const {
 
 std::string ApplyBuffItemEffectBase::getDescription() const {
   return getBuff().getDescription();
-}
-
-void ApplyBuffItemEffectBase::publishBuffAppliedEvent(
-    const entt::entity &SrcEt, const entt::entity &DstEt, bool IsCombat,
-    entt::registry &Reg) const {
-  if (auto *Ctx = Reg.ctx().find<GameContext>()) {
-    Ctx->EvHub.publish(
-        BuffAppliedEvent{{}, SrcEt, DstEt, &Reg, IsCombat, &getBuff()});
-  }
 }
 
 } // namespace rogue

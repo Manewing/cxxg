@@ -196,41 +196,69 @@ struct BlockBuffComp : public AdditiveBuff, public BuffBase {
   bool remove(const BlockBuffComp &Other);
 };
 
-template <typename BuffType, typename... RequiredComps> class BuffApplyHelper {
+class BuffApplyHelperBase {
 public:
-  static bool canApplyTo(const entt::entity &Et, entt::registry &Reg) {
+  /// Marks the entities as in combat
+  static void markCombat(const entt::entity &SrcEt, const entt::entity &DstEt,
+                         entt::registry &Reg);
+
+  static void publishBuffAppliedEvent(const entt::entity &SrcEt,
+                                      const entt::entity &DstEt, bool IsCombat,
+                                      entt::registry &Reg,
+                                      const BuffBase &Buff);
+
+public:
+  virtual ~BuffApplyHelperBase() = default;
+
+protected:
+  BuffApplyHelperBase() = default;
+};
+
+template <typename BuffType, bool IsCombat, typename... RequiredComps>
+class BuffApplyHelper : public BuffApplyHelperBase {
+public:
+  static bool canApplyTo(const entt::entity &, const entt::entity &DstEt,
+                         entt::registry &Reg) {
     if constexpr (sizeof...(RequiredComps) == 0) {
       return true;
     } else {
-      return Reg.all_of<RequiredComps...>(Et);
+      return Reg.all_of<RequiredComps...>(DstEt);
     }
   }
 
-  static void applyTo(const BuffType &Buff, const entt::entity &Et,
-                      entt::registry &Reg) {
-    auto ExistingBuff = Reg.try_get<BuffType>(Et);
+  static void applyTo(const BuffType &Buff, const entt::entity &SrcEt,
+                      const entt::entity &DstEt, entt::registry &Reg) {
+    auto ExistingBuff = Reg.try_get<BuffType>(DstEt);
     if (ExistingBuff) {
       ExistingBuff->add(Buff);
     } else {
-      Reg.emplace<BuffType>(Et, Buff);
+      Reg.emplace<BuffType>(DstEt, Buff);
     }
+    if constexpr (IsCombat) {
+      markCombat(SrcEt, DstEt, Reg);
+    }
+    publishBuffAppliedEvent(SrcEt, DstEt, IsCombat, Reg, Buff);
   }
 
-  static bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) {
+  static bool canRemoveFrom(const entt::entity &, const entt::entity &DstEt,
+                            entt::registry &Reg) {
     if constexpr (sizeof...(RequiredComps) == 0) {
       return true;
     } else {
-      return Reg.all_of<RequiredComps...>(Et);
+      return Reg.all_of<RequiredComps...>(DstEt);
     }
   }
 
-  static void removeFrom(const BuffType &Buff, const entt::entity &Et,
-                         entt::registry &Reg) {
-    auto ExistingBuff = Reg.try_get<BuffType>(Et);
+  static void removeFrom(const BuffType &Buff, const entt::entity &SrcEt,
+                         const entt::entity &DstEt, entt::registry &Reg) {
+    auto ExistingBuff = Reg.try_get<BuffType>(DstEt);
     if (ExistingBuff) {
       if (ExistingBuff->remove(Buff)) {
-        Reg.erase<BuffType>(Et);
+        Reg.erase<BuffType>(DstEt);
       }
+    }
+    if constexpr (IsCombat) {
+      markCombat(SrcEt, DstEt, Reg);
     }
   }
 };
@@ -238,6 +266,8 @@ public:
 /// Chance on hit to apply a buff
 template <typename BuffType, typename... RequiredComps>
 struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
+  using Helper = BuffApplyHelper<BuffType, true, RequiredComps...>;
+
   /// Chance to apply buff in percent
   StatValue Chance = 5.0;
 
@@ -265,15 +295,17 @@ struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
     return Buff.remove(Other.Buff);
   }
 
-  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const {
-    return BuffApplyHelper<BuffType, RequiredComps...>::canApplyTo(Et, Reg);
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const {
+    return Helper::canApplyTo(SrcEt, DstEt, Reg);
   }
 
-  void applyTo(const entt::entity &Et, entt::registry &Reg) const {
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const {
     if (!rollForPercentage(Chance)) {
       return;
     }
-    BuffApplyHelper<BuffType, RequiredComps...>::applyTo(Buff, Et, Reg);
+    Helper::applyTo(Buff, SrcEt, DstEt, Reg);
   }
 };
 
