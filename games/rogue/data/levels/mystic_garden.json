@@ -1,0 +1,17 @@
+{
+  "map": {
+    "type": "generated",
+    "config": "mystic_garden.cfg"
+  },
+  "entities": {
+    "b": "blood_fairy",
+    "f": "fairy",
+    "A": "pine_tree",
+    "O": "oak_tree",
+    "I": "iron_pine_tree",
+    "G": "grove_guardian",
+    "C": "common_chest",
+    "H": "level_entry",
+    "<": "level_exit"
+  }
+}

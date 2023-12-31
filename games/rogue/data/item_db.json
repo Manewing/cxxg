@@ -114,6 +114,11 @@
       "phys_armor": 10,
       "magic_armor": 0
     },
+    "armor_30": {
+      "type": "armor_buff_comp",
+      "phys_armor": 30,
+      "magic_armor": 0
+    },
     "magic_armor_10": {
       "type": "armor_buff_comp",
       "phys_armor": 0,
@@ -160,6 +165,12 @@
       "type": "melee_attack_comp",
       "phys_damage": 10,
       "magic_damage": 0,
+      "ap_cost": 10
+    },
+    "magic_melee_10": {
+      "type": "melee_attack_comp",
+      "phys_damage": 0,
+      "magic_damage": 10,
       "ap_cost": 10
     },
     "ranged_5": {
@@ -491,6 +502,27 @@
       "enhancements": "common_melee_weapon_enhancements"
     },
     {
+      "name": "Arcane Shardblade",
+      "description": "A blade of arcane power, it is said to have been forged by the first mages of the realm.",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "magic_melee_10"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
+        }
+      ],
+      "enhancements": "common_magic_melee_weapon_enhancements"
+    },
+    {
       "name": "Toxic Claws",
       "description": "TODO",
       "max_stack_size": 1,
@@ -779,6 +811,30 @@
         {
           "type": "equipment",
           "effect": "armor_2"
+        }
+      ]
+    },
+    {
+      "name": "Tree Guard Armor",
+      "description": "Armor of trees",
+      "max_stack_size": 99,
+      "types": ["chest_plate"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_30"
+        }
+      ]
+    },
+    {
+      "name": "Blood Fairy Fangs",
+      "description": "Head of blood fairy",
+      "max_stack_size": 99,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "magic_melee_10"
         }
       ]
     },
@@ -1317,6 +1373,13 @@
         },
         {
           "type": "item",
+          "name": "Arcane Shardblade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
           "name": "Leather Boots",
           "min_count": 1,
           "max_count": 1,
@@ -1780,6 +1843,38 @@
         }
       ]
     },
+    "common_magic_melee_weapon_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "item",
+          "name": "Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Spider Venom Oil",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
+      ]
+    },
     "rare_melee_weapon_enhancements": {
       "rolls": 3,
       "slots": [
@@ -2118,6 +2213,23 @@
         }
       ]
     },
+    "ltb_blood_fairy": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Blood Fairy Fangs",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "common_blob",
+          "weight": -1
+        }
+      ]
+    },
     "ltb_toxic_rat": {
       "rolls": 2,
       "slots": [
@@ -2195,6 +2307,29 @@
           "type": "table",
           "ref": "common_chest",
           "weight": -1
+        }
+      ]
+    },
+    "common_tree": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Tree Guard Armor",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "item",
+          "name": "Wooden Log",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "null",
+          "weight": 70
         }
       ]
     },

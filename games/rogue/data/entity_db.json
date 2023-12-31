@@ -135,6 +135,18 @@
       }
     },
     {
+      "name": "neutral_creature",
+      "assemblers": {
+        "collision": true,
+        "health": true,
+        "position": true,
+        "visible": true,
+        "agility": true,
+        "line_of_sight": true,
+        "wander_ai": true
+      }
+    },
+    {
       "name": "base_enemy",
       "from_template": "hostile_creature",
       "assemblers": {
@@ -357,6 +369,142 @@
           "int": 0,
           "vit": 30
         }
+      }
+    },
+    {
+      "name": "fairy",
+      "from_template": "neutral_creature",
+      "display_name": "Fairy",
+      "description": "A delicate creature, it dances amidst the moonlit meadows, radiating an otherworldly glow.",
+      "assemblers": {
+        "tile": {
+          "color": "#64e6e6",
+          "char": "f"
+        },
+        "race": "creature",
+        "stats": {
+          "str": 0,
+          "dex": 10,
+          "int": 20,
+          "vit": 1
+        }
+      }
+    },
+    {
+      "name": "blood_fairy",
+      "from_template": "hostile_creature",
+      "display_name": "Blood Fairy",
+      "description": "A corrupted fairy that consumes the blood of its victims.",
+      "assemblers": {
+        "tile": {
+          "color": "#c81e1e",
+          "char": "f"
+        },
+        "race": "creature",
+        "faction": "nature",
+        "stats": {
+          "str": 1,
+          "dex": 10,
+          "int": 20,
+          "vit": 3
+        },
+        "equipment": true,
+        "auto_equip": true,
+        "drop_equipment": false,
+        "inventory": {
+          "loot_table": "ltb_blood_fairy"
+        }
+      }
+    },
+    {
+      "name": "base_tree",
+      "from_template": "dummy_creature",
+      "assemblers": {
+        "equipment": true,
+        "drop_equipment": false,
+        "auto_equip": true,
+        "race": "creature",
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "common_tree"
+        }
+      }
+    },
+    {
+      "name": "pine_tree",
+      "from_template": "base_tree",
+      "display_name": "Pine Tree",
+      "description": "A pine tree",
+      "assemblers": {
+        "tile": {
+          "color": "#288232",
+          "char": "A"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 10
+        }
+      }
+    },
+    {
+      "name": "oak_tree",
+      "from_template": "base_tree",
+      "display_name": "Oak Tree",
+      "description": "An oak tree",
+      "assemblers": {
+        "tile": {
+          "color": "#82b45a",
+          "char": "A"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 10
+        }
+      }
+    },
+    {
+      "name": "iron_pine_tree",
+      "from_template": "pine_tree",
+      "display_name": "Iron Pine Tree",
+      "description": "A runic pine tree made of iron",
+      "assemblers": {
+        "tile": {
+          "color": "#5a5a5a",
+          "char": "A"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 10
+        }
+      }
+    },
+    {
+      "name": "grove_guardian",
+      "from_template": "base_enemy",
+      "display_name": "Grove Guardian",
+      "description": "A Massive tree-like being that serves as the protector of the forest.",
+      "assemblers": {
+        "race": "creature",
+        "tile": {
+          "color": "#a0c8a0",
+          "char": "A"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 1,
+          "int": 0,
+          "vit": 10
+        },
+        "inventory": {
+          "loot_table": "common_tree"
+        },
+        "drop_equipment": false
       }
     },
     {
