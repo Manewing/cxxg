@@ -90,6 +90,18 @@ std::vector<EffectInfo> Item::getAllEffects() const {
   return AllEffects;
 }
 
+bool Item::hasEffect(CapabilityFlags Flags, bool AllowNull,
+                     bool AllowRemove) const {
+  bool HasEffect = false;
+  if (Specialization) {
+    HasEffect = Specialization->hasEffect(Flags, AllowNull, AllowRemove);
+    if (SpecOverrides) {
+      return HasEffect;
+    }
+  }
+  return HasEffect || getProto().hasEffect(Flags, AllowNull, AllowRemove);
+}
+
 CapabilityFlags Item::getCapabilityFlags() const {
   auto Flags = getProto().getCapabilityFlags();
   if (Specialization) {

@@ -24,6 +24,9 @@ TEST_F(ItemPrototypeTest, Properties) {
   EXPECT_EQ(Proto.Type, rogue::ItemType::None);
   EXPECT_EQ(Proto.MaxStackSize, 1);
   EXPECT_EQ(Proto.Effects.size(), 0);
+  EXPECT_EQ(Proto.getAttributes(), rogue::EffectAttributes{});
+  EXPECT_EQ(Proto.getCapabilityFlags(), rogue::CapabilityFlags::None);
+  EXPECT_EQ(Proto.hasEffect(rogue::CapabilityFlags::UseOn), false);
 }
 
 TEST_F(ItemPrototypeTest, GetCapabilityFlags) {
@@ -31,16 +34,24 @@ TEST_F(ItemPrototypeTest, GetCapabilityFlags) {
       1, "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_EQ(Proto.getCapabilityFlags(), rogue::CapabilityFlags::UseOn);
+  EXPECT_EQ(Proto.getAttributes(),
+            rogue::EffectAttributes{rogue::CapabilityFlags::UseOn});
+  EXPECT_FALSE(Proto.hasEffect(rogue::CapabilityFlags::UseOn));
+  EXPECT_TRUE(Proto.hasEffect(rogue::CapabilityFlags::UseOn, true));
 
   rogue::ItemPrototype Proto2(1, "Name", "Description", rogue::ItemType::Ring,
                               1,
                               {{{rogue::CapabilityFlags::Equipment},
                                 rogue::test::DummyItems::NullEffect}});
   EXPECT_EQ(Proto2.getCapabilityFlags(), rogue::CapabilityFlags::Equipment);
+  EXPECT_EQ(Proto2.getAttributes(),
+            rogue::EffectAttributes{rogue::CapabilityFlags::Equipment});
 
   rogue::ItemPrototype Proto3(1, "Name", "Description",
                               rogue::ItemType::Crafting, 1, {});
   EXPECT_EQ(Proto3.getCapabilityFlags(), rogue::CapabilityFlags::None);
+  EXPECT_EQ(Proto3.getAttributes(),
+            rogue::EffectAttributes{rogue::CapabilityFlags::None});
 }
 
 TEST_F(ItemPrototypeTest, CanApply) {

@@ -28,6 +28,10 @@ public:
 
   EffectAttributes getAttributes() const;
   EffectAttributes getAttributes(CapabilityFlags Flags) const;
+
+  bool hasEffect(CapabilityFlags Flags, bool AllowNull = false,
+                 bool AllowRemove = false) const;
+
   CapabilityFlags getCapabilityFlags() const;
   bool checkCapabilityFlags(CapabilityFlags Flags) const;
 

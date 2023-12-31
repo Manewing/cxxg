@@ -134,9 +134,13 @@ namespace {
 
 std::string getSelectValue(const EquipmentSlot &ES, int Idx) {
   if (ES.It) {
-    return "[" + std::to_string(Idx) + "] " + ES.It->getQualifierName();
+    std::string Prefix = "[-] ";
+    if (ES.It->hasEffect(CapabilityFlags::Skill)) {
+      Prefix = "[" + std::to_string(Idx) + "] ";
+    }
+    return Prefix + ES.It->getQualifierName();
   }
-  return "[" + std::to_string(Idx) + "] ---";
+  return "[-] ---";
 }
 
 cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
@@ -151,9 +155,10 @@ cxxg::types::TermColor getSelectColor(const EquipmentSlot &ES) {
 void EquipmentController::addSelect(const EquipmentSlot &ES,
                                     cxxg::types::Position AtPos) {
   constexpr const auto NoColor = cxxg::types::Color::NONE;
+  int Idx = AtPos.Y - Pos.Y + 1;
   ItSel->addSelect<LabeledSelect>(ES.BaseTypeFilter.str(),
-                                  getSelectValue(ES, AtPos.Y - Pos.Y + 1),
-                                  AtPos, getSize().X - 2, NoColor, NoColor);
+                                  getSelectValue(ES, Idx), AtPos,
+                                  getSize().X - 2, NoColor, NoColor);
 }
 
 void EquipmentController::updateSelectValues() const {

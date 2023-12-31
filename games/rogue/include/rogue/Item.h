@@ -28,7 +28,11 @@ public:
   std::string getDescription() const;
   ItemType getType() const;
   int getMaxStackSize() const;
+
   std::vector<EffectInfo> getAllEffects() const;
+
+  bool hasEffect(CapabilityFlags Flags, bool AllowNull = false,
+                 bool AllowRemove = false) const;
 
   CapabilityFlags getCapabilityFlags() const;
 

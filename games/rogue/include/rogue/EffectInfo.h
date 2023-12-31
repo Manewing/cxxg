@@ -40,6 +40,12 @@ struct EffectAttributes {
   void applyCosts(const entt::entity &Entity, entt::registry &Reg) const;
 };
 
+inline bool operator==(const EffectAttributes &LHS,
+                       const EffectAttributes &RHS) noexcept {
+  return std::tie(LHS.Flags, LHS.APCost, LHS.ManaCost, LHS.HealthCost) ==
+         std::tie(RHS.Flags, RHS.APCost, RHS.ManaCost, RHS.HealthCost);
+}
+
 std::ostream &operator<<(std::ostream &OS, const EffectAttributes &Attr);
 
 struct EffectInfo {

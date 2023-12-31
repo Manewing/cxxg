@@ -40,6 +40,27 @@ EffectAttributes ItemPrototype::getAttributes(CapabilityFlags Flags) const {
   return Attrs;
 }
 
+bool ItemPrototype::hasEffect(CapabilityFlags Flags, bool AllowNull,
+                              bool AllowRemove) const {
+  for (const auto &Info : Effects) {
+    if (!(Info.Attributes.Flags & Flags)) {
+      continue;
+    }
+    const bool IsNullEffect =
+        dynamic_cast<const NullEffect *>(Info.Effect.get());
+    if (IsNullEffect && !AllowNull) {
+      continue;
+    }
+    const bool IsRemoveEffect =
+        dynamic_cast<const RemoveEffectBase *>(Info.Effect.get());
+    if (IsRemoveEffect && !AllowRemove) {
+      continue;
+    }
+    return true;
+  }
+  return false;
+}
+
 CapabilityFlags ItemPrototype::getCapabilityFlags() const {
   return getAttributes().Flags;
 }
