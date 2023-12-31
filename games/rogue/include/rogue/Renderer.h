@@ -1,6 +1,7 @@
 #ifndef ROGUE_RENDERER_H
 #define ROGUE_RENDERER_H
 
+#include <cxxg/Screen.h>
 #include <cxxg/Types.h>
 #include <rogue/Tile.h>
 #include <ymir/Map.hpp>
@@ -34,6 +35,16 @@ private:
   ymir::Map<Tile> RenderedLevelMap;
   ymir::Map<cxxg::types::ColoredChar> VisibleMap;
 };
+
+template <typename T, typename U>
+cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
+  for (auto PY = 0; PY < Map.getSize().H; PY++) {
+    for (auto PX = 0; PX < Map.getSize().W; PX++) {
+      Scr[PY][PX] = Map.getTile({PX, PY});
+    }
+  }
+  return Scr;
+}
 
 } // namespace rogue
 

@@ -13,6 +13,7 @@
 #include <rogue/Level.h>
 #include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
+#include <rogue/RenderEventCollector.h>
 #include <rogue/UI/Controller.h>
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
@@ -26,35 +27,9 @@ struct SwitchLevelEvent;
 struct SwitchGameWorldEvent;
 struct LootEvent;
 struct CraftEvent;
-struct EntityAttackEvent;
-struct DetectTargetEvent;
-struct LostTargetEvent;
-struct EffectDelayEvent;
-struct BuffAppliedEvent;
-struct BuffExpiredEvent;
-struct BuffApplyEffectEvent;
-class Renderer;
 } // namespace rogue
 
 namespace rogue {
-
-class RenderEventCollector : public EventHubConnector {
-public:
-  void setEventHub(EventHub *EH) override;
-  void onEntityAttackEvent(const EntityAttackEvent &E);
-  void onDetectTargetEvent(const DetectTargetEvent &E);
-  void onLostTargetEvent(const LostTargetEvent &E);
-  void onEffectDelayEvent(const EffectDelayEvent &E);
-  void onBuffAppliedEvent(const BuffAppliedEvent &E);
-  void onBuffExpiredEvent(const BuffExpiredEvent &E);
-  void onBuffApplyEffectEvent(const BuffApplyEffectEvent &E);
-  void apply(Renderer &R);
-  void clear();
-  bool hasEvents() const;
-
-private:
-  std::vector<std::function<void(Renderer &)>> RenderFns;
-};
 
 class Game : public cxxg::Game {
 public:

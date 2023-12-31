@@ -39,6 +39,7 @@ set(HEADER_FILES
   include/rogue/LevelGenerator.h
   include/rogue/LootTable.h
   include/rogue/Parser.h
+  include/rogue/RenderEventCollector.h
   include/rogue/Renderer.h
   include/rogue/Systems/AttackAISystem.h
   include/rogue/Systems/CombatSystem.h
@@ -113,6 +114,7 @@ set(SOURCE_FILES
   src/LevelGenerator.cpp
   src/LootTable.cpp
   src/Parser.cpp
+  src/RenderEventCollector.cpp
   src/Renderer.cpp
   src/Systems/AgilitySystem.cpp
   src/Systems/AttackAISystem.cpp
@@ -156,9 +158,6 @@ add_library(
   ${SOURCE_FILES}
 )
 
-add_executable(${TARGET}
-  src/main.cpp
-)
 
 target_include_directories(lib${TARGET} PUBLIC include)
 
@@ -175,7 +174,19 @@ target_include_directories(lib${TARGET} SYSTEM
     ../../third-party/rapidjson/include
 )
 
+add_executable(${TARGET}
+  src/main.cpp
+)
+
 target_link_libraries(${TARGET}
+  lib${TARGET}
+)
+
+add_executable(map_viewer
+  tools/map_viewer.cpp
+)
+
+target_link_libraries(map_viewer
   lib${TARGET}
 )
 

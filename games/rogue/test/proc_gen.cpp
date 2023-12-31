@@ -11,16 +11,6 @@
 
 using namespace rogue;
 
-template <typename T, typename U>
-cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
-  for (auto PY = 0; PY < Map.getSize().H; PY++) {
-    for (auto PX = 0; PX < Map.getSize().W; PX++) {
-      Scr[PY][PX] = Map.getTile({PX, PY});
-    }
-  }
-  return Scr;
-}
-
 const Tile DirtTile{{' ', cxxg::types::RgbColor{0, 0, 0, true, 100, 80, 50}}};
 const Tile SandTile{{' ', cxxg::types::RgbColor{0, 0, 0, true, 180, 180, 90}}};
 const Tile GreenGrassTile{

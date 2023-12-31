@@ -26,16 +26,6 @@ using namespace rogue;
 static const Tile NPCTile{
     {'@', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
 
-template <typename T, typename U>
-cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
-  for (auto PY = 0; PY < Map.getSize().H; PY++) {
-    for (auto PX = 0; PX < Map.getSize().W; PX++) {
-      Scr[PY][PX] = Map.getTile({PX, PY});
-    }
-  }
-  return Scr;
-}
-
 using NPCCompList =
     ComponentList<TileComp, FactionComp, PositionComp, StatsComp, HealthComp,
                   NameComp, LineOfSightComp, AgilityComp, MeleeAttackComp,
