@@ -24,5 +24,7 @@ if __name__ == "__main__":
 	print("")
 	print(f"cxxg::types::RgbColor{{ {r}, {g}, {b} }}")
 	print("")
-	for _ in range(0, 10):
+	for _ in range(0, 5):
 		print(f"\033[38;2;{r};{g};{b}mHello, World! ###### ABCDE ##### 12345690 \033[0m")
+	for _ in range(0, 5):
+		print(f"\033[48;2;{r};{g};{b}mHello, World! ###### ABCDE ##### 12345690 \033[0m")
