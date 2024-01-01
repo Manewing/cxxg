@@ -23,7 +23,8 @@ Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
       return;
     }
     auto &RenderedTile = RenderedLevelMap.getTile(Pos);
-    if (auto *RgbColor = std::get_if<cxxg::types::RgbColor>(&RenderedTile.color())) {
+    if (auto *RgbColor =
+            std::get_if<cxxg::types::RgbColor>(&RenderedTile.color())) {
       if (!RgbColor->HasBackground) {
         RgbColor->HasBackground = true;
         RgbColor->BgR = GroundColor->BgR;
@@ -102,7 +103,19 @@ void Renderer::renderEffect(cxxg::types::ColoredChar EffC,
   if (!VisibleMap.contains(AtPos + Offset)) {
     return;
   }
-  VisibleMap.getTile(AtPos + Offset) = EffC;
+  VisibleMap.getTile(AtPos + Offset).Char = EffC.Char;
+  if (auto *RgbColor = std::get_if<cxxg::types::RgbColor>(&EffC.Color)) {
+    if (RgbColor->HasBackground) {
+      VisibleMap.getTile(AtPos + Offset).Color = EffC.Color;
+    } else if (auto *VRgb = std::get_if<cxxg::types::RgbColor>(
+                   &VisibleMap.getTile(AtPos + Offset).Color)) {
+      VRgb->R = RgbColor->R;
+      VRgb->G = RgbColor->G;
+      VRgb->B = RgbColor->B;
+    }
+  } else {
+    VisibleMap.getTile(AtPos + Offset).Color = EffC.Color;
+  }
 }
 
 void Renderer::renderEntities() {
