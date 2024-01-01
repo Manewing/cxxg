@@ -156,6 +156,37 @@
       }
     },
     {
+      "name": "base_interact",
+      "assemblers": {
+        "position": true,
+        "collision": true,
+        "visible": true
+      }
+    },
+    {
+      "name": "base_chest",
+      "from_template": "base_interact",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "<not defined from base_chest>"
+        },
+        "loot_interact": {
+          "is_looted": false,
+          "is_persistent": true,
+          "loot_name": "Chest",
+          "interact_text": "Open Chest",
+          "default_tile": {
+            "char": "C",
+            "color": "#ff0000"
+          },
+          "looted_tile": {
+            "char": "c",
+            "color": "#00ff00"
+          }
+        }
+      }
+    },
+    {
       "name": "base_rat",
       "from_template": "hostile_creature",
       "assemblers": {
@@ -407,7 +438,7 @@
           "str": 1,
           "dex": 10,
           "int": 5,
-          "vit": 3
+          "vit": 1
         },
         "equipment": true,
         "auto_equip": true,
@@ -427,7 +458,7 @@
         "race": "creature",
         "faction": "nature",
         "inventory": {
-          "loot_table": "common_tree"
+          "loot_table": "ltb_base_tree"
         }
       }
     },
@@ -477,11 +508,14 @@
           "color": "#5a5a5a",
           "char": "A"
         },
+        "inventory": {
+          "loot_table": "ltb_iron_pine_tree"
+        },
         "stats": {
           "str": 0,
           "dex": 0,
           "int": 0,
-          "vit": 10
+          "vit": 40
         }
       }
     },
@@ -492,28 +526,44 @@
       "description": "A Massive tree-like being that serves as the protector of the forest.",
       "assemblers": {
         "race": "creature",
+        "faction": "nature",
         "tile": {
           "color": "#a0c8a0",
           "char": "A"
         },
         "stats": {
-          "str": 0,
+          "str": 10,
           "dex": 1,
           "int": 0,
-          "vit": 10
+          "vit": 20
         },
         "inventory": {
-          "loot_table": "common_tree"
+          "loot_table": "ltb_iron_pine_tree"
         },
         "drop_equipment": false
       }
     },
     {
-      "name": "base_interact",
+      "name": "berry_bush",
+      "from_template": "base_chest",
+      "display_name": "Berry Bush",
+      "description": "A bush full of berries",
       "assemblers": {
-        "position": true,
-        "collision": true,
-        "visible": true
+        "inventory": {
+          "loot_table": "common_fruits"
+        },
+        "loot_interact": {
+          "loot_name": "Berry Bush",
+          "interact_text": "Harvest Berries",
+          "default_tile": {
+            "char": "B",
+            "color": "#8c0a32"
+          },
+          "looted_tile": {
+            "char": "B",
+            "color": "#051e05"
+          }
+        }
       }
     },
     {
@@ -569,29 +619,6 @@
         },
         "level_entry_exit": {
           "is_exit": true
-        }
-      }
-    },
-    {
-      "name": "base_chest",
-      "from_template": "base_interact",
-      "assemblers": {
-        "inventory": {
-          "loot_table": "<not defined from base_chest>"
-        },
-        "loot_interact": {
-          "is_looted": false,
-          "is_persistent": true,
-          "loot_name": "Chest",
-          "interact_text": "Open Chest",
-          "default_tile": {
-            "char": "C",
-            "color": "#ff0000"
-          },
-          "looted_tile": {
-            "char": "c",
-            "color": "#00ff00"
-          }
         }
       }
     },

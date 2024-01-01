@@ -7,6 +7,10 @@
   "initial_level_config": "levels/mystic_garden.json",
   "initial_items": [
     {
+      "name": "Small Sword",
+      "count": 1
+    },
+    {
       "name": "Arcane Shardblade",
       "count": 1
     },

@@ -119,6 +119,11 @@
       "phys_armor": 30,
       "magic_armor": 0
     },
+    "armor_50": {
+      "type": "armor_buff_comp",
+      "phys_armor": 50,
+      "magic_armor": 10
+    },
     "magic_armor_10": {
       "type": "armor_buff_comp",
       "phys_armor": 0,
@@ -832,6 +837,18 @@
         {
           "type": "equipment",
           "effect": "armor_30"
+        }
+      ]
+    },
+    {
+      "name": "Iron Pine Tree Armor",
+      "description": "Armor of trees",
+      "max_stack_size": 99,
+      "types": ["chest_plate"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_50"
         }
       ]
     },
@@ -1995,7 +2012,7 @@
         }
       ]
     },
-    "common_consumables": {
+    "common_fruits": {
       "rolls": 2,
       "slots": [
         {
@@ -2038,7 +2055,7 @@
         },
         {
           "type": "table",
-          "ref": "common_consumables",
+          "ref": "common_fruits",
           "weight": 30
         },
         {
@@ -2324,7 +2341,30 @@
       ]
     },
     "common_tree": {
-      "rolls": 1,
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Wooden Log",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 70
+        },
+        {
+          "type": "null",
+          "weight": 70
+        },
+        {
+          "type": "item",
+          "name": "Wooden Log",
+          "min_count": 2,
+          "max_count": 4,
+          "weight": 30
+        }
+      ]
+    },
+    "ltb_base_tree": {
+      "rolls": 2,
       "slots": [
         {
           "type": "item",
@@ -2334,15 +2374,44 @@
           "weight": -1
         },
         {
+          "type": "table",
+          "ref": "common_tree",
+          "weight": -1
+        }
+      ]
+    },
+    "ltb_iron_pine_tree": {
+      "rolls": 2,
+      "slots": [
+        {
           "type": "item",
-          "name": "Wooden Log",
+          "name": "Iron Pine Tree Armor",
           "min_count": 1,
-          "max_count": 2,
-          "weight": 30
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "common_tree",
+          "weight": -1
+        },
+        {
+          "type": "item",
+          "name": "Iron Scrap",
+          "min_count": 4,
+          "max_count": 6,
+          "weight": 70
         },
         {
           "type": "null",
           "weight": 70
+        },
+        {
+          "type": "item",
+          "name": "Iron Scrap",
+          "min_count": 2,
+          "max_count": 4,
+          "weight": 30
         }
       ]
     },
