@@ -246,6 +246,13 @@
       },
       "chance": 10.0
     },
+    "high_chance_to_apply_blind": {
+      "type": "chance_on_hit_to_apply_blinded",
+      "buff": {
+        "ticks": 600
+      },
+      "chance": 70.0
+    },
     "dismantle_iron_equip": {
       "type": "dismantle",
       "items": [
@@ -369,6 +376,30 @@
         {
           "type": "use_on",
           "effect": "minor_poison_effect"
+        }
+      ]
+    },
+    {
+      "name": "Blinding Mushroom Spores",
+      "description": "A poisonous mushroom that causes blindness when eaten",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "high_chance_to_apply_blind"
+        }
+      ]
+    },
+    {
+      "name": "Blinding Mushroom",
+      "description": "A poisonous mushroom that causes blindness when eaten",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "blinded_debuff_comp"
         }
       ]
     },
@@ -1245,6 +1276,18 @@
         {
           "type": "use_on",
           "effect": "remove_poison_debuff"
+        }
+      ]
+    },
+    {
+      "name": "Fairy Dust",
+      "description": "A dust of fairy TODO",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "major_health_regen_effect"
         }
       ]
     },
@@ -2250,6 +2293,52 @@
         }
       ]
     },
+    "ltb_blinding_mushroom": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Blinding Mushroom Spores",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "item",
+          "name": "Blinding Mushroom",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 70
+        },
+        {
+          "type": "null",
+          "weight": 70
+        },
+        {
+          "type": "item",
+          "name": "Blinding Mushroom",
+          "min_count": 3,
+          "max_count": 4,
+          "weight": 30
+        }
+      ]
+    },
+    "ltb_fairy": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Fairy Dust",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 10
+        },
+        {
+          "type": "null",
+          "weight": 10
+        }
+      ]
+    },
     "ltb_blood_fairy": {
       "rolls": 2,
       "slots": [
@@ -2262,7 +2351,7 @@
         },
         {
           "type": "table",
-          "ref": "common_blob",
+          "ref": "ltb_fairy",
           "weight": -1
         }
       ]
@@ -2416,6 +2505,13 @@
         {
           "type": "item",
           "name": "Iron Scrap",
+          "min_count": 2,
+          "max_count": 4,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Arcane Liquid",
           "min_count": 2,
           "max_count": 4,
           "weight": 30

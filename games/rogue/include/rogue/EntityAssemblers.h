@@ -147,6 +147,15 @@ private:
   StatPoints Stats;
 };
 
+class DamageCompAssembler : public EntityAssembler {
+public:
+  explicit DamageCompAssembler(const DamageComp &DC);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  DamageComp DC;
+};
+
 // Keep sorted
 using AttackAICompAssembler = DefaultConstructEntityAssembler<AttackAIComp>;
 using BlockLOSCompAssembler = DefaultConstructEntityAssembler<BlocksLOS>;

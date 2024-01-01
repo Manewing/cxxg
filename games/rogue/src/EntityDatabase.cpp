@@ -198,6 +198,26 @@ makeStatsCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   return std::make_shared<StatsCompAssembler>(SP);
 }
 
+DamageComp parseDamageComp(const rapidjson::Value &Json) {
+  DamageComp DC;
+  const auto &JsonObj = Json.GetObject();
+  DC.PhysDamage = JsonObj["phys_damage"].GetUint();
+  DC.MagicDamage = JsonObj["magic_damage"].GetUint();
+  if (JsonObj.HasMember("hits")) {
+    DC.Hits = JsonObj["hits"].GetUint();
+  }
+  if (JsonObj.HasMember("ticks")) {
+    DC.Ticks = JsonObj["ticks"].GetUint();
+  }
+  return DC;
+}
+
+std::shared_ptr<DamageCompAssembler>
+makeDamageCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
+  auto DC = parseDamageComp(Json);
+  return std::make_shared<DamageCompAssembler>(DC);
+}
+
 using EntityAssemblerFactories =
     std::map<std::string, std::function<std::shared_ptr<EntityAssembler>(
                               ItemDatabase &, const rapidjson::Value &)>>;
@@ -209,6 +229,7 @@ const auto &getEntityAssemblerFactories() {
       {"inventory", makeInventoryCompAssembler},
       {"race", makeRaceCompAssembler},
       {"stats", makeStatsCompAssembler},
+      {"damage", makeDamageCompAssembler},
       {"tile", makeTileCompAssembler},
       {"world_entry", makeWorldEntryAssembler},
       {"level_entry_exit", makeLevelEntryExitAssembler},

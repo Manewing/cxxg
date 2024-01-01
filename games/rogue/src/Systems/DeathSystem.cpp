@@ -14,42 +14,13 @@ namespace rogue {
 
 namespace {
 
-// FIXME have another component for just storing extra to be dropped items?
-void addRaceDrops(RaceKind Race, Inventory &Inv, entt::registry &Reg) {
-  // FIXME load this from config
-  struct DropInfo {
-    double DropChance = 0.3;
-    int ItemId;
-
-    bool rollDice() const { return (rand() % 100) / 100.0 < DropChance; }
-  };
-  struct RaceDropInfo {
-    std::vector<DropInfo> Drops;
-  };
-  static std::map<RaceKind, RaceDropInfo> RaceDrops = {
-      {RaceKind::Undead, {{DropInfo{0.6, 11}}}},
-      {RaceKind::Troll, {{DropInfo{0.1, 12}}}},
-  };
-
-  auto It = RaceDrops.find(Race);
-  if (It == RaceDrops.end()) {
-    return;
-  }
-
-  for (const auto &Drop : It->second.Drops) {
-    if (Drop.rollDice()) {
-      Inv.addItem(
-          Reg.ctx().get<GameContext>().ItemDb.createItem(Drop.ItemId, 1));
-    }
-  }
-}
-
 Inventory getDropInventoryFromEntity(entt::entity Entity, entt::registry &Reg) {
   Inventory Inv;
 
   if (auto *IC = Reg.try_get<InventoryComp>(Entity)) {
     Inv = IC->Inv;
   }
+
   if (Reg.any_of<DropEquipmentComp>(Entity)) {
     if (auto *EC = Reg.try_get<EquipmentComp>(Entity)) {
       for (const auto &ES : EC->Equip.all()) {
@@ -59,17 +30,12 @@ Inventory getDropInventoryFromEntity(entt::entity Entity, entt::registry &Reg) {
       }
     }
   }
-  if (auto *RC = Reg.try_get<RaceComp>(Entity)) {
-    addRaceDrops(RC->Kind, Inv, Reg);
-  }
+
   return Inv;
 }
 
-void reapDeadEntities(entt::registry &Reg, EventHubConnector &EHC,
-                      const entt::entity Entity, const HealthComp &HC) {
-  if (HC.Value != 0) {
-    return;
-  }
+void reapEntity(entt::registry &Reg, EventHubConnector &EHC,
+                const entt::entity Entity) {
   EHC.publish(EntityDiedEvent{{}, Entity, &Reg});
 
   // Create loot from entity
@@ -90,6 +56,22 @@ void reapDeadEntities(entt::registry &Reg, EventHubConnector &EHC,
   Reg.destroy(Entity);
 }
 
+void reapDeadEntity(entt::registry &Reg, EventHubConnector &EHC,
+                    const entt::entity Entity, const HealthComp &HC) {
+  if (HC.Value != 0) {
+    return;
+  }
+  reapEntity(Reg, EHC, Entity);
+}
+
+void reapDamageEntity(entt::registry &Reg, EventHubConnector &EHC,
+                      const entt::entity Entity, DamageComp &DC) {
+  if (DC.Ticks-- > 0 && DC.Hits > 0) {
+    return;
+  }
+  reapEntity(Reg, EHC, Entity);
+}
+
 /// Empty inventory will be removed unless there is a health component
 void removeEmptyContainers(entt::registry &Reg, const entt::entity Entity,
                            const InventoryComp &IC,
@@ -107,9 +89,16 @@ void removeEmptyContainers(entt::registry &Reg, const entt::entity Entity,
 void DeathSystem::update(UpdateType Type) {
   (void)Type; // Always run
 
-  auto View = Reg.view<const HealthComp>();
-  View.each([this](const auto &Entity, const auto &HC) {
-    reapDeadEntities(Reg, *this, Entity, HC);
+  // Handle dead entities
+  auto DeadView = Reg.view<const HealthComp>();
+  DeadView.each([this](const auto &Entity, const auto &HC) {
+    reapDeadEntity(Reg, *this, Entity, HC);
+  });
+
+  // Handle damage components
+  auto DmgView = Reg.view<DamageComp>();
+  DmgView.each([this](const auto &Entity, auto &DC) {
+    reapDamageEntity(Reg, *this, Entity, DC);
   });
 
   // FIXME should this be done somewhere else?

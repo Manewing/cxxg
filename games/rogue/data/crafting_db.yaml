@@ -134,6 +134,13 @@ recipes:
       - Elder Flower
     results:
       - Nature Brew
+  - name: Rune Dust
+    ingredients:
+      - Fairy Dust
+      - Fire Stone
+    results:
+      - Rune Dust
+      - Rune Dust
   - name: Rune Stone
     ingredients:
       - Rune Dust

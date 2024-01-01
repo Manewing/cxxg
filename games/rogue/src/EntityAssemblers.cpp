@@ -296,4 +296,13 @@ void StatsCompAssembler::assemble(entt::registry &Reg,
   Reg.emplace<StatsComp>(Entity).Base = Stats;
 }
 
+DamageCompAssembler::DamageCompAssembler(const DamageComp &DC) : DC(DC) {}
+
+void DamageCompAssembler::assemble(entt::registry &Reg,
+                                   entt::entity Entity) const {
+  auto NewDC = DC;
+  NewDC.Source = Entity;
+  Reg.emplace<DamageComp>(Entity, NewDC);
+}
+
 } // namespace rogue

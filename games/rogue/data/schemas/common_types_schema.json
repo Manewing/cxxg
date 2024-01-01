@@ -77,6 +77,10 @@
         "bg_color": {
           "type": "string",
           "description": "The background color of the character"
+        },
+        "z_index": {
+          "type": "integer",
+          "description": "The z-index of the character"
         }
       }
     },

@@ -13,7 +13,7 @@
     "C": "common_chest",
     "H": "level_entry",
     "<": "level_exit",
-    "B": "berry_bush"
-
+    "B": "berry_bush",
+    "m": "blinding_mushroom"
   }
 }

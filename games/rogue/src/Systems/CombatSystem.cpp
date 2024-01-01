@@ -175,7 +175,7 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
   }
 }
 
-void applyDamage(entt::registry &Reg, entt::entity DmgEt, DamageComp &DC,
+void applyDamageComp(entt::registry &Reg, DamageComp &DC,
                  const PositionComp &PC, EventHubConnector &EHC) {
   Reg.view<PositionComp, HealthComp>().each(
       [&Reg, &PC, &DC, &EHC](const auto &TEt, auto &TPC, auto &THC) {
@@ -199,10 +199,6 @@ void applyDamage(entt::registry &Reg, entt::entity DmgEt, DamageComp &DC,
         EAE.Damage = Damage;
         EHC.publish(EAE);
       });
-
-  if (DC.Hits <= 0) {
-    Reg.destroy(DmgEt);
-  }
 }
 
 } // namespace
@@ -264,22 +260,15 @@ void CombatSystem::update(UpdateType Type) {
     return;
   }
 
-  // Remove expired damage components
-  Reg.view<DamageComp>().each([this](const auto &Et, auto &DC) {
-    if (DC.Ticks-- == 0) {
-      Reg.destroy(Et);
-    }
-  });
-
   // Deal with melee attacks
   Reg.view<CombatActionComp>().each([this](const auto &AttackerEt, auto &CC) {
     performAttack(Reg, AttackerEt, CC, *this);
   });
 
-  // Deal with damages
+  // Deal with damages, removing damage entities is handled by the death system
   Reg.view<DamageComp, PositionComp>().each(
-      [this](const auto &DmgEt, auto &DC, auto &PC) {
-        applyDamage(Reg, DmgEt, DC, PC, *this);
+      [this](const auto &, auto &DC, auto &PC) {
+        applyDamageComp(Reg, DC, PC, *this);
       });
 }
 

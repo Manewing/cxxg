@@ -79,45 +79,17 @@
       }
     },
     {
-      "name": "silk_cocoon",
-      "from_template": "dummy_creature",
-      "display_name": "Silk Cocoon",
-      "description": "Suspended cocoon containing captured prey.",
+      "name": "base_trap",
       "assemblers": {
+        "position": true,
+        "visible": true,
+        "damage": {
+          "phys_damage": 0,
+          "magic_damage": 0
+        },
         "tile": {
-          "color": "#e0e0e0",
-          "char": "0"
-        },
-        "stats": {
-          "str": 0,
-          "dex": 0,
-          "int": 0,
-          "vit": 1
-        },
-        "faction": "nature",
-        "inventory": {
-          "loot_table": "common_silk_cocoon"
-        },
-        "race": "dummy"
-      }
-    },
-    {
-      "name": "large_silk_cocoon",
-      "from_template": "silk_cocoon",
-      "display_name": "Large Silk Cocoon",
-      "assemblers": {
-        "tile": {
-          "color": "#e0e0a0",
-          "char": "O"
-        },
-        "stats": {
-          "str": 0,
-          "dex": 0,
-          "int": 0,
-          "vit": 3
-        },
-        "inventory": {
-          "loot_table": "rare_silk_cocoon"
+          "char": "T",
+          "color": "#ff0000"
         }
       }
     },
@@ -235,6 +207,49 @@
           "dex": 6,
           "int": 0,
           "vit": 3
+        }
+      }
+    },
+    {
+      "name": "silk_cocoon",
+      "from_template": "dummy_creature",
+      "display_name": "Silk Cocoon",
+      "description": "Suspended cocoon containing captured prey.",
+      "assemblers": {
+        "tile": {
+          "color": "#e0e0e0",
+          "char": "0"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 1
+        },
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "common_silk_cocoon"
+        },
+        "race": "dummy"
+      }
+    },
+    {
+      "name": "large_silk_cocoon",
+      "from_template": "silk_cocoon",
+      "display_name": "Large Silk Cocoon",
+      "assemblers": {
+        "tile": {
+          "color": "#e0e0a0",
+          "char": "O"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 3
+        },
+        "inventory": {
+          "loot_table": "rare_silk_cocoon"
         }
       }
     },
@@ -445,6 +460,24 @@
         "drop_equipment": false,
         "inventory": {
           "loot_table": "ltb_blood_fairy"
+        }
+      }
+    },
+    {
+      "name": "blinding_mushroom",
+      "display_name": "Blinding Mushroom",
+      "description": "A mushroom that emits toxic blinding spores when disturbed.",
+      "from_template": "base_trap",
+      "assemblers": {
+        "tile": {
+          "color": "#ff0000",
+          "char": "m"
+        },
+        "equipment": true,
+        "auto_equip": true,
+        "drop_equipment": false,
+        "inventory": {
+          "loot_table": "ltb_blinding_mushroom"
         }
       }
     },
