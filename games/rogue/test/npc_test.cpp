@@ -83,6 +83,7 @@ int main(int Argc, char *Argv[]) {
 
     const auto RenderSize = ymir::Size2d<int>{80, 24};
     Renderer Render(RenderSize, *Level, {40, 12});
+    Render.renderEntities();
     Scr << Render.get();
 
     auto &PC = Level->Reg.get<PositionComp>(NPCEntity);

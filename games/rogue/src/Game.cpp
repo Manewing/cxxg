@@ -458,6 +458,7 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   Render.renderShadow(/*Darkness=*/30);
   Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
   Render.renderAllLineOfSight();
+  Render.renderEntities();
   REC.apply(Render);
   REC.clear();
 
