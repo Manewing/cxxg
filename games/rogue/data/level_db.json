@@ -5,13 +5,19 @@
         {
           "type": "level",
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/sewers.json",
+          "level_config": "levels/l1_sewers.json",
           "weight": 5
         },
         {
           "type": "level",
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/spider_nest.json",
+          "level_config": "levels/l1_mystic_gardens.json",
+          "weight": 5
+        },
+        {
+          "type": "level",
+          "game_world": "multi_level_dungeon",
+          "level_config": "levels/l1_spiders.json",
           "weight": 5
         }
       ]

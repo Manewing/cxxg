@@ -1,0 +1,16 @@
+{
+  "map": {
+    "type": "composite",
+    "levels": [
+      {
+        "end": 1,
+        "config": "sewers.json"
+      },
+      {
+        "end": 2,
+        "config": "fat_rat.json"
+      }
+    ]
+  },
+  "entities": {}
+}

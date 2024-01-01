@@ -4,7 +4,7 @@
   "level_db_config": "level_db.json",
   "crafting_db_config": "crafting_db.json",
   "initial_game_world": "multi_level_dungeon",
-  "initial_level_config": "levels/mystic_garden.json",
+  "initial_level_config": "levels/fat_rat.json",
   "initial_items": [
     {
       "name": "Small Sword",

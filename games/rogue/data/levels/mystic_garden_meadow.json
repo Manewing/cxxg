@@ -1,16 +1,14 @@
 {
   "map": {
     "type": "generated",
-    "config": "mystic_garden.cfg"
+    "config": "mystic_garden_meadow.cfg"
   },
   "entities": {
-    "b": "blood_fairy",
     "f": "fairy",
     "A": "pine_tree",
     "O": "oak_tree",
     "H": "level_entry",
     "<": "level_exit",
-    "B": "berry_bush",
-    "m": "blinding_mushroom"
+    "B": "berry_bush"
   }
 }

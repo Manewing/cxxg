@@ -211,6 +211,29 @@
       }
     },
     {
+      "name": "fat_rat",
+      "from_template": "base_rat",
+      "display_name": "Fat Rat",
+      "description": "A giant fat rat with a vicious appetite.",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "ltb_fat_rat"
+        },
+        "equipment": true,
+        "auto_equip": true,
+        "tile": {
+          "color": "#c8c8b4",
+          "char": "R"
+        },
+        "stats": {
+          "str": 6,
+          "dex": 2,
+          "int": 0,
+          "vit": 10
+        }
+      }
+    },
+    {
       "name": "silk_cocoon",
       "from_template": "dummy_creature",
       "display_name": "Silk Cocoon",

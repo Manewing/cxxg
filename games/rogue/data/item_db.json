@@ -584,6 +584,22 @@
       ]
     },
     {
+      "name": "Sharp Rat Claws",
+      "description": "TODO",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "melee_5"
+        },
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_bleeding"
+        }
+      ]
+    },
+    {
       "name": "Fire Wand",
       "description": "A wand casting fire balls",
       "max_stack_size": 1,
@@ -2352,6 +2368,23 @@
         {
           "type": "table",
           "ref": "ltb_fairy",
+          "weight": -1
+        }
+      ]
+    },
+    "ltb_fat_rat": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Sharp Rat Claws",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "common_rat",
           "weight": -1
         }
       ]

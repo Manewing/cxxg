@@ -1,0 +1,20 @@
+{
+  "map": {
+    "type": "composite",
+    "levels": [
+      {
+        "end": 0,
+        "config": "mystic_garden.json"
+      },
+      {
+        "end": 1,
+        "config": "mystic_garden_meadow.json"
+      },
+      {
+        "end": 2,
+        "config": "mystic_garden.json"
+      }
+    ]
+  },
+  "entities": {}
+}
