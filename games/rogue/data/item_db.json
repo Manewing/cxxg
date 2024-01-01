@@ -232,6 +232,15 @@
       },
       "chance": 10.0
     },
+    "low_chance_to_apply_bleeding": {
+      "type": "chance_on_hit_to_apply_bleeding",
+      "buff": {
+        "reduce_amount": 1.0,
+        "ticks": 10,
+        "tick_period": 20
+      },
+      "chance": 10.0
+    },
     "dismantle_iron_equip": {
       "type": "dismantle",
       "items": [
@@ -835,6 +844,10 @@
         {
           "type": "equipment",
           "effect": "magic_melee_10"
+        },
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_bleeding"
         }
       ]
     },

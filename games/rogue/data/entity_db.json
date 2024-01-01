@@ -385,9 +385,10 @@
         "stats": {
           "str": 0,
           "dex": 10,
-          "int": 20,
+          "int": 5,
           "vit": 1
-        }
+        },
+        "healer": true
       }
     },
     {
@@ -405,7 +406,7 @@
         "stats": {
           "str": 1,
           "dex": 10,
-          "int": 20,
+          "int": 5,
           "vit": 3
         },
         "equipment": true,
