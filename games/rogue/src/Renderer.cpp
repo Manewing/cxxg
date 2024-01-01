@@ -16,6 +16,23 @@ Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
   RenderedLevelMap = L.Map.render();
   renderEntities();
 
+  // Render background color
+  L.Map.get(Level::LayerGroundIdx).forEach([this](auto Pos, auto &Tile) {
+    auto *GroundColor = std::get_if<cxxg::types::RgbColor>(&Tile.color());
+    if (!GroundColor) {
+      return;
+    }
+    auto &RenderedTile = RenderedLevelMap.getTile(Pos);
+    if (auto *RgbColor = std::get_if<cxxg::types::RgbColor>(&RenderedTile.color())) {
+      if (!RgbColor->HasBackground) {
+        RgbColor->HasBackground = true;
+        RgbColor->BgR = GroundColor->BgR;
+        RgbColor->BgG = GroundColor->BgG;
+        RgbColor->BgB = GroundColor->BgB;
+      }
+    }
+  });
+
   // FIXME make this configurable
   VisibleMap.fill(Level::WallTile.T);
 

@@ -7,13 +7,20 @@
 namespace rogue {
 
 cxxg::types::ColoredChar parseColoredChar(const std::string &Value) {
-  static const std::regex Regex("\\{('..?'), (\"#[0-9a-fA-F]+\")\\}");
+  static const std::regex Regex(
+      "\\{('..?'), (\"#[0-9a-fA-F]+\")( *, *(\"#[0-9a-fA-F]+\"))?\\}");
   std::smatch Match;
   if (std::regex_match(Value, Match, Regex)) {
     auto Char = ymir::Config::Parser::parseChar(Match[1]);
-    // FIXME allow background colors
     auto Color = ymir::Config::parseRgbColor(Match[2]);
     cxxg::types::RgbColor CxxColor{Color.R, Color.G, Color.B};
+    if (Match[4].matched) {
+      auto BgColor = ymir::Config::parseRgbColor(Match[4]);
+      CxxColor.HasBackground = true;
+      CxxColor.BgR = BgColor.R;
+      CxxColor.BgB = BgColor.B;
+      CxxColor.BgG = BgColor.G;
+    }
     return cxxg::types::ColoredChar(Char, CxxColor);
   }
   throw std::runtime_error("Invalid colored char format: " + Value);
