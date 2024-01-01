@@ -51,6 +51,7 @@ bool EquipmentController::handleUseSkill(Controller &Ctrl, Level &Lvl,
   }
 
   InventoryHandler InvHandler(Entity, Reg, CraftingHandler());
+  InvHandler.setEventHub(Ctrl.getEventHub());
   if (InvHandler.tryUseSkill(ItType)) {
     return true;
   }

@@ -198,6 +198,12 @@ bool Game::handleInput(int Char) {
     auto Idx = Char == '0' ? 10 : Char - '1';
     auto Player = getPlayer();
     auto &EC = getLvlReg().get<EquipmentComp>(Player);
+
+    const auto IsSlotValid = std::size_t(Idx) < EC.Equip.all().size();
+    if (!IsSlotValid) {
+      return true;
+    }
+
     if (EC.Equip.all().at(Idx)->It) {
       if (ui::EquipmentController::handleUseSkill(
               UICtrl, World->getCurrentLevelOrFail(), Player,
@@ -207,6 +213,8 @@ bool Game::handleInput(int Char) {
     } else {
       Hist.warn() << "No item equipped in slot "
                   << EC.Equip.all().at(Idx)->BaseTypeFilter;
+      handleUpdates(/*IsTick=*/false);
+      return true;
     }
   }
 

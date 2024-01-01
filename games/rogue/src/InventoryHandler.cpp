@@ -203,6 +203,13 @@ bool InventoryHandler::tryUseSkillOnTarget(ItemType SlotType,
   }
   const auto &It = *Slot.It;
 
+  if (!It.hasEffect(CapabilityFlags::Skill)) {
+    std::stringstream SS;
+    SS << It.getName() << " does not have a skill";
+    publish(PlayerInfoMessageEvent() << SS.str());
+    return false;
+  }
+
   if (!It.canApplyTo(Entity, TargetEt, Reg, CapabilityFlags::Skill)) {
     if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
       std::stringstream SS;
