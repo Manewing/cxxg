@@ -74,6 +74,7 @@ int wrapped_main(int Argc, char *Argv[]) {
       Ret = run_game(Scr, Cfg);
     } catch (const rogue::GameOverException &) {
     }
+    Cfg.Seed = std::time(nullptr);
   }
 
   return 0;

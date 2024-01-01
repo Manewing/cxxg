@@ -482,7 +482,7 @@ void Game::handleDrawGameOver() {
   handleShowNotifications(true);
   Scr.update();
   Scr.clear();
-  cxxg::utils::sleep(5000000);
+  cxxg::utils::sleep(1000000);
   cxxg::utils::getChar(true);
   throw GameOverException();
 }

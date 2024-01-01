@@ -160,6 +160,7 @@ MenuController::MenuController(Controller &C, Level &L)
     if (S.getValue() == "Resume") {
       Ctrl.closeMenuUI();
     } else if (S.getValue() == "Controls") {
+      CtrlTB->setPos(Pos);
       static_cast<Frame *>(Comp.get())->setComp(CtrlTB);
     } else if (S.getValue() == "Help") {
       Ctrl.addWindow(makeHelpWindow(), false, true);

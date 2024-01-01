@@ -61,7 +61,7 @@ bool EquipmentController::handleUseSkill(Controller &Ctrl, Level &Lvl,
 EquipmentController::EquipmentController(Controller &Ctrl, Equipment &Equip,
                                          entt::entity Entity, Level &Lvl,
                                          cxxg::types::Position Pos)
-    : BaseRectDecorator(Pos, {40, 11}, nullptr), Ctrl(Ctrl), Equip(Equip),
+    : BaseRectDecorator(Pos, {60, 11}, nullptr), Ctrl(Ctrl), Equip(Equip),
       Entity(Entity), Lvl(Lvl), Reg(Lvl.Reg),
       InvHandler(Entity, Reg, CraftingHandler()) {
   InvHandler.setEventHub(Ctrl.getEventHub());
