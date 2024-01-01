@@ -79,7 +79,7 @@ void removeEmptyContainers(entt::registry &Reg, const entt::entity Entity,
   if (Reg.any_of<HealthComp>(Entity)) {
     return;
   }
-  if (IC.Inv.empty() && !LIC.IsLooted && !LIC.IsPersistent) {
+  if (IC.Inv.empty() && LIC.IsLooted && !LIC.IsPersistent) {
     Reg.destroy(Entity);
   }
 }

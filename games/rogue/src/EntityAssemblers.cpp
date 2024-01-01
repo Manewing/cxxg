@@ -11,6 +11,11 @@ TileCompAssembler::TileCompAssembler(Tile T) : T(T) {}
 
 void TileCompAssembler::assemble(entt::registry &Reg,
                                  entt::entity Entity) const {
+  // There are some assemblers that already add a tile component, sanity check
+  // that there is none already (indicates incorrect usage of assemblers)
+  if (Reg.all_of<TileComp>(Entity)) {
+    throw std::runtime_error("Entity already has a tile component");
+  }
   Reg.emplace<TileComp>(Entity, T);
 }
 
