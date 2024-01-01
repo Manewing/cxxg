@@ -94,6 +94,8 @@ private:
   RenderEventCollector REC;
   ui::Controller UICtrl;
   long unsigned GameTicks = 0;
+
+  unsigned WorldSwitchCounter = 0;
 };
 
 } // namespace rogue

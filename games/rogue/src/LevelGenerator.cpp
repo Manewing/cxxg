@@ -397,8 +397,10 @@ LevelGeneratorLoader::create(unsigned Seed, const LevelConfig &Cfg) {
   }
   if (auto *CompCfg = std::get_if<CompositeMultiLevelGenerator::Config>(&Cfg)) {
     auto CompGen = std::make_shared<CompositeMultiLevelGenerator>(Ctx);
+    unsigned LevelGenSeed = Seed;
     for (const auto &[LevelEndIdx, LevelCfg] : CompCfg->Levels) {
-      CompGen->addGenerator(load(Seed, LevelCfg), LevelEndIdx);
+      CompGen->addGenerator(load(LevelGenSeed, LevelCfg), LevelEndIdx);
+      LevelGenSeed++;
     }
     return CompGen;
   }

@@ -379,7 +379,7 @@ void Game::onSwitchGameWorldEvent(const SwitchGameWorldEvent &E) {
   UICtrl.closeAll();
   REC.clear();
 
-  World->switchWorld(Cfg.Seed, E.LevelName, E.SwitchEt);
+  World->switchWorld(Cfg.Seed + WorldSwitchCounter++, E.LevelName, E.SwitchEt);
 
   // We could update the level here, but we want to draw the initial state.
   handleUpdates(/*IsTick=*/false);
