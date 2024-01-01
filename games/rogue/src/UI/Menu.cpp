@@ -75,7 +75,11 @@ std::shared_ptr<Widget> makeHelpWindow() {
      << "Progress is heavily based on your equipment. So make sure to upgrade "
         "your equipment regularly from found items, by crafting or by "
         "enhancing your items. You can equip items using ("
-     << Controls::Equip.getInteractMsg() << "). \n";
+     << Controls::Equip.getInteractMsg() << ").\n\n"
+     << "Equipment is also the only way to get access to new skills. You can "
+        "use skills by pressing the corresponding number key (0-9). You can "
+        "see the skills of your currently equipped items in the equipment "
+        "window. Items without skill will show '[-]'.\n";
 
   return makeHelpWindow("Help", SS.str(), DefaultPos, DefaultSize);
 }
@@ -148,6 +152,7 @@ MenuController::MenuController(Controller &C, Level &L)
   for (const auto *C : GameCtrlInfos) {
     SS << C->getInteractMsg() << "\n" << C->Desc << "\n\n";
   }
+  SS << "[0-9] Skill\nCast skill of related item in equipment slot.\n\n";
   SS << "--- UI ---\n";
   for (const auto *C : UICtrlInfos) {
     SS << C->getInteractMsg() << "\n" << C->Desc << "\n\n";
