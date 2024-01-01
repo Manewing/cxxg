@@ -63,8 +63,13 @@ int main(int Argc, char *Argv[]) {
   Level->setEventHub(&Hub);
 
   while (true) {
-    const auto RenderSize = ymir::Size2d<int>{80, 24};
-    rogue::Renderer Render(RenderSize, *Level, {40, 12});
+    // Render the current map
+    const auto RenderSize = ymir::Size2d<int>{
+        static_cast<int>(Scr.getSize().X), static_cast<int>(Scr.getSize().Y)};
+    // Compute center position
+    const auto CenterPos = ymir::Point2d<int>{Level->Map.getSize().W / 2,
+                                              Level->Map.getSize().H / 2};
+    rogue::Renderer Render(RenderSize, *Level, CenterPos);
     RenderCollector.apply(Render);
     RenderCollector.clear();
     Scr << Render.get();
