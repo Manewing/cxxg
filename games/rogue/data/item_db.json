@@ -684,8 +684,8 @@
         {
           "type": "skill",
           "effect": "sweeping_strike_effect",
-          "mana_cost": 25,
-          "ap_cost": 20
+          "mana_cost": 20,
+          "ap_cost": 12
         }
       ]
     },
