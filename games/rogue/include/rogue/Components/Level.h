@@ -7,10 +7,12 @@
 namespace rogue {
 
 struct LevelStartComp {
+  static std::string getName() { return "LevelStart"; }
   int NextLevelId = -1;
 };
 
 struct LevelEndComp {
+  static std::string getName() { return "LevelEnd"; }
   int NextLevelId = -1;
 };
 
