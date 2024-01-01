@@ -1067,6 +1067,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "enhancements": "common_armor_enhancements"
@@ -1084,6 +1088,10 @@
         {
           "type": "equipment",
           "effect": "magic_armor_10"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "specializations": [
