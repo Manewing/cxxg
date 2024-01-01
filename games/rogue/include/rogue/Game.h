@@ -31,6 +31,8 @@ struct CraftEvent;
 
 namespace rogue {
 
+class GameOverException {};
+
 class Game : public cxxg::Game {
 public:
   Game(cxxg::Screen &Scr, const GameConfig &Cfg);

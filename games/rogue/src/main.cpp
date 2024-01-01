@@ -28,6 +28,18 @@ void setup_main() {}
 
 #endif
 
+int run_game(cxxg::Screen &Scr, const rogue::GameConfig &Cfg) {
+  rogue::Game GameInstance(Scr, Cfg);
+  try {
+    GameInstance.initialize();
+    GameInstance.run();
+  } catch (std::exception const &E) {
+    std::cerr << "ERROR: Running game:" << E.what() << std::endl;
+    return 1;
+  }
+  return 0;
+}
+
 int wrapped_main(int Argc, char *Argv[]) {
   if (Argc == 2 && (std::string_view(Argv[1]) == "--help" ||
                     std::string_view(Argv[1]) == "-h")) {
@@ -56,13 +68,12 @@ int wrapped_main(int Argc, char *Argv[]) {
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
-  rogue::Game GameInstance(Scr, Cfg);
-  try {
-    GameInstance.initialize();
-    GameInstance.run();
-  } catch (std::exception const &E) {
-    std::cerr << "ERROR: Running game:" << E.what() << std::endl;
-    return 1;
+  int Ret = 0;
+  while (!Ret) {
+    try {
+      Ret = run_game(Scr, Cfg);
+    } catch (const rogue::GameOverException &) {
+    }
   }
 
   return 0;

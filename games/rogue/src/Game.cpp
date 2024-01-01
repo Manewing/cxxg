@@ -478,7 +478,13 @@ void Game::handleDrawLevel(bool UpdateScreen) {
 }
 
 void Game::handleDrawGameOver() {
-  // TODO
+  info() << "Game Over! Press any key to retry";
+  handleShowNotifications(true);
+  Scr.update();
+  Scr.clear();
+  cxxg::utils::sleep(5000000);
+  cxxg::utils::getChar(true);
+  throw GameOverException();
 }
 
 void Game::handleResize(cxxg::types::Size Size) {
