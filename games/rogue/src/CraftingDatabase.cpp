@@ -14,6 +14,8 @@ CraftingDatabase::load(const ItemDatabase &ItemDb,
   auto [DocStr, Doc] = loadJSON(CraftingDbConfig, &SchemaPath);
 
   for (const auto &Recipe : Doc["recipes"].GetArray()) {
+    auto Name = Recipe["name"].GetString();
+
     std::vector<CraftingRecipe::ItemId> RequiredItems;
     for (const auto &RequiredItem : Recipe["ingredients"].GetArray()) {
       RequiredItems.push_back(ItemDb.getItemId(RequiredItem.GetString()));
@@ -25,18 +27,48 @@ CraftingDatabase::load(const ItemDatabase &ItemDb,
     }
 
     CraftingDb.addRecipe(
-        CraftingRecipe(std::move(RequiredItems), std::move(ResultItems)));
+        CraftingRecipe(Name, std::move(RequiredItems), std::move(ResultItems)));
   }
 
   return CraftingDb;
 }
 
-const std::vector<CraftingRecipe> &CraftingDatabase::getRecipes() const {
+CraftingRecipeId CraftingDatabase::getRecipeId(const std::string &Name) const {
+  auto It = RecipeNameToId.find(Name);
+  if (It == RecipeNameToId.end()) {
+    throw std::runtime_error("CraftingDatabase::getRecipeId: Unknown recipe: " +
+                             Name);
+  }
+  return It->second;
+}
+
+const CraftingRecipe &CraftingDatabase::getRecipe(CraftingRecipeId Id) const {
+  auto It = Recipes.find(Id);
+  if (It == Recipes.end()) {
+    throw std::runtime_error(
+        "CraftingDatabase::getRecipe: Unknown recipe id: " +
+        std::to_string(Id));
+  }
+  return It->second;
+}
+
+const std::map<CraftingRecipeId, CraftingRecipe> &
+CraftingDatabase::getRecipes() const {
   return Recipes;
 }
 
 void CraftingDatabase::addRecipe(const CraftingRecipe &Recipe) {
-  Recipes.push_back(Recipe);
+  if (Recipe.getRequiredItems().size() < 2) {
+    throw std::runtime_error("CraftingDatabase::addRecipe: Invalid recipe");
+  }
+  if (RecipeNameToId.count(Recipe.getName()) != 0) {
+    throw std::runtime_error(
+        "CraftingDatabase::addRecipe: Duplicate recipe name: " +
+        Recipe.getName());
+  }
+  auto RecipeId = static_cast<CraftingRecipeId>(Recipes.size());
+  RecipeNameToId[Recipe.getName()] = RecipeId;
+  Recipes.emplace(RecipeId, Recipe);
 }
 
 } // namespace rogue

@@ -2,6 +2,7 @@
 #include <ranges>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
+#include <rogue/CraftingHandler.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 #include <rogue/ItemEffectImpl.h>
@@ -38,6 +39,11 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              const auto HealthValue = V["health_value"].GetDouble();
              return std::make_shared<HealItemEffect>(HealthValue);
            }},
+          {"mana_item_effect",
+           [](const auto &, const auto &V) {
+             const auto ManaValue = V["mana_value"].GetDouble();
+             return std::make_shared<ManaItemEffect>(ManaValue);
+           }},
           {"damage_item_effect",
            [](const auto &, const auto &V) {
              const auto DamageValue = V["damage_value"].GetDouble();
@@ -54,6 +60,12 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              HealthRegenBuffComp Buff;
              parseRegenerationBuff(V["buff"], Buff);
              return std::make_shared<HealthRegenBuffEffect>(Buff);
+           }},
+          {"mana_regen_buff_comp",
+           [](const auto &, const auto &V) {
+             ManaRegenBuffComp Buff;
+             parseRegenerationBuff(V["buff"], Buff);
+             return std::make_shared<ManaRegenBuffEffect>(Buff);
            }},
           {"bleeding_debuff_comp",
            [](const auto &, const auto &V) {
@@ -106,6 +118,9 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              MAC.PhysDamage = V["phys_damage"].GetDouble();
              MAC.MagicDamage = V["magic_damage"].GetDouble();
              MAC.APCost = V["ap_cost"].GetUint();
+             if (V.HasMember("mana_cost")) {
+               MAC.ManaCost = V["mana_cost"].GetUint();
+             }
              return std::make_shared<SetMeleeCompEffect>(MAC);
            }},
           {"ranged_attack_comp",
@@ -114,6 +129,9 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              RAC.PhysDamage = V["phys_damage"].GetDouble();
              RAC.MagicDamage = V["magic_damage"].GetDouble();
              RAC.APCost = V["ap_cost"].GetUint();
+             if (V.HasMember("mana_cost")) {
+               RAC.ManaCost = V["mana_cost"].GetUint();
+             }
              return std::make_shared<SetRangedCompEffect>(RAC);
            }},
           {"stats_buff_per_hit_comp",
@@ -167,7 +185,7 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
   return It->second(DB, V);
 }
 
-static void addDefaultConstructEffects(
+static void addDefaultConstructEffect(
     std::map<std::string, std::shared_ptr<ItemEffect>> &Effects,
     const std::string &EffectName, const std::shared_ptr<ItemEffect> &Effect) {
   const auto It = Effects.find(EffectName);
@@ -180,11 +198,17 @@ static void addDefaultConstructEffects(
 
 static void addDefaultConstructEffects(
     std::map<std::string, std::shared_ptr<ItemEffect>> &Effects) {
-  addDefaultConstructEffects(Effects, "null", std::make_shared<NullEffect>());
-  addDefaultConstructEffects(Effects, "remove_poison_effect",
-                             std::make_shared<RemovePoisonEffect>());
-  addDefaultConstructEffects(Effects, "remove_poison_debuff",
-                             std::make_shared<RemovePoisonDebuffEffect>());
+  addDefaultConstructEffect(Effects, "null", std::make_shared<NullEffect>());
+  addDefaultConstructEffect(Effects, "sweeping_strike_effect",
+                            std::make_shared<SweepingStrikeEffect>());
+  addDefaultConstructEffect(Effects, "smite_effect",
+                            std::make_shared<SmiteEffect>());
+  addDefaultConstructEffect(Effects, "remove_poison_effect",
+                            std::make_shared<RemovePoisonEffect>());
+  addDefaultConstructEffect(Effects, "remove_poison_debuff",
+                            std::make_shared<RemovePoisonDebuffEffect>());
+  addDefaultConstructEffect(Effects, "learn_crafting_recipe",
+                            std::make_shared<LearnRecipeEffect>());
 }
 
 static std::shared_ptr<ItemSpecialization>
@@ -234,9 +258,28 @@ static LootTable::LootSlot createLootNullSlot(const rapidjson::Value &V) {
   return LootTable::LootSlot{nullptr, Weight};
 }
 
+static EffectAttributes createEffectAttrs(const rapidjson::Value &V) {
+  EffectAttributes Attrs;
+  Attrs.Flags = CapabilityFlags::fromString(V["type"].GetString());
+  if (V.HasMember("ap_cost")) {
+    Attrs.APCost = V["ap_cost"].GetUint();
+  }
+  if (V.HasMember("mana_cost")) {
+    Attrs.ManaCost = V["mana_cost"].GetUint();
+  }
+  if (V.HasMember("health_cost")) {
+    Attrs.HealthCost = V["health_cost"].GetUint();
+  }
+  return Attrs;
+}
+
 static void fillLootTable(const ItemDatabase &DB, const rapidjson::Value &V,
                           LootTable &LootTb) {
   const auto NumRolls = V["rolls"].GetUint();
+  bool PickAndReturn = false;
+  if (V.HasMember("pick_and_return")) {
+    PickAndReturn = V["pick_and_return"].GetBool();
+  }
   std::vector<LootTable::LootSlot> Slots;
   for (const auto &SlotJson : V["slots"].GetArray()) {
     const auto Type = std::string(SlotJson["type"].GetString());
@@ -251,7 +294,7 @@ static void fillLootTable(const ItemDatabase &DB, const rapidjson::Value &V,
     }
   }
 
-  LootTb.reset(NumRolls, Slots);
+  LootTb.reset(NumRolls, Slots, PickAndReturn);
 }
 
 ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
@@ -291,6 +334,14 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     Specializations.emplace(SpecName, Spec);
   }
 
+  // Create loot tables
+  const auto &LootTablesJson = Doc["loot_tables"].GetObject();
+  for (const auto &[K, V] : LootTablesJson) {
+    const auto Name = std::string(K.GetString());
+    // Check if already registered
+    DB.addLootTable(Name);
+  }
+
   // Create item prototypes
   const auto &ItemProtosJson = Doc["item_prototypes"].GetArray();
   for (const auto &ItemProtoJson : ItemProtosJson) {
@@ -307,10 +358,13 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
     std::vector<EffectInfo> EffectInfos;
     for (const auto &CapJson : ItemProtoJson["capabilities"].GetArray()) {
       const auto &CapInfo = CapJson.GetObject();
-      const auto Flag =
-          CapabilityFlags::fromString(CapInfo["type"].GetString());
-      const auto Effect = Effects.at(CapJson["effect"].GetString());
-      EffectInfos.push_back({Flag, Effect});
+      const auto Attrs = createEffectAttrs(CapJson);
+      const auto EffectName = std::string(CapInfo["effect"].GetString());
+      const auto It = Effects.find(EffectName);
+      if (It == Effects.end()) {
+        throw std::out_of_range("Unknown item effect: " + EffectName);
+      }
+      EffectInfos.push_back({Attrs, It->second});
     }
 
     std::unique_ptr<ItemSpecializations> Specialization;
@@ -318,26 +372,26 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
       Specialization = std::make_unique<ItemSpecializations>();
       for (const auto &SpecJson : ItemProtoJson["specializations"].GetArray()) {
         const auto &SpecInfo = SpecJson.GetObject();
-        const auto Flags =
-            CapabilityFlags::fromString(SpecInfo["type"].GetString());
+        const auto Attrs = createEffectAttrs(SpecJson);
         const auto Spec =
             Specializations.at(SpecInfo["specialization"].GetString());
-        Specialization->addSpecialization(Flags, Spec);
+        Specialization->addSpecialization(Attrs, Spec);
       }
+    }
+
+    std::shared_ptr<LootTable> Enhancements = nullptr;
+    if (ItemProtoJson.HasMember("enhancements")) {
+      const auto &LootTbName = ItemProtoJson["enhancements"].GetString();
+      const auto &LootTb = DB.getLootTable(LootTbName);
+      Enhancements = LootTb;
     }
 
     ItemPrototype Proto(DB.getNewItemId(), Name, Description, ItType,
                         MaxStackSize, std::move(EffectInfos));
-    DB.addItemProto(Proto, Specialization.get());
+    DB.addItemProto(Proto, Specialization.get(), Enhancements);
   }
 
-  // Create loot tables
-  const auto &LootTablesJson = Doc["loot_tables"].GetObject();
-  for (const auto &[K, V] : LootTablesJson) {
-    const auto Name = std::string(K.GetString());
-    // Check if already registered
-    DB.addLootTable(Name);
-  }
+  // Fill loot tables
   for (const auto &[K, V] : LootTablesJson) {
     const auto Name = std::string(K.GetString());
     auto &LootTb = DB.getLootTable(Name);
@@ -373,17 +427,22 @@ const ItemSpecializations *ItemDatabase::getItemSpec(int ItemId) const {
   return &It->second;
 }
 
-void ItemDatabase::addItemProto(const ItemPrototype &ItemProto,
-                                const ItemSpecializations *ItemSpec) {
+void ItemDatabase::addItemProto(
+    const ItemPrototype &ItemProto, const ItemSpecializations *ItemSpec,
+    const std::shared_ptr<LootTable> &Enhancements) {
   // FIXME ID not yet taken
   assert(ItemProtos.count(ItemProto.ItemId) == 0);
   ItemProtos.emplace(ItemProto.ItemId, ItemProto);
   if (ItemSpec) {
     ItemSpecs.emplace(ItemProto.ItemId, *ItemSpec);
   }
+  if (Enhancements) {
+    ItemEnhancements.emplace(ItemProto.ItemId, Enhancements);
+  }
 }
 
-Item ItemDatabase::createItem(int ItemId, int StackSize) const {
+Item ItemDatabase::createItem(int ItemId, int StackSize,
+                              bool AllowEnchanting) const {
   auto It = ItemProtos.find(ItemId);
   if (It == ItemProtos.end()) {
     throw std::out_of_range("Unknown item id: " + std::to_string(ItemId));
@@ -393,7 +452,37 @@ Item ItemDatabase::createItem(int ItemId, int StackSize) const {
   if (auto SpecIt = ItemSpecs.find(ItemId); SpecIt != ItemSpecs.end()) {
     Spec = SpecIt->second.actualize(It->second);
   }
-  return Item(It->second, StackSize, Spec);
+
+  auto NewItem = Item(It->second, StackSize, Spec);
+
+  // Craft enhancements
+  if (auto EnhIt = ItemEnhancements.find(ItemId);
+      AllowEnchanting && EnhIt != ItemEnhancements.end() && EnhIt->second) {
+    auto LootRewards = EnhIt->second->generateLoot();
+    std::vector<Item> LootItems;
+    for (const auto &Reward : LootRewards) {
+      for (unsigned I = 0; I < Reward.Count; ++I) {
+        LootItems.push_back(createItem(Reward.ItId, 1));
+      }
+    }
+    CraftingHandler Crafter;
+    while (!LootItems.empty()) {
+      auto NextEnhancement = LootItems.back();
+      LootItems.pop_back();
+
+      // Try to craft, if it does not succeed abort (invalid combination)
+      auto Result = Crafter.tryCraft({NewItem, NextEnhancement});
+      if (!Result || Result->size() != 1) {
+        throw std::runtime_error("Invalid crafting result for " +
+                                 NewItem.getName() + " and " +
+                                 NextEnhancement.getName());
+      }
+
+      NewItem = Result->at(0);
+    }
+  }
+
+  return NewItem;
 }
 
 int ItemDatabase::getRandomItemId() const {

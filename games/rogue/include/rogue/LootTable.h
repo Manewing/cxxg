@@ -58,8 +58,10 @@ public:
 
 public:
   LootTable();
-  explicit LootTable(unsigned NumRolls, const std::vector<LootSlot> &Slots);
-  void reset(unsigned NumRolls, const std::vector<LootSlot> &Slots);
+  explicit LootTable(unsigned NumRolls, const std::vector<LootSlot> &Slots,
+                     bool PickAndReturn = false);
+  void reset(unsigned NumRolls, const std::vector<LootSlot> &Slots,
+             bool PickAndReturn = false);
 
   const std::vector<LootSlot> &getSlots() const;
   const std::vector<LootSlot> &getGuaranteedSlots() const;
@@ -67,9 +69,13 @@ public:
   void fillGuaranteedLoot(std::vector<LootReward> &Loot) const;
   void fillLoot(std::vector<LootReward> &Loot) const final;
 
+  void fillLootNoReturns(std::vector<LootReward> &Loot) const;
+  void fillLootWithReturns(std::vector<LootReward> &Loot) const;
+
 private:
   unsigned NumRolls = 1;
   std::vector<LootSlot> Slots;
+  bool PickAndReturn = false;
   std::vector<LootSlot> GuaranteedSlots;
 };
 

@@ -1,0 +1,13 @@
+{
+    "map": {
+      "type": "composite",
+      "levels": [
+        {
+          "end": 1,
+          "config": "spider_nest.json"
+        }
+      ]
+    },
+    "entities": {}
+  }
+  

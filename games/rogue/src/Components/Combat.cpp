@@ -43,8 +43,20 @@ StatValue MeleeAttackComp::getMagicEffectiveDamage(const StatPoints *SP) const {
 using ProjectileCompList = ComponentList<DamageComp, PositionComp, AgilityComp,
                                          TileComp, MovementComp>;
 
+static constexpr auto TempDamageTile =
+    Tile{{'*', cxxg::types::RgbColor{175, 175, 175}}};
 static constexpr auto ProjectileTile =
     Tile{{'*', cxxg::types::RgbColor{255, 65, 0}}};
+
+void createTempDamage(entt::registry &Reg, const DamageComp &DC,
+                      ymir::Point2d<int> Pos) {
+  auto E = Reg.create();
+  Reg.emplace<DamageComp>(E, DC).Ticks = 1;
+  Reg.emplace<PositionComp>(E, Pos);
+  Reg.emplace<TileComp>(E, TempDamageTile);
+  Reg.emplace<NameComp>(E, "Damage");
+  Reg.emplace<VisibleComp>(E);
+}
 
 void createProjectile(entt::registry &Reg, const DamageComp &DC,
                       ymir::Point2d<int> Pos, ymir::Point2d<int> TargetPos,

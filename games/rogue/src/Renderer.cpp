@@ -8,16 +8,33 @@
 namespace rogue {
 
 Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
-    : L(L), VisibleMap(Size) {
+    : L(L), VisibleMap(Size), IsVisibleMap(Size) {
   Offset.X = -(Center.X - Size.W / 2);
   Offset.Y = -(Center.Y - Size.H / 2);
 
   // Render map and copy to visible map
   RenderedLevelMap = L.Map.render();
-  renderEntities();
 
-  // FIXME make this configurable
+  // Render background color
+  L.Map.get(Level::LayerGroundIdx).forEach([this](auto Pos, auto &Tile) {
+    auto *GroundColor = std::get_if<cxxg::types::RgbColor>(&Tile.color());
+    if (!GroundColor) {
+      return;
+    }
+    auto &RenderedTile = RenderedLevelMap.getTile(Pos);
+    if (auto *RgbColor =
+            std::get_if<cxxg::types::RgbColor>(&RenderedTile.color())) {
+      if (!RgbColor->HasBackground) {
+        RgbColor->HasBackground = true;
+        RgbColor->BgR = GroundColor->BgR;
+        RgbColor->BgG = GroundColor->BgG;
+        RgbColor->BgB = GroundColor->BgB;
+      }
+    }
+  });
+
   VisibleMap.fill(Level::WallTile.T);
+  IsVisibleMap.fill(true);
 
   VisibleMap.forEach([this](auto Pos, auto &Tile) {
     Pos -= Offset;
@@ -32,6 +49,7 @@ void Renderer::renderShadow(unsigned char Darkness) {
   const cxxg::types::RgbColor ShadowColor{Darkness, Darkness, Darkness};
   VisibleMap.forEach(
       [ShadowColor](auto, auto &Tile) { Tile.Color = ShadowColor; });
+  IsVisibleMap.fill(false);
 }
 
 void Renderer::renderFogOfWar(const ymir::Map<bool, int> &SeenMap) {
@@ -66,6 +84,7 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
       !RenderedLevelMap.contains(AtPos)) {
     return;
   }
+  IsVisibleMap.getTile(AtPos + Offset) = true;
   auto &Tile = VisibleMap.getTile(AtPos + Offset);
   auto &RenderedTile = RenderedLevelMap.getTile(AtPos);
 
@@ -80,12 +99,29 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
   }
 }
 
-void Renderer::renderEffect(cxxg::types::ColoredChar EffC,
-                            ymir::Point2d<int> AtPos) {
+void Renderer::renderVisibleChar(const cxxg::types::ColoredChar &EffC,
+                                 ymir::Point2d<int> AtPos) {
   if (!VisibleMap.contains(AtPos + Offset)) {
     return;
   }
-  VisibleMap.getTile(AtPos + Offset) = EffC;
+  VisibleMap.getTile(AtPos + Offset).Char = EffC.Char;
+  if (auto *RgbColor = std::get_if<cxxg::types::RgbColor>(&EffC.Color)) {
+    if (RgbColor->HasBackground) {
+      VisibleMap.getTile(AtPos + Offset).Color = EffC.Color;
+    } else if (auto *VRgb = std::get_if<cxxg::types::RgbColor>(
+                   &VisibleMap.getTile(AtPos + Offset).Color)) {
+      VRgb->R = RgbColor->R;
+      VRgb->G = RgbColor->G;
+      VRgb->B = RgbColor->B;
+    }
+  } else {
+    VisibleMap.getTile(AtPos + Offset).Color = EffC.Color;
+  }
+}
+
+void Renderer::renderEffect(cxxg::types::ColoredChar EffC,
+                            ymir::Point2d<int> AtPos) {
+  renderVisibleChar(EffC, AtPos);
 }
 
 void Renderer::renderEntities() {
@@ -94,19 +130,27 @@ void Renderer::renderEntities() {
   L.Reg.sort<PositionComp, TileComp>();
   auto View =
       L.Reg.view<const PositionComp, const TileComp, const VisibleComp>();
-  View.each([this](const auto &Pos, const auto &T, const auto &VC) {
-    if (!VC.IsVisible && !VC.Partially) {
-      return;
-    }
-    if (!RenderedLevelMap.contains(Pos)) {
-      return;
-    }
-    if (!VC.IsVisible && VC.Partially) {
-      RenderedLevelMap.getTile(Pos).T.Char = T.T.T.Char;
-    } else {
-      RenderedLevelMap.getTile(Pos) = T.T;
-    }
+  View.each([this](const auto &PC, const auto &T, const auto &VC) {
+    renderVisibleEntity(PC, T, VC);
   });
+}
+
+void Renderer::renderVisibleEntity(const PositionComp &PC, const TileComp &T,
+                                   const VisibleComp &VC) {
+  if (!VC.IsVisible && !VC.Partially) {
+    return;
+  }
+  if (!IsVisibleMap.contains(PC.Pos + Offset) ||
+      !IsVisibleMap.getTile(PC.Pos + Offset)) {
+    return;
+  }
+  if (!VC.IsVisible && VC.Partially) {
+    auto ColorChar = T.T.T;
+    ColorChar.Color = cxxg::types::RgbColor{30, 30, 30};
+    renderVisibleChar(ColorChar, PC.Pos);
+  } else {
+    renderVisibleChar(T.T.T, PC.Pos);
+  }
 }
 
 } // namespace rogue

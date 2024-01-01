@@ -8,7 +8,8 @@
 
 namespace rogue {
 struct BuffBase;
-}
+struct DiminishingReturnsValueGenBuff;
+} // namespace rogue
 
 namespace rogue {
 
@@ -52,9 +53,34 @@ inline bool operator==(const EntityDiedEvent &Lhs, const EntityDiedEvent &Rhs) {
   return Lhs.Entity == Rhs.Entity && Lhs.Registry == Rhs.Registry;
 }
 
+/// Can be published to introduce a delay when rendering for an effect
+struct EffectDelayEvent : public BaseEvent {};
+
+struct BuffAppliedEvent : public BaseEvent {
+  entt::entity SrcEt = entt::null;
+  entt::entity TargetEt = entt::null;
+  entt::registry *Registry = nullptr;
+  bool IsCombat = false;
+  const BuffBase *Buff = nullptr;
+
+  bool isPlayerAffected() const;
+};
+
+struct BuffApplyEffectEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
+  entt::registry *Registry = nullptr;
+  bool IsReduce = false;
+  const DiminishingReturnsValueGenBuff *Buff = nullptr;
+
+  bool isPlayerAffected() const;
+};
+
 struct BuffExpiredEvent : public BaseEvent {
   entt::entity Entity = entt::null;
+  entt::registry *Registry = nullptr;
   const BuffBase *Buff = nullptr;
+
+  bool isPlayerAffected() const;
 };
 
 struct SwitchLevelEvent : public BaseEvent {
@@ -74,6 +100,13 @@ struct LootEvent : public BaseEvent {
   std::string LootName;
   entt::entity Entity = entt::null;
   entt::entity LootedEntity = entt::null;
+  entt::registry *Registry = nullptr;
+
+  bool isPlayerAffected() const;
+};
+
+struct CraftEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
   entt::registry *Registry = nullptr;
 
   bool isPlayerAffected() const;

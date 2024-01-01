@@ -177,6 +177,17 @@
                   "const": false
                 }
               ]
+            },
+            "damage": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/damage"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -279,6 +290,30 @@
           "level_name": {
             "type": "string",
             "description": "Name of the level to enter"
+          }
+        },
+        "additionalProperties": false
+      },
+      "damage": {
+        "type": "object",
+        "required": ["phys_damage", "magic_damage"],
+        "properties": {
+          "phys_damage": {
+            "type": "number",
+            "description": "Physical damage"
+          },
+          "magic_damage": {
+            "type": "number",
+            "description": "Magic damage"
+          },
+          "hits": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of hits before the entity is destroyed, default 1"
+          },
+          "ticks": {
+            "type": "integer",
+            "description": "Number of ticks before the entity is destroyed, default -1 (never)"
           }
         },
         "additionalProperties": false

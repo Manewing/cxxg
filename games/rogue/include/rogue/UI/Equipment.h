@@ -12,6 +12,7 @@
 namespace rogue {
 class Equipment;
 class Controller;
+class Level;
 struct EquipmentSlot;
 } // namespace rogue
 
@@ -19,8 +20,13 @@ namespace rogue::ui {
 
 class EquipmentController : public BaseRectDecorator {
 public:
+  /// Returns true if the skill was used
+  static bool handleUseSkill(Controller &Ctrl, Level &Lvl, entt::entity Entity,
+                             const EquipmentSlot &ES);
+
+public:
   EquipmentController(Controller &Ctrl, Equipment &Equip, entt::entity Entity,
-                      entt::registry &Reg, cxxg::types::Position Pos);
+                      Level &Lvl, cxxg::types::Position Pos);
   bool handleInput(int Char) final;
   std::string getInteractMsg() const final;
   void draw(cxxg::Screen &Scr) const final;
@@ -33,6 +39,7 @@ protected:
   Controller &Ctrl;
   Equipment &Equip;
   entt::entity Entity;
+  Level &Lvl;
   entt::registry &Reg;
   std::shared_ptr<ItemSelect> ItSel;
   InventoryHandler InvHandler;

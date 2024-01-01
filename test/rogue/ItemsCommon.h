@@ -88,33 +88,37 @@ public:
     }
   }
 
-  bool canApplyTo(const entt::entity &Et, entt::registry &Reg) const final {
+  bool canApplyTo(const entt::entity &, const entt::entity &DstEt,
+                  entt::registry &Reg) const final {
     if constexpr (sizeof...(RequiredComps) == 0) {
       return true;
     } else {
-      return Reg.all_of<RequiredComps...>(Et);
+      return Reg.all_of<RequiredComps...>(DstEt);
     }
   }
 
-  void applyTo(const entt::entity &Et, entt::registry &Reg) const final {
-    auto *Existing = Reg.try_get<CompType>(Et);
+  void applyTo(const entt::entity &, const entt::entity &DstEt,
+               entt::registry &Reg) const final {
+    auto *Existing = Reg.try_get<CompType>(DstEt);
     if (Existing) {
       Existing->Value += Comp.Value;
     } else {
-      Reg.emplace<CompType>(Et, Comp);
+      Reg.emplace<CompType>(DstEt, Comp);
     }
   }
 
-  bool canRemoveFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    return Reg.all_of<CompType, RequiredComps...>(Et);
+  bool canRemoveFrom(const entt::entity &, const entt::entity &DstEt,
+                     entt::registry &Reg) const final {
+    return Reg.all_of<CompType, RequiredComps...>(DstEt);
   }
 
-  void removeFrom(const entt::entity &Et, entt::registry &Reg) const final {
-    auto *Existing = Reg.try_get<CompType>(Et);
+  void removeFrom(const entt::entity &, const entt::entity &DstEt,
+                  entt::registry &Reg) const final {
+    auto *Existing = Reg.try_get<CompType>(DstEt);
     if (Existing) {
       Existing->Value -= Comp.Value;
       if (Existing->Value <= 0) {
-        Reg.remove<CompType>(Et);
+        Reg.remove<CompType>(DstEt);
       }
     }
   }

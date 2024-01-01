@@ -30,7 +30,8 @@ int getCharNonBlocking() {
     return KEY_INVALID;
   }
 
-  if (InputRecord.EventType == WINDOW_BUFFER_SIZE_EVENT && WindowResizeHandler) {
+  if (InputRecord.EventType == WINDOW_BUFFER_SIZE_EVENT &&
+      WindowResizeHandler) {
     auto Size = ::cxxg::utils::getTerminalSize();
     WindowResizeHandler(Size);
     return KEY_INVALID;
@@ -138,8 +139,10 @@ void sleep(size_t MicroSeconds) { Sleep(MicroSeconds / 1000); }
 cxxg::types::Size getTerminalSize() {
   CONSOLE_SCREEN_BUFFER_INFO CSBI;
   GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &CSBI);
-  return {static_cast<cxxg::types::Size::ValueType>(CSBI.srWindow.Right - CSBI.srWindow.Left + 1),
-          static_cast<cxxg::types::Size::ValueType>(CSBI.srWindow.Bottom - CSBI.srWindow.Top + 1)};
+  return {static_cast<cxxg::types::Size::ValueType>(CSBI.srWindow.Right -
+                                                    CSBI.srWindow.Left + 1),
+          static_cast<cxxg::types::Size::ValueType>(CSBI.srWindow.Bottom -
+                                                    CSBI.srWindow.Top + 1)};
 }
 
 } // namespace cxxg::utils

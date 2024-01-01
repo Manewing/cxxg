@@ -20,6 +20,8 @@ class Inventory;
 class Equipment;
 struct StatsComp;
 class Level;
+class CraftingDatabase;
+class CraftingHandler;
 } // namespace rogue
 
 namespace rogue::ui {
@@ -29,7 +31,8 @@ public:
   struct PlayerInfo {
     int Health;
     int MaxHealth;
-    int AP;
+    int Mana;
+    int MaxMana;
     std::string InteractStr;
   };
 
@@ -46,7 +49,8 @@ public:
   bool isUIActive() const;
   void handleInput(int Char);
 
-  void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false);
+  void addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows = false,
+                 bool CenterWindow = false);
 
   template <typename T> T *getWindowOfType() {
     return WdwContainer.getWindowOfType<T>();
@@ -64,7 +68,7 @@ public:
   bool hasCommandLineUI() const;
   void closeCommandLineUI();
 
-  void setEquipmentUI(entt::entity Entity, entt::registry &Reg);
+  void setEquipmentUI(entt::entity Entity, Level &Lvl);
   bool hasEquipmentUI() const;
   void closeEquipmentUI();
 
@@ -92,6 +96,15 @@ public:
   bool hasLootUI() const;
   void closeLootUI();
 
+  /// Creates a crafting UI
+  /// \param Entity The entity that is crafting
+  /// \param Reg The registry
+  void setCraftingUI(entt::entity Entity, entt::registry &Reg,
+                     const CraftingDatabase &CraftingDb,
+                     const CraftingHandler &Crafter);
+  bool hasCraftingUI() const;
+  void closeCraftingUI();
+
   void setHistoryUI(History &Hist);
   bool hasHistoryUI() const;
   void closeHistoryUI();
@@ -111,6 +124,8 @@ public:
 
   /// Closes all windows
   void closeAll();
+
+  void handleResize(cxxg::types::Size Size);
 
 private:
   cxxg::Screen &Scr;

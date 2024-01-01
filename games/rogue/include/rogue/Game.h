@@ -13,6 +13,7 @@
 #include <rogue/Level.h>
 #include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
+#include <rogue/RenderEventCollector.h>
 #include <rogue/UI/Controller.h>
 #include <ymir/LayeredMap.hpp>
 #include <ymir/Map.hpp>
@@ -25,27 +26,12 @@ struct EntityDiedEvent;
 struct SwitchLevelEvent;
 struct SwitchGameWorldEvent;
 struct LootEvent;
-struct EntityAttackEvent;
-struct DetectTargetEvent;
-struct LostTargetEvent;
-class Renderer;
+struct CraftEvent;
 } // namespace rogue
 
 namespace rogue {
 
-class RenderEventCollector : public EventHubConnector {
-public:
-  void setEventHub(EventHub *EH) override;
-  void onEntityAttackEvent(const EntityAttackEvent &E);
-  void onDetectTargetEvent(const DetectTargetEvent &E);
-  void onLostTargetEvent(const LostTargetEvent &E);
-  void apply(Renderer &R);
-  void clear();
-  bool hasEvents() const;
-
-private:
-  std::vector<std::function<void(Renderer &)>> RenderFns;
-};
+class GameOverException {};
 
 class Game : public cxxg::Game {
 public:
@@ -81,9 +67,12 @@ private:
   void onSwitchLevelEvent(const SwitchLevelEvent &E);
   void onSwitchGameWorldEvent(const SwitchGameWorldEvent &E);
   void onLootEvent(const LootEvent &E);
+  void onCraftEvent(const CraftEvent &E);
 
   void handleDrawLevel(bool UpdateScreen);
   void handleDrawGameOver();
+
+  void handleResize(cxxg::types::Size Size) final;
 
 private:
   const GameConfig &Cfg;
@@ -94,6 +83,7 @@ private:
   ItemDatabase ItemDb;
   EntityDatabase EntityDb;
   LevelDatabase LevelDb;
+  CraftingDatabase CraftingDb;
   CraftingHandler Crafter;
 
   GameContext Ctx;
@@ -104,6 +94,8 @@ private:
   RenderEventCollector REC;
   ui::Controller UICtrl;
   long unsigned GameTicks = 0;
+
+  unsigned WorldSwitchCounter = 0;
 };
 
 } // namespace rogue

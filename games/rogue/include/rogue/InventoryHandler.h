@@ -9,6 +9,7 @@
 namespace rogue {
 class Inventory;
 class Equipment;
+class CraftingRecipe;
 class CraftingHandler;
 } // namespace rogue
 
@@ -51,11 +52,25 @@ public:
   /// @return True if the item was used, false otherwise
   bool tryUseItemOnTarget(std::size_t InvItemIdx, entt::entity TargetEt);
 
+  /// Try using skill of item from equipment
+  bool tryUseSkill(ItemType SlotType);
+
+  /// Try using skill of item from equipment on target entity
+  bool tryUseSkillOnTarget(ItemType SlotType, entt::entity TargetEt);
+
   /// Auto equip items from inventory
   void autoEquipItems();
 
   /// Tries to craft the items in the inventory
-  bool tryCraftItems();
+  /// \param SrcEt The entity to craft the items for, defaults to \p Entity
+  /// \return True if the items were crafted, false otherwise
+  bool tryCraftItems(entt::entity SrcEt = entt::null);
+
+  /// Checks if the inventory has all items to craft the recipe
+  bool canCraft(const CraftingRecipe &Recipe) const;
+
+  /// Tries to craft the recipe from the inventory
+  bool tryCraft(const CraftingRecipe &Recipe);
 
 private:
   entt::entity Entity;

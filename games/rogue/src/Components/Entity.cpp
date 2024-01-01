@@ -30,6 +30,7 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
 
   auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
   ITC.Actions.push_back({"Loot", [Entity](auto &EHC, auto Et, auto &Reg) {
+                           Reg.template get<LootInteractComp>(Entity).IsLooted = true;
                            EHC.publish(LootEvent{{}, "Loot", Et, Entity, &Reg});
                          }});
 

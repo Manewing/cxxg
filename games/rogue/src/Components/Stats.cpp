@@ -46,4 +46,14 @@ StatValue ValueRegenCompBase::reduce(StatValue Amount) {
   return Value;
 }
 
+bool ValueRegenCompBase::hasAmount(StatValue Amount) { return Value >= Amount; }
+
+bool ValueRegenCompBase::tryReduce(StatValue Amount) {
+  if (hasAmount(Amount)) {
+    reduce(Amount);
+    return true;
+  }
+  return false;
+}
+
 } // namespace rogue

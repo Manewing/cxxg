@@ -147,6 +147,15 @@ private:
   StatPoints Stats;
 };
 
+class DamageCompAssembler : public EntityAssembler {
+public:
+  explicit DamageCompAssembler(const DamageComp &DC);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  DamageComp DC;
+};
+
 // Keep sorted
 using AttackAICompAssembler = DefaultConstructEntityAssembler<AttackAIComp>;
 using BlockLOSCompAssembler = DefaultConstructEntityAssembler<BlocksLOS>;
@@ -154,6 +163,7 @@ using CollisionCompAssembler = DefaultConstructEntityAssembler<CollisionComp>;
 using DropEquipAssembler = DefaultConstructEntityAssembler<DropEquipmentComp>;
 using EquipmentCompAssembler = DefaultConstructEntityAssembler<EquipmentComp>;
 using HealthCompAssembler = DefaultConstructEntityAssembler<HealthComp>;
+using ManaCompAssembler = DefaultConstructEntityAssembler<ManaComp>;
 using PlayerCompAssembler = DefaultConstructEntityAssembler<PlayerComp>;
 using PositionCompAssembler = DefaultConstructEntityAssembler<PositionComp>;
 using VisibleCompAssembler = DefaultConstructEntityAssembler<VisibleComp>;

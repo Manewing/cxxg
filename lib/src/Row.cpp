@@ -1,7 +1,5 @@
-#include "cxxg/Types.h"
+#include <cxxg/Types.h>
 #include <cxxg/Row.h>
-
-#include <stdexcept>
 
 namespace cxxg {
 
@@ -57,13 +55,32 @@ RowAccessor &RowAccessor::operator<<(const Row &OtherRw) {
   return *this;
 }
 
+RowAccessor &RowAccessor::operator<<(const RWidth &W) {
+  MaxWidth = W.Width;
+  return *this;
+}
+
 void RowAccessor::flushBuffer() {
   if (!Valid) {
     return;
   }
-  output(SS.str());
+  auto Str = SS.str();
+  if (MaxWidth && NumCharactersWritten + Str.size() > *MaxWidth) {
+    auto Length = *MaxWidth - NumCharactersWritten;
+    if (Length > 0) {
+      Str = Str.substr(0, Length);
+    } else {
+      Str = "";
+    }
+  }
+  output(Str);
   SS.str("");
   SS.clear();
+}
+
+RowAccessor &RowAccessor::width(std::size_t Width) {
+  this->MaxWidth = Width;
+  return *this;
 }
 
 void RowAccessor::output(::std::string const &Str) {
@@ -110,6 +127,7 @@ void RowAccessor::output(::std::string const &Str) {
   }
 
   Offset += Str.size();
+  NumCharactersWritten += Str.size();
 }
 
 Row::Row(size_t Size) {

@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <functional>
 #include <optional>
+#include <rogue/CraftingDatabase.h>
 #include <string>
 #include <ymir/Types.hpp>
 
@@ -38,6 +39,7 @@ public:
   std::optional<Interaction> CurrentInteraction;
   ymir::Dir2d MoveDir = ymir::Dir2d::NONE;
   bool IsReady = false;
+  std::set<CraftingRecipeId> KnownRecipes;
 };
 
 } // namespace rogue

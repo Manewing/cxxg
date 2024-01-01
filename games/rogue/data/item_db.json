@@ -4,15 +4,31 @@
       "type": "health_item_effect",
       "health_value": 5
     },
+    "health_effect": {
+      "type": "health_item_effect",
+      "health_value": 5
+    },
+    "minor_mana_effect": {
+      "type": "mana_item_effect",
+      "mana_value": 5
+    },
+    "major_mana_effect": {
+      "type": "mana_item_effect",
+      "mana_value": 25
+    },
     "damage_effect_10": {
       "type": "damage_item_effect",
       "damage_value": 10
     },
+    "major_damage_effect": {
+      "type": "damage_item_effect",
+      "damage_value": 50
+    },
     "minor_poison_effect": {
       "type": "poison_debuff_comp",
       "buff": {
-        "reduce_amount": 0.5,
-        "ticks": 5,
+        "reduce_amount": 1.0,
+        "ticks": 10,
         "tick_period": 20
       }
     },
@@ -20,7 +36,7 @@
       "type": "poison_debuff_comp",
       "buff": {
         "reduce_amount": 5.0,
-        "ticks": 5,
+        "ticks": 10,
         "tick_period": 10
       }
     },
@@ -28,7 +44,15 @@
       "type": "health_regen_buff_comp",
       "buff": {
         "regen_amount": 1.0,
-        "ticks": 4,
+        "ticks": 8,
+        "tick_period": 10
+      }
+    },
+    "minor_quick_mana_regen_effect": {
+      "type": "mana_regen_buff_comp",
+      "buff": {
+        "regen_amount": 1.0,
+        "ticks": 8,
         "tick_period": 10
       }
     },
@@ -36,7 +60,15 @@
       "type": "health_regen_buff_comp",
       "buff": {
         "regen_amount": 0.5,
-        "ticks": 10,
+        "ticks": 20,
+        "tick_period": 20
+      }
+    },
+    "major_health_regen_effect": {
+      "type": "health_regen_buff_comp",
+      "buff": {
+        "regen_amount": 1.5,
+        "ticks": 20,
         "tick_period": 20
       }
     },
@@ -48,22 +80,12 @@
         "tick_period": 10
       }
     },
-    "stats_buff_effect": {
-      "type": "stats_buff_comp",
-      "stats": {
-        "str": 10,
-        "dex": 1,
-        "int": 1,
-        "vit": 5
-      }
-    },
-    "stats_buff_effect_str_1": {
-      "type": "stats_buff_comp",
-      "stats": {
-        "str": 1,
-        "dex": 0,
-        "int": 0,
-        "vit": 0
+    "major_bleeding_debuff_effect": {
+      "type": "bleeding_debuff_comp",
+      "buff": {
+        "reduce_amount": 7.0,
+        "ticks": 5,
+        "tick_period": 10
       }
     },
     "str_5_per_hit_buff": {
@@ -91,6 +113,16 @@
       "type": "armor_buff_comp",
       "phys_armor": 10,
       "magic_armor": 0
+    },
+    "armor_30": {
+      "type": "armor_buff_comp",
+      "phys_armor": 30,
+      "magic_armor": 0
+    },
+    "armor_50": {
+      "type": "armor_buff_comp",
+      "phys_armor": 50,
+      "magic_armor": 10
     },
     "magic_armor_10": {
       "type": "armor_buff_comp",
@@ -122,6 +154,12 @@
       "magic_damage": 0,
       "ap_cost": 10
     },
+    "melee_fast_3": {
+      "type": "melee_attack_comp",
+      "phys_damage": 3,
+      "magic_damage": 0,
+      "ap_cost": 5
+    },
     "melee_5": {
       "type": "melee_attack_comp",
       "phys_damage": 5,
@@ -134,38 +172,92 @@
       "magic_damage": 0,
       "ap_cost": 10
     },
-    "ranged_2": {
-      "type": "ranged_attack_comp",
-      "phys_damage": 2,
-      "magic_damage": 0,
-      "ap_cost": 20
+    "magic_melee_5": {
+      "type": "melee_attack_comp",
+      "phys_damage": 0,
+      "magic_damage": 10,
+      "ap_cost": 10
+    },
+    "magic_melee_10": {
+      "type": "melee_attack_comp",
+      "phys_damage": 0,
+      "magic_damage": 10,
+      "ap_cost": 10
     },
     "ranged_5": {
       "type": "ranged_attack_comp",
       "phys_damage": 5,
       "magic_damage": 0,
-      "ap_cost": 20
-    },
-    "ranged_10": {
-      "type": "ranged_attack_comp",
-      "phys_damage": 10,
-      "magic_damage": 0,
-      "ap_cost": 20
+      "ap_cost": 20,
+      "mana_cost": 5
     },
     "ranged_magic_5": {
       "type": "ranged_attack_comp",
       "phys_damage": 0,
       "magic_damage": 5,
-      "ap_cost": 20
+      "ap_cost": 15,
+      "mana_cost": 10
+    },
+    "str_5": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 5,
+        "dex": 0,
+        "int": 0,
+        "vit": 0
+      }
+    },
+    "dex_5": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 0,
+        "dex": 5,
+        "int": 0,
+        "vit": 0
+      }
+    },
+    "int_5": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 0,
+        "dex": 0,
+        "int": 5,
+        "vit": 0
+      }
+    },
+    "vit_5": {
+      "type": "stats_buff_comp",
+      "stats": {
+        "str": 0,
+        "dex": 0,
+        "int": 0,
+        "vit": 5
+      }
     },
     "low_chance_to_apply_poison": {
       "type": "chance_on_hit_to_apply_poison",
       "buff": {
-        "reduce_amount": 0.5,
-        "ticks": 5,
+        "reduce_amount": 1.0,
+        "ticks": 10,
         "tick_period": 20
       },
-      "chance": 60.0
+      "chance": 10.0
+    },
+    "low_chance_to_apply_bleeding": {
+      "type": "chance_on_hit_to_apply_bleeding",
+      "buff": {
+        "reduce_amount": 1.0,
+        "ticks": 10,
+        "tick_period": 20
+      },
+      "chance": 10.0
+    },
+    "high_chance_to_apply_blind": {
+      "type": "chance_on_hit_to_apply_blinded",
+      "buff": {
+        "ticks": 600
+      },
+      "chance": 70.0
     },
     "dismantle_iron_equip": {
       "type": "dismantle",
@@ -194,10 +286,6 @@
         },
         {
           "name": "Rune Dust",
-          "amount": 1
-        },
-        {
-          "name": "Leather Scrap",
           "amount": 1
         }
       ]
@@ -234,6 +322,22 @@
         {
           "type": "use_on",
           "effect": "minor_health_effect"
+        }
+      ]
+    },
+    {
+      "name": "Dragon Fruit",
+      "description": "Fruit of the dragon, it has a unique restorative power.",
+      "max_stack_size": 99,
+      "types": ["crafting", "consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "minor_quick_mana_regen_effect"
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_mana_effect"
         }
       ]
     },
@@ -282,6 +386,30 @@
       ]
     },
     {
+      "name": "Blinding Mushroom Spores",
+      "description": "A poisonous mushroom that causes blindness when eaten",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "high_chance_to_apply_blind"
+        }
+      ]
+    },
+    {
+      "name": "Blinding Mushroom",
+      "description": "A poisonous mushroom that causes blindness when eaten",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "blinded_debuff_comp"
+        }
+      ]
+    },
+    {
       "name": "Wooden Log",
       "description": "A log of wood",
       "max_stack_size": 99,
@@ -309,6 +437,80 @@
       ]
     },
     {
+      "name": "Orb of Strength",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "str_5"
+        }
+      ]
+    },
+    {
+      "name": "Orb of Dexterity",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "dex_5"
+        }
+      ]
+    },
+    {
+      "name": "Orb of Intelligence",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "int_5"
+        }
+      ]
+    },
+    {
+      "name": "Orb of Vitality",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "vit_5"
+        }
+      ]
+    },
+    {
+      "name": "Orb of Upgrade",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "common_stats_buff_effect"
+        }
+      ]
+    },
+    {
+      "name": "Great Orb of Upgrade",
+      "description": "An orb that can be used to upgrade equipment",
+      "max_stack_size": 1,
+      "types": ["crafting"],
+      "capabilities": [],
+      "specializations": [
+        {
+          "type": "equipment",
+          "specialization": "rare_stats_buff_effect"
+        }
+      ]
+    },
+    {
       "name": "Small Sword",
       "description": "A small sword",
       "max_stack_size": 1,
@@ -323,16 +525,53 @@
           "effect": "melee_5"
         },
         {
-          "type": "equipment",
-          "effect": "low_chance_to_apply_poison"
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
+      "enhancements": "common_melee_weapon_enhancements"
+    },
+    {
+      "name": "Eternal Dagger",
+      "description": "A slender weapon, its blade shimmering as though forged from the essence of time itself. ",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        },
         {
           "type": "equipment",
-          "specialization": "common_stats_buff_effect"
+          "effect": "melee_fast_3"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
-      ]
+      ],
+      "enhancements": "common_melee_weapon_enhancements"
+    },
+    {
+      "name": "Arcane Shardblade",
+      "description": "A blade of arcane power, it is said to have been forged by the first mages of the realm.",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "equipment",
+          "effect": "magic_melee_10"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
+        }
+      ],
+      "enhancements": "common_magic_melee_weapon_enhancements"
     },
     {
       "name": "Toxic Claws",
@@ -351,6 +590,22 @@
       ]
     },
     {
+      "name": "Sharp Rat Claws",
+      "description": "TODO",
+      "max_stack_size": 1,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "melee_5"
+        },
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_bleeding"
+        }
+      ]
+    },
+    {
       "name": "Fire Wand",
       "description": "A wand casting fire balls",
       "max_stack_size": 1,
@@ -363,6 +618,10 @@
         {
           "type": "equipment",
           "effect": "ranged_magic_5"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "specializations": [
@@ -385,6 +644,10 @@
         {
           "type": "equipment",
           "effect": "ranged_5"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "specializations": [
@@ -402,7 +665,95 @@
       "capabilities": [
         {
           "type": "ranged_use",
-          "effect": "damage_effect_10"
+          "effect": "damage_effect_10",
+          "mana_cost": 10
+        }
+      ]
+    },
+    {
+      "name": "Scroll of striking",
+      "description": "Strikes targets in the surrounding area",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "sweeping_strike_effect",
+          "mana_cost": 10
+        },
+        {
+          "type": "skill",
+          "effect": "sweeping_strike_effect",
+          "mana_cost": 20,
+          "ap_cost": 12
+        }
+      ]
+    },
+    {
+      "name": "Scroll of smiting",
+      "description": "Smite the target with enormous power",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "adjacent_use",
+          "effect": "smite_effect",
+          "mana_cost": 10
+        },
+        {
+          "type": "skill_adjacent",
+          "effect": "smite_effect",
+          "mana_cost": 10,
+          "ap_cost": 15
+        }
+      ]
+    },
+    {
+      "name": "Scroll of holy sacrifice",
+      "description": "Sacrifice health to deal damage to the target",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "ranged_use",
+          "effect": "major_damage_effect",
+          "health_cost": 10
+        },
+        {
+          "type": "skill_ranged",
+          "effect": "major_damage_effect",
+          "health_cost": 10
+        }
+      ]
+    },
+    {
+      "name": "Scroll of poison",
+      "description": "A scroll that poisons the target",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "ranged_use",
+          "effect": "minor_poison_effect",
+          "mana_cost": 5
+        }
+      ]
+    },
+    {
+      "name": "Scroll of sacrificial restoration",
+      "description": "Sacrifice health to restore health over time",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "major_health_regen_effect",
+          "health_cost": 10
+        },
+        {
+          "type": "skill",
+          "effect": "major_health_regen_effect",
+          "health_cost": 10
         }
       ]
     },
@@ -414,7 +765,75 @@
       "capabilities": [
         {
           "type": "ranged_use",
-          "effect": "blinded_debuff_comp"
+          "effect": "blinded_debuff_comp",
+          "mana_cost": 10
+        }
+      ]
+    },
+    {
+      "name": "Scroll of bleeding",
+      "description": "A cluster of small cuts causes strong bleeding on the target",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "adjacent_use",
+          "effect": "major_bleeding_debuff_effect",
+          "mana_cost": 10
+        },
+        {
+          "type": "skill_adjacent",
+          "effect": "major_bleeding_debuff_effect",
+          "mana_cost": 10,
+          "ap_cost": 15
+        }
+      ]
+    },
+    {
+      "name": "Scroll of restoration",
+      "description": "A scroll that restores health",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "health_effect",
+          "mana_cost": 5
+        },
+        {
+          "type": "use_on",
+          "effect": "minor_quick_health_regen_effect",
+          "mana_cost": 5
+        },
+        {
+          "type": "skill",
+          "effect": "health_effect",
+          "mana_cost": 5,
+          "ap_cost": 8
+        },
+        {
+          "type": "skill",
+          "effect": "minor_quick_health_regen_effect",
+          "mana_cost": 5,
+          "ap_cost": 8
+        }
+      ]
+    },
+    {
+      "name": "Scroll of life tap",
+      "description": "A scroll that mana by sacrificing health",
+      "max_stack_size": 1,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "major_mana_effect",
+          "health_cost": 10
+        },
+        {
+          "type": "skill",
+          "effect": "major_mana_effect",
+          "health_cost": 10
         }
       ]
     },
@@ -426,7 +845,10 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "mind_vision_buff_comp"
+          "effect": "mind_vision_buff_comp",
+          "mana_cost": 10,
+          "health_cost": 10,
+          "ap_cost": 20
         }
       ]
     },
@@ -438,7 +860,8 @@
       "capabilities": [
         {
           "type": "use_on",
-          "effect": "invisibility_buff_comp"
+          "effect": "invisibility_buff_comp",
+          "mana_cost": 10
         }
       ]
     },
@@ -467,6 +890,46 @@
       ]
     },
     {
+      "name": "Tree Guard Armor",
+      "description": "Armor of trees",
+      "max_stack_size": 99,
+      "types": ["chest_plate"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_30"
+        }
+      ]
+    },
+    {
+      "name": "Iron Pine Tree Armor",
+      "description": "Armor of trees",
+      "max_stack_size": 99,
+      "types": ["chest_plate"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "armor_50"
+        }
+      ]
+    },
+    {
+      "name": "Blood Fairy Fangs",
+      "description": "Head of blood fairy",
+      "max_stack_size": 99,
+      "types": ["weapon"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "magic_melee_5"
+        },
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_bleeding"
+        }
+      ]
+    },
+    {
       "name": "Wooden Shield",
       "description": "A shield of wood",
       "max_stack_size": 1,
@@ -483,6 +946,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "specializations": [
@@ -521,14 +988,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_armor_enhancements"
     },
     {
       "name": "Leather Boots",
@@ -543,14 +1009,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_armor_enhancements"
     },
     {
       "name": "Leather Pants",
@@ -565,14 +1030,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_armor_enhancements"
     },
     {
       "name": "Linen Pants",
@@ -603,14 +1067,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "common_stats_buff_effect"
-        }
-      ]
+      "enhancements": "common_armor_enhancements"
     },
     {
       "name": "Iron Ring",
@@ -625,6 +1088,10 @@
         {
           "type": "equipment",
           "effect": "magic_armor_10"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "specializations": [
@@ -647,14 +1114,13 @@
         {
           "type": "equipment",
           "effect": "melee_10"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_melee_weapon_enhancements"
     },
     {
       "name": "Chain Mail",
@@ -669,14 +1135,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_armor_enhancements"
     },
     {
       "name": "Plate Boots",
@@ -691,14 +1156,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_armor_enhancements"
     },
     {
       "name": "Great Helm",
@@ -713,14 +1177,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_armor_enhancements"
     },
     {
       "name": "Plate Greaves",
@@ -735,14 +1198,13 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
-      "specializations": [
-        {
-          "type": "equipment",
-          "specialization": "rare_stats_buff_effect"
-        }
-      ]
+      "enhancements": "rare_armor_enhancements"
     },
     {
       "name": "Sword of the Slayer",
@@ -792,6 +1254,13 @@
       "capabilities": []
     },
     {
+      "name": "Iron Ingot",
+      "description": "An iron ingot",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
       "name": "Leather Scrap",
       "description": "A scrap of leather",
       "max_stack_size": 99,
@@ -827,6 +1296,13 @@
       "capabilities": []
     },
     {
+      "name": "Nature Brew",
+      "description": "A brew of the treats of nature, it is not safe to consume",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
       "name": "Arcane Liquid",
       "description": "An arcane liquid TODO",
       "max_stack_size": 99,
@@ -842,10 +1318,30 @@
         {
           "type": "use_on",
           "effect": "remove_poison_effect"
-        },
+        }
+      ]
+    },
+    {
+      "name": "Elder Flower",
+      "description": "A flower of elder TODO",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
         {
           "type": "use_on",
           "effect": "remove_poison_debuff"
+        }
+      ]
+    },
+    {
+      "name": "Fairy Dust",
+      "description": "A dust of fairy TODO",
+      "max_stack_size": 99,
+      "types": ["consumable", "crafting"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "major_health_regen_effect"
         }
       ]
     },
@@ -857,11 +1353,37 @@
       "capabilities": []
     },
     {
+      "name": "Rune Stone",
+      "description": "A stone enchanted with rune magic",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
       "name": "Silk Thread",
       "description": "Lightweight crafting material spun from spider silk, known for its incredible strength.",
       "max_stack_size": 99,
       "types": ["crafting"],
       "capabilities": []
+    },
+    {
+      "name": "Silk Cloth",
+      "description": "Lightweight crafting material webbed from spider silk, known for its incredible strength.",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
+      "name": "Infused Silk Cloth",
+      "description": "Lightweight crafting material webbed from spider silk, infused with arcane magic.",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "magic_armor_10"
+        }
+      ]
     },
     {
       "name": "Arachnid Chitin Shard",
@@ -899,6 +1421,18 @@
       ]
     },
     {
+      "name": "Spider Venom Oil",
+      "description": "An oil that can be applied to a weapon, adding a possibility to poison",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "low_chance_to_apply_poison"
+        }
+      ]
+    },
+    {
       "name": "Key",
       "description": "A key for a lock. Who knows what it opens...",
       "max_stack_size": 1,
@@ -906,25 +1440,56 @@
       "capabilities": []
     },
     {
+      "name": "Book of crafting",
+      "description": "A book that teaches crafting. It can be used to learn crafting recipes",
+      "max_stack_size": 1,
+      "types": ["quest", "consumable"],
+      "capabilities": [
+        {
+          "type": "use_on",
+          "effect": "learn_crafting_recipe"
+        },
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
+        }
+      ]
+    },
+    {
       "name": "L1 Key",
       "description": "The key that unlocks the first level",
       "max_stack_size": 1,
       "types": ["quest"],
-      "capabilities": []
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
+        }
+      ]
     },
     {
       "name": "L2 Key",
       "description": "The key that unlocks the second level",
       "max_stack_size": 1,
       "types": ["quest"],
-      "capabilities": []
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
+        }
+      ]
     },
     {
       "name": "L3 Key",
       "description": "The key that unlocks the third level",
       "max_stack_size": 1,
       "types": ["quest"],
-      "capabilities": []
+      "capabilities": [
+        {
+          "type": "dismantle",
+          "effect": "dismantle_rare_iron_equip"
+        }
+      ]
     },
     {
       "name": "Final Key",
@@ -941,6 +1506,20 @@
         {
           "type": "item",
           "name": "Small Sword",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Eternal Dagger",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Arcane Shardblade",
           "min_count": 1,
           "max_count": 1,
           "weight": 5
@@ -1055,6 +1634,13 @@
         },
         {
           "type": "item",
+          "name": "Scroll of striking",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
           "name": "Scroll of blinding",
           "min_count": 1,
           "max_count": 1,
@@ -1063,6 +1649,62 @@
         {
           "type": "item",
           "name": "Scroll of invisibility",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of poison",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of bleeding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of smiting",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of sacrificial restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of holy sacrifice",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of bleeding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of life tap",
           "min_count": 1,
           "max_count": 1,
           "weight": 5
@@ -1084,30 +1726,349 @@
           "name": "Wooden Log",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
         },
         {
           "type": "item",
           "name": "Stone",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
         },
         {
           "type": "item",
           "name": "Iron Scrap",
           "min_count": 1,
           "max_count": 3,
-          "weight": 5
+          "weight": 15
         },
         {
           "type": "item",
           "name": "Rune Dust",
           "min_count": 1,
           "max_count": 3,
+          "weight": 15
+        },
+        {
+          "type": "item",
+          "name": "Glass Vial",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 15
+        },
+        {
+          "type": "item",
+          "name": "Arcane Liquid",
+          "min_count": 1,
+          "max_count": 3,
+          "weight": 15
+        },
+        {
+          "type": "item",
+          "name": "Book of crafting",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 7
+        }
+      ]
+    },
+    "common_stat_orb": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Orb of Strength",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Orb of Dexterity",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Orb of Intelligence",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Orb of Vitality",
+          "min_count": 1,
+          "max_count": 1,
           "weight": 5
         }
-
+      ]
+    },
+    "common_armor_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "item",
+          "name": "Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of life tap",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of poison",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of bleeding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Armor Plating",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
+      ]
+    },
+    "rare_armor_enhancements": {
+      "rolls": 3,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "null",
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Great Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of sacrificial restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of poison",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of holy sacrifice",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of bleeding",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of restoration",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of life tap",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Armor Plating",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
+      ]
+    },
+    "common_melee_weapon_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "item",
+          "name": "Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Spider Venom Oil",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of striking",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of smiting",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
+      ]
+    },
+    "common_magic_melee_weapon_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "item",
+          "name": "Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Spider Venom Oil",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
+      ]
+    },
+    "rare_melee_weapon_enhancements": {
+      "rolls": 3,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "type": "null",
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "Great Orb of Upgrade",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 10
+        },
+        {
+          "type": "table",
+          "ref": "common_stat_orb",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Spider Venom Oil",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of striking",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "Scroll of smiting",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 1
+        }
       ]
     },
     "l1_key": {
@@ -1167,70 +2128,94 @@
         }
       ]
     },
-    "common_chest": {
-      "rolls": 4,
+    "common_fruits": {
+      "rolls": 2,
       "slots": [
         {
           "type": "item",
           "name": "Blueberry",
           "min_count": 1,
           "max_count": 2,
-          "weight": 20
+          "weight": 30
         },
+        {
+          "type": "item",
+          "name": "Dragon Fruit",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Poison Berry",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Elder Flower",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 30
+        }
+      ]
+    },
+    "common_chest": {
+      "rolls": 4,
+      "slots": [
         {
           "type": "table",
           "ref": "common_equip",
-          "weight": 20
+          "weight": 30
+        },
+        {
+          "type": "table",
+          "ref": "common_fruits",
+          "weight": 30
         },
         {
           "type": "table",
           "ref": "common_crafting",
-          "weight": 20
+          "weight": 30
         },
         {
           "type": "null",
-          "weight": 20
+          "weight": 30
         },
         {
           "type": "null",
-          "weight": 20
+          "weight": 30
         },
         {
           "type": "null",
-          "weight": 20
+          "weight": 30
         },
         {
           "type": "table",
           "ref": "common_equip",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "common_scroll",
+          "weight": 20
+        },
+        {
+          "type": "table",
+          "ref": "l2_key",
           "weight": 10
         },
         {
           "type": "table",
           "ref": "rare_equip",
           "weight": 5
-        },
-        {
-          "type": "table",
-          "ref": "common_scroll",
-          "weight": 5
-        },
-        {
-          "type": "table",
-          "ref": "l2_key",
-          "weight": 2
         }
       ]
     },
     "rare_chest": {
       "rolls": 5,
       "slots": [
-        {
-          "type": "item",
-          "name": "Blueberry",
-          "min_count": 5,
-          "max_count": 10,
-          "weight": 20
-        },
         {
           "type": "table",
           "ref": "rare_equip",
@@ -1269,11 +2254,14 @@
           "weight": 5
         },
         {
-          "type": "item",
-          "name": "Iron Scrap",
-          "min_count": 3,
-          "max_count": 3,
-          "weight": -1
+          "type": "table",
+          "ref": "common_crafting",
+          "weight": 5
+        },
+        {
+          "type": "table",
+          "ref": "common_crafting",
+          "weight": 5
         }
       ]
     },
@@ -1356,18 +2344,109 @@
       ]
     },
     "common_rat": {
-      "rolls": 1,
+      "rolls": 2,
       "slots": [
         {
           "type": "item",
           "name": "Sewer Meat",
           "min_count": 1,
           "max_count": 2,
-          "weight": 30
+          "weight": 15
+        },
+        {
+          "type": "item",
+          "name": "Leather Scrap",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 15
+        },
+        {
+          "type": "null",
+          "weight": 35
+        },
+        {
+          "type": "null",
+          "weight": 35
+        }
+      ]
+    },
+    "ltb_blinding_mushroom": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Blinding Mushroom Spores",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "item",
+          "name": "Blinding Mushroom",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 70
         },
         {
           "type": "null",
           "weight": 70
+        },
+        {
+          "type": "item",
+          "name": "Blinding Mushroom",
+          "min_count": 3,
+          "max_count": 4,
+          "weight": 30
+        }
+      ]
+    },
+    "ltb_fairy": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Fairy Dust",
+          "min_count": 1,
+          "max_count": 2,
+          "weight": 10
+        },
+        {
+          "type": "null",
+          "weight": 10
+        }
+      ]
+    },
+    "ltb_blood_fairy": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Blood Fairy Fangs",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "ltb_fairy",
+          "weight": -1
+        }
+      ]
+    },
+    "ltb_fat_rat": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Sharp Rat Claws",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "common_rat",
+          "weight": -1
         }
       ]
     },
@@ -1447,6 +2526,103 @@
         {
           "type": "table",
           "ref": "common_chest",
+          "weight": -1
+        }
+      ]
+    },
+    "common_tree": {
+      "rolls": 1,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Wooden Log",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 70
+        },
+        {
+          "type": "null",
+          "weight": 70
+        },
+        {
+          "type": "item",
+          "name": "Wooden Log",
+          "min_count": 2,
+          "max_count": 4,
+          "weight": 30
+        }
+      ]
+    },
+    "ltb_base_tree": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Tree Guard Armor",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "common_tree",
+          "weight": -1
+        }
+      ]
+    },
+    "ltb_iron_pine_tree": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "item",
+          "name": "Iron Pine Tree Armor",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "common_tree",
+          "weight": -1
+        },
+        {
+          "type": "item",
+          "name": "Iron Scrap",
+          "min_count": 4,
+          "max_count": 6,
+          "weight": 70
+        },
+        {
+          "type": "null",
+          "weight": 70
+        },
+        {
+          "type": "item",
+          "name": "Iron Scrap",
+          "min_count": 2,
+          "max_count": 4,
+          "weight": 30
+        },
+        {
+          "type": "item",
+          "name": "Arcane Liquid",
+          "min_count": 2,
+          "max_count": 4,
+          "weight": 30
+        }
+      ]
+    },
+    "rare_silk_cocoon": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "table",
+          "ref": "common_spider",
+          "weight": -1
+        },
+        {
+          "type": "table",
+          "ref": "mixed_chest",
           "weight": -1
         }
       ]

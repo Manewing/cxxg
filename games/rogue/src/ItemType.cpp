@@ -101,6 +101,7 @@ std::ostream &operator<<(std::ostream &Out, const ItemType &Type) {
   Out << Type.str();
   return Out;
 }
+
 std::optional<CapabilityFlags>
 CapabilityFlags::parseString(const std::string &Str) {
   if (Str == "use_on") {
@@ -127,8 +128,18 @@ CapabilityFlags::parseString(const std::string &Str) {
   if (Str == "adjacent_use") {
     return CapabilityFlags::Adjacent | CapabilityFlags::UseOn;
   }
+  if (Str == "skill") {
+    return CapabilityFlags::Skill | CapabilityFlags::Self;
+  }
+  if (Str == "skill_ranged") {
+    return CapabilityFlags::Skill | CapabilityFlags::Ranged;
+  }
+  if (Str == "skill_adjacent") {
+    return CapabilityFlags::Skill | CapabilityFlags::Adjacent;
+  }
   return std::nullopt;
 }
+
 CapabilityFlags CapabilityFlags::fromString(const std::string &Str) {
   if (const auto It = parseString(Str); It.has_value()) {
     return It.value();
@@ -145,6 +156,15 @@ const char *CapabilityFlags::str() const {
   }
   if ((CapabilityFlags::UseOn | CapabilityFlags::Adjacent) == Value) {
     return "Adjacent use";
+  }
+  if ((CapabilityFlags::Skill | CapabilityFlags::Self) == Value) {
+    return "Skill";
+  }
+  if ((CapabilityFlags::Skill | CapabilityFlags::Ranged) == Value) {
+    return "Ranged skill";
+  }
+  if ((CapabilityFlags::Skill | CapabilityFlags::Adjacent) == Value) {
+    return "Adjacent skill";
   }
   switch (Value) {
   case CapabilityFlags::None:
@@ -163,10 +183,27 @@ const char *CapabilityFlags::str() const {
     return "Ranged";
   case CapabilityFlags::Adjacent:
     return "Adjacent";
+  case CapabilityFlags::Self:
+    return "Self";
+  case CapabilityFlags::Skill:
+    return "Skill";
   default:
     break;
   }
   return "<unimp. CapabilityFlags>";
+}
+
+CapabilityFlags::operator bool() const {
+  // Filter out capability flags that are not valid on their own
+  return (Value & ~(Self | Ranged | Adjacent)) != None;
+}
+
+bool CapabilityFlags::isAdjacent(CapabilityFlags Other) const {
+  return (Value & (Adjacent | Other)) == (Adjacent | Other);
+}
+
+bool CapabilityFlags::isRanged(CapabilityFlags Other) const {
+  return (Value & (Ranged | Other)) == (Ranged | Other);
 }
 
 std::ostream &operator<<(std::ostream &Out, const CapabilityFlags &Flags) {

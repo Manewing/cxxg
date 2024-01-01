@@ -4,6 +4,7 @@
 #include <rogue/UI/Buffs.h>
 #include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controller.h>
+#include <rogue/UI/Crafting.h>
 #include <rogue/UI/Equipment.h>
 #include <rogue/UI/History.h>
 #include <rogue/UI/Interact.h>
@@ -20,6 +21,8 @@ namespace rogue::ui {
 
 namespace {
 
+/// Returns color for health bar, based on current health and max health. From
+/// red to green (full life).
 cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
   if (Health <= 0) {
     return {145, 10, 10};
@@ -34,15 +37,30 @@ cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
   return {245, 30, 30};
 }
 
-cxxg::types::Size getWindowContainerSize(cxxg::Screen &Scr) {
-  auto S = Scr.getSize();
-  return {S.X - 1, S.Y - 2};
+/// Returns color for mana bar, based on current mana and max mana. From grey to
+/// blue (full mana).
+cxxg::types::RgbColor getManaColor(int Mana, int MaxMana) {
+  if (Mana <= 0) {
+    return {145, 145, 145};
+  }
+  int Percent = (Mana * 100) / MaxMana;
+  if (Percent >= 66) {
+    return {10, 140, 250};
+  }
+  if (Percent >= 33) {
+    return {80, 150, 200};
+  }
+  return {145, 145, 200};
+}
+
+cxxg::types::Size getWindowContainerSize(const cxxg::types::Size &Size) {
+  return {Size.X - 1, Size.Y - 2};
 }
 
 } // namespace
 
 Controller::Controller(cxxg::Screen &Scr)
-    : Scr(Scr), WdwContainer({1, 2}, getWindowContainerSize(Scr)) {}
+    : Scr(Scr), WdwContainer({1, 2}, getWindowContainerSize(Scr.getSize())) {}
 
 void Controller::draw(int LevelIdx, const PlayerInfo &PI,
                       const std::optional<TargetInfo> &TI) {
@@ -51,6 +69,7 @@ void Controller::draw(int LevelIdx, const PlayerInfo &PI,
   const auto NoInterColor = cxxg::types::Color::GREY;
   const auto HasInterColor = cxxg::types::RgbColor{80, 200, 145};
   const auto HealthColor = getHealthColor(PI.Health, PI.MaxHealth);
+  const auto ManaColor = getManaColor(PI.Mana, PI.MaxMana);
 
   auto InteractStr = PI.InteractStr;
   if (WdwContainer.hasActiveWindow()) {
@@ -66,8 +85,9 @@ void Controller::draw(int LevelIdx, const PlayerInfo &PI,
   auto Acc = Scr[0][0];
   Acc << NoColor.underline() << "[FLOOR]:" << NoColor << " " << std::setw(3)
       << (LevelIdx + 1) << " | " << HealthColor << std::setw(4) << PI.Health
-      << " HP" << NoColor << " | " << PI.AP << " AP | " << NoColor.underline()
-      << "[T]:" << NoColor << " ";
+      << " HP" << NoColor << " | " << ManaColor << std::setw(4) << PI.Mana
+      << " MP" << NoColor << " | " << NoColor.underline() << "[T]:" << NoColor
+      << " ";
   if (TI) {
     Acc << TI->Name << " | " << getHealthColor(TI->Health, TI->MaxHealth)
         << std::setw(4) << TI->Health << " HP" << NoColor;
@@ -89,16 +109,20 @@ void Controller::handleInput(int Char) {
   WdwContainer.handleInput(Char);
 }
 
-void Controller::addWindow(std::shared_ptr<Widget> Wdw,
-                           bool AutoLayoutWindows) {
-  WdwContainer.addWindow(std::move(Wdw));
+void Controller::addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows,
+                           bool CenterWindow) {
+  WdwContainer.addWindow(Wdw);
   if (AutoLayoutWindows) {
     WdwContainer.autoLayoutWindows();
+  }
+  if (CenterWindow) {
+    WdwContainer.centerWindow(*Wdw);
   }
 }
 
 void Controller::setMenuUI(Level &Lvl) {
   WdwContainer.addWindow<MenuController>(*this, Lvl);
+  WdwContainer.centerSingleWindow();
 }
 
 bool Controller::hasMenuUI() const {
@@ -123,14 +147,14 @@ void Controller::closeCommandLineUI() {
       WdwContainer.getWindowOfType<CommandLineController>());
 }
 
-void Controller::setEquipmentUI(entt::entity Entity, entt::registry &Reg) {
+void Controller::setEquipmentUI(entt::entity Entity, Level &Lvl) {
   if (Entity == entt::null) {
     return;
   }
-  auto &EquipComp = Reg.get<EquipmentComp>(Entity);
+  auto &EquipComp = Lvl.Reg.get<EquipmentComp>(Entity);
 
   WdwContainer.addWindow<EquipmentController>(*this, EquipComp.Equip, Entity,
-                                              Reg, cxxg::types::Position{2, 2});
+                                              Lvl, cxxg::types::Position{2, 2});
   WdwContainer.autoLayoutWindows();
 }
 
@@ -210,6 +234,22 @@ void Controller::closeLootUI() {
   }
 }
 
+void Controller::setCraftingUI(entt::entity Entity, entt::registry &Reg,
+                               const CraftingDatabase &CraftingDb,
+                               const CraftingHandler &Crafter) {
+  WdwContainer.addWindow<CraftingController>(*this, Entity, Reg, CraftingDb,
+                                             Crafter);
+  WdwContainer.autoLayoutWindows();
+}
+
+bool Controller::hasCraftingUI() const {
+  return WdwContainer.hasWindowOfType<CraftingController>();
+}
+
+void Controller::closeCraftingUI() {
+  WdwContainer.closeWindow(WdwContainer.getWindowOfType<CraftingController>());
+}
+
 void Controller::setHistoryUI(History &Hist) {
   WdwContainer.addWindow<HistoryController>(cxxg::types::Position{0, 2}, Hist);
   WdwContainer.autoLayoutWindows();
@@ -265,6 +305,11 @@ void Controller::closeAll() {
   while (WdwContainer.hasActiveWindow()) {
     WdwContainer.closeWindow(&WdwContainer.getActiveWindow());
   }
+}
+
+void Controller::handleResize(cxxg::types::Size Size) {
+  WdwContainer.setSize(getWindowContainerSize(Size));
+  WdwContainer.autoLayoutWindows();
 }
 
 } // namespace rogue::ui

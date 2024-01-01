@@ -1,6 +1,10 @@
 #include <iomanip>
 #include <random>
 #include <rogue/Components/Buffs.h>
+#include <rogue/Components/Combat.h>
+#include <rogue/Context.h>
+#include <rogue/Event.h>
+#include <rogue/EventHub.h>
 #include <sstream>
 
 namespace rogue {
@@ -327,6 +331,24 @@ bool BlockBuffComp::remove(const BlockBuffComp &Other) {
   }
   BlockChance -= Other.BlockChance;
   return false;
+}
+
+void BuffApplyHelperBase::markCombat(const entt::entity &SrcEt,
+                                     const entt::entity &DstEt,
+                                     entt::registry &Reg) {
+  Reg.get_or_emplace<CombatAttackComp>(SrcEt).Target = DstEt;
+  Reg.get_or_emplace<CombatTargetComp>(DstEt).Attacker = SrcEt;
+}
+
+void BuffApplyHelperBase::publishBuffAppliedEvent(const entt::entity &SrcEt,
+                                                  const entt::entity &DstEt,
+                                                  bool IsCombat,
+                                                  entt::registry &Reg,
+                                                  const BuffBase &Buff) {
+  if (auto *Ctx = Reg.ctx().find<GameContext>()) {
+    Ctx->EvHub.publish(
+        BuffAppliedEvent{{}, SrcEt, DstEt, &Reg, IsCombat, &Buff});
+  }
 }
 
 std::string StatsBuffPerHitComp::getName() const {

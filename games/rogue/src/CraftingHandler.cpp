@@ -5,29 +5,31 @@
 #include <iostream>
 namespace rogue {
 
-const std::optional<std::vector<CraftingNode::ItemId>> &
+static const std::optional<CraftingNode::CraftingResult> EmptyResult;
+
+const std::optional<CraftingNode::CraftingResult> &
 CraftingNode::search(const std::vector<Item> &Items) const {
-  static const std::optional<std::vector<ItemId>> Empty;
   if (Items.empty()) {
-    return Empty;
+    return EmptyResult;
   }
 
   const CraftingNode *Node = this;
   for (auto &It : Items) {
     auto ItNode = Node->Children.find(It.getId());
     if (ItNode == Node->Children.end()) {
-      return Empty;
+      return EmptyResult;
     }
     Node = &ItNode->second;
   }
 
-  return Node->ResultItems;
+  return Node->Result;
 }
 
 CraftingHandler::CraftingHandler(const ItemDatabase &ItemDb)
     : ItemDb(&ItemDb) {}
 
-void CraftingHandler::addRecipe(const CraftingRecipe &Recipe) {
+void CraftingHandler::addRecipe(CraftingRecipeId RecipeId,
+                                const CraftingRecipe &Recipe) {
   if (Recipe.getResultItems().empty() || Recipe.getRequiredItems().empty()) {
     throw std::runtime_error("CraftingHandler::addRecipe: Empty recipe");
   }
@@ -37,10 +39,39 @@ void CraftingHandler::addRecipe(const CraftingRecipe &Recipe) {
     Node = &Node->Children[Id];
   }
 
-  if (Node->ResultItems) {
+  if (Node->Result) {
     throw std::runtime_error("CraftingHandler::addRecipe: Duplicate recipe");
   }
-  Node->ResultItems = Recipe.getResultItems();
+  Node->Result =
+      CraftingNode::CraftingResult{RecipeId, Recipe.getResultItems()};
+}
+
+const ItemDatabase *CraftingHandler::getItemDb() const { return ItemDb; }
+
+const ItemDatabase &CraftingHandler::getItemDbOrFail() const {
+  if (!ItemDb) {
+    throw std::runtime_error("CraftingHandler::getItemDbOrFail: No ItemDb");
+  }
+  return *ItemDb;
+}
+
+const std::optional<CraftingNode::CraftingResult> &
+CraftingHandler::getCraftingRecipeResultOrNone(
+    const std::vector<Item> &Items) const {
+  if (Items.size() < 2) {
+    return EmptyResult;
+  }
+  auto &First = Items.at(0);
+  auto &Second = Items.at(1);
+
+  // If both items are crafting items this indicates a crafting recipe,
+  // otherwise it's a modification of an item or invalid combination
+  if (!(First.getType() & (ItemType::Crafting | ItemType::CraftingBase)) ||
+      !(Second.getType() & ItemType::Crafting)) {
+    return EmptyResult;
+  }
+
+  return Tree.search(Items);
 }
 
 std::optional<std::vector<Item>>
@@ -53,16 +84,8 @@ CraftingHandler::tryCraft(const std::vector<Item> &Items) const {
 
   // If both items are crafting items this indicates a crafting recipe,
   // otherwise it's a modification of an item or invalid combination
-  if ((First.getType() & (ItemType::Crafting | ItemType::CraftingBase)) &&
-      (Second.getType() & ItemType::Crafting)) {
-    auto Result = Tree.search(Items);
-    if (Result) {
-      std::vector<Item> CraftedItems;
-      for (auto &Id : *Result) {
-        CraftedItems.push_back(ItemDb->createItem(Id));
-      }
-      return CraftedItems;
-    }
+  if (auto CraftedOrNone = tryCraftAsRecipe(Items)) {
+    return CraftedOrNone;
   }
 
   // Filter out any invalid combinations
@@ -77,15 +100,31 @@ CraftingHandler::tryCraft(const std::vector<Item> &Items) const {
   return std::vector<Item>{craftEnhancedItem(Items)};
 }
 
+std::optional<std::vector<Item>>
+CraftingHandler::tryCraftAsRecipe(const std::vector<Item> &Items) const {
+  auto Result = getCraftingRecipeResultOrNone(Items);
+  if (!Result) {
+    return std::nullopt;
+  }
+
+  std::vector<Item> CraftedItems;
+  for (auto &Id : Result->Items) {
+    CraftedItems.push_back(
+        ItemDb->createItem(Id, /*StackSize=*/1, /*AllowEnchanting=*/false));
+  }
+  return CraftedItems;
+}
+
 namespace {
 
+/// Return all effects with an non-empty subset of the given flags
 std::vector<EffectInfo> getAllEffects(const std::vector<Item> &Items,
                                       CapabilityFlags Flags) {
   std::vector<EffectInfo> AllEffects = Items.front().getAllEffects();
   for (std::size_t Idx = 1; Idx < Items.size(); ++Idx) {
     auto &It = Items.at(Idx);
     for (const auto &Info : It.getAllEffects()) {
-      if (Info.Flags & Flags) {
+      if (Info.Attributes.Flags & Flags) {
         AllEffects.push_back(Info);
       }
     }
@@ -98,7 +137,10 @@ std::vector<EffectInfo>
 computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
   std::vector<EffectInfo> NewEffects;
   std::optional<EffectInfo> NullInfo;
-  CapabilityFlags EffectFlags = CapabilityFlags::None;
+
+  // Keep track of the overall flags of all effects
+  CapabilityFlags AllEffectFlags = CapabilityFlags::None;
+
   for (const auto &Info : AllEffects) {
     auto Effect = Info.Effect.get();
 
@@ -106,7 +148,7 @@ computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
     // effect has the same flags
     if (dynamic_cast<NullEffect *>(Info.Effect.get())) {
       if (NullInfo) {
-        NullInfo->Flags |= Info.Flags;
+        NullInfo->Attributes.Flags |= Info.Attributes.Flags;
       } else {
         NullInfo = Info;
       }
@@ -116,10 +158,10 @@ computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
     // Handle RemoveEffectBase separately, we remove all newly added effects
     // that are removed by this effect
     if (auto *RM = dynamic_cast<const RemoveEffectBase *>(Effect)) {
-      auto RMFlags = Info.Flags;
+      auto RMFlags = Info.Attributes.Flags;
       auto It = std::remove_if(NewEffects.begin(), NewEffects.end(),
                                [RM, RMFlags](const EffectInfo &Info) {
-                                 if (Info.Flags != RMFlags) {
+                                 if (Info.Attributes.Flags != RMFlags) {
                                    return false;
                                  }
                                  return RM->removesEffect(*Info.Effect);
@@ -128,24 +170,32 @@ computeNewEffects(const std::vector<EffectInfo> &AllEffects) {
       continue;
     }
 
-    EffectFlags |= Info.Flags;
+    // Update all flags with the effect info flags
+    AllEffectFlags |= Info.Attributes.Flags;
 
+    // Try to combine the effect with any existing effect
     for (auto &NewInfo : NewEffects) {
-      if (NewInfo.Flags != Info.Flags) {
+      if (NewInfo.Attributes.Flags != Info.Attributes.Flags) {
         continue;
       }
       auto NewEffect = NewInfo.Effect.get();
       if (NewEffect->canAddFrom(*Effect)) {
         NewEffect->addFrom(*Effect);
+        NewInfo.Attributes.updateCostsFrom(Info.Attributes);
         Effect = nullptr;
         break;
       }
     }
+
+    // If effect was not combined with any existing effect, add it as a new one
     if (Effect) {
-      NewEffects.push_back({Info.Flags, Effect->clone()});
+      NewEffects.push_back({Info.Attributes, Effect->clone()});
     }
   }
-  if (NullInfo && (NullInfo->Flags & ~EffectFlags)) {
+
+  // Add NullEffect if there are any flags that are not covered by any other
+  // effect
+  if (NullInfo && (NullInfo->Attributes.Flags & ~AllEffectFlags)) {
     NewEffects.push_back(*NullInfo);
   }
   return NewEffects;

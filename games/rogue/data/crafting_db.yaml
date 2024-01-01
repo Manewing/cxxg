@@ -1,9 +1,66 @@
 recipes:
-  - ingredients:
+  - name: Leather
+    ingredients:
+      - Leather Scrap
+      - Leather Scrap
       - Leather Scrap
     results:
       - Leather
-  - ingredients:
+  - name: Iron Ingot
+    ingredients:
+      - Iron Scrap
+      - Iron Scrap
+      - Iron Scrap
+      - Iron Scrap
+    results:
+      - Iron Ingot
+  - name: Leather Tunic
+    ingredients:
+      - Leather
+      - Leather
+      - Iron Scrap
+      - Leather
+      - Leather
+    results:
+      - Leather Tunic
+  - name: Leather Pants
+    ingredients:
+      - Iron Scrap
+      - Leather
+      - Leather
+      - Leather
+      - Leather
+      - Iron Scrap
+    results:
+      - Leather Pants
+  - name: Leather Boots
+    ingredients:
+      - Leather
+      - Leather
+      - Iron Scrap
+      - Iron Scrap
+      - Leather
+      - Leather
+    results:
+      - Leather Boots
+  - name: Leather Helmet
+    ingredients:
+      - Leather
+      - Iron Scrap
+      - Iron Scrap
+      - Iron Scrap
+      - Leather
+    results:
+      - Leather Helmet
+  - name: Small Sword
+    ingredients:
+      - Wooden Log
+      - Leather
+      - Iron Ingot
+    results:
+      - Small Sword
+  - name: Wooden Shield
+    ingredients:
       - Wooden Log
       - Wooden Log
       - Leather Scrap
@@ -12,7 +69,8 @@ recipes:
       - Wooden Log
     results:
       - Wooden Shield
-  - ingredients:
+  - name: Wooden Bow
+    ingredients:
       - Wooden Log
       - Leather Scrap
       - Leather Scrap
@@ -22,13 +80,15 @@ recipes:
       - Wooden Log
     results:
       - Wooden Bow
-  - ingredients:
+  - name: Fire Stone
+    ingredients:
       - Rune Dust
       - Iron Scrap
       - Stone
     results:
       - Fire Stone
-  - ingredients:
+  - name: Burn Wooden Logs
+    ingredients:
       - Wooden Log
       - Wooden Log
       - Wooden Log
@@ -38,8 +98,155 @@ recipes:
       - Ash
       - Fire Stone
       - Charcoal
-  - ingredients:
+  - name: Arcane Potion
+    ingredients:
       - Glass Vial
       - Arcane Liquid
     results:
       - Arcane Potion
+  - name: Armor Plating
+    ingredients:
+      - Rune Dust
+      - Rune Dust
+      - Arachnid Chitin Shard
+      - Arachnid Chitin Shard
+      - Arachnid Chitin Shard
+    results:
+      - Armor Plating
+  - name: Spider Venom Oil
+    ingredients:
+      - Arcane Liquid
+      - Venomous Fang
+      - Venomous Fang
+      - Venomous Fang
+      - Spiderling Venom Sac
+      - Spiderling Venom Sac
+      - Spiderling Venom Sac
+    results:
+      - Spider Venom Oil
+  - name: Nature Brew
+    ingredients:
+      - Glass Vial
+      - Arcane Liquid
+      - Blueberry
+      - Poison Berry
+      - Dragon Fruit
+      - Elder Flower
+    results:
+      - Nature Brew
+  - name: Rune Dust
+    ingredients:
+      - Fairy Dust
+      - Fire Stone
+    results:
+      - Rune Dust
+      - Rune Dust
+      - Fire Stone
+  - name: Infused Silk Cloth
+    ingredients:
+      - Silk Cloth
+      - Fairy Dust
+      - Arcane Liquid
+    results:
+      - Infused Silk Cloth
+  - name: Rune Stone
+    ingredients:
+      - Rune Dust
+      - Rune Dust
+      - Stone
+      - Rune Dust
+      - Rune Dust
+    results:
+      - Rune Stone
+  - name: Orb of Strength
+    ingredients:
+      - Glass Vial
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
+      - Armor Plating
+      - Fire Stone
+    results:
+      - Orb of Strength
+      - Fire Stone
+  - name: Orb of Dexterity
+    ingredients:
+      - Glass Vial
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
+      - Silk Cloth
+      - Silk Cloth
+      - Silk Cloth
+      - Silk Cloth
+      - Silk Cloth
+      - Fire Stone
+    results:
+      - Orb of Dexterity
+      - Fire Stone
+  - name: Orb of Vitality
+    ingredients:
+      - Glass Vial
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
+      - Nature Brew
+      - Nature Brew
+      - Nature Brew
+      - Nature Brew
+      - Nature Brew
+      - Fire Stone
+    results:
+      - Orb of Vitality
+      - Fire Stone
+  - name: Orb of Intelligence
+    ingredients:
+      - Glass Vial
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
+      - Arcane Potion
+      - Arcane Potion
+      - Arcane Potion
+      - Arcane Potion
+      - Arcane Potion
+      - Fire Stone
+    results:
+      - Orb of Intelligence
+      - Fire Stone
+  - name: Orb of Upgrade
+    ingredients:
+      - Glass Vial
+      - Rune Dust
+      - Rune Dust
+      - Rune Dust
+      - Rune Dust
+      - Rune Dust
+      - Arcane Liquid
+      - Arcane Liquid
+      - Arcane Liquid
+      - Arcane Liquid
+      - Arcane Liquid
+      - Fire Stone
+    results:
+      - Orb of Upgrade
+      - Fire Stone
+  - name: Great Orb of Upgrade
+    ingredients:
+      - Orb of Upgrade
+      - Orb of Upgrade
+      - Orb of Upgrade
+      - Fire Stone
+    results:
+      - Great Orb of Upgrade
+      - Fire Stone
+  - name: Silk Cloth
+    ingredients:
+      - Silk Thread
+      - Silk Thread
+      - Silk Thread
+      - Silk Thread
+      - Silk Thread
+      - Silk Thread
+    results:
+      - Silk Cloth

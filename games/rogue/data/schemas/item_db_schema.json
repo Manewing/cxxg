@@ -43,6 +43,21 @@
                 "effect": {
                   "type": "string",
                   "description": "The effect of the capability"
+                },
+                "mana_cost": {
+                  "type": "number",
+                  "description": "The mana cost of the capability",
+                  "minimum": 0
+                },
+                "health_cost": {
+                  "type": "number",
+                  "description": "The health cost of the capability",
+                  "minimum": 0
+                },
+                "ap_cost": {
+                  "type": "number",
+                  "description": "The action point cost of the capability",
+                  "minimum": 0
                 }
               },
               "additionalProperties": false
@@ -60,10 +75,29 @@
                 "specialization": {
                   "type": "string",
                   "description": "The effect of the capability"
+                },
+                "mana_cost": {
+                  "type": "number",
+                  "description": "The mana cost of the capability",
+                  "minimum": 0
+                },
+                "health_cost": {
+                  "type": "number",
+                  "description": "The health cost of the capability",
+                  "minimum": 0
+                },
+                "ap_cost": {
+                  "type": "number",
+                  "description": "The action point cost of the capability",
+                  "minimum": 0
                 }
               },
               "additionalProperties": false
             }
+          },
+          "enhancements": {
+            "type": "string",
+            "description": "Optional loot table referencing optional enhancements to be crafted onto the item"
           },
           "additionalProperties": false
         }

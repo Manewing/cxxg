@@ -7,7 +7,7 @@ namespace {
 
 const rogue::ItemPrototype DummyConsumable(
     1, "consumable", "desc", rogue::ItemType::Consumable, 5,
-    {{rogue::CapabilityFlags::UseOn, std::make_shared<rogue::NullEffect>()}});
+    {{{rogue::CapabilityFlags::UseOn}, std::make_shared<rogue::NullEffect>()}});
 
 TEST(InventoryTest, Empty) {
   rogue::Inventory Inv;
@@ -89,12 +89,31 @@ TEST(InventoryTest, TakeItem) {
   EXPECT_EQ(Inv.size(), 1);
 }
 
+TEST(InventoryTest, HasItem) {
+  rogue::Inventory Inv;
+  rogue::Item It(DummyConsumable, 5);
+  Inv.addItem(It);
+  ASSERT_EQ(Inv.size(), 1);
+
+  EXPECT_TRUE(Inv.hasItem(1, 5));
+  EXPECT_TRUE(Inv.hasItem(1, 3));
+  EXPECT_TRUE(Inv.hasItem(1, 1));
+  EXPECT_FALSE(Inv.hasItem(1, 6));
+  EXPECT_FALSE(Inv.hasItem(1, 0));
+  EXPECT_FALSE(Inv.hasItem(2, 5));
+
+  Inv.addItem(It);
+  ASSERT_EQ(Inv.size(), 2);
+
+  EXPECT_TRUE(Inv.hasItem(1, 10));
+}
+
 TEST(InventoryTest, ApplyItemToUseConsumable) {
   rogue::Item It(DummyConsumable);
   entt::registry Reg;
   entt::entity Entity = Reg.create();
   EXPECT_TRUE(rogue::Inventory::applyItemTo(It, rogue::CapabilityFlags::UseOn,
-                                            Entity, Reg));
+                                            Entity, Entity, Reg));
 }
 
 TEST(InventoryTest, ApplyItemToUseConsumableFromInv) {
@@ -102,7 +121,8 @@ TEST(InventoryTest, ApplyItemToUseConsumableFromInv) {
   Inv.addItem(rogue::Item(DummyConsumable, 4));
   entt::registry Reg;
   entt::entity Entity = Reg.create();
-  EXPECT_TRUE(Inv.applyItemTo(0, rogue::CapabilityFlags::UseOn, Entity, Reg));
+  EXPECT_TRUE(
+      Inv.applyItemTo(0, rogue::CapabilityFlags::UseOn, Entity, Entity, Reg));
 
   ASSERT_EQ(Inv.size(), 1);
   EXPECT_EQ(Inv.getItem(0).StackSize, 3);

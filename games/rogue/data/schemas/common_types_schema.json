@@ -32,7 +32,10 @@
         "equipment",
         "dismantle",
         "ranged_use",
-        "adjacent_use"
+        "adjacent_use",
+        "skill",
+        "skill_ranged",
+        "skill_adjacent"
       ]
     },
     "stat_points": {
@@ -74,6 +77,10 @@
         "bg_color": {
           "type": "string",
           "description": "The background color of the character"
+        },
+        "z_index": {
+          "type": "integer",
+          "description": "The z-index of the character"
         }
       }
     },

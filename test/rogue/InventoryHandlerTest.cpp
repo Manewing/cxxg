@@ -324,11 +324,11 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
   Reg.emplace<rogue::NameComp>(Entity, "Entity");
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
-  Crafter.addRecipe(rogue::CraftingRecipe(
-      {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
-      {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
-
-  rogue::EventHub Hub;
+  Crafter.addRecipe(
+      0,
+      rogue::CraftingRecipe(
+          "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+          {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
 
   Inv.addItem(rogue::Item(DummyItems.CraftingA));
   Inv.addItem(rogue::Item(DummyItems.CraftingC));
@@ -350,6 +350,94 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
   ASSERT_EQ(Inv.size(), 2);
   EXPECT_EQ(Inv.getItem(0).getName(), "crafting_c");
   EXPECT_EQ(Inv.getItem(1).getName(), "crafting_d");
+}
+
+TEST_F(InventoryHandlerTest, TryCraftItemsForPlayer) {
+  Reg.emplace<rogue::NameComp>(Entity, "Entity");
+  auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
+
+  auto PlayerEt = Reg.create();
+  Reg.emplace<rogue::NameComp>(PlayerEt, "Player");
+  auto &PC = Reg.emplace<rogue::PlayerComp>(PlayerEt);
+  auto &PlayerInv = Reg.emplace<rogue::InventoryComp>(PlayerEt).Inv;
+
+  rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
+  Crafter.addRecipe(
+      0,
+      rogue::CraftingRecipe(
+          "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+          {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingA));
+  Inv.addItem(rogue::Item(DummyItems.CraftingB));
+
+  InvHandler.tryCraftItems(PlayerEt);
+  ASSERT_EQ(Inv.size(), 0);
+  ASSERT_EQ(PlayerInv.size(), 2);
+
+  EXPECT_EQ(PlayerInv.getItem(0).getName(), "crafting_c");
+  EXPECT_EQ(PlayerInv.getItem(1).getName(), "crafting_d");
+
+  EXPECT_EQ(PC.KnownRecipes, std::set<rogue::CraftingRecipeId>{0});
+}
+
+TEST_F(InventoryHandlerTest, CanCraft) {
+  Reg.emplace<rogue::NameComp>(Entity, "Entity");
+  rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
+
+  auto Recipe = rogue::CraftingRecipe(
+      "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+      {DummyItems.CraftingC.ItemId});
+
+  EXPECT_FALSE(InvHandler.canCraft(Recipe))
+      << "Expect not to be able to craft if there is no inventory";
+
+  auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
+  InvHandler.refresh();
+  EXPECT_FALSE(InvHandler.canCraft(Recipe))
+      << "Expect not to be able to craft if the inventory is empty";
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingA));
+  EXPECT_FALSE(InvHandler.canCraft(Recipe))
+      << "Expect not to be able to craft if the inventory is missing required "
+         "items";
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingB));
+
+  EXPECT_TRUE(InvHandler.canCraft(Recipe))
+      << "Expect to be able to craft if the inventory has all required items";
+}
+
+TEST_F(InventoryHandlerTest, TryCraft) {
+  Reg.emplace<rogue::NameComp>(Entity, "Entity");
+  rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
+
+  auto Recipe = rogue::CraftingRecipe(
+      "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
+      {DummyItems.CraftingC.ItemId});
+  Crafter.addRecipe(0, Recipe);
+
+  EXPECT_FALSE(InvHandler.tryCraft(Recipe))
+      << "Expect not to be able to craft if there is no inventory";
+
+  auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
+  InvHandler.refresh();
+  EXPECT_FALSE(InvHandler.tryCraft(Recipe))
+      << "Expect not to be able to craft if the inventory is empty";
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingA));
+
+  EXPECT_FALSE(InvHandler.tryCraft(Recipe))
+      << "Expect not to be able to craft if the inventory is missing required "
+         "items";
+
+  Inv.addItem(rogue::Item(DummyItems.CraftingB));
+
+  EXPECT_TRUE(InvHandler.tryCraft(Recipe))
+      << "Expect to be able to craft if the inventory has all required items";
+
+  ASSERT_EQ(Inv.size(), 1);
+  EXPECT_EQ(Inv.getItem(0).getName(), "crafting_c");
 }
 
 } // namespace

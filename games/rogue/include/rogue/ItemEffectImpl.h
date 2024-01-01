@@ -9,52 +9,56 @@
 namespace rogue {
 
 // Apply buff effects
-using PoisonDebuffEffect = ApplyBuffItemEffect<PoisonDebuffComp, HealthComp>;
+using PoisonDebuffEffect =
+    ApplyBuffItemEffect<PoisonDebuffComp, true, HealthComp>;
 
 using BleedingDebuffEffect =
-    ApplyBuffItemEffect<BleedingDebuffComp, HealthComp>;
+    ApplyBuffItemEffect<BleedingDebuffComp, true, HealthComp>;
 
-using StatsBuffEffect = ApplyBuffItemEffect<StatsBuffComp, StatsComp>;
+using StatsBuffEffect = ApplyBuffItemEffect<StatsBuffComp, false, StatsComp>;
 
-using ArmorBuffEffect = ApplyBuffItemEffect<ArmorBuffComp, HealthComp>;
+using ArmorBuffEffect = ApplyBuffItemEffect<ArmorBuffComp, false, HealthComp>;
 
-using BlockBuffEffect = ApplyBuffItemEffect<BlockBuffComp, HealthComp>;
+using BlockBuffEffect = ApplyBuffItemEffect<BlockBuffComp, false, HealthComp>;
 
 using HealthRegenBuffEffect =
-    ApplyBuffItemEffect<HealthRegenBuffComp, HealthComp>;
+    ApplyBuffItemEffect<HealthRegenBuffComp, false, HealthComp>;
+
+using ManaRegenBuffEffect =
+    ApplyBuffItemEffect<ManaRegenBuffComp, false, ManaComp>;
 
 using BlindedDebuffEffect =
-    ApplyBuffItemEffect<BlindedDebuffComp, LineOfSightComp>;
+    ApplyBuffItemEffect<BlindedDebuffComp, true, LineOfSightComp>;
 
-using MindVisionBuffEffect = ApplyBuffItemEffect<MindVisionBuffComp>;
+using MindVisionBuffEffect = ApplyBuffItemEffect<MindVisionBuffComp, false>;
 
-using InvisibilityBuffEffect = ApplyBuffItemEffect<InvisibilityBuffComp>;
+using InvisibilityBuffEffect = ApplyBuffItemEffect<InvisibilityBuffComp, false>;
 
 using StatsBuffPerHitEffect =
-    ApplyBuffItemEffect<StatsBuffPerHitComp, StatsComp>;
+    ApplyBuffItemEffect<StatsBuffPerHitComp, false, StatsComp>;
 
 using CoHTargetBleedingDebuffEffect =
-    ApplyBuffItemEffect<CoHTargetBleedingDebuffComp>;
+    ApplyBuffItemEffect<CoHTargetBleedingDebuffComp, false>;
 
 using CoHTargetPoisonDebuffEffect =
-    ApplyBuffItemEffect<CoHTargetPoisonDebuffComp>;
+    ApplyBuffItemEffect<CoHTargetPoisonDebuffComp, false>;
 
 using CoHTargetBlindedDebuffEffect =
-    ApplyBuffItemEffect<CoHTargetBlindedDebuffComp>;
+    ApplyBuffItemEffect<CoHTargetBlindedDebuffComp, false>;
 
 // Set component effects
 
-class SetMeleeCompEffect : public SetComponentEffect<MeleeAttackComp> {
+class SetMeleeCompEffect : public SetComponentEffect<MeleeAttackComp, false> {
 public:
-  using SetComponentEffect<MeleeAttackComp>::SetComponentEffect;
+  using SetComponentEffect<MeleeAttackComp, false>::SetComponentEffect;
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
   std::string getDescription() const final;
 };
 
-class SetRangedCompEffect : public SetComponentEffect<RangedAttackComp> {
+class SetRangedCompEffect : public SetComponentEffect<RangedAttackComp, false> {
 public:
-  using SetComponentEffect<RangedAttackComp>::SetComponentEffect;
+  using SetComponentEffect<RangedAttackComp, false>::SetComponentEffect;
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
   std::string getDescription() const final;
@@ -73,12 +77,64 @@ public:
 // Remove buff effects
 
 class RemovePoisonDebuffEffect
-    : public RemoveComponentEffect<PoisonDebuffComp> {
+    : public RemoveComponentEffect<PoisonDebuffComp, false> {
 public:
-  using RemoveComponentEffect<PoisonDebuffComp>::RemoveComponentEffect;
+  using RemoveComponentEffect<PoisonDebuffComp, false>::RemoveComponentEffect;
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
   std::string getDescription() const final;
+};
+
+// Combat
+
+class ManaItemEffect : public ItemEffect {
+public:
+  explicit ManaItemEffect(StatValue Amount);
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &Et, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+
+private:
+  StatValue Amount;
+};
+
+class SweepingStrikeEffect : public ItemEffect {
+public:
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+};
+
+class SmiteEffect : public ItemEffect {
+public:
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+};
+
+// Knowledge
+
+class LearnRecipeEffect : public ItemEffect {
+public:
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &Et, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
 };
 
 } // namespace rogue

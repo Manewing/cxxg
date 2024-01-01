@@ -1,0 +1,17 @@
+{
+  "map": {
+    "type": "generated",
+    "config": "mystic_garden.cfg"
+  },
+  "entities": {
+    "b": "young_blood_fairy",
+    "f": "fairy",
+    "A": "pine_tree",
+    "O": "oak_tree",
+    "C": "common_chest",
+    "H": "level_entry",
+    "<": "level_exit",
+    "B": "berry_bush",
+    "m": "blinding_mushroom"
+  }
+}

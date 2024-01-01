@@ -7,9 +7,7 @@
 #include <tuple>
 #include <variant>
 
-namespace cxxg {
-
-namespace types {
+namespace cxxg::types {
 
 template <class... Ts> struct Overloaded : Ts... {
   using Ts::operator()...;
@@ -72,6 +70,12 @@ struct Size {
   /// Size Y, Rows
   ValueType Y;
 
+  /// Creates a size from a position, negative values are clamped to 0
+  static constexpr Size clamp(const Position &P) {
+    return {static_cast<ValueType>(P.X < 0 ? 0 : P.X),
+            static_cast<ValueType>(P.Y < 0 ? 0 : P.Y)};
+  }
+
   // allow implicit conversion to position
   operator Position() const {
     return {static_cast<int>(X), static_cast<int>(Y)};
@@ -88,6 +92,16 @@ struct Size {
 /// Adds to sizes together
 inline Size operator+(Size const A, Size const B) {
   return {A.X + B.X, A.Y + B.Y};
+}
+
+/// Scales a size by a factor
+inline Size operator*(Size const S, Size::ValueType Factor) {
+  return {S.X * Factor, S.Y * Factor};
+}
+
+/// Divides a size by a factor
+inline Size operator/(Size const S, Size::ValueType Factor) {
+  return {S.X / Factor, S.Y / Factor};
 }
 
 struct FontStyle {
@@ -250,8 +264,6 @@ inline bool operator!=(const ColoredChar &Lhs,
 }
 std::ostream &operator<<(std::ostream &Out, const ColoredChar &Char);
 
-}; // namespace types
-
-}; // namespace cxxg
+} // namespace cxxg::types
 
 #endif // #ifndef CXXG_TYPES_H

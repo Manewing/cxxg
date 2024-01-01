@@ -26,6 +26,8 @@ public:
 public:
   WindowContainer(cxxg::types::Position Pos, cxxg::types::Size Size);
 
+  void setSize(cxxg::types::Size Size);
+
   bool handleInput(int Char) override;
   std::string getInteractMsg() const override;
   void draw(cxxg::Screen &Scr) const override;
@@ -67,6 +69,8 @@ public:
   void selectNextWindow();
   void selectPrevWindow();
 
+  void centerWindow(Widget &Wdw);
+  void centerSingleWindow();
   void autoLayoutWindows();
   void autoLayoutWindows(cxxg::types::Position StartPos,
                          cxxg::types::Size Size);

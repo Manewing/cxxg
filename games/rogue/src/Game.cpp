@@ -16,88 +16,24 @@
 #include <rogue/Renderer.h>
 #include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controls.h>
+#include <rogue/UI/Equipment.h>
 #include <rogue/UI/TargetUI.h>
 
 namespace rogue {
-
-template <typename T, typename U>
-cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
-  for (auto PY = 0; PY < Map.getSize().H; PY++) {
-    for (auto PX = 0; PX < Map.getSize().W; PX++) {
-      Scr[PY][PX] = Map.getTile({PX, PY});
-    }
-  }
-  return Scr;
-}
-
-void RenderEventCollector::setEventHub(EventHub *EH) {
-  EventHubConnector::setEventHub(EH);
-  EH->subscribe(*this, &RenderEventCollector::onEntityAttackEvent);
-  EH->subscribe(*this, &RenderEventCollector::onDetectTargetEvent);
-  EH->subscribe(*this, &RenderEventCollector::onLostTargetEvent);
-}
-
-void RenderEventCollector::onEntityAttackEvent(const EntityAttackEvent &E) {
-  auto *PC = E.Registry->try_get<PositionComp>(E.Target);
-  if (!PC) {
-    return;
-  }
-  auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos](Renderer &R) {
-    R.renderEffect(
-        cxxg::types::ColoredChar{'*', cxxg::types::RgbColor{155, 20, 20}},
-        AtPos);
-  });
-}
-
-void RenderEventCollector::onDetectTargetEvent(const DetectTargetEvent &E) {
-  auto *PC = E.Registry->try_get<PositionComp>(E.Entity);
-  if (!PC) {
-    return;
-  }
-  auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos](Renderer &R) {
-    R.renderEffect(
-        cxxg::types::ColoredChar{'!', cxxg::types::RgbColor{173, 161, 130}},
-        AtPos);
-  });
-}
-
-void RenderEventCollector::onLostTargetEvent(const LostTargetEvent &E) {
-  auto *PC = E.Registry->try_get<PositionComp>(E.Entity);
-  if (!PC) {
-    return;
-  }
-  auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos](Renderer &R) {
-    R.renderEffect(
-        cxxg::types::ColoredChar{'?', cxxg::types::RgbColor{56, 55, 89}},
-        AtPos);
-  });
-}
-
-void RenderEventCollector::apply(Renderer &R) {
-  for (auto &Fn : RenderFns) {
-    Fn(R);
-  }
-}
-
-void RenderEventCollector::clear() { RenderFns.clear(); }
-
-bool RenderEventCollector::hasEvents() const { return !RenderFns.empty(); }
 
 Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
     : cxxg::Game(Scr), Cfg(Cfg), Hist(*this), EHW(Hist),
       ItemDb(ItemDatabase::load(Cfg.ItemDbConfig)),
       EntityDb(EntityDatabase::load(ItemDb, Cfg.EntityDbConfig)),
-      LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)), Crafter(ItemDb),
-      Ctx({ItemDb, EntityDb, LevelDb, Crafter}),
+      LevelDb(LevelDatabase::load(Cfg.LevelDbConfig)),
+      CraftingDb(CraftingDatabase::load(ItemDb, Cfg.CraftingDbConfig)),
+      Crafter(ItemDb),
+      Ctx({EvHub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter}),
       LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
       UICtrl(Scr) {
-  auto CraftDb = CraftingDatabase::load(ItemDb, Cfg.CraftingDbConfig);
-  for (const auto &Recipe : CraftDb.getRecipes()) {
-    Crafter.addRecipe(Recipe);
+  for (const auto &[RecipeId, Recipe] : CraftingDb.getRecipes()) {
+    Crafter.addRecipe(RecipeId, Recipe);
   }
 }
 
@@ -130,6 +66,7 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   EHW.subscribe(*this, &Game::onSwitchLevelEvent);
   EHW.subscribe(*this, &Game::onSwitchGameWorldEvent);
   EHW.subscribe(*this, &Game::onLootEvent);
+  EHW.subscribe(*this, &Game::onCraftEvent);
   REC.setEventHub(&EvHub);
   World->setEventHub(&EvHub);
   UICtrl.setEventHub(&EvHub);
@@ -144,6 +81,8 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
 
   // We could update the level here, but we want to draw the initial state.
   handleUpdates(/*IsTick=*/false);
+
+  UICtrl.setMenuUI(World->getCurrentLevelOrFail());
 
   handleDraw();
 }
@@ -186,7 +125,7 @@ bool Game::handleInput(int Char) {
       UICtrl.closeEquipmentUI();
       handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
     } else {
-      UICtrl.setEquipmentUI(getPlayerOrNull(), getLvlReg());
+      UICtrl.setEquipmentUI(getPlayerOrNull(), World->getCurrentLevelOrFail());
     }
     return true;
   }
@@ -253,6 +192,30 @@ bool Game::handleInput(int Char) {
     UICtrl.handleInput(Char);
     handleUpdates(/*IsTick=*/!UICtrl.isUIActive());
     return true;
+  }
+
+  if (Char >= '0' && Char <= '9') {
+    auto Idx = Char == '0' ? 10 : Char - '1';
+    auto Player = getPlayer();
+    auto &EC = getLvlReg().get<EquipmentComp>(Player);
+
+    const auto IsSlotValid = std::size_t(Idx) < EC.Equip.all().size();
+    if (!IsSlotValid) {
+      return true;
+    }
+
+    if (EC.Equip.all().at(Idx)->It) {
+      if (ui::EquipmentController::handleUseSkill(
+              UICtrl, World->getCurrentLevelOrFail(), Player,
+              *EC.Equip.all().at(Idx))) {
+        return handleUpdates(/*IsTick=*/true);
+      }
+    } else {
+      Hist.warn() << "No item equipped in slot "
+                  << EC.Equip.all().at(Idx)->BaseTypeFilter;
+      handleUpdates(/*IsTick=*/false);
+      return true;
+    }
   }
 
   // FIXME add user input to context and process input in player system
@@ -424,7 +387,7 @@ void Game::onSwitchGameWorldEvent(const SwitchGameWorldEvent &E) {
   UICtrl.closeAll();
   REC.clear();
 
-  World->switchWorld(Cfg.Seed, E.LevelName, E.SwitchEt);
+  World->switchWorld(Cfg.Seed + WorldSwitchCounter++, E.LevelName, E.SwitchEt);
 
   // We could update the level here, but we want to draw the initial state.
   handleUpdates(/*IsTick=*/false);
@@ -439,18 +402,28 @@ void Game::onLootEvent(const LootEvent &E) {
                    E.LootName);
 }
 
+void Game::onCraftEvent(const CraftEvent &E) {
+  if (!E.isPlayerAffected() ||
+      &World->getCurrentLevelOrFail().Reg != E.Registry) {
+    return;
+  }
+  UICtrl.setCraftingUI(E.Entity, World->getCurrentLevelOrFail().Reg, CraftingDb,
+                       Crafter);
+}
+
 namespace {
 
 ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
                                            entt::registry &Reg,
                                            Interaction *Interact) {
   const auto &Health = Reg.get<HealthComp>(Player);
-  const auto &AGC = Reg.get<AgilityComp>(Player);
+  const auto &Mana = Reg.get<ManaComp>(Player);
 
   ui::Controller::PlayerInfo PI;
   PI.Health = Health.Value;
   PI.MaxHealth = Health.MaxValue;
-  PI.AP = AGC.AP;
+  PI.Mana = Mana.Value;
+  PI.MaxMana = Mana.MaxValue;
   if (Interact) {
     PI.InteractStr = "[e] " + Interact->Msg;
   }
@@ -493,6 +466,7 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   Render.renderShadow(/*Darkness=*/30);
   Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
   Render.renderAllLineOfSight();
+  Render.renderEntities();
   REC.apply(Render);
   REC.clear();
 
@@ -512,7 +486,18 @@ void Game::handleDrawLevel(bool UpdateScreen) {
 }
 
 void Game::handleDrawGameOver() {
-  // TODO
+  info() << "Game Over! Press any key to retry";
+  handleShowNotifications(true);
+  Scr.update();
+  Scr.clear();
+  cxxg::utils::sleep(1000000);
+  cxxg::utils::getChar(true);
+  throw GameOverException();
+}
+
+void Game::handleResize(cxxg::types::Size Size) {
+  cxxg::Game::handleResize(Size);
+  UICtrl.handleResize(Size);
 }
 
 } // namespace rogue

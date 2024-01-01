@@ -5,12 +5,10 @@
 #include <array>
 #include <iosfwd>
 #include <numeric>
+#include <rogue/Types.h>
 #include <tuple>
 
 namespace rogue {
-
-using StatPoint = int;
-using StatValue = double;
 
 struct StatPoints {
   StatPoint Int = 0;
@@ -90,6 +88,8 @@ struct ValueRegenCompBase {
   unsigned TicksLeft = 1;
   StatValue RegenAmount = 0.05;
 
+  bool hasAmount(StatValue Value);
+  bool tryReduce(StatValue Amount);
   StatValue restore(StatValue Amount);
   StatValue reduce(StatValue Amount);
 };
@@ -112,9 +112,11 @@ struct AgilityComp {
     if (!hasEnoughAP(APAmount)) {
       return false;
     }
-    AP -= APAmount;
+    spendAP(APAmount);
     return true;
   }
+
+  void spendAP(StatValue APAmount) { AP -= APAmount; }
 };
 
 } // namespace rogue

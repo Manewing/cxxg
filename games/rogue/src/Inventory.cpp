@@ -4,11 +4,12 @@
 namespace rogue {
 
 bool Inventory::applyItemTo(const Item &It, CapabilityFlags Flags,
-                            entt::entity Entity, entt::registry &Reg) {
-  if (!It.canApplyTo(Entity, Reg, Flags)) {
+                            entt::entity SrcEt, entt::entity DstEt,
+                            entt::registry &Reg) {
+  if (!It.canApplyTo(SrcEt, DstEt, Reg, Flags)) {
     return false;
   }
-  It.applyTo(Entity, Reg, Flags);
+  It.applyTo(SrcEt, DstEt, Reg, Flags);
   return true;
 }
 
@@ -62,6 +63,22 @@ Item Inventory::takeItem(std::size_t ItemIdx, unsigned Count) {
   return takeItem(ItemIdx);
 }
 
+bool Inventory::hasItem(int Id, unsigned Count) const {
+  if (Count == 0) {
+    return false;
+  }
+  unsigned FoundCount = 0;
+  for (const auto &It : Items) {
+    if (It.getId() == Id) {
+      FoundCount += It.StackSize;
+      if (FoundCount >= Count) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 std::optional<std::size_t> Inventory::getItemIndexForId(int Id) const {
   for (std::size_t Idx = 0; Idx < Items.size(); ++Idx) {
     if (Items.at(Idx).getId() == Id) {
@@ -73,9 +90,10 @@ std::optional<std::size_t> Inventory::getItemIndexForId(int Id) const {
 
 std::optional<Item> Inventory::applyItemTo(std::size_t ItemIdx,
                                            CapabilityFlags Flags,
-                                           entt::entity Entity,
+                                           entt::entity SrcEt,
+                                           entt::entity DstEt,
                                            entt::registry &Reg) {
-  if (applyItemTo(getItem(ItemIdx), Flags, Entity, Reg)) {
+  if (applyItemTo(getItem(ItemIdx), Flags, SrcEt, DstEt, Reg)) {
     return takeItem(ItemIdx, /*Count=*/1);
   }
   return {};

@@ -1,6 +1,7 @@
 #include <random>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
+#include <rogue/Components/Player.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
@@ -30,8 +31,8 @@ template <typename ChanceOnHitBuffType>
 void tryApplyChanceOnHitBuff(entt::registry &Reg, entt::entity Target,
                              entt::entity Source) {
   if (auto *COHB = Reg.try_get<ChanceOnHitBuffType>(Source)) {
-    if (COHB->canApplyTo(Target, Reg)) {
-      COHB->applyTo(Target, Reg);
+    if (COHB->canApplyTo(Source, Target, Reg)) {
+      COHB->applyTo(Source, Target, Reg);
     }
   }
 }
@@ -63,10 +64,9 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
 
   THealth.reduce(NewDC.PhysDamage);
   THealth.reduce(NewDC.MagicDamage);
-  return NewDC.total();
+  return static_cast<unsigned>(NewDC.total());
 }
 
-/// Returns true if the combat component can be removed
 bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
                         entt::entity Target, EventHubConnector &EHC) {
   auto *THealth = Reg.try_get<HealthComp>(Target);
@@ -83,37 +83,25 @@ bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
     MA = *AMA;
   }
 
+  // Check if the attacker has enough AP
   auto *AG = Reg.try_get<AgilityComp>(Attacker);
   if (AG && !AG->trySpendAP(MA.APCost)) {
     return false;
   }
 
-  // Compute the effective damage and apply it
-  DamageComp DC;
-  DC.Source = Attacker;
-  if (auto *SC = Reg.try_get<StatsComp>(Attacker)) {
-    auto SP = SC->effective();
-    DC.PhysDamage = MA.getPhysEffectiveDamage(&SP);
-    DC.MagicDamage = MA.getMagicEffectiveDamage(&SP);
-  } else {
-    DC.PhysDamage = MA.getPhysEffectiveDamage();
-    DC.MagicDamage = MA.getMagicEffectiveDamage();
-  }
-  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC);
-
-  // Check for on hit buffs and apply stacks
-  if (auto *SBPH = Reg.try_get<StatsBuffPerHitComp>(Attacker);
-      TotalDamage && SBPH) {
-    SBPH->addStack();
+  // If there is a mana cost, check if the attacker has enough mana. This if not
+  // remove the combat component, we still consume AP for trying the action
+  if (MA.ManaCost > 0) {
+    auto *MC = Reg.try_get<ManaComp>(Attacker);
+    if (!MC || !MC->tryReduce(MA.ManaCost)) {
+      if (Reg.any_of<PlayerComp>(Attacker)) {
+        EHC.publish(PlayerInfoMessageEvent() << "Not enough mana");
+      }
+      return true;
+    }
   }
 
-  // publish
-  EntityAttackEvent EAE;
-  EAE.Registry = &Reg;
-  EAE.Attacker = Attacker;
-  EAE.Target = Target;
-  EAE.Damage = TotalDamage;
-  EHC.publish(EAE);
+  CombatSystem::handleMeleeAttack(Reg, Attacker, Target, EHC);
 
   return true;
 }
@@ -122,7 +110,7 @@ bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
 /// damage for the attacker
 /// \return true if the combat component can be removed
 bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
-                         ymir::Point2d<int> TargetPos) {
+                         ymir::Point2d<int> TargetPos, EventHubConnector &EHC) {
   auto *AttackerPC = Reg.try_get<PositionComp>(Attacker);
   if (!AttackerPC) {
     return true;
@@ -133,9 +121,22 @@ bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
     return true;
   }
 
+  // Check if the attacker has enough AP
   auto *AG = Reg.try_get<AgilityComp>(Attacker);
   if (AG && !AG->trySpendAP(RAC->APCost)) {
     return false;
+  }
+
+  // If there is a mana cost, check if the attacker has enough mana. This if not
+  // remove the combat component, we still consume AP for trying the action
+  if (RAC->ManaCost > 0) {
+    auto *MC = Reg.try_get<ManaComp>(Attacker);
+    if (!MC || !MC->tryReduce(RAC->ManaCost)) {
+      if (Reg.any_of<PlayerComp>(Attacker)) {
+        EHC.publish(PlayerInfoMessageEvent() << "Not enough mana");
+      }
+      return true;
+    }
   }
 
   // Compute the effective damage and apply it
@@ -164,7 +165,7 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
   assert(CC.Target != entt::null || CC.RangedPos.has_value());
   bool CanRemove = false;
   if (CC.RangedPos) {
-    CanRemove = performRangedAttack(Reg, Attacker, *CC.RangedPos);
+    CanRemove = performRangedAttack(Reg, Attacker, *CC.RangedPos, EHC);
   } else {
     CanRemove = performMeleeAttack(Reg, Attacker, CC.Target, EHC);
   }
@@ -174,7 +175,7 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
   }
 }
 
-void applyDamage(entt::registry &Reg, entt::entity DmgEt, DamageComp &DC,
+void applyDamageComp(entt::registry &Reg, DamageComp &DC,
                  const PositionComp &PC, EventHubConnector &EHC) {
   Reg.view<PositionComp, HealthComp>().each(
       [&Reg, &PC, &DC, &EHC](const auto &TEt, auto &TPC, auto &THC) {
@@ -198,13 +199,61 @@ void applyDamage(entt::registry &Reg, entt::entity DmgEt, DamageComp &DC,
         EAE.Damage = Damage;
         EHC.publish(EAE);
       });
-
-  if (DC.Hits <= 0) {
-    Reg.destroy(DmgEt);
-  }
 }
 
 } // namespace
+
+/// Returns true if the combat component can be removed
+void CombatSystem::handleMeleeAttack(entt::registry &Reg, entt::entity Attacker,
+                                     entt::entity Target,
+                                     EventHubConnector &EHC,
+                                     float DamageFactor) {
+  // Melee is always possible, used default values for damage if not set
+  const MeleeAttackComp DefaultMA = {/*PhysDamage = */ 1, /*MagicDamage = */ 0,
+                                     /*APCost = */ 10};
+  MeleeAttackComp MA = DefaultMA;
+  auto *AMA = Reg.try_get<MeleeAttackComp>(Attacker);
+  if (AMA) {
+    MA = *AMA;
+  }
+
+  auto *THealth = Reg.try_get<HealthComp>(Target);
+  if (!THealth) {
+    return;
+  }
+
+  // Compute the effective damage and apply it
+  DamageComp DC;
+  DC.Source = Attacker;
+  if (auto *SC = Reg.try_get<StatsComp>(Attacker)) {
+    auto SP = SC->effective();
+    DC.PhysDamage = MA.getPhysEffectiveDamage(&SP);
+    DC.MagicDamage = MA.getMagicEffectiveDamage(&SP);
+  } else {
+    DC.PhysDamage = MA.getPhysEffectiveDamage();
+    DC.MagicDamage = MA.getMagicEffectiveDamage();
+  }
+  DC.PhysDamage *= DamageFactor;
+  DC.MagicDamage *= DamageFactor;
+  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC);
+
+  // Check for on hit buffs and apply stacks
+  if (auto *SBPH = Reg.try_get<StatsBuffPerHitComp>(Attacker);
+      TotalDamage && SBPH) {
+    SBPH->addStack();
+  }
+
+  // Applying damage may cause update attack/target components
+  applyCombatComps(Reg, Attacker, Target);
+
+  // publish
+  EntityAttackEvent EAE;
+  EAE.Registry = &Reg;
+  EAE.Attacker = Attacker;
+  EAE.Target = Target;
+  EAE.Damage = TotalDamage;
+  EHC.publish(EAE);
+}
 
 void CombatSystem::update(UpdateType Type) {
   if (Type == UpdateType::NoTick) {
@@ -216,10 +265,10 @@ void CombatSystem::update(UpdateType Type) {
     performAttack(Reg, AttackerEt, CC, *this);
   });
 
-  // Deal with damages
+  // Deal with damages, removing damage entities is handled by the death system
   Reg.view<DamageComp, PositionComp>().each(
-      [this](const auto &DmgEt, auto &DC, auto &PC) {
-        applyDamage(Reg, DmgEt, DC, PC, *this);
+      [this](const auto &, auto &DC, auto &PC) {
+        applyDamageComp(Reg, DC, PC, *this);
       });
 }
 

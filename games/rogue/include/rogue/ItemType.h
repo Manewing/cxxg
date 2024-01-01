@@ -2,7 +2,6 @@
 #define ROGUE_ITEM_TYPE_H
 
 #include <iosfwd>
-#include <memory>
 #include <optional>
 #include <rogue/BitOps.h>
 #include <string>
@@ -96,6 +95,9 @@ public:
 
     // Self, indicates that the item can be used on the entity using the item
     Self = 0x40,
+
+    // Skill, indicates that the item can be used to cast a skill
+    Skill = 0x80,
   };
   using value_type = ValueType;
 
@@ -113,7 +115,7 @@ public:
   CapabilityFlags &operator=(CapabilityFlags &&) = default;
 
   operator ValueType() const { return Value; }
-  explicit operator bool() const { return Value != None; }
+  explicit operator bool() const;
 
   bool operator==(const CapabilityFlags &Other) const {
     return Value == Other.Value;
@@ -121,6 +123,12 @@ public:
   bool operator!=(const CapabilityFlags &Other) const {
     return Value != Other.Value;
   }
+
+  /// Checks if both adjacent and \p Other flags are set
+  bool isAdjacent(CapabilityFlags Other) const;
+
+  /// Checks if both ranged and \p Other flags are set
+  bool isRanged(CapabilityFlags Other) const;
 
   bool operator==(ValueType Other) const { return Value == Other; }
   bool operator!=(ValueType Other) const { return Value != Other; }
@@ -132,12 +140,6 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &Out, const CapabilityFlags &Flags);
-
-class ItemEffect;
-struct EffectInfo {
-  CapabilityFlags Flags;
-  std::shared_ptr<ItemEffect> Effect;
-};
 
 } // namespace rogue
 

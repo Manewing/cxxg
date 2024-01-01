@@ -12,45 +12,33 @@ Item::Item(const ItemPrototype &Proto, int StackSize,
 
 namespace {
 
-// FIXME Move this to UI/Item
-std::string getQualifierName(const StatPoints &P) {
-  std::string Prefix = "+" + std::to_string(P.sum()) + " ";
-  if (P.Str == P.Dex && P.Str == P.Int && P.Str == P.Vit) {
-    return Prefix + "Bal. ";
+std::string getQualifierNameForHash(std::size_t Hash) {
+  static constexpr std::array Runes = {"f", "u", "t", "o", "r", "k", "o",
+                                       "n", "i", "s", "x", "v", "y", "z"};
+  std::string Name;
+  Name.reserve(6);
+  for (std::size_t I = 0; I < 5; ++I) {
+    Name += Runes[Hash % Runes.size()];
+    Hash /= Runes.size();
   }
-  if (P.Str >= P.Dex && P.Str >= P.Int && P.Str >= P.Vit) {
-    return Prefix + "Str. ";
-  }
-  if (P.Dex >= P.Str && P.Dex >= P.Int && P.Dex >= P.Vit) {
-    return Prefix + "Fast ";
-  }
-  if (P.Int >= P.Str && P.Int >= P.Dex && P.Int >= P.Vit) {
-    return Prefix + "Wise ";
-  }
-  if (P.Vit >= P.Str && P.Vit >= P.Dex && P.Vit >= P.Int) {
-    return Prefix + "Tgh. ";
-  }
-  return Prefix;
+  Name[0] = std::toupper(Name[0]);
+  Name += ' ';
+  return Name;
 }
 
-std::string getQualifierName(const Item &It) {
+std::string getQualifierNameForItem(const Item &It) {
   // Check for stats buff effect and return name based strongest
   // stat point boost
+  std::size_t Hash = 0;
   for (const auto &ItEff : It.getAllEffects()) {
-    if ((ItEff.Flags & CapabilityFlags::Equipment) == CapabilityFlags::None) {
+    if (!(ItEff.Attributes.Flags &
+          (CapabilityFlags::Equipment | CapabilityFlags::Skill))) {
       continue;
     }
-    const auto *StatEff =
-        dynamic_cast<const ApplyBuffItemEffectBase *>(ItEff.Effect.get());
-    if (!StatEff) {
-      continue;
-    }
-    const auto *StatBuff =
-        dynamic_cast<const StatsBuffComp *>(&StatEff->getBuff());
-    if (!StatBuff) {
-      continue;
-    }
-    return getQualifierName(StatBuff->Bonus);
+    Hash ^= std::hash<std::string>{}(ItEff.Effect->getDescription());
+  }
+  if (Hash != 0) {
+    return getQualifierNameForHash(Hash);
   }
   return "";
 }
@@ -59,9 +47,11 @@ std::string getQualifierName(const Item &It) {
 
 int Item::getId() const { return getProto().ItemId; }
 
-std::string Item::getName() const {
+const std::string &Item::getName() const { return getProto().Name; }
+
+std::string Item::getQualifierName() const {
   if (getType() & ItemType::EquipmentMask) {
-    return getQualifierName(*this) + getProto().Name;
+    return getQualifierNameForItem(*this) + getProto().Name;
   }
   return getProto().Name;
 }
@@ -100,6 +90,18 @@ std::vector<EffectInfo> Item::getAllEffects() const {
   return AllEffects;
 }
 
+bool Item::hasEffect(CapabilityFlags Flags, bool AllowNull,
+                     bool AllowRemove) const {
+  bool HasEffect = false;
+  if (Specialization) {
+    HasEffect = Specialization->hasEffect(Flags, AllowNull, AllowRemove);
+    if (SpecOverrides) {
+      return HasEffect;
+    }
+  }
+  return HasEffect || getProto().hasEffect(Flags, AllowNull, AllowRemove);
+}
+
 CapabilityFlags Item::getCapabilityFlags() const {
   auto Flags = getProto().getCapabilityFlags();
   if (Specialization) {
@@ -112,49 +114,63 @@ bool Item::isSameKind(const Item &Other) const {
   return Proto == Other.Proto && Specialization == Other.Specialization;
 }
 
-bool Item::canApplyTo(const entt::entity &Entity, entt::registry &Reg,
-                      CapabilityFlags Flags) const {
+bool Item::canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                      entt::registry &Reg, CapabilityFlags Flags) const {
   if (Specialization && SpecOverrides) {
-    return Specialization->canApplyTo(Entity, Reg, Flags);
+    return Specialization->canApplyTo(SrcEt, DstEt, Reg, Flags);
   }
-  bool SpecCanUseOn =
-      Specialization && Specialization->canApplyTo(Entity, Reg, Flags);
-  return getProto().canApplyTo(Entity, Reg, Flags) || SpecCanUseOn;
+
+  // Compute overall attributes to check overall costs
+  bool SpecCanUseOn = false;
+  auto Attrs = getProto().getAttributes(Flags);
+  if (Specialization) {
+    SpecCanUseOn = Specialization->canApplyTo(SrcEt, DstEt, Reg, Flags);
+    if (SpecCanUseOn) {
+      Attrs.addFrom(Specialization->getAttributes(Flags));
+    }
+  }
+  if (!Attrs.checkCosts(SrcEt, Reg)) {
+    return false;
+  }
+
+  return getProto().canApplyTo(SrcEt, DstEt, Reg, Flags) || SpecCanUseOn;
 }
 
-void Item::applyTo(const entt::entity &Entity, entt::registry &Reg,
-                   CapabilityFlags Flags) const {
-  if (Specialization && Specialization->canApplyTo(Entity, Reg, Flags)) {
-    Specialization->applyTo(Entity, Reg, Flags);
+void Item::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                   entt::registry &Reg, CapabilityFlags Flags) const {
+  if (Specialization && Specialization->canApplyTo(SrcEt, DstEt, Reg, Flags)) {
+    Specialization->applyTo(SrcEt, DstEt, Reg, Flags);
     if (SpecOverrides) {
       return;
     }
   }
-  if (getProto().canApplyTo(Entity, Reg, Flags)) {
-    getProto().applyTo(Entity, Reg, Flags);
+  if (getProto().canApplyTo(SrcEt, DstEt, Reg, Flags)) {
+    getProto().applyTo(SrcEt, DstEt, Reg, Flags);
   }
 }
 
-bool Item::canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
-                         CapabilityFlags Flags) const {
+bool Item::canRemoveFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                         entt::registry &Reg, CapabilityFlags Flags) const {
   if (Specialization && SpecOverrides) {
-    return Specialization->canRemoveFrom(Entity, Reg, Flags);
+    return Specialization->canRemoveFrom(SrcEt, DstEt, Reg, Flags);
   }
   bool SpecCanUnequipFrom =
-      Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags);
-  return getProto().canRemoveFrom(Entity, Reg, Flags) || SpecCanUnequipFrom;
+      Specialization && Specialization->canRemoveFrom(SrcEt, DstEt, Reg, Flags);
+  return getProto().canRemoveFrom(SrcEt, DstEt, Reg, Flags) ||
+         SpecCanUnequipFrom;
 }
 
-void Item::removeFrom(const entt::entity &Entity, entt::registry &Reg,
-                      CapabilityFlags Flags) const {
-  if (Specialization && Specialization->canRemoveFrom(Entity, Reg, Flags)) {
-    Specialization->removeFrom(Entity, Reg, Flags);
+void Item::removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                      entt::registry &Reg, CapabilityFlags Flags) const {
+  if (Specialization &&
+      Specialization->canRemoveFrom(SrcEt, DstEt, Reg, Flags)) {
+    Specialization->removeFrom(SrcEt, DstEt, Reg, Flags);
     if (SpecOverrides) {
       return;
     }
   }
-  if (getProto().canRemoveFrom(Entity, Reg, Flags)) {
-    getProto().removeFrom(Entity, Reg, Flags);
+  if (getProto().canRemoveFrom(SrcEt, DstEt, Reg, Flags)) {
+    getProto().removeFrom(SrcEt, DstEt, Reg, Flags);
   }
 }
 

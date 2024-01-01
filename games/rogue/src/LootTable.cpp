@@ -47,12 +47,15 @@ std::size_t LootTable::rollForSlot(const std::vector<LootSlot> &Slots) {
 
 LootTable::LootTable() { reset(0, {}); }
 
-LootTable::LootTable(unsigned NumRolls, const std::vector<LootSlot> &Sls)
-    : NumRolls(NumRolls) {
-  reset(NumRolls, Sls);
+LootTable::LootTable(unsigned NumRolls, const std::vector<LootSlot> &Sls,
+                     bool PickAndReturn)
+    : NumRolls(NumRolls), PickAndReturn(PickAndReturn) {
+  reset(NumRolls, Sls, PickAndReturn);
 }
 
-void LootTable::reset(unsigned NR, const std::vector<LootSlot> &Sls) {
+void LootTable::reset(unsigned NR, const std::vector<LootSlot> &Sls,
+                      bool PickAndReturn) {
+  this->PickAndReturn = PickAndReturn;
   GuaranteedSlots.clear();
   Slots.clear();
 
@@ -90,6 +93,14 @@ void LootTable::fillGuaranteedLoot(std::vector<LootReward> &Loot) const {
 
 void LootTable::fillLoot(std::vector<LootReward> &Loot) const {
   fillGuaranteedLoot(Loot);
+  if (PickAndReturn) {
+    fillLootWithReturns(Loot);
+  } else {
+    fillLootNoReturns(Loot);
+  }
+}
+
+void LootTable::fillLootNoReturns(std::vector<LootReward> &Loot) const {
   std::vector<LootSlot> LeftOverSlots = Slots;
   for (unsigned Cnt = 0; Cnt < NumRolls; Cnt++) {
     if (LeftOverSlots.empty()) {
@@ -105,6 +116,19 @@ void LootTable::fillLoot(std::vector<LootReward> &Loot) const {
     // Remove the slot so the given entry can not be included again
     // in the loot rewards
     LeftOverSlots.erase(LeftOverSlots.begin() + SlotIdx);
+  }
+}
+
+void LootTable::fillLootWithReturns(std::vector<LootReward> &Loot) const {
+  if (Slots.empty()) {
+    return;
+  }
+  for (unsigned Cnt = 0; Cnt < NumRolls; Cnt++) {
+    auto SlotIdx = rollForSlot(Slots);
+    const auto &Slot = Slots.at(SlotIdx);
+    if (Slot.LC) {
+      Slot.LC->fillLoot(Loot);
+    }
   }
 }
 

@@ -2,6 +2,7 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/Item.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/ItemPrototype.h>
 #include <rogue/UI/Item.h>
 #include <sstream>
 
@@ -32,7 +33,10 @@ getColorForItemEffects(const std::vector<EffectInfo> &Effects,
                        CapabilityFlags Flags) {
   unsigned Count = 0;
   for (const auto &EffInfo : Effects) {
-    if (EffInfo.Flags & Flags) {
+    if (dynamic_cast<const NullEffect *>(EffInfo.Effect.get())) {
+      continue;
+    }
+    if (EffInfo.Attributes.Flags & Flags) {
       ++Count;
     }
   }
@@ -56,48 +60,97 @@ getColorForItemEffects(const std::vector<EffectInfo> &Effects,
 cxxg::types::TermColor getColorForItem(const Item &It) {
   const auto AllEffects = It.getAllEffects();
   if (It.getType() & ItemType::EquipmentMask && AllEffects.size() > 1) {
-    return getColorForItemEffects(AllEffects, CapabilityFlags::Equipment);
+    return getColorForItemEffects(AllEffects, CapabilityFlags::Equipment |
+                                                  CapabilityFlags::Skill);
   }
   return getColorForItemType(It.getType());
 }
 
-std::string getCapabilityDescription(const std::vector<EffectInfo> &AllEffects,
+std::string getCapabilityDescription(const ItemType &ItType,
+                                     const std::vector<EffectInfo> &AllEffects,
                                      CapabilityFlags Flag) {
-  std::stringstream SS;
-  SS << Flag << ":\n";
+
   bool HasAny = false;
+  EffectAttributes Attrs;
   for (const auto &EffInfo : AllEffects) {
-    if ((EffInfo.Flags & Flag) != Flag) {
+    if (dynamic_cast<const NullEffect *>(EffInfo.Effect.get())) {
+      continue;
+    }
+    if ((EffInfo.Attributes.Flags & Flag) != Flag) {
       continue;
     }
     HasAny = true;
-    SS << "- " << EffInfo.Effect->getDescription() << "\n";
+    Attrs.addFrom(EffInfo.Attributes);
   }
   if (!HasAny) {
     return "";
   }
+
+  std::stringstream SS;
+  SS << Flag << ":";
+  if (Attrs.APCost > 0) {
+    SS << " " << Attrs.APCost << "AP";
+  }
+  if (Attrs.ManaCost > 0) {
+    SS << " " << Attrs.ManaCost << "MP";
+  }
+  if (Attrs.HealthCost > 0) {
+    SS << " " << Attrs.HealthCost << "HP";
+  }
   SS << "\n";
+  for (const auto &EffInfo : AllEffects) {
+    if (dynamic_cast<const NullEffect *>(EffInfo.Effect.get())) {
+      continue;
+    }
+    if ((EffInfo.Attributes.Flags & Flag) != Flag) {
+      continue;
+    }
+    if (Flag & CapabilityFlags::Skill) {
+      SS << "- " << EffInfo.Effect->getName() << ": "
+         << EffInfo.Effect->getDescription() << "\n";
+    } else {
+      SS << "- " << EffInfo.Effect->getDescription() << "\n";
+    }
+  }
+  if (!ItemPrototype::canApply(ItType, Flag)) {
+    return "Crafting only: " + SS.str();
+  }
   return SS.str();
 }
 
 std::string getItemEffectDescription(const Item &It) {
   std::stringstream SS;
   const auto AllEffects = It.getAllEffects();
+
   SS << getCapabilityDescription(
-            AllEffects, (CapabilityFlags::Self | CapabilityFlags::UseOn))
+            It.getType(), AllEffects,
+            (CapabilityFlags::Self | CapabilityFlags::UseOn))
      << getCapabilityDescription(
-            AllEffects, (CapabilityFlags::Ranged | CapabilityFlags::UseOn))
+            It.getType(), AllEffects,
+            (CapabilityFlags::Ranged | CapabilityFlags::UseOn))
      << getCapabilityDescription(
-            AllEffects, (CapabilityFlags::Adjacent | CapabilityFlags::UseOn))
-     << getCapabilityDescription(AllEffects, CapabilityFlags::EquipOn);
+            It.getType(), AllEffects,
+            (CapabilityFlags::Adjacent | CapabilityFlags::UseOn))
+     << getCapabilityDescription(
+            It.getType(), AllEffects,
+            (CapabilityFlags::Self | CapabilityFlags::Skill))
+     << getCapabilityDescription(
+            It.getType(), AllEffects,
+            (CapabilityFlags::Ranged | CapabilityFlags::Skill))
+     << getCapabilityDescription(
+            It.getType(), AllEffects,
+            (CapabilityFlags::Adjacent | CapabilityFlags::Skill))
+     << getCapabilityDescription(It.getType(), AllEffects,
+                                 CapabilityFlags::EquipOn)
+     << getCapabilityDescription(It.getType(), AllEffects,
+                                 CapabilityFlags::Dismantle);
   return SS.str();
 }
 
 std::string getItemText(const Item &It) {
   std::stringstream SS;
-  SS << "Type: " << It.getType() << "\n---\n"
-     << getItemEffectDescription(It) << "---\n"
-     << It.getDescription();
+  SS << "Type: " << It.getType() << "\n---\n";
+  SS << getItemEffectDescription(It) << "---\n" << It.getDescription();
   return SS.str();
 }
 

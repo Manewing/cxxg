@@ -4,6 +4,7 @@
 #include <array>
 #include <entt/entt.hpp>
 #include <memory>
+#include <rogue/EffectInfo.h>
 #include <rogue/ItemType.h>
 #include <string>
 #include <vector>
@@ -22,25 +23,30 @@ public:
   virtual ~Item() = default;
 
   int getId() const;
-  std::string getName() const;
+  const std::string &getName() const;
+  std::string getQualifierName() const;
   std::string getDescription() const;
   ItemType getType() const;
   int getMaxStackSize() const;
+
   std::vector<EffectInfo> getAllEffects() const;
+
+  bool hasEffect(CapabilityFlags Flags, bool AllowNull = false,
+                 bool AllowRemove = false) const;
 
   CapabilityFlags getCapabilityFlags() const;
 
   /// Returns true if other Item has same prototype and specialization
   bool isSameKind(const Item &Other) const;
 
-  bool canApplyTo(const entt::entity &Entity, entt::registry &Reg,
-                  CapabilityFlags Flags) const;
-  void applyTo(const entt::entity &Entity, entt::registry &Reg,
-               CapabilityFlags Flags) const;
-  bool canRemoveFrom(const entt::entity &Entity, entt::registry &Reg,
-                     CapabilityFlags Flags) const;
-  void removeFrom(const entt::entity &Entity, entt::registry &Reg,
-                  CapabilityFlags Flags) const;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg, CapabilityFlags Flags) const;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg, CapabilityFlags Flags) const;
+  bool canRemoveFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                     entt::registry &Reg, CapabilityFlags Flags) const;
+  void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg, CapabilityFlags Flags) const;
 
   const ItemPrototype &getProto() const;
 

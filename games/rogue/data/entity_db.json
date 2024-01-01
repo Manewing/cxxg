@@ -79,26 +79,14 @@
       }
     },
     {
-      "name": "silk_cocoon",
-      "from_template": "dummy_creature",
-      "display_name": "Silk Cocoon",
-      "description": "Suspended cocoon containing captured prey.",
+      "name": "base_trap",
       "assemblers": {
-        "tile": {
-          "color": "#e0e0e0",
-          "char": "0"
-        },
-        "stats": {
-          "str": 0,
-          "dex": 0,
-          "int": 0,
-          "vit": 1
-        },
-        "faction": "nature",
-        "inventory": {
-          "loot_table": "common_silk_cocoon"
-        },
-        "race": "dummy"
+        "position": true,
+        "visible": true,
+        "damage": {
+          "phys_damage": 0,
+          "magic_damage": 0
+        }
       }
     },
     {
@@ -115,12 +103,55 @@
       }
     },
     {
+      "name": "neutral_creature",
+      "assemblers": {
+        "collision": true,
+        "health": true,
+        "position": true,
+        "visible": true,
+        "agility": true,
+        "line_of_sight": true,
+        "wander_ai": true
+      }
+    },
+    {
       "name": "base_enemy",
       "from_template": "hostile_creature",
       "assemblers": {
         "equipment": true,
         "drop_equipment": true,
         "auto_equip": true
+      }
+    },
+    {
+      "name": "base_interact",
+      "assemblers": {
+        "position": true,
+        "collision": true,
+        "visible": true
+      }
+    },
+    {
+      "name": "base_chest",
+      "from_template": "base_interact",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "<not defined from base_chest>"
+        },
+        "loot_interact": {
+          "is_looted": false,
+          "is_persistent": true,
+          "loot_name": "Chest",
+          "interact_text": "Open Chest",
+          "default_tile": {
+            "char": "C",
+            "color": "#ff0000"
+          },
+          "looted_tile": {
+            "char": "c",
+            "color": "#00ff00"
+          }
+        }
       }
     },
     {
@@ -172,6 +203,72 @@
           "dex": 6,
           "int": 0,
           "vit": 3
+        }
+      }
+    },
+    {
+      "name": "fat_rat",
+      "from_template": "base_rat",
+      "display_name": "Fat Rat",
+      "description": "A giant fat rat with a vicious appetite.",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "ltb_fat_rat"
+        },
+        "equipment": true,
+        "auto_equip": true,
+        "tile": {
+          "color": "#c8c8b4",
+          "char": "R"
+        },
+        "stats": {
+          "str": 6,
+          "dex": 2,
+          "int": 0,
+          "vit": 10
+        }
+      }
+    },
+    {
+      "name": "silk_cocoon",
+      "from_template": "dummy_creature",
+      "display_name": "Silk Cocoon",
+      "description": "Suspended cocoon containing captured prey.",
+      "assemblers": {
+        "tile": {
+          "color": "#e0e0e0",
+          "char": "0"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 1
+        },
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "common_silk_cocoon"
+        },
+        "race": "dummy"
+      }
+    },
+    {
+      "name": "large_silk_cocoon",
+      "from_template": "silk_cocoon",
+      "display_name": "Large Silk Cocoon",
+      "assemblers": {
+        "tile": {
+          "color": "#e0e0a0",
+          "char": "O"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 3
+        },
+        "inventory": {
+          "loot_table": "rare_silk_cocoon"
         }
       }
     },
@@ -262,7 +359,7 @@
           "char": "b"
         },
         "stats": {
-          "str": 4,
+          "str": 7,
           "dex": 1,
           "int": 0,
           "vit": 7
@@ -340,11 +437,212 @@
       }
     },
     {
-      "name": "base_interact",
+      "name": "fairy",
+      "from_template": "neutral_creature",
+      "display_name": "Fairy",
+      "description": "A delicate creature, it dances amidst the moonlit meadows, radiating an otherworldly glow.",
       "assemblers": {
-        "position": true,
-        "collision": true,
-        "visible": true
+        "tile": {
+          "color": "#64e6e6",
+          "char": "f"
+        },
+        "race": "creature",
+        "stats": {
+          "str": 0,
+          "dex": 10,
+          "int": 5,
+          "vit": 1
+        },
+        "healer": true
+      }
+    },
+    {
+      "name": "blood_fairy",
+      "from_template": "hostile_creature",
+      "display_name": "Blood Fairy",
+      "description": "A corrupted fairy that consumes the blood of its victims.",
+      "assemblers": {
+        "tile": {
+          "color": "#c81e1e",
+          "char": "f"
+        },
+        "race": "creature",
+        "faction": "nature",
+        "stats": {
+          "str": 1,
+          "dex": 10,
+          "int": 5,
+          "vit": 1
+        },
+        "equipment": true,
+        "auto_equip": true,
+        "drop_equipment": false,
+        "inventory": {
+          "loot_table": "ltb_blood_fairy"
+        }
+      }
+    },
+    {
+      "name": "young_blood_fairy",
+      "from_template": "blood_fairy",
+      "display_name": "Young Blood Fairy",
+      "description": "A corrupted fairy that consumes the blood of its victims.",
+      "assemblers": {
+        "tile": {
+          "color": "#c86464"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 5,
+          "int": 2,
+          "vit": 1
+        }
+      }
+    },
+    {
+      "name": "blinding_mushroom",
+      "display_name": "Blinding Mushroom",
+      "description": "A mushroom that emits toxic blinding spores when disturbed.",
+      "from_template": "base_trap",
+      "assemblers": {
+        "equipment": true,
+        "auto_equip": true,
+        "drop_equipment": false,
+        "loot_interact": {
+          "is_looted": false,
+          "is_persistent": false,
+          "loot_name": "Blinding Mushroom",
+          "interact_text": "Harvest Mushroom",
+          "default_tile": {
+            "color": "#ff0000",
+            "char": "m"
+          },
+          "looted_tile": {
+            "color": "#0a0a0a",
+            "char": "m"
+          }
+        },
+        "inventory": {
+          "loot_table": "ltb_blinding_mushroom"
+        }
+      }
+    },
+    {
+      "name": "base_tree",
+      "from_template": "dummy_creature",
+      "assemblers": {
+        "equipment": true,
+        "drop_equipment": false,
+        "auto_equip": true,
+        "race": "creature",
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_base_tree"
+        }
+      }
+    },
+    {
+      "name": "pine_tree",
+      "from_template": "base_tree",
+      "display_name": "Pine Tree",
+      "description": "A pine tree",
+      "assemblers": {
+        "tile": {
+          "color": "#288232",
+          "char": "A"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 10
+        }
+      }
+    },
+    {
+      "name": "oak_tree",
+      "from_template": "base_tree",
+      "display_name": "Oak Tree",
+      "description": "An oak tree",
+      "assemblers": {
+        "tile": {
+          "color": "#82b45a",
+          "char": "A"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 10
+        }
+      }
+    },
+    {
+      "name": "iron_pine_tree",
+      "from_template": "pine_tree",
+      "display_name": "Iron Pine Tree",
+      "description": "A runic pine tree made of iron",
+      "assemblers": {
+        "tile": {
+          "color": "#5a5a5a",
+          "char": "A"
+        },
+        "inventory": {
+          "loot_table": "ltb_iron_pine_tree"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 0,
+          "int": 0,
+          "vit": 40
+        }
+      }
+    },
+    {
+      "name": "grove_guardian",
+      "from_template": "base_enemy",
+      "display_name": "Grove Guardian",
+      "description": "A Massive tree-like being that serves as the protector of the forest.",
+      "assemblers": {
+        "race": "creature",
+        "faction": "nature",
+        "tile": {
+          "color": "#a0c8a0",
+          "char": "A"
+        },
+        "stats": {
+          "str": 10,
+          "dex": 1,
+          "int": 0,
+          "vit": 20
+        },
+        "inventory": {
+          "loot_table": "ltb_iron_pine_tree"
+        },
+        "drop_equipment": false
+      }
+    },
+    {
+      "name": "berry_bush",
+      "from_template": "base_chest",
+      "display_name": "Berry Bush",
+      "description": "A bush full of berries",
+      "assemblers": {
+        "inventory": {
+          "loot_table": "common_fruits"
+        },
+        "loot_interact": {
+          "loot_name": "Berry Bush",
+          "interact_text": "Harvest Berries",
+          "default_tile": {
+            "char": "B",
+            "color": "#8c0a32"
+          },
+          "looted_tile": {
+            "char": "B",
+            "color": "#051e05"
+          }
+        }
       }
     },
     {
@@ -404,29 +702,6 @@
       }
     },
     {
-      "name": "base_chest",
-      "from_template": "base_interact",
-      "assemblers": {
-        "inventory": {
-          "loot_table": "<not defined from base_chest>"
-        },
-        "loot_interact": {
-          "is_looted": false,
-          "is_persistent": true,
-          "loot_name": "Chest",
-          "interact_text": "Open Chest",
-          "default_tile": {
-            "char": "C",
-            "color": "#ff0000"
-          },
-          "looted_tile": {
-            "char": "c",
-            "color": "#00ff00"
-          }
-        }
-      }
-    },
-    {
       "name": "stash",
       "from_template": "base_chest",
       "assemblers": {
@@ -458,6 +733,10 @@
           "loot_name": "Vase",
           "interact_text": "Look into Vase",
           "default_tile": {
+            "char": "V",
+            "color": "#77412c"
+          },
+          "looted_tile": {
             "char": "v",
             "color": "#77412c"
           }
@@ -474,7 +753,11 @@
         "loot_interact": {
           "default_tile": {
             "char": "C",
-            "color": "#ff0000"
+            "color": "#fac43c"
+          },
+          "looted_tile": {
+            "char": "c",
+            "color": "#c49a31"
           }
         }
       }
@@ -489,7 +772,11 @@
         "loot_interact": {
           "default_tile": {
             "char": "C",
-            "color": "#ff0000"
+            "color": "#e0884f"
+          },
+          "looted_tile": {
+            "char": "c",
+            "color": "#a65c2d"
           }
         }
       }

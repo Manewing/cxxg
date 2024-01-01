@@ -10,6 +10,7 @@
 #include <rogue/Event.h>
 #include <rogue/Inventory.h>
 #include <rogue/InventoryHandler.h>
+#include <rogue/ItemEffect.h>
 
 namespace rogue {
 
@@ -132,8 +133,8 @@ bool InventoryHandler::tryDismantleItem(std::size_t InvItemIdx) {
   if (!Inv) {
     return false;
   }
-  auto ItOrNone =
-      Inv->applyItemTo(InvItemIdx, CapabilityFlags::Dismantle, Entity, Reg);
+  auto ItOrNone = Inv->applyItemTo(InvItemIdx, CapabilityFlags::Dismantle,
+                                   Entity, Entity, Reg);
   if (ItOrNone) {
     // FIXME add information on result of dismantle
     if (IsPlayer) {
@@ -164,15 +165,9 @@ bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
     return false;
   }
 
-  auto ItOrNone =
-      Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, TargetEt, Reg);
+  auto ItOrNone = Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, Entity,
+                                   TargetEt, Reg);
   if (ItOrNone) {
-    if (Entity != TargetEt) {
-      // FIXME check if it is actually an attack
-      Reg.get_or_emplace<CombatAttackComp>(Entity).Target = TargetEt;
-      Reg.get_or_emplace<CombatTargetComp>(TargetEt).Attacker = Entity;
-    }
-
     // FIXME add information on result of use
     if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
       publish(PlayerInfoMessageEvent() << "Used " + ItOrNone->getName() +
@@ -191,6 +186,62 @@ bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
   return false;
 }
 
+bool InventoryHandler::tryUseSkill(ItemType SlotType) {
+  return tryUseSkillOnTarget(SlotType, Entity);
+}
+
+bool InventoryHandler::tryUseSkillOnTarget(ItemType SlotType,
+                                           entt::entity TargetEt) {
+  // Nothing can be used if there is no equipment
+  if (!Equip || !Reg.valid(TargetEt)) {
+    return false;
+  }
+
+  const auto &Slot = Equip->getSlot(SlotType);
+  if (!Slot.It) {
+    return false;
+  }
+  const auto &It = *Slot.It;
+
+  if (!It.hasEffect(CapabilityFlags::Skill)) {
+    std::stringstream SS;
+    SS << It.getName() << " does not have a skill";
+    publish(PlayerInfoMessageEvent() << SS.str());
+    return false;
+  }
+
+  if (!It.canApplyTo(Entity, TargetEt, Reg, CapabilityFlags::Skill)) {
+    if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
+      std::stringstream SS;
+      SS << "Can not use skill ";
+      for (const auto &Info : It.getAllEffects()) {
+        if (Info.Attributes.Flags & CapabilityFlags::Skill) {
+          SS << Info.Effect->getName() << " ";
+        }
+      }
+      SS << "of " << It.getName() << " on " << getNameOrNone(Reg, TargetEt);
+      publish(PlayerInfoMessageEvent() << SS.str());
+    }
+    return false;
+  }
+
+  It.applyTo(Entity, TargetEt, Reg, CapabilityFlags::Skill);
+
+  if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
+    std::stringstream SS;
+    SS << "Used skill ";
+    for (const auto &Info : It.getAllEffects()) {
+      if (Info.Attributes.Flags & CapabilityFlags::Skill) {
+        SS << Info.Effect->getName() << " ";
+      }
+    }
+    SS << "of " << It.getName() << " on " << getNameOrNone(Reg, TargetEt);
+    publish(PlayerInfoMessageEvent() << SS.str());
+  }
+
+  return true;
+}
+
 void InventoryHandler::autoEquipItems() {
   // Nothing can be auto equipped if there is no equipment or inventory
   if (!Inv || !Equip) {
@@ -207,22 +258,111 @@ void InventoryHandler::autoEquipItems() {
   }
 }
 
-bool InventoryHandler::tryCraftItems() {
+bool InventoryHandler::tryCraftItems(entt::entity SrcEt) {
+  // Nothing can be crafted if there is no inventory
+  if (!Inv) {
+    return false;
+  }
+  const auto &Items = Inv->getItems();
+
+  if (SrcEt == entt::null) {
+    SrcEt = Entity;
+  }
+  bool IsRecipe = false;
+  if (auto *PC = Reg.try_get<PlayerComp>(SrcEt)) {
+    if (auto Result = Crafter.getCraftingRecipeResultOrNone(Items)) {
+      PC->KnownRecipes.insert(Result->RecipeId);
+      IsRecipe = true;
+    }
+  }
+
+  // Try crafting all items in the inventory
+  auto NewItemsOrNone = Crafter.tryCraft(Items);
+
+  // Add all new items to the inventory
+  if (NewItemsOrNone) {
+    if (SrcEt != Entity && Reg.valid(SrcEt) &&
+        Reg.all_of<InventoryComp>(SrcEt)) {
+      auto &SrcInv = Reg.get<InventoryComp>(SrcEt).Inv;
+      for (auto &It : *NewItemsOrNone) {
+        SrcInv.addItem(std::move(It));
+      }
+      Inv->clear();
+    } else {
+      Inv->setItems(*NewItemsOrNone);
+    }
+
+    if (Reg.any_of<PlayerComp>(SrcEt) || IsPlayer) {
+      std::stringstream SS;
+      SS << (IsRecipe ? "Crafted " : "Enhanced ");
+      const char *Pred = "";
+      for (const auto &It : *NewItemsOrNone) {
+        SS << Pred << It.getName();
+        Pred = ", ";
+      }
+      publish(PlayerInfoMessageEvent() << SS.str());
+    }
+
+    return true;
+  }
+
+  if (Reg.any_of<PlayerComp>(SrcEt) || IsPlayer) {
+    publish(PlayerInfoMessageEvent() << "Crafting failed");
+  }
+
+  return false;
+}
+
+bool InventoryHandler::canCraft(const CraftingRecipe &Recipe) const {
   // Nothing can be crafted if there is no inventory
   if (!Inv) {
     return false;
   }
 
-  // Try crafting all items in the inventory
-  auto NewItemsOrNone = Crafter.tryCraft(Inv->getItems());
-
-  // Add all new items to the inventory
-  if (NewItemsOrNone) {
-    Inv->setItems(*NewItemsOrNone);
-    return true;
+  std::map<int, unsigned> ItemCounts;
+  for (const auto &ItId : Recipe.getRequiredItems()) {
+    ItemCounts[ItId] += 1;
   }
 
-  return false;
+  for (const auto [ItId, Count] : ItemCounts) {
+    if (!Inv->hasItem(ItId, Count)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool InventoryHandler::tryCraft(const CraftingRecipe &Recipe) {
+  // Nothing can be crafted if there is no inventory
+  if (!Inv) {
+    return false;
+  }
+
+  if (!canCraft(Recipe)) {
+    return false;
+  }
+
+  std::vector<Item> CraftItems;
+  for (const auto &ItId : Recipe.getRequiredItems()) {
+    if (auto IdxOrNone = Inv->getItemIndexForId(ItId)) {
+      CraftItems.push_back(Inv->takeItem(*IdxOrNone, 1));
+    }
+  }
+
+  auto NewItemsOrNone = Crafter.tryCraft(CraftItems);
+  if (!NewItemsOrNone) {
+    for (auto &It : CraftItems) {
+      Inv->addItem(std::move(It));
+    }
+    return false;
+  }
+
+  for (auto &It : *NewItemsOrNone) {
+    Inv->addItem(std::move(It));
+  }
+
+  return true;
 }
 
 } // namespace rogue

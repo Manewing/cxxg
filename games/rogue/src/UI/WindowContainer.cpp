@@ -35,6 +35,8 @@ WindowContainer::WindowContainer(cxxg::types::Position Pos,
                                  cxxg::types::Size Size)
     : Widget(Pos), Size(Size) {}
 
+void WindowContainer::setSize(cxxg::types::Size Size) { this->Size = Size; }
+
 bool WindowContainer::handleInput(int Char) {
   switch (Char) {
   case Controls::MoveWindow.Char:
@@ -236,11 +238,25 @@ std::optional<cxxg::types::Position> findPositionForWindow(
 
 } // namespace
 
+void WindowContainer::centerWindow(Widget &Wdw) {
+  if (auto WI = WindowInfo::getWindowInfo(&Wdw)) {
+    Wdw.setPos(Pos + Size / 2 - WI->Size / 2);
+  }
+}
+
+void WindowContainer::centerSingleWindow() {
+  if (Windows.size() != 1) {
+    return;
+  }
+  centerWindow(*Windows.front());
+}
+
 void WindowContainer::autoLayoutWindows(cxxg::types::Position StartPos,
                                         cxxg::types::Size Size) {
   if (Windows.empty()) {
     return;
   }
+
   std::vector<WindowInfo> WdwInfos;
   WdwInfos.reserve(Windows.size());
 

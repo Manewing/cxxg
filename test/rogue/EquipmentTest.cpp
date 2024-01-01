@@ -9,11 +9,11 @@ const auto NullEffect = std::make_shared<rogue::NullEffect>();
 
 const rogue::ItemPrototype
     DummyConsumable(1, "consumable", "desc", rogue::ItemType::Consumable, 5,
-                    {{rogue::CapabilityFlags::UseOn, NullEffect}});
+                    {{{rogue::CapabilityFlags::UseOn}, NullEffect}});
 
 const rogue::ItemPrototype
     DummyRing(2, "ring", "desc", rogue::ItemType::Ring, 1,
-              {{rogue::CapabilityFlags::Equipment, NullEffect}});
+              {{{rogue::CapabilityFlags::Equipment}, NullEffect}});
 
 TEST(EquipmentSlotTest, Empty) {
   rogue::EquipmentSlot Slot;

@@ -42,9 +42,9 @@ std::string Select::getInteractMsg() const { return ""; }
 void Select::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
   if (IsSelected) {
-    Scr[Pos.Y][Pos.X] << HighlightColor << Value << NoColor;
+    Scr[Pos.Y][Pos.X].width(Size.X) << HighlightColor << Value << NoColor;
   } else {
-    Scr[Pos.Y][Pos.X] << ValueColor << Value << NoColor;
+    Scr[Pos.Y][Pos.X].width(Size.X) << ValueColor << Value << NoColor;
   }
 }
 
@@ -62,11 +62,11 @@ std::string LabeledSelect::getInteractMsg() const { return ""; }
 void LabeledSelect::draw(cxxg::Screen &Scr) const {
   BaseRect::draw(Scr);
   if (IsSelected) {
-    Scr[Pos.Y][Pos.X] << HighlightColor << Label << ":"
-                      << " " << ValueColor << Value << NoColor;
+    Scr[Pos.Y][Pos.X].width(Size.X) << HighlightColor << Label << ":"
+                                    << " " << ValueColor << Value << NoColor;
   } else {
-    Scr[Pos.Y][Pos.X] << LabelColor << Label << ": " << ValueColor << Value
-                      << NoColor;
+    Scr[Pos.Y][Pos.X].width(Size.X)
+        << LabelColor << Label << ": " << ValueColor << Value << NoColor;
   }
 }
 

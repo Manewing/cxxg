@@ -2,6 +2,7 @@
 #define ROGUE_UI_ITEM_SELECT_H
 
 #include <cxxg/Types.h>
+#include <functional>
 #include <memory>
 #include <rogue/UI/Widget.h>
 #include <string>

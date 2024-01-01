@@ -26,16 +26,6 @@ using namespace rogue;
 static const Tile NPCTile{
     {'@', cxxg::types::RgbColor{0, 60, 255, true, 100, 80, 50}}};
 
-template <typename T, typename U>
-cxxg::Screen &operator<<(cxxg::Screen &Scr, const ymir::Map<T, U> &Map) {
-  for (auto PY = 0; PY < Map.getSize().H; PY++) {
-    for (auto PX = 0; PX < Map.getSize().W; PX++) {
-      Scr[PY][PX] = Map.getTile({PX, PY});
-    }
-  }
-  return Scr;
-}
-
 using NPCCompList =
     ComponentList<TileComp, FactionComp, PositionComp, StatsComp, HealthComp,
                   NameComp, LineOfSightComp, AgilityComp, MeleeAttackComp,
@@ -74,11 +64,13 @@ int main(int Argc, char *Argv[]) {
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
+  rogue::EventHub Hub;
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
   rogue::LevelDatabase LevelDb;
+  rogue::CraftingDatabase CraftingDb;
   rogue::CraftingHandler Crafter(ItemDb);
-  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb, Crafter};
+  rogue::GameContext Ctx{Hub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter};
 
   LevelGeneratorLoader LvlGenLoader(Ctx);
   auto LG = LvlGenLoader.load(0, Argv[1]);
@@ -91,6 +83,7 @@ int main(int Argc, char *Argv[]) {
 
     const auto RenderSize = ymir::Size2d<int>{80, 24};
     Renderer Render(RenderSize, *Level, {40, 12});
+    Render.renderEntities();
     Scr << Render.get();
 
     auto &PC = Level->Reg.get<PositionComp>(NPCEntity);

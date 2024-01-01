@@ -31,17 +31,21 @@ char getWallTileKind(const rogue::Level &Lvl, const ymir::Point2d<int> &Pos) {
 class LevelGeneratorTest : public ::testing::Test {
 public:
   void SetUp() override {
+    EvHub = rogue::EventHub();
     ItemDb = rogue::ItemDatabase();
     EntityDb = rogue::EntityDatabase();
     LevelDb = rogue::LevelDatabase();
+    CraftingDb = rogue::CraftingDatabase();
     Crafter = rogue::CraftingHandler(ItemDb);
   }
 
+  rogue::EventHub EvHub;
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
   rogue::LevelDatabase LevelDb;
+  rogue::CraftingDatabase CraftingDb;
   rogue::CraftingHandler Crafter{ItemDb};
-  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb, Crafter};
+  rogue::GameContext Ctx{EvHub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter};
 };
 
 TEST_F(LevelGeneratorTest, EmptyLevelGenerator) {
@@ -97,11 +101,11 @@ TEST_F(LevelGeneratorTest, DesignedMapLevelGeneratorSimpleMapWithEntities) {
   Cfg.CharInfoMap['T'].Layer = "entities";
   Cfg.CharInfoMap['C'].T = rogue::Tile{{'C'}};
   Cfg.CharInfoMap['C'].Layer = "entities";
-  Cfg.EntityConfig = {/*Entities =*/ {
-                          {'s', "dummy_s"},
-                          {'T', "dummy_t"},
-                          {'C', "dummy_c"},
-                      }};
+  Cfg.EntityConfig = {/*Entities =*/{
+      {'s', "dummy_s"},
+      {'T', "dummy_t"},
+      {'C', "dummy_c"},
+  }};
 
   ItemDb.addLootTable("loot_tb");
   rogue::EntityTemplateInfo ETI;

@@ -11,6 +11,11 @@ TileCompAssembler::TileCompAssembler(Tile T) : T(T) {}
 
 void TileCompAssembler::assemble(entt::registry &Reg,
                                  entt::entity Entity) const {
+  // There are some assemblers that already add a tile component, sanity check
+  // that there is none already (indicates incorrect usage of assemblers)
+  if (Reg.all_of<TileComp>(Entity)) {
+    throw std::runtime_error("Entity already has a tile component");
+  }
   Reg.emplace<TileComp>(Entity, T);
 }
 
@@ -271,18 +276,20 @@ void ShopAssembler::assemble(entt::registry &Reg, entt::entity Entity) const {
 void WorkbenchAssembler::assemble(entt::registry &Reg,
                                   entt::entity Entity) const {
   auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
-  ITC.Actions.push_back(
-      {"Transmute", [Entity](auto &EHC, auto SrcEt, auto &Reg) {
-         (void)SrcEt;
-         (void)Reg;
-         auto &Crafter = Reg.ctx().template get<GameContext>().Crafter;
-         InventoryHandler InvHandler(Entity, Reg, Crafter);
-         if (InvHandler.tryCraftItems()) {
-           EHC.publish(PlayerInfoMessageEvent() << "Transmutation successful");
-         } else {
-           EHC.publish(PlayerInfoMessageEvent() << "Transmutation failed");
-         }
-       }});
+  ITC.Actions.push_back({"Craft", [Entity](auto &EHC, auto SrcEt, auto &Reg) {
+                           (void)Reg;
+                           auto &Crafter =
+                               Reg.ctx().template get<GameContext>().Crafter;
+                           InventoryHandler InvHandler(Entity, Reg, Crafter);
+                           InvHandler.setEventHub(EHC.getEventHub());
+                           InvHandler.tryCraftItems(SrcEt);
+                         }});
+  ITC.Actions.push_back({"Known Recipes", [](auto &EHC, auto SrcEt, auto &Reg) {
+                           CraftEvent CE;
+                           CE.Entity = SrcEt;
+                           CE.Registry = &Reg;
+                           EHC.publish(CE);
+                         }});
 }
 
 bool WorkbenchAssembler::isPostProcess() const { return true; }
@@ -292,6 +299,15 @@ StatsCompAssembler::StatsCompAssembler(StatPoints Stats) : Stats(Stats) {}
 void StatsCompAssembler::assemble(entt::registry &Reg,
                                   entt::entity Entity) const {
   Reg.emplace<StatsComp>(Entity).Base = Stats;
+}
+
+DamageCompAssembler::DamageCompAssembler(const DamageComp &DC) : DC(DC) {}
+
+void DamageCompAssembler::assemble(entt::registry &Reg,
+                                   entt::entity Entity) const {
+  auto NewDC = DC;
+  NewDC.Source = Entity;
+  Reg.emplace<DamageComp>(Entity, NewDC);
 }
 
 } // namespace rogue

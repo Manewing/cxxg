@@ -44,10 +44,10 @@ TEST_F(ItemTest, Properties) {
 TEST_F(ItemTest, Specialization) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::UseOn, rogue::test::DummyItems::NullEffect}});
+      {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   rogue::ItemPrototype SpecProto(2, "Test Item", "Test Description",
                                  rogue::ItemType::Ring, 1,
-                                 {{rogue::CapabilityFlags::Equipment,
+                                 {{{rogue::CapabilityFlags::Equipment},
                                    rogue::test::DummyItems::NullEffect}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
   rogue::Item Item(Proto, 1, Specialization);
@@ -66,48 +66,100 @@ TEST_F(ItemTest, CanApplyTo) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description",
       rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, DummyEffCompReq0}});
+      {{{rogue::CapabilityFlags::UseOn}, DummyEffCompReq0}});
   rogue::ItemPrototype SpecProto(
       2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffCompReq1}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffCompReq1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
   rogue::Item Item(Proto);
-  EXPECT_FALSE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_FALSE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
 
   Reg.emplace<rogue::test::DummyRequiredComp<0>>(Entity);
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_FALSE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
 
   Item = rogue::Item(Proto, 1, Specialization);
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_FALSE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
 
   Reg.emplace<rogue::test::DummyRequiredComp<1>>(Entity);
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
 
   Item = rogue::Item(Proto, 1, Specialization, /*SpecOverrides=*/true);
-  EXPECT_FALSE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
 
   Reg.remove<rogue::test::DummyRequiredComp<1>>(Entity);
-  EXPECT_FALSE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_FALSE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
+}
+
+TEST_F(ItemTest, CanApplyToWithCost) {
+  rogue::ItemPrototype Proto(
+      1, "Test Item", "Test Description",
+      rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
+      {{{rogue::CapabilityFlags::UseOn, 10, 0, 0},
+        rogue::test::DummyItems::NullEffect},
+       {{rogue::CapabilityFlags::Equipment, 0, 0, 10},
+        rogue::test::DummyItems::NullEffect}});
+  rogue::ItemPrototype SpecProto(
+      2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      {{{rogue::CapabilityFlags::Equipment, 0, 0, 10},
+        rogue::test::DummyItems::NullEffect}});
+  auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
+
+  auto Item = rogue::Item(Proto, 1, Specialization);
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
+
+  Reg.emplace<rogue::AgilityComp>(Entity);
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
+
+  auto &HC = Reg.emplace<rogue::HealthComp>(Entity);
+  HC.Value = 15;
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
+
+  HC.Value = 20;
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
 }
 
 TEST_F(ItemTest, ApplyToWithSpecialization) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp0}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
       2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp1}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
   auto Item = rogue::Item(Proto, 1, Specialization);
-  Item.applyTo(Entity, Reg, rogue::CapabilityFlags::Equipment);
+  Item.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
 
   ASSERT_TRUE(Reg.any_of<rogue::test::DummyComp<0>>(Entity));
   EXPECT_EQ(Reg.get<rogue::test::DummyComp<0>>(Entity).Value, 1);
@@ -119,14 +171,14 @@ TEST_F(ItemTest, ApplyToWithSpecialization) {
 TEST_F(ItemTest, ApplyToWithSpecializationOverride) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp0}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
       2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp1}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
   auto Item = rogue::Item(Proto, 1, Specialization, /*SpecOverrides=*/true);
-  Item.applyTo(Entity, Reg, rogue::CapabilityFlags::Equipment);
+  Item.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
 
   EXPECT_FALSE(Reg.any_of<rogue::test::DummyComp<0>>(Entity));
 
@@ -137,24 +189,26 @@ TEST_F(ItemTest, ApplyToWithSpecializationOverride) {
 TEST_F(ItemTest, ApplyToWithSpecMutuallyExclusiveFlags) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp0}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
       2, "Test Item", "Test Description", rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, DummyEffComp1}});
+      {{{rogue::CapabilityFlags::UseOn}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
   auto Item = rogue::Item(Proto, 1, Specialization);
 
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
 
   ASSERT_FALSE(Reg.any_of<rogue::test::DummyComp<0>>(Entity));
-  Item.applyTo(Entity, Reg, rogue::CapabilityFlags::Equipment);
+  Item.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
   ASSERT_TRUE(Reg.any_of<rogue::test::DummyComp<0>>(Entity));
   EXPECT_EQ(Reg.get<rogue::test::DummyComp<0>>(Entity).Value, 1);
 
   ASSERT_FALSE(Reg.any_of<rogue::test::DummyComp<1>>(Entity));
-  Item.applyTo(Entity, Reg, rogue::CapabilityFlags::UseOn);
+  Item.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn);
   ASSERT_TRUE(Reg.any_of<rogue::test::DummyComp<1>>(Entity));
   EXPECT_EQ(Reg.get<rogue::test::DummyComp<1>>(Entity).Value, 1);
 }
@@ -163,59 +217,66 @@ TEST_F(ItemTest, CanRemoveFrom) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description",
       rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, DummyEffCompReq0}});
+      {{{rogue::CapabilityFlags::UseOn}, DummyEffCompReq0}});
   rogue::ItemPrototype SpecProto(
       2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffCompReq1}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffCompReq1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
   rogue::Item Item(Proto);
-  EXPECT_FALSE(Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn));
   EXPECT_FALSE(
-      Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment));
+      Item.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(Item.canRemoveFrom(Entity, Entity, Reg,
+                                  rogue::CapabilityFlags::Equipment));
 
   Reg.emplace<rogue::test::DummyComp<0>>(Entity);
   Reg.emplace<rogue::test::DummyRequiredComp<0>>(Entity);
-  EXPECT_TRUE(Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_FALSE(
-      Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_TRUE(
+      Item.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(Item.canRemoveFrom(Entity, Entity, Reg,
+                                  rogue::CapabilityFlags::Equipment));
 
   Item = rogue::Item(Proto, 1, Specialization);
-  EXPECT_TRUE(Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_FALSE(
-      Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_TRUE(
+      Item.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(Item.canRemoveFrom(Entity, Entity, Reg,
+                                  rogue::CapabilityFlags::Equipment));
 
   Reg.emplace<rogue::test::DummyComp<1>>(Entity);
   Reg.emplace<rogue::test::DummyRequiredComp<1>>(Entity);
-  EXPECT_TRUE(Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn));
   EXPECT_TRUE(
-      Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment));
+      Item.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_TRUE(Item.canRemoveFrom(Entity, Entity, Reg,
+                                 rogue::CapabilityFlags::Equipment));
 
   Item = rogue::Item(Proto, 1, Specialization, /*SpecOverrides=*/true);
-  EXPECT_FALSE(Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  EXPECT_TRUE(
-      Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment));
+  EXPECT_FALSE(
+      Item.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_TRUE(Item.canRemoveFrom(Entity, Entity, Reg,
+                                 rogue::CapabilityFlags::Equipment));
 
   Reg.remove<rogue::test::DummyComp<1>>(Entity);
   Reg.remove<rogue::test::DummyRequiredComp<1>>(Entity);
-  EXPECT_FALSE(Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn));
   EXPECT_FALSE(
-      Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment));
+      Item.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  EXPECT_FALSE(Item.canRemoveFrom(Entity, Entity, Reg,
+                                  rogue::CapabilityFlags::Equipment));
 }
 
 TEST_F(ItemTest, RemoveFromWithSpecialization) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp0}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
       2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp1}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
   auto Item = rogue::Item(Proto, 1, Specialization);
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
-  Item.applyTo(Entity, Reg, rogue::CapabilityFlags::Equipment);
-  Item.removeFrom(Entity, Reg, rogue::CapabilityFlags::Equipment);
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
+  Item.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
+  Item.removeFrom(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
 
   EXPECT_FALSE(Reg.any_of<rogue::test::DummyComp<0>>(Entity));
   EXPECT_FALSE(Reg.any_of<rogue::test::DummyComp<1>>(Entity));
@@ -224,19 +285,20 @@ TEST_F(ItemTest, RemoveFromWithSpecialization) {
 TEST_F(ItemTest, RemoveFromWithSpecializationOverride) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp0}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
       2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp1}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
   auto Item = rogue::Item(Proto, 1, Specialization, /*SpecOverrides=*/true);
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
-  Item.applyTo(Entity, Reg, rogue::CapabilityFlags::Equipment);
-
   EXPECT_TRUE(
-      Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment));
-  Item.removeFrom(Entity, Reg, rogue::CapabilityFlags::Equipment);
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
+  Item.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
+
+  EXPECT_TRUE(Item.canRemoveFrom(Entity, Entity, Reg,
+                                 rogue::CapabilityFlags::Equipment));
+  Item.removeFrom(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
 
   EXPECT_FALSE(Reg.any_of<rogue::test::DummyComp<0>>(Entity));
   EXPECT_FALSE(Reg.any_of<rogue::test::DummyComp<1>>(Entity));
@@ -245,28 +307,31 @@ TEST_F(ItemTest, RemoveFromWithSpecializationOverride) {
 TEST_F(ItemTest, RemoveFromWithSpecMutuallyExclusive) {
   rogue::ItemPrototype Proto(
       1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
-      {{rogue::CapabilityFlags::Equipment, DummyEffComp0}});
+      {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
       2, "Test Item", "Test Description", rogue::ItemType::Consumable, 1,
-      {{rogue::CapabilityFlags::UseOn, DummyEffComp1}});
+      {{{rogue::CapabilityFlags::UseOn}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
   auto Item = rogue::Item(Proto, 1, Specialization);
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::Equipment));
-  Item.applyTo(Entity, Reg, rogue::CapabilityFlags::Equipment);
-  EXPECT_TRUE(Item.canApplyTo(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  Item.applyTo(Entity, Reg, rogue::CapabilityFlags::UseOn);
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment));
+  Item.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
+  EXPECT_TRUE(
+      Item.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  Item.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn);
 
   EXPECT_TRUE(Reg.any_of<rogue::test::DummyComp<0>>(Entity));
   EXPECT_TRUE(Reg.any_of<rogue::test::DummyComp<1>>(Entity));
 
-  EXPECT_TRUE(
-      Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::Equipment));
-  Item.removeFrom(Entity, Reg, rogue::CapabilityFlags::Equipment);
+  EXPECT_TRUE(Item.canRemoveFrom(Entity, Entity, Reg,
+                                 rogue::CapabilityFlags::Equipment));
+  Item.removeFrom(Entity, Entity, Reg, rogue::CapabilityFlags::Equipment);
 
   EXPECT_FALSE(Reg.any_of<rogue::test::DummyComp<0>>(Entity));
-  EXPECT_TRUE(Item.canRemoveFrom(Entity, Reg, rogue::CapabilityFlags::UseOn));
-  Item.removeFrom(Entity, Reg, rogue::CapabilityFlags::UseOn);
+  EXPECT_TRUE(
+      Item.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn));
+  Item.removeFrom(Entity, Entity, Reg, rogue::CapabilityFlags::UseOn);
   EXPECT_FALSE(Reg.any_of<rogue::test::DummyComp<1>>(Entity));
 }
 

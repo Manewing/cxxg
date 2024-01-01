@@ -84,7 +84,7 @@ bool Equipment::canEquip(const Item &It, entt::entity Entity,
   if (isEquipped(Type)) {
     return false;
   }
-  return It.canApplyTo(Entity, Reg, CapabilityFlags::EquipOn);
+  return It.canApplyTo(Entity, Entity, Reg, CapabilityFlags::EquipOn);
 }
 
 bool Equipment::canUnequip(ItemType Type, entt::entity Entity,
@@ -92,13 +92,13 @@ bool Equipment::canUnequip(ItemType Type, entt::entity Entity,
   if (!isEquipped(Type)) {
     return false;
   }
-  return getSlot(Type).It->canRemoveFrom(Entity, Reg,
+  return getSlot(Type).It->canRemoveFrom(Entity, Entity, Reg,
                                          CapabilityFlags::UnequipFrom);
 }
 
 void Equipment::equip(Item It, entt::entity Entity, entt::registry &Reg) {
   assert(canEquip(It, Entity, Reg) && "Can not equip item on entity");
-  It.applyTo(Entity, Reg, CapabilityFlags::EquipOn);
+  It.applyTo(Entity, Entity, Reg, CapabilityFlags::EquipOn);
   getSlot(It.getType()).equip(std::move(It));
 }
 
@@ -107,7 +107,7 @@ Item Equipment::unequip(ItemType Type, entt::entity Entity,
   assert(canUnequip(Type, Entity, Reg) &&
          "Can not unequip. Unequip removes item effects from entity");
   auto &Slot = getSlot(Type);
-  Slot.It->removeFrom(Entity, Reg, CapabilityFlags::UnequipFrom);
+  Slot.It->removeFrom(Entity, Entity, Reg, CapabilityFlags::UnequipFrom);
   return Slot.unequip();
 }
 

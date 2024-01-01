@@ -13,6 +13,9 @@
             "$ref": "#/defs/effect/damage_item_effect"
           },
           {
+            "$ref": "#/defs/effect/mana_item_effect"
+          },
+          {
             "$ref": "#/defs/effect/stats_buff_comp"
           },
           {
@@ -20,6 +23,9 @@
           },
           {
             "$ref": "#/defs/effect/health_regen_buff_comp"
+          },
+          {
+            "$ref": "#/defs/effect/mana_regen_buff_comp"
           },
           {
             "$ref": "#/defs/effect/bleeding_debuff_comp"
@@ -59,15 +65,6 @@
           },
           {
             "$ref": "#/defs/effect/dismantle"
-          },
-          {
-            "const": "null"
-          },
-          {
-            "const": "remove_poison_effect"
-          },
-          {
-            "const": "remove_poison_debuff"
           }
         ]
       },
@@ -97,6 +94,20 @@
           }
         },
         "required": ["damage_value", "type"],
+        "additionalProperties": false
+      },
+      "mana_item_effect": {
+        "type": "object",
+        "properties": {
+          "mana_value": {
+            "type": "number",
+            "minimum": 0
+          },
+          "type": {
+            "const": "mana_item_effect"
+          }
+        },
+        "required": ["mana_value", "type"],
         "additionalProperties": false
       },
       "stats_buff_comp": {
@@ -130,6 +141,19 @@
         "properties": {
           "type": {
             "const": "health_regen_buff_comp"
+          },
+          "buff": {
+            "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/regeneration_buff"
+          }
+        },
+        "required": ["buff", "type"],
+        "additionalProperties": false
+      },
+      "mana_regen_buff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "mana_regen_buff_comp"
           },
           "buff": {
             "$ref": "https://rogue-todo.com/buffs_schema.json#/defs/regeneration_buff"
@@ -266,7 +290,11 @@
           },
           "ap_cost": {
             "type": "integer",
-            "minimum": 10
+            "minimum": 1
+          },
+          "mana_cost": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": ["phys_damage", "magic_damage", "ap_cost", "type"],
@@ -288,7 +316,11 @@
           },
           "ap_cost": {
             "type": "integer",
-            "minimum": 10
+            "minimum": 1
+          },
+          "mana_cost": {
+            "type": "integer",
+            "minimum": 0
           }
         },
         "required": ["phys_damage", "magic_damage", "ap_cost", "type"],

@@ -24,7 +24,8 @@ SelectBox::SelectBox(cxxg::types::Position Pos,
   ItSel = std::make_shared<ItemSelect>(Pos);
   cxxg::types::Position StartPos = {1, 1};
   for (auto const &Opt : Options) {
-    ItSel->addSelect<Select>(Opt.getValue(), StartPos, Size.X);
+    ItSel->addSelect<Select>(Opt.getValue(), StartPos,
+                             static_cast<unsigned>(Size.X));
     StartPos.Y++;
   }
   Decorated = std::make_shared<Frame>(ItSel, Pos, Size);

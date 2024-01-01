@@ -93,13 +93,15 @@ ymir::Point2d<int> getLevelStartEndPos(const Level &L) {
   auto View = L.Reg.view<const PositionComp, const LevelComp>();
   View.each([&FoundPos](const auto &Pos, const auto &) { FoundPos = Pos; });
   if (!FoundPos) {
-    throw std::runtime_error("Could not find start/end in level");
+    throw std::runtime_error("Could not find " + LevelComp::getName() +
+                             " in level");
   }
   auto Pos = L.getNonBodyBlockedPosNextTo(*FoundPos);
   if (!Pos) {
     std::stringstream SS;
-    SS << "Could not find non-blocked start/end position for player in level "
-          "at "
+    SS << "Could not find non-blocked " + LevelComp::getName() +
+              " position for player in level "
+              "at "
        << *FoundPos;
     throw std::runtime_error(SS.str());
   }

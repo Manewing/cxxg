@@ -13,17 +13,21 @@ namespace {
 class GameWorldTest : public ::testing::Test {
 public:
   void SetUp() override {
+    EvHub = rogue::EventHub();
     ItemDb = rogue::ItemDatabase();
     EntityDb = rogue::EntityDatabase();
     LevelDb = rogue::LevelDatabase();
+    CraftingDb = rogue::CraftingDatabase();
     Crafter = rogue::CraftingHandler(ItemDb);
   }
 
+  rogue::EventHub EvHub;
   rogue::ItemDatabase ItemDb;
   rogue::EntityDatabase EntityDb;
   rogue::LevelDatabase LevelDb;
+  rogue::CraftingDatabase CraftingDb;
   rogue::CraftingHandler Crafter;
-  rogue::GameContext Ctx{ItemDb, EntityDb, LevelDb, Crafter};
+  rogue::GameContext Ctx{EvHub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter};
 };
 
 TEST_F(GameWorldTest, MultiLevelDungeonEmpty) {

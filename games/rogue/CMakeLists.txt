@@ -20,6 +20,7 @@ set(HEADER_FILES
   include/rogue/Event.h
   include/rogue/EventHub.h
   include/rogue/Game.h
+  include/rogue/EffectInfo.h
   include/rogue/GameWorld.h
   include/rogue/History.h
   include/rogue/Inventory.h
@@ -31,13 +32,14 @@ set(HEADER_FILES
   include/rogue/ItemPrototype.h
   include/rogue/ItemSpecialization.h
   include/rogue/ItemType.h
-  include/rogue/LevelDatabase.h
   include/rogue/JSON.h
   include/rogue/JSONHelpers.h
   include/rogue/Level.h
+  include/rogue/LevelDatabase.h
   include/rogue/LevelGenerator.h
   include/rogue/LootTable.h
   include/rogue/Parser.h
+  include/rogue/RenderEventCollector.h
   include/rogue/Renderer.h
   include/rogue/Systems/AttackAISystem.h
   include/rogue/Systems/CombatSystem.h
@@ -50,10 +52,12 @@ set(HEADER_FILES
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
+  include/rogue/Types.h
   include/rogue/UI/Buffs.h
   include/rogue/UI/CommandLine.h
   include/rogue/UI/Controller.h
   include/rogue/UI/Controls.h
+  include/rogue/UI/Crafting.h
   include/rogue/UI/Decorator.h
   include/rogue/UI/Equipment.h
   include/rogue/UI/Frame.h
@@ -85,6 +89,7 @@ set(SOURCE_FILES
   src/Components/Visual.cpp
   src/CraftingDatabase.cpp
   src/CraftingHandler.cpp
+  src/EffectInfo.cpp
   src/EntityAssemblers.cpp
   src/EntityDatabase.cpp
   src/Equipment.cpp
@@ -100,15 +105,16 @@ set(SOURCE_FILES
   src/ItemEffect.cpp
   src/ItemEffectImpl.cpp
   src/ItemPrototype.cpp
-  src/LevelDatabase.cpp
   src/ItemSpecialization.cpp
   src/ItemType.cpp
   src/JSON.cpp
   src/JSONHelpers.cpp
   src/Level.cpp
+  src/LevelDatabase.cpp
   src/LevelGenerator.cpp
   src/LootTable.cpp
   src/Parser.cpp
+  src/RenderEventCollector.cpp
   src/Renderer.cpp
   src/Systems/AgilitySystem.cpp
   src/Systems/AttackAISystem.cpp
@@ -125,6 +131,7 @@ set(SOURCE_FILES
   src/UI/CommandLine.cpp
   src/UI/Controller.cpp
   src/UI/Controls.cpp
+  src/UI/Crafting.cpp
   src/UI/Decorator.cpp
   src/UI/Equipment.cpp
   src/UI/Frame.cpp
@@ -151,9 +158,6 @@ add_library(
   ${SOURCE_FILES}
 )
 
-add_executable(${TARGET}
-  src/main.cpp
-)
 
 target_include_directories(lib${TARGET} PUBLIC include)
 
@@ -170,7 +174,19 @@ target_include_directories(lib${TARGET} SYSTEM
     ../../third-party/rapidjson/include
 )
 
+add_executable(${TARGET}
+  src/main.cpp
+)
+
 target_link_libraries(${TARGET}
+  lib${TARGET}
+)
+
+add_executable(map_viewer
+  tools/map_viewer.cpp
+)
+
+target_link_libraries(map_viewer
   lib${TARGET}
 )
 
