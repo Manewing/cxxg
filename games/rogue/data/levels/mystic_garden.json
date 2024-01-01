@@ -4,7 +4,7 @@
     "config": "mystic_garden.cfg"
   },
   "entities": {
-    "b": "blood_fairy",
+    "b": "young_blood_fairy",
     "f": "fairy",
     "A": "pine_tree",
     "O": "oak_tree",

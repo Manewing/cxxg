@@ -86,10 +86,6 @@
         "damage": {
           "phys_damage": 0,
           "magic_damage": 0
-        },
-        "tile": {
-          "char": "T",
-          "color": "#ff0000"
         }
       }
     },
@@ -487,18 +483,45 @@
       }
     },
     {
+      "name": "young_blood_fairy",
+      "from_template": "blood_fairy",
+      "display_name": "Young Blood Fairy",
+      "description": "A corrupted fairy that consumes the blood of its victims.",
+      "assemblers": {
+        "tile": {
+          "color": "#c86464"
+        },
+        "stats": {
+          "str": 0,
+          "dex": 5,
+          "int": 2,
+          "vit": 1
+        }
+      }
+    },
+    {
       "name": "blinding_mushroom",
       "display_name": "Blinding Mushroom",
       "description": "A mushroom that emits toxic blinding spores when disturbed.",
       "from_template": "base_trap",
       "assemblers": {
-        "tile": {
-          "color": "#ff0000",
-          "char": "m"
-        },
         "equipment": true,
         "auto_equip": true,
         "drop_equipment": false,
+        "loot_interact": {
+          "is_looted": false,
+          "is_persistent": false,
+          "loot_name": "Blinding Mushroom",
+          "interact_text": "Harvest Mushroom",
+          "default_tile": {
+            "color": "#ff0000",
+            "char": "m"
+          },
+          "looted_tile": {
+            "color": "#0a0a0a",
+            "char": "m"
+          }
+        },
         "inventory": {
           "loot_table": "ltb_blinding_mushroom"
         }

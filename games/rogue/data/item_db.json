@@ -172,6 +172,12 @@
       "magic_damage": 0,
       "ap_cost": 10
     },
+    "magic_melee_5": {
+      "type": "melee_attack_comp",
+      "phys_damage": 0,
+      "magic_damage": 10,
+      "ap_cost": 10
+    },
     "magic_melee_10": {
       "type": "melee_attack_comp",
       "phys_damage": 0,
@@ -907,7 +913,7 @@
       "capabilities": [
         {
           "type": "equipment",
-          "effect": "magic_melee_10"
+          "effect": "magic_melee_5"
         },
         {
           "type": "equipment",
@@ -932,6 +938,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_iron_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "specializations": [
@@ -1334,6 +1344,18 @@
       "max_stack_size": 99,
       "types": ["crafting"],
       "capabilities": []
+    },
+    {
+      "name": "Infused Silk Cloth",
+      "description": "Lightweight crafting material webbed from spider silk, infused with arcane magic.",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": [
+        {
+          "type": "equipment",
+          "effect": "magic_armor_10"
+        }
+      ]
     },
     {
       "name": "Arachnid Chitin Shard",
@@ -2294,18 +2316,29 @@
       ]
     },
     "common_rat": {
-      "rolls": 1,
+      "rolls": 2,
       "slots": [
         {
           "type": "item",
           "name": "Sewer Meat",
           "min_count": 1,
           "max_count": 2,
-          "weight": 30
+          "weight": 15
+        },
+        {
+          "type": "item",
+          "name": "Leather Scrap",
+          "min_count": 1,
+          "max_count": 1,
+          "weight": 15
         },
         {
           "type": "null",
-          "weight": 70
+          "weight": 35
+        },
+        {
+          "type": "null",
+          "weight": 35
         }
       ]
     },
@@ -2470,13 +2503,13 @@
       ]
     },
     "common_tree": {
-      "rolls": 2,
+      "rolls": 1,
       "slots": [
         {
           "type": "item",
           "name": "Wooden Log",
           "min_count": 1,
-          "max_count": 2,
+          "max_count": 1,
           "weight": 70
         },
         {

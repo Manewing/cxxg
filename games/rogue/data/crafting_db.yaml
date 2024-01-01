@@ -141,6 +141,14 @@ recipes:
     results:
       - Rune Dust
       - Rune Dust
+      - Fire Stone
+  - name: Infused Silk Cloth
+    ingredients:
+      - Silk Cloth
+      - Fairy Dust
+      - Arcane Liquid
+    results:
+      - Infused Silk Cloth
   - name: Rune Stone
     ingredients:
       - Rune Dust
