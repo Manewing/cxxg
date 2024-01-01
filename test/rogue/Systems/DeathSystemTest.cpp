@@ -26,17 +26,28 @@ TEST(DeathSystemTest, CheckEmptyContainersAreRemoved) {
 
   entt::entity Et = Reg.create();
   Reg.emplace<rogue::InventoryComp>(Et);
-  Reg.emplace<rogue::LootInteractComp>(Et).IsPersistent = false;
+  rogue::LootInteractComp LIC;
+  LIC.IsPersistent = false;
+  LIC.IsLooted = true;
+  Reg.emplace<rogue::LootInteractComp>(Et, LIC);
   DS.update(rogue::System::UpdateType::NoTick);
-  EXPECT_FALSE(Reg.valid(Et));
+  EXPECT_FALSE(Reg.valid(Et)) << "Expect not yet looted empty containers not to be removed";
 
   Et = Reg.create();
+  LIC.IsLooted = false;
   Reg.emplace<rogue::InventoryComp>(Et);
-  Reg.emplace<rogue::LootInteractComp>(Et).IsPersistent = false;
+  Reg.emplace<rogue::LootInteractComp>(Et, LIC);
+  DS.update(rogue::System::UpdateType::NoTick);
+  EXPECT_TRUE(Reg.valid(Et)) << "Expect looted empty containers to be removed";
+
+  Et = Reg.create();
+  LIC.IsLooted = true;
+  Reg.emplace<rogue::InventoryComp>(Et);
+  Reg.emplace<rogue::LootInteractComp>(Et, LIC);
   auto &HC = Reg.emplace<rogue::HealthComp>(Et);
   ASSERT_FALSE(HC.isDead());
   DS.update(rogue::System::UpdateType::NoTick);
-  EXPECT_TRUE(Reg.valid(Et));
+  EXPECT_TRUE(Reg.valid(Et)) << "Expect non-dead entities not to be removed";
 
   Reg.erase<rogue::HealthComp>(Et);
   DS.update(rogue::System::UpdateType::Tick);
@@ -44,7 +55,8 @@ TEST(DeathSystemTest, CheckEmptyContainersAreRemoved) {
 
   Et = Reg.create();
   Reg.emplace<rogue::InventoryComp>(Et);
-  Reg.emplace<rogue::LootInteractComp>(Et).IsPersistent = true;
+  LIC.IsPersistent = true;
+  Reg.emplace<rogue::LootInteractComp>(Et, LIC);
   DS.update(rogue::System::UpdateType::NoTick);
   EXPECT_TRUE(Reg.valid(Et));
 }
