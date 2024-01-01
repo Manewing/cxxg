@@ -618,6 +618,10 @@
         {
           "type": "equipment",
           "effect": "ranged_magic_5"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "specializations": [
@@ -640,6 +644,10 @@
         {
           "type": "equipment",
           "effect": "ranged_5"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "specializations": [
@@ -980,6 +988,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "enhancements": "common_armor_enhancements"
@@ -997,6 +1009,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "enhancements": "common_armor_enhancements"
@@ -1014,6 +1030,10 @@
         {
           "type": "dismantle",
           "effect": "dismantle_leather_equip"
+        },
+        {
+          "type": "skill",
+          "effect": "null"
         }
       ],
       "enhancements": "common_armor_enhancements"
