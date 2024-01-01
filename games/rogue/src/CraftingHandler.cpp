@@ -109,7 +109,8 @@ CraftingHandler::tryCraftAsRecipe(const std::vector<Item> &Items) const {
 
   std::vector<Item> CraftedItems;
   for (auto &Id : Result->Items) {
-    CraftedItems.push_back(ItemDb->createItem(Id));
+    CraftedItems.push_back(
+        ItemDb->createItem(Id, /*StackSize=*/1, /*AllowEnchanting=*/false));
   }
   return CraftedItems;
 }

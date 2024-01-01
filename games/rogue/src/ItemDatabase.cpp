@@ -441,7 +441,8 @@ void ItemDatabase::addItemProto(
   }
 }
 
-Item ItemDatabase::createItem(int ItemId, int StackSize) const {
+Item ItemDatabase::createItem(int ItemId, int StackSize,
+                              bool AllowEnchanting) const {
   auto It = ItemProtos.find(ItemId);
   if (It == ItemProtos.end()) {
     throw std::out_of_range("Unknown item id: " + std::to_string(ItemId));
@@ -456,7 +457,7 @@ Item ItemDatabase::createItem(int ItemId, int StackSize) const {
 
   // Craft enhancements
   if (auto EnhIt = ItemEnhancements.find(ItemId);
-      EnhIt != ItemEnhancements.end() && EnhIt->second) {
+      AllowEnchanting && EnhIt != ItemEnhancements.end() && EnhIt->second) {
     auto LootRewards = EnhIt->second->generateLoot();
     std::vector<Item> LootItems;
     for (const auto &Reward : LootRewards) {

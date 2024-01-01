@@ -25,7 +25,7 @@ public:
                     const ItemSpecializations *ItemSpec = nullptr,
                     const std::shared_ptr<LootTable> &Enhancements = nullptr);
 
-  Item createItem(int ItemId, int StackSize = 1) const;
+  Item createItem(int ItemId, int StackSize = 1, bool AllowEnchanting = true) const;
 
   int getRandomItemId() const;
 
