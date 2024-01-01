@@ -6,6 +6,59 @@ recipes:
       - Leather Scrap
     results:
       - Leather
+  - name: Iron Ingot
+    ingredients:
+      - Iron Scrap
+      - Iron Scrap
+      - Iron Scrap
+      - Iron Scrap
+    results:
+      - Iron Ingot
+  - name: Leather Tunic
+    ingredients:
+      - Leather
+      - Leather
+      - Iron Scrap
+      - Leather
+      - Leather
+    results:
+      - Leather Tunic
+  - name: Leather Pants
+    ingredients:
+      - Iron Scrap
+      - Leather
+      - Leather
+      - Leather
+      - Leather
+      - Iron Scrap
+    results:
+      - Leather Pants
+  - name: Leather Boots
+    ingredients:
+      - Leather
+      - Leather
+      - Iron Scrap
+      - Iron Scrap
+      - Leather
+      - Leather
+    results:
+      - Leather Boots
+  - name: Leather Helmet
+    ingredients:
+      - Leather
+      - Iron Scrap
+      - Iron Scrap
+      - Iron Scrap
+      - Leather
+    results:
+      - Leather Helmet
+  - name: Small Sword
+    ingredients:
+      - Wooden Log
+      - Leather
+      - Iron Ingot
+    results:
+      - Small Sword
   - name: Wooden Shield
     ingredients:
       - Wooden Log

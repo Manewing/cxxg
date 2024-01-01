@@ -1169,6 +1169,13 @@
       "capabilities": []
     },
     {
+      "name": "Iron Ingot",
+      "description": "An iron ingot",
+      "max_stack_size": 99,
+      "types": ["crafting"],
+      "capabilities": []
+    },
+    {
       "name": "Leather Scrap",
       "description": "A scrap of leather",
       "max_stack_size": 99,
