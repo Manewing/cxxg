@@ -15,6 +15,9 @@ void handleSigint(int) { SigintHandler(); }
 
 std::string getCharTxt(int Char) {
   if (32 <= Char && Char < 127) {
+    if (Char == ' ') {
+      return "SPACE";
+    }
     std::string Str = "' '";
     Str[1] = Char;
     return Str;
