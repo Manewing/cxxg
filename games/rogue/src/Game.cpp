@@ -431,19 +431,50 @@ ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
   return PI;
 }
 
-std::optional<ui::Controller::TargetInfo> getUITargetInfo(entt::entity Player,
-                                                          entt::registry &Reg) {
-  const auto *CC = Reg.try_get<CombatAttackComp>(Player);
-  if (!CC || CC->Target == entt::null || !Reg.valid(CC->Target)) {
-    return {};
+std::optional<ui::Controller::TargetInfo>
+getUITargetInfoForTarget(entt::entity Target, const entt::registry &Reg) {
+  if (!Reg.valid(Target)) {
+    return ui::Controller::TargetInfo{"<InvalidEntity>", 0, 0};
   }
   ui::Controller::TargetInfo TI;
-  auto *TNC = Reg.try_get<NameComp>(CC->Target);
-  auto *THC = Reg.try_get<HealthComp>(CC->Target);
+  auto *TNC = Reg.try_get<NameComp>(Target);
+  auto *THC = Reg.try_get<HealthComp>(Target);
   TI.Name = TNC ? TNC->Name : "<NameCompMissing>";
   TI.Health = THC ? THC->Value : 0;
   TI.MaxHealth = THC ? THC->MaxValue : 0;
   return TI;
+}
+
+std::optional<ui::Controller::TargetInfo>
+getUITargetInfoFromPlayer(entt::entity Player, const entt::registry &Reg) {
+  const auto *CC = Reg.try_get<CombatAttackComp>(Player);
+  if (!CC || CC->Target == entt::null || !Reg.valid(CC->Target)) {
+    return {};
+  }
+  return getUITargetInfoForTarget(CC->Target, Reg);
+}
+
+std::optional<ui::Controller::TargetInfo>
+getUITargetInfoFromTargetUI(const ui::Controller &UICtrl,
+                            const entt::registry &Reg) {
+  const auto *TUI = UICtrl.getWindowOfType<ui::TargetUI>();
+  if (!TUI || TUI->getTarget() == entt::null) {
+    return {};
+  }
+  return getUITargetInfoForTarget(TUI->getTarget(), Reg);
+}
+
+std::optional<ui::Controller::TargetInfo>
+getUITargetInfo(entt::entity Player, const ui::Controller &UICtrl,
+                const entt::registry &Reg) {
+  auto TI = getUITargetInfoFromTargetUI(UICtrl, Reg);
+  if (TI || UICtrl.hasTargetUI()) {
+    return TI;
+  }
+  if (auto TI = getUITargetInfoFromPlayer(Player, Reg)) {
+    return TI;
+  }
+  return {};
 }
 
 } // namespace
@@ -475,7 +506,7 @@ void Game::handleDrawLevel(bool UpdateScreen) {
 
   // Draw UI overlay
   auto PI = getUIPlayerInfo(Player, getLvlReg(), getAvailableInteraction());
-  auto TI = getUITargetInfo(Player, getLvlReg());
+  auto TI = getUITargetInfo(Player, UICtrl, getLvlReg());
   UICtrl.draw(World->getCurrentLevelIdx(), PI, TI);
 
   if (UpdateScreen) {
