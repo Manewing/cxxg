@@ -155,7 +155,7 @@ Frame *getFrameFromWidget(Widget *W) {
 void changeWindowHighlight(Widget &W, bool Highlight) {
   if (auto *F = getFrameFromWidget(&W)) {
     if (Highlight) {
-      F->setFrameColor(cxxg::types::RgbColor{255, 255, 200}.bold());
+      F->setFrameColor(cxxg::types::RgbColor{255, 255, 170}.bold());
     } else {
       F->setFrameColor(cxxg::types::Color::NONE);
     }

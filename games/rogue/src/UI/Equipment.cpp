@@ -159,7 +159,7 @@ void EquipmentController::addSelect(const EquipmentSlot &ES,
   int Idx = AtPos.Y - Pos.Y + 1;
   ItSel->addSelect<LabeledSelect>(ES.BaseTypeFilter.str(),
                                   getSelectValue(ES, Idx), AtPos,
-                                  getSize().X - 2, NoColor, NoColor);
+                                  getSize().X - 4, NoColor, NoColor);
 }
 
 void EquipmentController::updateSelectValues() const {
