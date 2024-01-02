@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <rogue/UI/Decorator.h>
 #include <rogue/UI/Widget.h>
+#include <rogue/UI/WordWrap.h>
 #include <ymir/Types.hpp>
 
 namespace rogue {
@@ -18,6 +19,9 @@ namespace rogue::ui {
 
 class TargetInfo : public BaseRectDecorator {
 public:
+  static bool DebugTargets;
+
+public:
   TargetInfo(Controller &Ctrl, entt::entity TargetEt, Level &Lvl);
   void draw(cxxg::Screen &Scr) const override;
 
@@ -25,6 +29,7 @@ private:
   Controller &Ctrl;
   entt::entity TargetEt;
   Level &Lvl;
+  WordWrap WW;
 };
 
 class TargetUI : public Widget {

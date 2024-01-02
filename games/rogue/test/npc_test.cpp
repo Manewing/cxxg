@@ -38,7 +38,7 @@ entt::entity createNPCEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   Reg.emplace<PhysState>(Entity);
   Reg.emplace<ReasoningStateComp>(Entity);
   Reg.emplace<TileComp>(Entity, NPCTile);
-  Reg.emplace<NameComp>(Entity, "NPC");
+  Reg.emplace<NameComp>(Entity, "NPC", "NPC");
   Reg.emplace<AgilityComp>(Entity);
   Reg.emplace<StatsComp>(Entity, Stats);
   Reg.emplace<HealthComp>(Entity);

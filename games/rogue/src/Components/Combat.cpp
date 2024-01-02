@@ -64,7 +64,7 @@ void createTempDamage(entt::registry &Reg, const DamageComp &DC,
   Reg.emplace<DamageComp>(E, DC).Ticks = 1;
   Reg.emplace<PositionComp>(E, Pos);
   Reg.emplace<TileComp>(E, TempDamageTile);
-  Reg.emplace<NameComp>(E, "Damage");
+  Reg.emplace<NameComp>(E, "Damage", "Damage");
   Reg.emplace<VisibleComp>(E);
 }
 
@@ -76,7 +76,7 @@ void createProjectile(entt::registry &Reg, const DamageComp &DC,
   Reg.emplace<PositionComp>(E, Pos);
   Reg.emplace<AgilityComp>(E, Agility);
   Reg.emplace<TileComp>(E, ProjectileTile);
-  Reg.emplace<NameComp>(E, "Projectile");
+  Reg.emplace<NameComp>(E, "Projectile", "Projectile");
   VectorMovementComp VMC;
   VMC.Flying = true;
   VMC.KillOnWall = true;

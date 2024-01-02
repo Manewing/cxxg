@@ -374,7 +374,7 @@ entt::entity EntityFactory::createEntity(EntityTemplateId Id) const {
   auto Entity = Reg.create();
   auto &EtTmpl = EntityDb.getEntityTemplate(Id);
 
-  Reg.emplace<NameComp>(Entity, EtTmpl.getDisplayName());
+  Reg.emplace<NameComp>(Entity, EtTmpl.getDisplayName(), EtTmpl.getDescription());
 
   // Assemble entity
   try {

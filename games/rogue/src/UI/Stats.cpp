@@ -1,7 +1,7 @@
 #include <cxxg/Screen.h>
-#include <iomanip>
 #include <memory>
 #include <rogue/Components/Stats.h>
+#include <rogue/UI/CompHelpers.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
@@ -10,7 +10,7 @@
 #include <rogue/UI/Tooltip.h>
 
 static constexpr cxxg::types::Position DefaultPos = {2, 2};
-static constexpr cxxg::types::Size DefaultSize = {32, 12};
+static constexpr cxxg::types::Size DefaultSize = {36, 12};
 constexpr cxxg::types::Size TooltipSize = {40, 10};
 constexpr cxxg::types::Position TooltipOffset = {1, 1};
 
@@ -91,37 +91,12 @@ void StatsController::draw(cxxg::Screen &Scr) const {
 
   BaseRectDecorator::draw(Scr);
 
-  // Add health info
-  if (const auto *HC = Reg.try_get<HealthComp>(Entity)) {
-    Scr[Pos.Y + getSize().Y - 6][Pos.X + 2]
-        << "HP: " << std::fixed << std::setprecision(1) << std::setw(6)
-        << HC->Value << "/" << std::setprecision(1) << std::setw(6)
-        << HC->MaxValue;
-  } else {
-    Scr[Pos.Y + getSize().Y - 6][Pos.X + 2] << "HP: ---";
-  }
-
-  // Add mana info
-  if (const auto *MC = Reg.try_get<ManaComp>(Entity)) {
-    Scr[Pos.Y + getSize().Y - 5][Pos.X + 2]
-        << "MP: " << std::fixed << std::setprecision(1) << std::setw(6)
-        << MC->Value << "/" << std::setprecision(1) << std::setw(6)
-        << MC->MaxValue;
-  } else {
-    Scr[Pos.Y + getSize().Y - 5][Pos.X + 2] << "MP: ---";
-  }
-
-  // Add agility info
-  if (const auto *AC = Reg.try_get<AgilityComp>(Entity)) {
-    Scr[Pos.Y + getSize().Y - 4][Pos.X + 2]
-        << "Agility: " << std::fixed << std::setprecision(1) << AC->Agility
-        << ", AP: " << AC->AP;
-  } else {
-    Scr[Pos.Y + getSize().Y - 4][Pos.X + 2] << "MP: ---";
-  }
-
-  // FIXME points to spend
-  Scr[Pos.Y + getSize().Y - 2][Pos.X + 2] << "Available Points: 0000";
+  auto DP = Pos + cxxg::types::Position{2, static_cast<int>(getSize().Y) - 6};
+  addHealthInfo(Scr, DP, Reg, Entity);
+  DP.Y++;
+  addManaInfo(Scr, DP, Reg, Entity);
+  DP.Y++;
+  addAgilityInfo(Scr, DP, Reg, Entity);
 }
 
 } // namespace rogue::ui

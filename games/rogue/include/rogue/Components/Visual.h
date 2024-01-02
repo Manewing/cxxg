@@ -16,6 +16,7 @@ struct TileComp {
 
 struct NameComp {
   std::string Name;
+  std::string Description;
 };
 
 struct CursorComp {};

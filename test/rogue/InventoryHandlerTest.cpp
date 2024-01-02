@@ -21,6 +21,7 @@ public:
     Crafter = rogue::CraftingHandler(ItemDb);
     Reg = entt::registry();
     Entity = Reg.create();
+    Reg.emplace<rogue::NameComp>(Entity, "Entity", "Desc");
   }
 
   rogue::test::DummyItems DummyItems;
@@ -40,7 +41,6 @@ public:
 };
 
 TEST_F(InventoryHandlerTest, TryUnequipItem) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   Reg.emplace<rogue::HealthComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
@@ -82,7 +82,6 @@ TEST_F(InventoryHandlerTest, TryUnequipItem) {
 }
 
 TEST_F(InventoryHandlerTest, TryEquipInventoryItem) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   rogue::EventHub Hub;
@@ -158,7 +157,6 @@ TEST_F(InventoryHandlerTest, TryEquipInventoryItem) {
 }
 
 TEST_F(InventoryHandlerTest, TryDropItem) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   rogue::EventHub Hub;
@@ -189,7 +187,6 @@ TEST_F(InventoryHandlerTest, TryDropItem) {
 }
 
 TEST_F(InventoryHandlerTest, TryDismantleItem) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   rogue::EventHub Hub;
@@ -225,7 +222,6 @@ TEST_F(InventoryHandlerTest, TryDismantleItem) {
 }
 
 TEST_F(InventoryHandlerTest, TryUseItem) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   rogue::EventHub Hub;
@@ -258,8 +254,7 @@ TEST_F(InventoryHandlerTest, TryUseItem) {
 
 TEST_F(InventoryHandlerTest, TryUseItemOnTarget) {
   entt::entity TargetEntity = Reg.create();
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
-  Reg.emplace<rogue::NameComp>(TargetEntity, "Target");
+  Reg.emplace<rogue::NameComp>(TargetEntity, "Target", "Target");
   Reg.emplace<rogue::PlayerComp>(Entity);
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   rogue::EventHub Hub;
@@ -290,7 +285,6 @@ TEST_F(InventoryHandlerTest, TryUseItemOnTarget) {
 }
 
 TEST_F(InventoryHandlerTest, AutoEquipItems) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   Reg.emplace<rogue::PlayerComp>(Entity);
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
   auto &Equip = Reg.emplace<rogue::EquipmentComp>(Entity).Equip;
@@ -321,7 +315,6 @@ TEST_F(InventoryHandlerTest, AutoEquipItems) {
 }
 
 TEST_F(InventoryHandlerTest, TryCraftItems) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   Crafter.addRecipe(
@@ -353,11 +346,10 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
 }
 
 TEST_F(InventoryHandlerTest, TryCraftItemsForPlayer) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
 
   auto PlayerEt = Reg.create();
-  Reg.emplace<rogue::NameComp>(PlayerEt, "Player");
+  Reg.emplace<rogue::NameComp>(PlayerEt, "Player", "Desc");
   auto &PC = Reg.emplace<rogue::PlayerComp>(PlayerEt);
   auto &PlayerInv = Reg.emplace<rogue::InventoryComp>(PlayerEt).Inv;
 
@@ -382,7 +374,6 @@ TEST_F(InventoryHandlerTest, TryCraftItemsForPlayer) {
 }
 
 TEST_F(InventoryHandlerTest, CanCraft) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
 
   auto Recipe = rogue::CraftingRecipe(
@@ -409,7 +400,6 @@ TEST_F(InventoryHandlerTest, CanCraft) {
 }
 
 TEST_F(InventoryHandlerTest, TryCraft) {
-  Reg.emplace<rogue::NameComp>(Entity, "Entity");
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
 
   auto Recipe = rogue::CraftingRecipe(

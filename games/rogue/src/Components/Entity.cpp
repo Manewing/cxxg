@@ -18,7 +18,7 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
   Reg.emplace<TileComp>(Entity, DropTile, -1);
-  Reg.emplace<NameComp>(Entity, "Drop");
+  Reg.emplace<NameComp>(Entity, "Drop", "Drop containing items");
 
   // Copy inventory
   auto &IC = Reg.emplace<InventoryComp>(Entity);

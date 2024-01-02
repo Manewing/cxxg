@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <rogue/UI/Buffs.h>
 #include <rogue/UI/CommandLine.h>
+#include <rogue/UI/CompHelpers.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Crafting.h>
 #include <rogue/UI/Equipment.h>
@@ -20,38 +21,6 @@
 namespace rogue::ui {
 
 namespace {
-
-/// Returns color for health bar, based on current health and max health. From
-/// red to green (full life).
-cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
-  if (Health <= 0) {
-    return {145, 10, 10};
-  }
-  int Percent = (Health * 100) / MaxHealth;
-  if (Percent >= 66) {
-    return {135, 250, 10};
-  }
-  if (Percent >= 33) {
-    return {225, 140, 10};
-  }
-  return {245, 30, 30};
-}
-
-/// Returns color for mana bar, based on current mana and max mana. From grey to
-/// blue (full mana).
-cxxg::types::RgbColor getManaColor(int Mana, int MaxMana) {
-  if (Mana <= 0) {
-    return {145, 145, 145};
-  }
-  int Percent = (Mana * 100) / MaxMana;
-  if (Percent >= 66) {
-    return {10, 140, 250};
-  }
-  if (Percent >= 33) {
-    return {80, 150, 200};
-  }
-  return {145, 145, 200};
-}
 
 cxxg::types::Size getWindowContainerSize(const cxxg::types::Size &Size) {
   return {Size.X - 1, Size.Y - 2};

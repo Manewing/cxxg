@@ -704,6 +704,8 @@
     {
       "name": "stash",
       "from_template": "base_chest",
+      "display_name": "Stash",
+      "description": "A stash where you can store items",
       "assemblers": {
         "inventory": {
           "loot_table": "l1_key"

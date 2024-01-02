@@ -14,13 +14,13 @@ set(HEADER_FILES
   include/rogue/Context.h
   include/rogue/CraftingDatabase.h
   include/rogue/CraftingHandler.h
+  include/rogue/EffectInfo.h
   include/rogue/EntityAssemblers.h
   include/rogue/EntityDatabase.h
   include/rogue/Equipment.h
   include/rogue/Event.h
   include/rogue/EventHub.h
   include/rogue/Game.h
-  include/rogue/EffectInfo.h
   include/rogue/GameWorld.h
   include/rogue/History.h
   include/rogue/Inventory.h
@@ -55,6 +55,7 @@ set(HEADER_FILES
   include/rogue/Types.h
   include/rogue/UI/Buffs.h
   include/rogue/UI/CommandLine.h
+  include/rogue/UI/CompHelpers.h
   include/rogue/UI/Controller.h
   include/rogue/UI/Controls.h
   include/rogue/UI/Crafting.h
@@ -129,6 +130,7 @@ set(SOURCE_FILES
   src/Systems/WanderAISystem.cpp
   src/UI/Buffs.cpp
   src/UI/CommandLine.cpp
+  src/UI/CompHelpers.cpp
   src/UI/Controller.cpp
   src/UI/Controls.cpp
   src/UI/Crafting.cpp
