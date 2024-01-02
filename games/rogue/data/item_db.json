@@ -6,7 +6,7 @@
     },
     "health_effect": {
       "type": "health_item_effect",
-      "health_value": 5
+      "health_value": 10
     },
     "minor_mana_effect": {
       "type": "mana_item_effect",
