@@ -290,9 +290,10 @@ struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
 
   bool remove(const ChanceToApplyBuffComp &Other) {
     if (!AdditiveBuff::remove(Other)) {
+      Buff.remove(Other.Buff);
       return false;
     }
-    return Buff.remove(Other.Buff);
+    return true;
   }
 
   bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
