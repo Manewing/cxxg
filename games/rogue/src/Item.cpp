@@ -26,13 +26,15 @@ std::string getQualifierNameForHash(std::size_t Hash) {
   return Name;
 }
 
-std::string getQualifierNameForItem(const Item &It) {
+std::string getQualifierNameForItem(const Item &It, CapabilityFlags Flags) {
   // Check for stats buff effect and return name based strongest
   // stat point boost
   std::size_t Hash = 0;
   for (const auto &ItEff : It.getAllEffects()) {
-    if (!(ItEff.Attributes.Flags &
-          (CapabilityFlags::Equipment | CapabilityFlags::Skill))) {
+    if (!(ItEff.Attributes.Flags & Flags)) {
+      continue;
+    }
+    if (dynamic_cast<const NullEffect *>(ItEff.Effect.get())) {
       continue;
     }
     Hash ^= std::hash<std::string>{}(ItEff.Effect->getDescription());
@@ -51,7 +53,12 @@ const std::string &Item::getName() const { return getProto().Name; }
 
 std::string Item::getQualifierName() const {
   if (getType() & ItemType::EquipmentMask) {
-    return getQualifierNameForItem(*this) + getProto().Name;
+    return getQualifierNameForItem(*this, CapabilityFlags::Equipment) +
+           getProto().Name;
+  }
+  if (getType().is(ItemType::CraftingBase | ItemType::Consumable)) {
+    return getQualifierNameForItem(*this, CapabilityFlags::UseOn) +
+           getProto().Name;
   }
   return getProto().Name;
 }

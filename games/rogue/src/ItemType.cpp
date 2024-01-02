@@ -35,6 +35,10 @@ ItemType ItemType::fromString(const std::string &Type) {
   throw std::out_of_range("Unknown ItemType: " + Type);
 }
 
+bool ItemType::is(ItemType Other) const {
+  return (Value & Other.Value) == Other.Value;
+}
+
 std::string ItemType::str() const {
   std::stringstream Label;
   const char *Pred = "";

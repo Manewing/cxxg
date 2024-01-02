@@ -63,6 +63,9 @@ public:
   bool operator==(ValueType Other) const { return Value == Other; }
   bool operator!=(ValueType Other) const { return Value != Other; }
 
+  /// Returns true if all flags set in other are also set in this
+  bool is(ItemType Other) const;
+
   std::string str() const;
 
 private:
