@@ -142,16 +142,11 @@ void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
     MA = *AMA;
   }
 
+  auto EffMA = MA.getEffective(Reg.try_get<StatsComp>(SrcEt));
   DamageComp DC;
   DC.Source = SrcEt;
-  if (auto *SC = Reg.try_get<StatsComp>(SrcEt)) {
-    auto SP = SC->effective();
-    DC.PhysDamage = MA.getPhysEffectiveDamage(&SP);
-    DC.MagicDamage = MA.getMagicEffectiveDamage(&SP);
-  } else {
-    DC.PhysDamage = MA.getPhysEffectiveDamage();
-    DC.MagicDamage = MA.getMagicEffectiveDamage();
-  }
+  DC.MagicDamage = EffMA.MagicDamage;
+  DC.PhysDamage = EffMA.PhysDamage;
 
   for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
     createTempDamage(Reg, DC, PC.Pos + Dir);

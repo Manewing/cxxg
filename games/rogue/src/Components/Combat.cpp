@@ -6,37 +6,47 @@
 
 namespace rogue {
 
-StatValue RangedAttackComp::getPhysEffectiveDamage(const StatPoints *SP) const {
-  if (!SP || PhysDamage == 0) {
-    return PhysDamage;
-  }
-  auto Dex = StatValue(SP->Dex);
+StatValue RangedAttackComp::getPhysEffectiveDamage(const StatPoints &SP) const {
+  auto Dex = StatValue(SP.Dex);
   return (PhysDamage + Dex) * (100.0 + Dex) / 100.0;
 }
 
 StatValue
-RangedAttackComp::getMagicEffectiveDamage(const StatPoints *SP) const {
-  if (!SP || MagicDamage == 0) {
-    return MagicDamage;
-  }
-  auto Int = StatValue(SP->Int);
+RangedAttackComp::getMagicEffectiveDamage(const StatPoints &SP) const {
+  auto Int = StatValue(SP.Int);
   return (MagicDamage + Int) * (100.0 + Int) / 100.0;
 }
 
-StatValue MeleeAttackComp::getPhysEffectiveDamage(const StatPoints *SP) const {
-  if (!SP || PhysDamage == 0) {
-    return PhysDamage;
+RangedAttackComp RangedAttackComp::getEffective(const StatsComp *SC) const {
+  RangedAttackComp RAC = *this;
+  if (!SC) {
+    return RAC;
   }
-  auto Str = StatValue(SP->Str);
+  auto Eff = SC->effective();
+  RAC.PhysDamage = getPhysEffectiveDamage(Eff);
+  RAC.MagicDamage = getMagicEffectiveDamage(Eff);
+  return RAC;
+}
+
+StatValue MeleeAttackComp::getPhysEffectiveDamage(const StatPoints &SP) const {
+  auto Str = StatValue(SP.Str);
   return (PhysDamage + Str) * (100.0 + Str) / 100.0;
 }
 
-StatValue MeleeAttackComp::getMagicEffectiveDamage(const StatPoints *SP) const {
-  if (!SP || MagicDamage == 0) {
-    return MagicDamage;
-  }
-  auto Int = StatValue(SP->Int);
+StatValue MeleeAttackComp::getMagicEffectiveDamage(const StatPoints &SP) const {
+  auto Int = StatValue(SP.Int);
   return (MagicDamage + Int) * (100.0 + Int) / 100.0;
+}
+
+MeleeAttackComp MeleeAttackComp::getEffective(const StatsComp *SC) const {
+  MeleeAttackComp MAC = *this;
+  if (!SC) {
+    return MAC;
+  }
+  auto Eff = SC->effective();
+  MAC.PhysDamage = getPhysEffectiveDamage(Eff);
+  MAC.MagicDamage = getMagicEffectiveDamage(Eff);
+  return MAC;
 }
 
 // FIXME include collision?

@@ -115,6 +115,7 @@ std::string getCapabilityDescription(const ItemType &ItType,
   if (!ItemPrototype::canApply(ItType, Flag)) {
     return "Crafting only: " + SS.str();
   }
+  SS << "\n";
   return SS.str();
 }
 

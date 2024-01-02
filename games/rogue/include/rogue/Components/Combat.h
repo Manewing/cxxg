@@ -35,10 +35,13 @@ struct RangedAttackComp {
   StatValue ManaCost = 0;
 
   /// Dexterity increases physical damage by 1 and by 1% per point
-  StatValue getPhysEffectiveDamage(const StatPoints *SP = nullptr) const;
+  StatValue getPhysEffectiveDamage(const StatPoints &SP) const;
 
   /// Intelligence increases magic damage by 1 and by 1% per point
-  StatValue getMagicEffectiveDamage(const StatPoints *SP = nullptr) const;
+  StatValue getMagicEffectiveDamage(const StatPoints &SP) const;
+
+  /// Returns the effective ranged attack component based on the given stats
+  RangedAttackComp getEffective(const StatsComp *SC) const;
 };
 
 struct MeleeAttackComp {
@@ -48,10 +51,13 @@ struct MeleeAttackComp {
   StatValue ManaCost = 0;
 
   /// Strength increases melee damage by 1 and by 1% per point
-  StatValue getPhysEffectiveDamage(const StatPoints *SP = nullptr) const;
+  StatValue getPhysEffectiveDamage(const StatPoints &SP) const;
 
   /// Intelligence increases magic damage by 1 and by 1% per point
-  StatValue getMagicEffectiveDamage(const StatPoints *SP = nullptr) const;
+  StatValue getMagicEffectiveDamage(const StatPoints &SP) const;
+
+  /// Returns the effective melee attack component based on the given stats
+  MeleeAttackComp getEffective(const StatsComp *SP) const;
 };
 
 struct DamageComp {

@@ -140,16 +140,11 @@ bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
   }
 
   // Compute the effective damage and apply it
+  auto EffRAC = RAC->getEffective(Reg.try_get<StatsComp>(Attacker));
   DamageComp DC;
   DC.Source = Attacker;
-  if (auto *SC = Reg.try_get<StatsComp>(Attacker)) {
-    auto SP = SC->effective();
-    DC.PhysDamage = RAC->getPhysEffectiveDamage(&SP);
-    DC.MagicDamage = RAC->getMagicEffectiveDamage(&SP);
-  } else {
-    DC.PhysDamage = RAC->getPhysEffectiveDamage();
-    DC.MagicDamage = RAC->getMagicEffectiveDamage();
-  }
+  DC.MagicDamage = EffRAC.MagicDamage;
+  DC.PhysDamage = EffRAC.PhysDamage;
 
   // Create projectile in the move direction
   auto Diff = TargetPos - AttackerPC->Pos;
@@ -176,7 +171,7 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
 }
 
 void applyDamageComp(entt::registry &Reg, DamageComp &DC,
-                 const PositionComp &PC, EventHubConnector &EHC) {
+                     const PositionComp &PC, EventHubConnector &EHC) {
   Reg.view<PositionComp, HealthComp>().each(
       [&Reg, &PC, &DC, &EHC](const auto &TEt, auto &TPC, auto &THC) {
         auto *TMC = Reg.try_get<MovementComp>(TEt);
@@ -223,16 +218,11 @@ void CombatSystem::handleMeleeAttack(entt::registry &Reg, entt::entity Attacker,
   }
 
   // Compute the effective damage and apply it
+  auto EffMA = MA.getEffective(Reg.try_get<StatsComp>(Attacker));
   DamageComp DC;
   DC.Source = Attacker;
-  if (auto *SC = Reg.try_get<StatsComp>(Attacker)) {
-    auto SP = SC->effective();
-    DC.PhysDamage = MA.getPhysEffectiveDamage(&SP);
-    DC.MagicDamage = MA.getMagicEffectiveDamage(&SP);
-  } else {
-    DC.PhysDamage = MA.getPhysEffectiveDamage();
-    DC.MagicDamage = MA.getMagicEffectiveDamage();
-  }
+  DC.MagicDamage = EffMA.MagicDamage;
+  DC.PhysDamage = EffMA.PhysDamage;
   DC.PhysDamage *= DamageFactor;
   DC.MagicDamage *= DamageFactor;
   auto TotalDamage = applyDamage(Reg, Target, *THealth, DC);
