@@ -119,7 +119,7 @@ std::shared_ptr<ItemEffect> SweepingStrikeEffect::clone() const {
 std::string SweepingStrikeEffect::getName() const { return "Sweeping Strike"; }
 
 std::string SweepingStrikeEffect::getDescription() const {
-  return "Hits all surrounding enemies.";
+  return "Hits all surrounding enemies as melee damage.";
 }
 
 bool SweepingStrikeEffect::canApplyTo(const entt::entity &SrcEt,
