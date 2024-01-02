@@ -28,7 +28,7 @@ std::string HealItemEffect::getName() const { return "Heal"; }
 
 std::string HealItemEffect::getDescription() const {
   std::stringstream SS;
-  SS << "Heals for " << Amount;
+  SS << "Heals for " << Amount << "HP";
   return SS.str();
 }
 
