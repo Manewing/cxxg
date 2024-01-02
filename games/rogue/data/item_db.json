@@ -1768,7 +1768,7 @@
           "name": "Book of crafting",
           "min_count": 1,
           "max_count": 1,
-          "weight": 7
+          "weight": 10
         }
       ]
     },
