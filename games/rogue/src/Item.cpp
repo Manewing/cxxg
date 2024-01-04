@@ -49,33 +49,51 @@ std::string getQualifierNameForItem(const Item &It, CapabilityFlags Flags) {
 
 int Item::getId() const { return getProto().ItemId; }
 
-const std::string &Item::getName() const { return getProto().Name; }
+const std::string &Item::getName() const {
+  if (!Specialization || !SpecOverrides) {
+    return getProto().Name;
+  } else {
+    return Specialization->Name;
+  }
+}
 
 std::string Item::getQualifierName() const {
+  auto Name = getProto().Name;
+  if (Specialization && SpecOverrides) {
+    Name = Specialization->Name;
+  }
   if (getType() & ItemType::EquipmentMask) {
-    return getQualifierNameForItem(*this, CapabilityFlags::Equipment) +
-           getProto().Name;
+    return getQualifierNameForItem(*this, CapabilityFlags::Equipment) + Name;
   }
   if (getType().is(ItemType::CraftingBase | ItemType::Consumable)) {
-    return getQualifierNameForItem(*this, CapabilityFlags::UseOn) +
-           getProto().Name;
+    return getQualifierNameForItem(*this, CapabilityFlags::UseOn) + Name;
   }
-  return getProto().Name;
+  return Name;
 }
 
 std::string Item::getDescription() const {
-  // TODO make description depend on quality etc
+  if (Specialization && SpecOverrides) {
+    return Specialization->Description;
+  }
   return getProto().Description;
 }
 
 ItemType Item::getType() const {
   if (Specialization) {
+    if (SpecOverrides) {
+      return Specialization->Type;
+    }
     return getProto().Type | Specialization->Type;
   }
   return getProto().Type;
 }
 
-int Item::getMaxStackSize() const { return getProto().MaxStackSize; }
+int Item::getMaxStackSize() const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->MaxStackSize;
+  }
+  return getProto().MaxStackSize;
+}
 
 std::vector<EffectInfo> Item::getAllEffects() const {
   if (Specialization && SpecOverrides) {
@@ -110,6 +128,10 @@ bool Item::hasEffect(CapabilityFlags Flags, bool AllowNull,
 }
 
 CapabilityFlags Item::getCapabilityFlags() const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->getCapabilityFlags();
+  }
+
   auto Flags = getProto().getCapabilityFlags();
   if (Specialization) {
     Flags = Flags | Specialization->getCapabilityFlags();
