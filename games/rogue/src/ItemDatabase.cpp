@@ -411,6 +411,10 @@ int ItemDatabase::getItemId(const std::string &ItemName) const {
   return It->second;
 }
 
+const std::map<int, ItemPrototype> &ItemDatabase::getItemProtos() const {
+  return ItemProtos;
+}
+
 const ItemPrototype &ItemDatabase::getItemProto(int ItemId) const {
   const auto It = ItemProtos.find(ItemId);
   if (It == ItemProtos.end()) {

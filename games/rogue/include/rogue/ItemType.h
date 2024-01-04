@@ -137,6 +137,7 @@ public:
   bool operator!=(ValueType Other) const { return Value != Other; }
 
   const char *str() const;
+  std::string flagString() const;
 
 private:
   ValueType Value = None;

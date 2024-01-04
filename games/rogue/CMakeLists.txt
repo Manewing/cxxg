@@ -192,6 +192,14 @@ target_link_libraries(map_viewer
   lib${TARGET}
 )
 
+add_executable(loot_info
+  tools/loot_info.cpp
+)
+
+target_link_libraries(loot_info
+  lib${TARGET}
+)
+
 add_subdirectory(test)
 
 add_custom_target(

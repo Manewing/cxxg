@@ -18,6 +18,8 @@ public:
   int getNewItemId();
   int getItemId(const std::string &ItemName) const;
 
+  const std::map<int, ItemPrototype> &getItemProtos() const;
+
   const ItemPrototype &getItemProto(int ItemId) const;
   const ItemSpecializations *getItemSpec(int ItemId) const;
 
