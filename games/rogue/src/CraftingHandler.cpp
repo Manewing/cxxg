@@ -124,6 +124,8 @@ std::vector<EffectInfo> getAllEffects(const std::vector<Item> &Items,
   for (std::size_t Idx = 1; Idx < Items.size(); ++Idx) {
     auto &It = Items.at(Idx);
     for (const auto &Info : It.getAllEffects()) {
+      // We allow merging of ranged, adjacent and self effects here we check
+      // only that the main flag is set not the sub-flags for range, etc.
       if (Info.Attributes.Flags & Flags) {
         AllEffects.push_back(Info);
       }

@@ -7,6 +7,7 @@
 #include <rogue/ItemType.h>
 
 namespace rogue {
+class Item;
 class Inventory;
 class Equipment;
 class CraftingRecipe;
@@ -56,6 +57,7 @@ public:
   bool tryUseSkill(ItemType SlotType);
 
   /// Try using skill of item from equipment on target entity
+  void handleCanNotUseSkill(entt::entity TargetEt, Item const &It);
   bool tryUseSkillOnTarget(ItemType SlotType, entt::entity TargetEt);
 
   /// Auto equip items from inventory

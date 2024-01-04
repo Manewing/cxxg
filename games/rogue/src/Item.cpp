@@ -31,7 +31,7 @@ std::string getQualifierNameForItem(const Item &It, CapabilityFlags Flags) {
   // stat point boost
   std::size_t Hash = 0;
   for (const auto &ItEff : It.getAllEffects()) {
-    if (!(ItEff.Attributes.Flags & Flags)) {
+    if (!(ItEff.Attributes.Flags.is(Flags))) {
       continue;
     }
     if (dynamic_cast<const NullEffect *>(ItEff.Effect.get())) {

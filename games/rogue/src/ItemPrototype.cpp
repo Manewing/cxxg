@@ -33,7 +33,7 @@ EffectAttributes ItemPrototype::getAttributes() const {
 EffectAttributes ItemPrototype::getAttributes(CapabilityFlags Flags) const {
   EffectAttributes Attrs;
   for (const auto &Info : Effects) {
-    if (Info.Attributes.Flags & Flags) {
+    if (Info.Attributes.Flags.is(Flags)) {
       Attrs.addFrom(Info.Attributes);
     }
   }
@@ -43,7 +43,7 @@ EffectAttributes ItemPrototype::getAttributes(CapabilityFlags Flags) const {
 bool ItemPrototype::hasEffect(CapabilityFlags Flags, bool AllowNull,
                               bool AllowRemove) const {
   for (const auto &Info : Effects) {
-    if (!(Info.Attributes.Flags & Flags)) {
+    if (!(Info.Attributes.Flags.is(Flags))) {
       continue;
     }
     const bool IsNullEffect =
@@ -66,7 +66,7 @@ CapabilityFlags ItemPrototype::getCapabilityFlags() const {
 }
 
 bool ItemPrototype::checkCapabilityFlags(CapabilityFlags Flags) const {
-  return canApply(Type, Flags) && bool(Flags & getCapabilityFlags());
+  return canApply(Type, Flags) && bool(getCapabilityFlags().is(Flags));
 }
 
 bool ItemPrototype::canApplyTo(const entt::entity &SrcEt,
@@ -78,7 +78,7 @@ bool ItemPrototype::canApplyTo(const entt::entity &SrcEt,
   }
   bool CanApply = true;
   for (const auto &Info : Effects) {
-    if (Info.Attributes.Flags & Flags) {
+    if (Info.Attributes.Flags.is(Flags)) {
       CanApply = CanApply && Info.canApplyTo(SrcEt, DstEt, Reg, Flags);
     }
   }
@@ -97,7 +97,7 @@ void ItemPrototype::applyTo(const entt::entity &SrcEt,
     throw std::runtime_error(SS.str());
   }
   for (const auto &Info : Effects) {
-    if (Info.Attributes.Flags & Flags) {
+    if (Info.Attributes.Flags.is(Flags)) {
       Info.applyTo(SrcEt, DstEt, Reg, Flags);
     }
   }
@@ -112,7 +112,7 @@ bool ItemPrototype::canRemoveFrom(const entt::entity &SrcEt,
   }
   bool CanRemove = true;
   for (const auto &Info : Effects) {
-    if (Info.Attributes.Flags & Flags) {
+    if (Info.Attributes.Flags.is(Flags)) {
       CanRemove = CanRemove && Info.canRemoveFrom(SrcEt, DstEt, Reg, Flags);
     }
   }
@@ -130,7 +130,7 @@ void ItemPrototype::removeFrom(const entt::entity &SrcEt,
     throw std::runtime_error(SS.str());
   }
   for (const auto &Info : Effects) {
-    if (Info.Attributes.Flags & Flags) {
+    if (Info.Attributes.Flags.is(Flags)) {
       Info.removeFrom(SrcEt, DstEt, Reg, Flags);
     }
   }

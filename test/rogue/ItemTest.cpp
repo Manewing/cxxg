@@ -39,6 +39,39 @@ TEST_F(ItemTest, Properties) {
   EXPECT_EQ(Item.getMaxStackSize(), 1);
   EXPECT_EQ(Item.getAllEffects().size(), 0);
   EXPECT_EQ(Item.getCapabilityFlags(), rogue::CapabilityFlags::None);
+  EXPECT_FALSE(Item.hasEffect(rogue::CapabilityFlags::UseOn, true));
+}
+
+TEST_F(ItemTest, HasEffect) {
+  auto Proto = rogue::ItemPrototype(
+      1, "Test Item", "Test Description",
+      rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
+      {{{rogue::CapabilityFlags::Skill | rogue::CapabilityFlags::Self},
+        DummyEffComp0}});
+  auto Item = rogue::Item(Proto);
+
+  EXPECT_TRUE(Item.hasEffect(rogue::CapabilityFlags::Skill));
+  EXPECT_TRUE(Item.hasEffect(rogue::CapabilityFlags::Skill |
+                             rogue::CapabilityFlags::Self));
+  EXPECT_FALSE(Item.hasEffect(rogue::CapabilityFlags::Skill |
+                              rogue::CapabilityFlags::Adjacent));
+
+  Proto = rogue::ItemPrototype(
+      1, "Test Item", "Test Description",
+      rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
+      {{{rogue::CapabilityFlags::Skill | rogue::CapabilityFlags::Self},
+        DummyEffComp0},
+       {{rogue::CapabilityFlags::Skill | rogue::CapabilityFlags::Adjacent},
+        DummyEffComp0}});
+  Item = rogue::Item(Proto);
+
+  EXPECT_TRUE(Item.hasEffect(rogue::CapabilityFlags::Skill));
+  EXPECT_TRUE(Item.hasEffect(rogue::CapabilityFlags::Skill |
+                             rogue::CapabilityFlags::Self));
+  EXPECT_TRUE(Item.hasEffect(rogue::CapabilityFlags::Skill |
+                             rogue::CapabilityFlags::Adjacent));
+  EXPECT_FALSE(Item.hasEffect(rogue::CapabilityFlags::Skill |
+                              rogue::CapabilityFlags::Ranged));
 }
 
 TEST_F(ItemTest, Specialization) {
@@ -60,6 +93,8 @@ TEST_F(ItemTest, Specialization) {
   EXPECT_EQ(Item.getAllEffects().size(), 2);
   EXPECT_EQ(Item.getCapabilityFlags(),
             rogue::CapabilityFlags::Equipment | rogue::CapabilityFlags::UseOn);
+  EXPECT_TRUE(Item.hasEffect(rogue::CapabilityFlags::Equipment, true));
+  EXPECT_TRUE(Item.hasEffect(rogue::CapabilityFlags::UseOn, true));
 }
 
 TEST_F(ItemTest, SpecializationOverrides) {
@@ -80,6 +115,8 @@ TEST_F(ItemTest, SpecializationOverrides) {
   EXPECT_EQ(Item.getMaxStackSize(), 99);
   EXPECT_EQ(Item.getAllEffects().size(), 1);
   EXPECT_EQ(Item.getCapabilityFlags(), rogue::CapabilityFlags::Equipment);
+  EXPECT_TRUE(Item.hasEffect(rogue::CapabilityFlags::Equipment, true));
+  EXPECT_FALSE(Item.hasEffect(rogue::CapabilityFlags::UseOn, true));
 }
 
 TEST_F(ItemTest, CanApplyTo) {

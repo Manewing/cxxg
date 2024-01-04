@@ -127,6 +127,9 @@ public:
     return Value != Other.Value;
   }
 
+  /// Returns true if all flags set in other are also set in this
+  bool is(CapabilityFlags Other) const;
+
   /// Checks if both adjacent and \p Other flags are set
   bool isAdjacent(CapabilityFlags Other) const;
 

@@ -164,30 +164,72 @@ bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
   if (!Inv || !Reg.valid(TargetEt)) {
     return false;
   }
-
-  auto ItOrNone = Inv->applyItemTo(InvItemIdx, CapabilityFlags::UseOn, Entity,
-                                   TargetEt, Reg);
-  if (ItOrNone) {
-    // FIXME add information on result of use
-    if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
-      publish(PlayerInfoMessageEvent() << "Used " + ItOrNone->getName() +
-                                              " on " +
-                                              getNameOrNone(Reg, TargetEt));
+  const auto &It = Inv->getItem(InvItemIdx);
+  if (!It.hasEffect(CapabilityFlags::UseOn)) {
+    if (IsPlayer) {
+      publish(PlayerInfoMessageEvent()
+              << It.getName() << " does not have a use effect");
     }
-    return true;
+    return false;
   }
+
+  const auto FlagsSelf = CapabilityFlags::UseOn | CapabilityFlags::Self;
+  const auto FlagsAdj = CapabilityFlags::UseOn | CapabilityFlags::Adjacent;
+  const auto FlagsRanged = CapabilityFlags::UseOn | CapabilityFlags::Ranged;
+
+  if (Entity != TargetEt && !It.canApplyTo(Entity, TargetEt, Reg, FlagsAdj) &&
+      !It.canApplyTo(Entity, TargetEt, Reg, FlagsRanged)) {
+    if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
+      std::stringstream SS;
+      SS << "Can not use " << It.getName() << " on "
+         << getNameOrNone(Reg, TargetEt);
+      publish(PlayerInfoMessageEvent() << SS.str());
+    }
+    return false;
+  }
+
+  if (!It.canApplyTo(Entity, TargetEt, Reg, CapabilityFlags::UseOn)) {
+    if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
+      std::stringstream SS;
+      SS << "Can not use " << It.getName() << " on "
+         << getNameOrNone(Reg, TargetEt);
+      publish(PlayerInfoMessageEvent() << SS.str());
+    }
+    return false;
+  }
+
+  It.applyTo(Entity, Entity, Reg, FlagsSelf);
+  It.applyTo(Entity, TargetEt, Reg, FlagsAdj);
+  It.applyTo(Entity, TargetEt, Reg, FlagsRanged);
+
+  Inv->takeItem(InvItemIdx, /*Count=*/1);
 
   if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
-    publish(PlayerInfoMessageEvent()
-            << "Can not use " + Inv->getItem(InvItemIdx).getName() + " on " +
-                   getNameOrNone(Reg, TargetEt));
+    std::stringstream SS;
+    SS << "Used " << It.getName() << " on " << getNameOrNone(Reg, TargetEt);
+    publish(PlayerInfoMessageEvent() << SS.str());
   }
 
-  return false;
+  return true;
 }
 
 bool InventoryHandler::tryUseSkill(ItemType SlotType) {
   return tryUseSkillOnTarget(SlotType, Entity);
+}
+
+void InventoryHandler::handleCanNotUseSkill(entt::entity TargetEt,
+                                            Item const &It) {
+  if (IsPlayer) {
+    std::stringstream SS;
+    SS << "Can not use skill ";
+    for (const auto &Info : It.getAllEffects()) {
+      if (Info.Attributes.Flags.is(CapabilityFlags::Skill)) {
+        SS << Info.Effect->getName() << " ";
+      }
+    }
+    SS << "of " << It.getName() << " on " << getNameOrNone(Reg, TargetEt);
+    publish(PlayerInfoMessageEvent() << SS.str());
+  }
 }
 
 bool InventoryHandler::tryUseSkillOnTarget(ItemType SlotType,
@@ -203,6 +245,10 @@ bool InventoryHandler::tryUseSkillOnTarget(ItemType SlotType,
   }
   const auto &It = *Slot.It;
 
+  const auto FlagsSelf = CapabilityFlags::Skill | CapabilityFlags::Self;
+  const auto FlagsAdj = CapabilityFlags::Skill | CapabilityFlags::Adjacent;
+  const auto FlagsRanged = CapabilityFlags::Skill | CapabilityFlags::Ranged;
+
   if (!It.hasEffect(CapabilityFlags::Skill)) {
     std::stringstream SS;
     SS << It.getName() << " does not have a skill";
@@ -210,28 +256,28 @@ bool InventoryHandler::tryUseSkillOnTarget(ItemType SlotType,
     return false;
   }
 
-  if (!It.canApplyTo(Entity, TargetEt, Reg, CapabilityFlags::Skill)) {
-    if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
-      std::stringstream SS;
-      SS << "Can not use skill ";
-      for (const auto &Info : It.getAllEffects()) {
-        if (Info.Attributes.Flags & CapabilityFlags::Skill) {
-          SS << Info.Effect->getName() << " ";
-        }
-      }
-      SS << "of " << It.getName() << " on " << getNameOrNone(Reg, TargetEt);
-      publish(PlayerInfoMessageEvent() << SS.str());
-    }
+  // If there is another target check ranged flags
+  if (Entity != TargetEt && !It.canApplyTo(Entity, TargetEt, Reg, FlagsAdj) &&
+      !It.canApplyTo(Entity, TargetEt, Reg, FlagsRanged)) {
+    handleCanNotUseSkill(TargetEt, It);
     return false;
   }
 
-  It.applyTo(Entity, TargetEt, Reg, CapabilityFlags::Skill);
+  // Check overall use of skill
+  if (!It.canApplyTo(Entity, TargetEt, Reg, CapabilityFlags::Skill)) {
+    handleCanNotUseSkill(TargetEt, It);
+    return false;
+  }
+
+  It.applyTo(Entity, Entity, Reg, FlagsSelf);
+  It.applyTo(Entity, TargetEt, Reg, FlagsAdj);
+  It.applyTo(Entity, TargetEt, Reg, FlagsRanged);
 
   if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
     std::stringstream SS;
     SS << "Used skill ";
     for (const auto &Info : It.getAllEffects()) {
-      if (Info.Attributes.Flags & CapabilityFlags::Skill) {
+      if (Info.Attributes.Flags.is(CapabilityFlags::Skill)) {
         SS << Info.Effect->getName() << " ";
       }
     }

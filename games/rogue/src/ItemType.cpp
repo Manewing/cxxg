@@ -241,6 +241,10 @@ CapabilityFlags::operator bool() const {
   return (Value & ~(Self | Ranged | Adjacent)) != None;
 }
 
+bool CapabilityFlags::is(CapabilityFlags Other) const {
+  return (Value & Other) == Other;
+}
+
 bool CapabilityFlags::isAdjacent(CapabilityFlags Other) const {
   return (Value & (Adjacent | Other)) == (Adjacent | Other);
 }
