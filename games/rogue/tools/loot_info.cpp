@@ -33,23 +33,29 @@ void dumpLootTableRewards(const rogue::ItemDatabase &ItemDb,
   }
   std::sort(SortedCounts.begin(), SortedCounts.end(), std::greater<>());
 
+  std::cout << "{\n'item_rewards': [" << std::endl;
+  const char *Pred = "  ";
   for (auto &[Count, ItId] : SortedCounts) {
     auto Occurrences = ItemIdOccurrences.at(ItId);
     auto PercentagePerDrop = static_cast<double>(Occurrences) / Rolls * 100.0;
     auto CountPerDrop = static_cast<double>(Count) / Occurrences;
     auto AverageCountPerDrop = static_cast<double>(Count) / Rolls;
-    std::cout << std::left << std::fixed << "Count=" << std::setw(6) << Count
-              << " Name=" << std::setw(40)
+    std::cout << std::left << std::fixed << Pred
+              << "{ 'count': " << std::setw(6) << Count
+              << ", 'name':" << std::setw(40)
               << ("'" + ItemDb.getItemProto(ItId).Name + "'")
-              << " PPDrop=" << std::setw(5) << std::setprecision(2)
-              << PercentagePerDrop << "   OC=" << std::setw(6) << Occurrences
-              << " CPDrop=" << std::setw(4) << std::setprecision(2)
-              << CountPerDrop << " ACPDrop=" << std::setw(4)
+              << ", 'pp_drop': " << std::setw(5) << std::setprecision(2)
+              << PercentagePerDrop << " ,'oc':" << std::setw(6) << Occurrences
+              << ", 'cp_drop':" << std::setw(4) << std::setprecision(2)
+              << CountPerDrop << ", 'ac_drop':" << std::setw(4)
               << std::setprecision(2) << AverageCountPerDrop << std::endl;
+    Pred = "},";
   }
+  std::cout << "}]," << std::endl;
 
-  std::cout << "\nTotal: " << Total << std::endl
-            << "Rolls: " << Rolls << std::endl;
+  std::cout << "'total': " << Total << ", " << std::endl
+            << "'rolls': " << Rolls << std::endl
+            << "}" << std::endl;
 }
 
 int handleLootTable(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
