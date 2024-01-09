@@ -63,6 +63,7 @@ public:
   void reset(unsigned NumRolls, const std::vector<LootSlot> &Slots,
              bool PickAndReturn = false);
 
+  inline unsigned getRolls() const { return NumRolls; }
   const std::vector<LootSlot> &getSlots() const;
   const std::vector<LootSlot> &getGuaranteedSlots() const;
 

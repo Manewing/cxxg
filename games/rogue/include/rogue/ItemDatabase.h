@@ -33,6 +33,7 @@ public:
 
   LootTable &addLootTable(const std::string &Name);
   const std::shared_ptr<LootTable> &getLootTable(const std::string &Name) const;
+  const std::map<std::string, std::shared_ptr<LootTable>> &getLootTables() const;
 
 private:
   int MaxItemId = 0;

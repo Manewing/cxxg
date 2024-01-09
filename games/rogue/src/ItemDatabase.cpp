@@ -516,4 +516,9 @@ ItemDatabase::getLootTable(const std::string &Name) const {
   return It->second;
 }
 
+const std::map<std::string, std::shared_ptr<LootTable>> &
+ItemDatabase::getLootTables() const {
+  return LootTables;
+}
+
 } // namespace rogue
