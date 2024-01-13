@@ -57,14 +57,15 @@ class SchemaProcessor:
         for schema in self.schemas:
             self.schemas_by_id[schema.schema_id] = schema
 
-    def resolve_all(self) -> None:
+    def resolve_all(self, remove_keys: bool = True) -> None:
         """
         Resolves references for all schemas.
         """
         for schema in self.schemas:
             self.resolve(schema)
-        for schema in self.schemas:
-            self.remove_ref_keys(schema)
+        if remove_keys:
+            for schema in self.schemas:
+                self.remove_ref_keys(schema)
 
     def resolve(self, schema: Schema) -> None:
         """

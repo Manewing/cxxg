@@ -40,7 +40,7 @@ def main(argv: List[str]) -> int:
 
     # Resolve all references
     schema_processor = SchemaProcessor(schemas)
-    schema_processor.resolve_all()
+    schema_processor.resolve_all(remove_keys=False)
 
     ref = schema_processor.resolve_external_ref(None, args.path)
 

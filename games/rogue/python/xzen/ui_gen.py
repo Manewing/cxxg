@@ -74,6 +74,38 @@ class BaseGeneratedEditor(BaseInterface):
         self._on_change_handlers.append(handler)
 
 
+class GenerateConstEditor(BaseGeneratedEditor):
+    def __init__(
+        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+    ):
+        super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
+        self.value = obj["const"]
+
+    def get_value(self) -> Any:
+        return self.value
+
+    def set_value(
+        self, value: Any, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        if value != self.value:
+            raise ValueError(f"Invalid const value: {value}")
+        self.value = value
+        super().set_value(value, trigger_handlers, update_ui)
+
+    def update_ui(self) -> None:
+        self.w.text.update(f"{self.title:s} {self.value}")
+
+    def get_row(self) -> List[sg.Element]:
+        row = [
+            sg.Text(
+                f"{self.title:s}: {self.value}",
+                tooltip=self.description,
+                key=self.k.text,
+            ),
+        ]
+        return row
+
+
 class GeneratedEnumEditor(BaseGeneratedEditor):
     def __init__(
         self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
@@ -142,12 +174,13 @@ class GeneratedInputEditor(BaseGeneratedEditor):
 
     def get_row(self) -> List[sg.Element]:
         row = [
-            sg.Text(self.title, tooltip=self.description),
+            sg.Text(f"{self.title}: ", tooltip=self.description),
             sg.InputText(
                 default_text=str(self.value),
                 enable_events=True,
                 key=self.k.text,
                 tooltip=self.description,
+                expand_x=True,
             ),
         ]
         self.register_event(self.k.text)
@@ -156,10 +189,52 @@ class GeneratedInputEditor(BaseGeneratedEditor):
     def handle_event(self, event: str, values: dict) -> bool:
         if event == self.k.text:
             value = values[self.k.text]
-            if value:
+            try:
                 value = self.get_type(self.value_type)(value)
-            else:
+            except ValueError:
                 value = self.get_type(self.value_type)()
+            self.set_value(value, trigger_handlers=True, update_ui=False)
+            return True
+        return False
+
+
+class GeneratedCheckboxEditor(BaseGeneratedEditor):
+    def __init__(
+        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+    ):
+        super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
+        self.value = obj.get("default", False)
+
+    def get_value(self) -> Any:
+        return self.value
+
+    def set_value(
+        self, value: bool, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        if not isinstance(value, bool):
+            raise ValueError(f"Expected bool, got: {value}")
+        self.value = value
+        super().set_value(value, trigger_handlers, update_ui)
+
+    def update_ui(self) -> None:
+        self.w.checkbox.update(self.value)
+
+    def get_row(self) -> List[sg.Element]:
+        row = [
+            sg.Checkbox(
+                self.title,
+                default=self.value,
+                enable_events=True,
+                key=self.k.checkbox,
+                tooltip=self.description,
+            ),
+        ]
+        self.register_event(self.k.checkbox)
+        return row
+
+    def handle_event(self, event: str, values: dict) -> bool:
+        if event == self.k.checkbox:
+            value = values[self.k.checkbox]
             self.set_value(value, trigger_handlers=True, update_ui=False)
             return True
         return False
@@ -222,15 +297,19 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
         self.set_value(obj, trigger_handlers=True, update_ui=False)
 
     def get_row(self) -> List[sg.Element]:
-        layout = []
+        if self.description:
+            layout = [
+                [sg.Text(self.description, size=(40, None))],
+                [sg.HSep(pad=(None, 20))],
+            ]
+        else:
+            layout = []
         editors = [v for _, v in sorted(self.property_editors.items())]
         for editor in editors:
             layout += [editor.get_row()]
         return [
             sg.Frame(
-                self.title,
-                [[sg.Column(layout)]],
-                tooltip=self.description,
+                self.title, [[sg.Column(layout, expand_x=True)]], expand_x=True
             )
         ]
 
@@ -272,18 +351,27 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         return f"[{idx}]: {title}"
 
     def get_row(self) -> List[sg.Element]:
+        toolbar = [
+            sg.Text("Search:"),
+            sg.InputText(
+                "", expand_x=True, key=self.k.search, tooltip="Search"
+            ),
+            sg.Button("+", key=self.k.add_item, tooltip="Add item"),
+            sg.Button("-", key=self.k.rm_item, tooltip="Remove item"),
+        ]
         layout = [
+            toolbar,
             [
-                sg.Button("+", key=self.k.add_item),
-                sg.Button("-", key=self.k.rm_item),
                 sg.Listbox(
                     values=[],
                     enable_events=True,
                     size=(40, 10),
                     key=self.k.listbox,
+                    tooltip=self.description,
+                    expand_x=True,
                 ),
             ],
-            [sg.HSep()],
+            [sg.HSep(pad=(None, 20))],
             self.item_editor.get_row(),
         ]
         row = [
@@ -333,9 +421,94 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             self.values.pop(self.selected_idx)
             new_idx = min(self.selected_idx, len(self.values) - 1)
             self._update_selected_idx(new_idx)
-            self.set_value(
-                self.values, trigger_handlers=True, update_ui=True
+            self.set_value(self.values, trigger_handlers=True, update_ui=True)
+            return True
+        return False
+
+
+class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
+    def __init__(
+        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+    ):
+        super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
+        self.any_of = obj.get("anyOf")
+
+        self.editors: Dict[str, GeneratedObjectEditor] = {}
+        for obj in self.any_of:
+            typed_info = obj["properties"]["type"]["const"]
+            self.editors[typed_info] = GeneratedObjectEditor(
+                typed_info, obj, self, prefix=f"{prefix:s}_{key:s}"
             )
+            self.editors[typed_info].register_on_change_handler(
+                partial(self._on_editor_changed, typed_info)
+            )
+        self.selected_type = list(self.editors.keys())[1]
+
+    def get_types(self) -> List[str]:
+        return list(self.editors.keys())
+
+    def get_value(self) -> Any:
+        return self.editors[self.selected_type].get_value()
+
+    def set_value(
+        self, value: Any, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        if not isinstance(value, dict):
+            raise ValueError(f"Expected dict, got: {value}")
+        if "type" not in value:
+            raise ValueError(f"Expected 'type' in dict, got: {value}")
+        if value["type"] not in self.editors:
+            raise ValueError(f"Invalid type: {value['type']}")
+        self.selected_type = value["type"]
+        self.editors[self.selected_type].set_value(
+            value, trigger_handlers=False, update_ui=update_ui
+        )
+        super().set_value(value, trigger_handlers, update_ui)
+
+        for typed_info in self.editors:
+            enabled = typed_info == self.selected_type
+            self.w.get(typed_info).update(visible=enabled)
+
+    def _on_editor_changed(self, typed_info: str, value: Any) -> None:
+        self.set_value(value, trigger_handlers=True, update_ui=False)
+
+    def update_ui(self) -> None:
+        self.w.combo.update(self.selected_type)
+        self.editors[self.selected_type].update_ui()
+
+    def get_row(self) -> List[sg.Element]:
+        layout = [
+            [
+                sg.Text("Any Of", tooltip=self.description),
+                sg.Combo(
+                    self.get_types(),
+                    default_value=self.selected_type,
+                    enable_events=True,
+                    readonly=True,
+                    key=self.k.combo,
+                    tooltip=self.description,
+                ),
+            ],
+            [sg.HSep(pad=(None, 20))],
+        ]
+        for typed_info, editor in self.editors.items():
+            enabled = typed_info == self.selected_type
+            container = sg.Column(
+                [editor.get_row()],
+                visible=enabled,
+                key=self.k.get(typed_info),
+                expand_x=True,
+            )
+            layout += [[sg.pin(container)]]
+
+        self.register_event(self.k.combo)
+        return [sg.Column(layout, expand_x=True)]
+
+    def handle_event(self, event: str, values: dict) -> bool:
+        if event == self.k.combo:
+            self.selected_type = values[self.k.combo]
+            value = self.get_value()
+            self.set_value(value, trigger_handlers=True, update_ui=False)
             return True
         return False
 
@@ -350,6 +523,26 @@ def create_string_editor_interface(
     return GeneratedInputEditor(key, obj, parent, prefix)
 
 
+def _create_typed_editor_interface(
+    obj_type: str,
+    key: str,
+    obj: Dict[str, Any],
+    parent: BaseInterface,
+    prefix: str = "",
+) -> BaseGeneratedEditor:
+    handlers = {
+        "string": create_string_editor_interface,
+        "integer": GeneratedInputEditor,
+        "number": GeneratedInputEditor,
+        "object": GeneratedObjectEditor,
+        "array": GeneratedArrayEditor,
+        "boolean": GeneratedCheckboxEditor,
+    }
+    if obj_type not in handlers:
+        raise ValueError(f"/{prefix}/{key}: Unsupported type: {obj_type}")
+    return handlers[obj_type](key, obj, parent, prefix)
+
+
 def create_editor_interface(
     key: Any, obj: Any, parent: BaseInterface, prefix: str = ""
 ) -> BaseGeneratedEditor:
@@ -357,19 +550,24 @@ def create_editor_interface(
         raise ValueError(f"/{prefix}/{key}: Expected str, got: {key}")
     if not isinstance(obj, dict):
         raise ValueError(f"/{prefix}/{key}: Expected dict, got: {obj}")
+
+    if "const" in obj:
+        return GenerateConstEditor(key, obj, parent, prefix)
+
     obj_type = obj.get("type")
-    if not obj_type:
-        raise ValueError(f"Expected type in object, got: {obj_type}")
-    handlers = {
-        "string": create_string_editor_interface,
-        "integer": GeneratedInputEditor,
-        "number": GeneratedInputEditor,
-        "object": GeneratedObjectEditor,
-        "array": GeneratedArrayEditor,
-    }
-    if obj_type not in handlers:
-        raise ValueError(f"/{prefix}/{key}: Unsupported type: {obj_type}")
-    return handlers[obj_type](key, obj, parent, prefix)
+    if obj_type:
+        return _create_typed_editor_interface(
+            obj_type, key, obj, parent, prefix
+        )
+
+    any_of = obj.get("anyOf")
+    if any_of:
+        return TypedAnyOfGeneratedEditor(key, obj, parent, prefix)
+
+    kws = ["type", "anyOf"]
+    raise ValueError(
+        f"/{prefix}/{key}: Expected one of the keywords {kws} in object, got: {obj}"
+    )
 
 
 class GeneratedJsonEditor(BaseWindow):
