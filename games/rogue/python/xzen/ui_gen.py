@@ -4,7 +4,7 @@ import abc
 import json
 import PySimpleGUI as sg
 from functools import partial
-from typing import List, Any, Dict, Type, Callable, Optional
+from typing import List, Any, Dict, Type, Callable, Optional, Tuple
 
 from xzen.schema import Schema
 from xzen.schema import SchemaProcessor
@@ -386,6 +386,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self.item_editor.register_on_change_handler(self._update_item)
         self.values: List[Any] = []
         self.selected_idx = 0
+        self.filter = ""
 
     def get_value(self) -> List[Any]:
         return self.values
@@ -399,12 +400,27 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self._update_selected_idx(self.selected_idx)
         super().set_value(value, trigger_handlers, update_ui)
 
+    def _get_filtered_values(self) -> List[Tuple[int, str, Any]]:
+        values = [
+            (idx, self.get_item_text(idx, x), x)
+            for idx, x in enumerate(self.values)
+        ]
+        return [
+            (idx, text, value)
+            for idx, text, value in values
+            if self.filter in text
+        ]
+
     def update_ui(self) -> None:
-        self.w.listbox.update(
-            [self.get_item_text(idx, x) for idx, x in enumerate(self.values)]
-        )
-        if self.selected_idx < len(self.values):
-            self.w.listbox.update(set_to_index=[self.selected_idx])
+        values = self._get_filtered_values()
+        self.w.listbox.update([x for _, x, _ in values])
+        if self.selected_idx >= len(values):
+            self.selected_idx = len(values) - 1 if len(values) else 0
+        if self.selected_idx < len(values):
+            self.w.listbox.update(
+                set_to_index=[self.selected_idx],
+                scroll_to_index=self.selected_idx,
+            )
 
     def get_item_text(self, idx: int, item: Any) -> str:
         if isinstance(item, (str, int, float, bool)):
@@ -416,7 +432,11 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         toolbar = [
             sg.Text("Search:"),
             sg.InputText(
-                "", expand_x=True, key=self.k.search, tooltip="Search"
+                "",
+                expand_x=True,
+                key=self.k.search,
+                enable_events=True,
+                tooltip="Search",
             ),
             sg.Button("+", key=self.k.add_item, tooltip="Add item"),
             sg.Button("-", key=self.k.rm_item, tooltip="Remove item"),
@@ -449,6 +469,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self.register_event(self.k.rm_item)
         self.register_event(self.k.move_up)
         self.register_event(self.k.move_down)
+        self.register_event(self.k.search)
         return row
 
     def _update_item(self, value: Any) -> None:
@@ -458,58 +479,73 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self.set_value(self.values, trigger_handlers=True, update_ui=True)
 
     def _update_selected_idx(self, idx: int) -> None:
-        if idx >= len(self.values) or idx < 0:
-            self.selected_idx = 0
-            return
+        values = self._get_filtered_values()
+        if idx >= len(values):
+            idx = len(values) - 1
+        if idx < 0:
+            idx = 0
         self.selected_idx = idx
+        if not values:
+            return
         self.item_editor.set_value(
-            self.values[self.selected_idx],
+            values[self.selected_idx][2],
             trigger_handlers=False,
             update_ui=True,
         )
 
     def handle_event(self, event: str, values: dict) -> bool:
+        filt_values = self._get_filtered_values()
+        if filt_values:
+            real_idx = filt_values[self.selected_idx][0]
+        else:
+            real_idx = 0
+
         if event == self.k.listbox:
             self._update_selected_idx(self.w.listbox.get_indexes()[0])
             return True
         if event == self.k.add_item:
-            value = self.values + [self.item_editor.get_value()]
-            self.selected_idx = len(value) - 1
+            new_values = self.values + [self.item_editor.get_value()]
+            self.selected_idx = len(new_values) - 1
             self.set_value(
-                value,
+                new_values,
                 trigger_handlers=True,
                 update_ui=True,
             )
             return True
         if event == self.k.rm_item:
-            if not self.values or self.selected_idx >= len(self.values):
+            if not filt_values or self.selected_idx >= len(filt_values):
                 return True
-            self.values.pop(self.selected_idx)
-            new_idx = min(self.selected_idx, len(self.values) - 1)
+            self.values.pop(real_idx)
+            new_idx = max(self.selected_idx, len(filt_values) - 1)
             self._update_selected_idx(new_idx)
             self.set_value(self.values, trigger_handlers=True, update_ui=True)
             return True
         if event == self.k.move_up:
-            if self.selected_idx <= 0:
+            if real_idx <= 0:
                 return True
-            i = self.selected_idx
-            self.values[i - 1], self.values[i] = (
-                self.values[i],
-                self.values[i - 1],
+            self.values[real_idx - 1], self.values[real_idx] = (
+                self.values[real_idx],
+                self.values[real_idx - 1],
             )
-            self._update_selected_idx(i - 1)
+            if (real_idx - 1) in [x[0] for x in filt_values]:
+                self._update_selected_idx(self.selected_idx - 1)
             self.set_value(self.values, trigger_handlers=True, update_ui=True)
             return True
         if event == self.k.move_down:
-            if self.selected_idx >= len(self.values) - 1:
+            if real_idx >= len(self.values) - 1:
                 return True
-            i = self.selected_idx
-            self.values[i + 1], self.values[i] = (
-                self.values[i],
-                self.values[i + 1],
+            self.values[real_idx + 1], self.values[real_idx] = (
+                self.values[real_idx],
+                self.values[real_idx + 1],
             )
-            self._update_selected_idx(i + 1)
+            if (real_idx + 1) in [x[0] for x in filt_values]:
+                self._update_selected_idx(self.selected_idx + 1)
             self.set_value(self.values, trigger_handlers=True, update_ui=True)
+            return True
+        if event == self.k.search:
+            self.filter = values[self.k.search]
+            self.update_ui()
+            self._update_selected_idx(self.selected_idx)
             return True
         return False
 
