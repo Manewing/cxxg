@@ -43,7 +43,7 @@ class BaseGeneratedEditor(BaseInterface):
         self.title = title
         self.obj = obj
         self.description = obj.get("description")
-        self._on_change_handlers: List[Callable[[Any], None]] = []
+        self._on_change_handlers: List[Callable[[Any, bool, bool], None]] = []
 
     def is_required(self) -> bool:
         if self.obj.get("required", False):
@@ -75,7 +75,7 @@ class BaseGeneratedEditor(BaseInterface):
 
         if trigger_handlers:
             for handler in self._on_change_handlers:
-                handler(value)
+                handler(value, trigger_handlers, update_ui)
 
     @abc.abstractmethod
     def update_ui(self) -> None:
@@ -96,7 +96,7 @@ class BaseGeneratedEditor(BaseInterface):
         return type_map[obj_type]
 
     def register_on_change_handler(
-        self, handler: Callable[[Any], None]
+        self, handler: Callable[[Any, bool, bool], None]
     ) -> None:
         self._on_change_handlers.append(handler)
 
@@ -340,17 +340,20 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
             editor.restore_default(trigger_handlers=False, update_ui=False)
         for key, value in obj.items():
             editor = self.property_editors[key]
-            editor.set_value(value, trigger_handlers=False, update_ui=False)
-        super().set_value(obj, trigger_handlers, update_ui=update_ui)
+            editor.set_value(value, trigger_handlers=False, update_ui=update_ui)
+        super().set_value(obj, trigger_handlers, update_ui=False)
 
     def update_ui(self) -> None:
         for editor in self.property_editors.values():
             editor.update_ui()
 
-    def _update_property(self, key: str, value: Any) -> None:
+    def _update_property(
+        self, key: str, value: Any, trigger_handlers: bool, update_ui: bool
+    ) -> None:
         obj = self.get_value()
         obj[key] = value
-        self.set_value(obj, trigger_handlers=True, update_ui=False)
+        # Do not propagate update_ui we are reacting to a child update
+        self.set_value(obj, trigger_handlers=trigger_handlers, update_ui=False)
 
     def get_row(self) -> List[sg.Element]:
         if self.description:
@@ -392,12 +395,12 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         return self.values
 
     def set_value(
-        self, value: str, trigger_handlers: bool, update_ui: bool
+        self, value: Any, trigger_handlers: bool, update_ui: bool
     ) -> None:
         if not isinstance(value, list):
             raise ValueError(f"Expected list, got: {value}")
         self.values = value
-        self._update_selected_idx(self.selected_idx)
+        self._update_selected_idx(self.selected_idx, update_ui)
         super().set_value(value, trigger_handlers, update_ui)
 
     def _get_filtered_values(self) -> List[Tuple[int, str, Any]]:
@@ -422,7 +425,8 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
                 scroll_to_index=self.selected_idx,
             )
 
-    def get_item_text(self, idx: int, item: Any) -> str:
+    def get_item_text(self, idx: int) -> str:
+        item = self.values[idx]
         if isinstance(item, (str, int, float, bool)):
             return f"[{idx}]: {item}"
         title = self.item_editor.title
@@ -440,8 +444,8 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             ),
             sg.Button("+", key=self.k.add_item, tooltip="Add item"),
             sg.Button("-", key=self.k.rm_item, tooltip="Remove item"),
-            sg.Button("^", key=self.k.move_up, tooltip="Move up"),
-            sg.Button("v", key=self.k.move_down, tooltip="Move down"),
+            sg.Button("↑", key=self.k.move_up, tooltip="Move up"),
+            sg.Button("↓", key=self.k.move_down, tooltip="Move down"),
         ]
         layout = [
             toolbar,
@@ -472,13 +476,23 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self.register_event(self.k.search)
         return row
 
-    def _update_item(self, value: Any) -> None:
-        if self.selected_idx >= len(self.values):
+    def _update_item(
+        self, value: Any, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        filt_values = self._get_filtered_values()
+        if filt_values:
+            real_idx = filt_values[self.selected_idx][0]
+        else:
+            real_idx = 0
+        if real_idx >= len(self.values):
             return
-        self.values[self.selected_idx] = value
-        self.set_value(self.values, trigger_handlers=True, update_ui=True)
+        self.values[real_idx] = value
+        self.set_value(
+            self.values, trigger_handlers=trigger_handlers, update_ui=False
+        )
+        self.update_ui()
 
-    def _update_selected_idx(self, idx: int) -> None:
+    def _update_selected_idx(self, idx: int, update_ui: bool) -> None:
         values = self._get_filtered_values()
         if idx >= len(values):
             idx = len(values) - 1
@@ -490,7 +504,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self.item_editor.set_value(
             values[self.selected_idx][2],
             trigger_handlers=False,
-            update_ui=True,
+            update_ui=update_ui,
         )
 
     def handle_event(self, event: str, values: dict) -> bool:
@@ -501,7 +515,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             real_idx = 0
 
         if event == self.k.listbox:
-            self._update_selected_idx(self.w.listbox.get_indexes()[0])
+            self._update_selected_idx(self.w.listbox.get_indexes()[0], True)
             return True
         if event == self.k.add_item:
             new_values = self.values + [self.item_editor.get_value()]
@@ -517,7 +531,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
                 return True
             self.values.pop(real_idx)
             new_idx = max(self.selected_idx, len(filt_values) - 1)
-            self._update_selected_idx(new_idx)
+            self._update_selected_idx(new_idx, True)
             self.set_value(self.values, trigger_handlers=True, update_ui=True)
             return True
         if event == self.k.move_up:
@@ -528,7 +542,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
                 self.values[real_idx - 1],
             )
             if (real_idx - 1) in [x[0] for x in filt_values]:
-                self._update_selected_idx(self.selected_idx - 1)
+                self._update_selected_idx(self.selected_idx - 1, True)
             self.set_value(self.values, trigger_handlers=True, update_ui=True)
             return True
         if event == self.k.move_down:
@@ -539,13 +553,13 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
                 self.values[real_idx + 1],
             )
             if (real_idx + 1) in [x[0] for x in filt_values]:
-                self._update_selected_idx(self.selected_idx + 1)
+                self._update_selected_idx(self.selected_idx + 1, True)
             self.set_value(self.values, trigger_handlers=True, update_ui=True)
             return True
         if event == self.k.search:
             self.filter = values[self.k.search]
             self.update_ui()
-            self._update_selected_idx(self.selected_idx)
+            self._update_selected_idx(self.selected_idx, True)
             return True
         return False
 
@@ -598,8 +612,16 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
             enabled = typed_info == self.selected_type
             self.w.get(typed_info).update(visible=enabled)
 
-    def _on_editor_changed(self, typed_info: str, value: Any) -> None:
-        self.set_value(value, trigger_handlers=True, update_ui=False)
+    def _on_editor_changed(
+        self,
+        typed_info: str,
+        value: Any,
+        trigger_handlers: bool,
+        update_ui: bool,
+    ) -> None:
+        self.set_value(
+            value, trigger_handlers=trigger_handlers, update_ui=update_ui
+        )
 
     def update_ui(self) -> None:
         self.w.combo.update(self.selected_type)

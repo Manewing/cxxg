@@ -4,7 +4,7 @@ import sys
 import abc
 import matplotlib
 import PySimpleGUI as sg
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Callable, Tuple, Any
 
 
 class KeyGenGenerator:
@@ -68,6 +68,196 @@ class BaseInterface(abc.ABC):
         if self.parent is not None:
             return self.parent.get_window()
         raise ValueError("Parent not initialized")
+
+
+class ListEditorBase(BaseInterface):
+    def __init__(
+        self,
+        select_cb: Callable[[int], None],
+        parent: Optional["BaseInterface"] = None,
+        prefix: str = "",
+        modifiable: bool = True,
+        orderable: bool = True,
+        description: Optional[str] = None,
+        values: Optional[List[str]] = None,
+        size: Tuple[Optional[int], Optional[int]] = (40, 10),
+        on_add_item: Optional[Callable[[], Optional[str]]] = None,
+        on_rm_item: Optional[Callable[[int], None]] = None,
+        on_move_up: Optional[Callable[[int], None]] = None,
+        on_move_down: Optional[Callable[[int], None]] = None,
+    ):
+        super().__init__(parent, prefix)
+        self.values: List[str] = [] if values is None else values
+        self.selected_idx = 0
+        self.filter = ""
+        self.modifiable = modifiable
+        self.select_cb = select_cb
+        self.orderable = orderable
+        self.description = description
+        self.size = size
+        self.on_add_item = on_add_item
+        self.on_rm_item = on_rm_item
+        self.on_move_up = on_move_up
+        self.on_move_down = on_move_down
+
+    def get_values(self) -> List[str]:
+        return self.values
+
+    def set_values(self, values: List[str], update_ui: bool) -> None:
+        self.values = values
+        self._update_selected_idx(self.selected_idx)
+        if update_ui:
+            self.update_ui()
+
+    def get_real_index(self) -> int:
+        filtered_values = self._get_filtered_values()
+        if filtered_values:
+            return filtered_values[self.selected_idx][0]
+        return 0
+
+    def _get_filtered_values(self) -> List[Tuple[int, str, Any]]:
+        values = list(enumerate(self.values))
+        return [(idx, text) for idx, text in values if self.filter in text]
+
+    def update_ui(self) -> None:
+        values = self._get_filtered_values()
+        self.w.listbox.update([x for _, x in values])
+        if self.selected_idx >= len(values):
+            self.selected_idx = len(values) - 1 if len(values) else 0
+        if self.selected_idx < len(values):
+            self.w.listbox.update(
+                set_to_index=[self.selected_idx],
+                scroll_to_index=self.selected_idx,
+            )
+
+    def get_element(self) -> sg.Element:
+        toolbar = [
+            sg.Text("Search:"),
+            sg.InputText(
+                "",
+                expand_x=True,
+                key=self.k.search,
+                enable_events=True,
+                tooltip="Search",
+            ),
+        ]
+        self.register_event(self.k.search)
+        if self.modifiable:
+            toolbar += [
+                sg.Button("+", key=self.k.add_item, tooltip="Add item"),
+                sg.Button("-", key=self.k.rm_item, tooltip="Remove item"),
+            ]
+            self.register_event(self.k.add_item)
+            self.register_event(self.k.rm_item)
+
+        if self.orderable:
+            toolbar += [
+                sg.Button("↑", key=self.k.move_up, tooltip="Move up"),
+                sg.Button("↓", key=self.k.move_down, tooltip="Move down"),
+            ]
+            self.register_event(self.k.move_up)
+            self.register_event(self.k.move_down)
+
+        layout = [
+            toolbar,
+            [
+                sg.Listbox(
+                    values=self.values,
+                    enable_events=True,
+                    size=self.size,
+                    key=self.k.listbox,
+                    tooltip=self.description,
+                    expand_x=True,
+                    expand_y=True,
+                ),
+            ],
+        ]
+        self.register_event(self.k.listbox)
+
+        return sg.Column(layout, expand_x=True, expand_y=True)
+
+    def _update_selected_idx(self, idx: int) -> None:
+        filtered_values = self._get_filtered_values()
+        if idx >= len(filtered_values):
+            idx = len(filtered_values) - 1
+        if idx < 0:
+            idx = 0
+        self.selected_idx = idx
+
+        if not filtered_values:
+            return
+        idx, _ = filtered_values[idx]
+        self.select_cb(idx)
+
+    def handle_event(self, event: str, values: dict) -> bool:
+        if event == self.k.listbox:
+            self._update_selected_idx(self.w.listbox.get_indexes()[0])
+            return True
+        if event == self.k.add_item:
+            self.handle_add_item()
+            return True
+        if event == self.k.rm_item:
+            self.handle_rm_item()
+            return True
+        if event == self.k.move_up:
+            self.handle_move_up()
+            return True
+        if event == self.k.move_down:
+            self.handle_move_down()
+            return True
+        if event == self.k.search:
+            self.handle_search(values[self.k.search])
+            return True
+        return False
+
+    def handle_add_item(self) -> None:
+        value = "---"
+        if self.on_add_item is not None:
+            value = self.on_add_item()
+        if value is None:
+            return
+        self.values.append(value)
+        self._update_selected_idx(self.selected_idx)
+        self.update_ui()
+
+    def handle_rm_item(self) -> None:
+        real_idx = self.get_real_index()
+        if real_idx >= len(self.values):
+            return
+        if self.on_rm_item is not None:
+            self.on_rm_item(real_idx)
+        del self.values[real_idx]
+        self._update_selected_idx(self.selected_idx)
+        self.update_ui()
+
+    def handle_move_up(self) -> None:
+        real_idx = self.get_real_index()
+        if real_idx <= 0:
+            return
+        if self.on_move_up is not None:
+            self.on_move_up(real_idx)
+        self.values[real_idx - 1], self.values[real_idx] = (
+            self.values[real_idx],
+            self.values[real_idx - 1],
+        )
+        self.update_ui()
+
+    def handle_move_down(self) -> None:
+        real_idx = self.get_real_index()
+        if real_idx >= len(self.values) - 1:
+            return
+        if self.on_move_down is not None:
+            self.on_move_down(real_idx)
+        self.values[real_idx + 1], self.values[real_idx] = (
+            self.values[real_idx],
+            self.values[real_idx + 1],
+        )
+        self.update_ui()
+
+    def handle_search(self, value: str) -> None:
+        self.filter = value
+        self.update_ui()
+        self._update_selected_idx(self.selected_idx)
 
 
 class BaseWindow(BaseInterface):
