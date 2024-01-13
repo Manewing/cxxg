@@ -13,6 +13,7 @@ from matplotlib import pyplot as plt
 from typing import List, Optional, Callable
 
 from xzen.ui import BaseInterface
+from xzen.ui import BaseWindow
 
 
 
@@ -485,17 +486,13 @@ class LootTableViewer(BaseInterface):
         self.set_table(self.selected_table, self.loot_slot.slot_idx)
 
 
-class LootViewer(BaseInterface):
+class LootViewer(BaseWindow):
     def __init__(self, item_db: ItemDb, loot_info_wrapper: LootInfoWrapper):
-        super().__init__()
+        super().__init__("Loot Viewer")
         self.item_db = item_db
         self.loot_info_wrapper = loot_info_wrapper
 
-    def setup(self):
-        sg.theme("DarkAmber")
-        sg.set_options(font=("Courier New", 16))
-        matplotlib.use("tkagg")
-
+    def get_layout(self):
         self.select_loot_table = SelectLootTableViewer(
             self,
             self.item_db,
@@ -503,9 +500,7 @@ class LootViewer(BaseInterface):
             self._on_select_loot_table,
         )
         self.loot_table = LootTableViewer(self, self.item_db)
-
-        # Create window with a list selection titled "Loot Tables"
-        layout = [
+        return [
             [
                 self.select_loot_table.get_element(),
                 sg.VSep(),
@@ -513,18 +508,8 @@ class LootViewer(BaseInterface):
             ],
         ]
 
-        self.window = sg.Window("Loot Viewer", layout)
-
     def _on_select_loot_table(self, loot_table_name: str) -> None:
         self.loot_table.set_table(loot_table_name)
-
-    def run(self):
-        while True:
-            event, values = self.window.read()
-            if event == sg.WIN_CLOSED:
-                break
-            if not self.handle_event(event, values):
-                print(f"Unhandled event: {event}", file=sys.stderr)
 
 
 def is_windows() -> bool:

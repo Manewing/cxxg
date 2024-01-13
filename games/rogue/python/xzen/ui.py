@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+import sys
 import abc
+import matplotlib
 import PySimpleGUI as sg
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 
 class KeyGenGenerator:
@@ -22,19 +24,24 @@ class WindowFetcher:
         self.window = window
         self.key_gen = key_gen
 
-    def __getattr__(self, name: str) -> sg.Element:
+    def get(self, name: str) -> sg.Element:
         return self.window[self.key_gen.get(name)]
+
+    def __getattr__(self, name: str) -> sg.Element:
+        return self.get(name)
 
 
 class BaseInterface(abc.ABC):
-    def __init__(self, parent: Optional["BaseInterface"] = None):
+    def __init__(
+        self, parent: Optional["BaseInterface"] = None, prefix: str = ""
+    ):
         self.parent = parent
         self.events: Dict[str, "BaseInterface"] = {}
-        self.window = None
+        self.prefix = prefix
 
     @property
     def k(self) -> KeyGenGenerator:
-        return KeyGenGenerator(self)
+        return KeyGenGenerator(self, prefix=self.prefix)
 
     @property
     def w(self) -> WindowFetcher:
@@ -44,11 +51,6 @@ class BaseInterface(abc.ABC):
         if event in self.events:
             return self.events[event].handle_event(event, values)
         return False
-
-    def publish_event(self, event: str, values: dict) -> bool:
-        if self.parent is None:
-            raise ValueError(f"Cannot publish event on root interface: {self}")
-        return self.parent.handle_event(event, values)
 
     def register_event(
         self, event: str, handler: Optional["BaseInterface"] = None
@@ -63,6 +65,37 @@ class BaseInterface(abc.ABC):
             self.events[event] = handler
 
     def get_window(self) -> sg.Window:
-        if self.window is None and self.parent is not None:
+        if self.parent is not None:
             return self.parent.get_window()
+        raise ValueError("Parent not initialized")
+
+
+class BaseWindow(BaseInterface):
+    def __init__(self, title: str):
+        super().__init__()
+        self.title = title
+        self.window: Optional[sg.Window] = None
+
+    def setup(self) -> None:
+        sg.theme("DarkAmber")
+        sg.set_options(font=("Courier New", 16))
+        matplotlib.use("tkagg")
+        self.window = sg.Window(self.title, self.get_layout())
+
+    @abc.abstractmethod
+    def get_layout(self) -> List[List[sg.Element]]:
+        pass
+
+    def run(self):
+        while True:
+            event, values = self.window.read()
+            if event == sg.WIN_CLOSED:
+                self.window.close()
+                break
+            if not self.handle_event(event, values):
+                print(f"Unhandled event: {event}", file=sys.stderr)
+
+    def get_window(self) -> sg.Window:
+        if self.window is None:
+            raise ValueError("Window not initialized")
         return self.window
