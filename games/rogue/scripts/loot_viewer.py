@@ -6,11 +6,12 @@ import sys
 import json
 import argparse
 import subprocess
+from pathlib import Path
 
-import PySimpleGUI as sg
-from typing import Any, List, Dict, Optional, Callable
 import matplotlib
+import PySimpleGUI as sg
 from matplotlib import pyplot as plt
+from typing import Any, List, Dict, Optional, Callable
 
 
 class ItemDb:
@@ -22,6 +23,10 @@ class ItemDb:
         with open(item_db_path, "r") as f:
             item_db = json.load(f)
         return ItemDb(item_db)
+
+    def save(self, item_db_path: str) -> None:
+        with open(item_db_path, "w") as f:
+            json.dump(self.item_db, f, indent=2, sort_keys=True)
 
     def get_loot_table_names(self) -> List[str]:
         return sorted(self.item_db["loot_tables"].keys())
@@ -134,48 +139,105 @@ class SelectLootTableViewer(BaseInterface):
         self.loot_info_wrapper = loot_info_wrapper
         self.loot_tables_column = sg.Column(
             [
-                [sg.Text("Loot Tables", justification="center")],
+                [
+                    sg.Text("Loot Tables", justification="center"),
+                    sg.InputText(
+                        "",
+                        size=(20, 1),
+                        key=self.k.table_name,
+                        enable_events=True,
+                    ),
+                    sg.Button("+", key=self.k.add_table),
+                    sg.Button("-", key=self.k.rm_table),
+                ],
                 [
                     sg.Listbox(
                         values=self.item_db.get_loot_table_names(),
                         size=(39, 40),
-                        key="-LOOT_TABLES-",
+                        key=self.k.loot_tables,
+                        enable_events=True,
                     )
                 ],
                 [
-                    sg.Button("View Loot Table", size=(16, 1)),
+                    sg.Button(
+                        "Show Statistics",
+                        key=self.k.show_stats,
+                    ),
                     sg.VSep(),
-                    sg.Button("Show Statistics", size=(16, 1)),
+                    sg.Button("Save As", key=self.k.save_as),
                 ],
             ]
         )
 
-        self.register_event("View Loot Table")
-        self.register_event("Show Statistics")
+        self.register_event(self.k.table_name)
+        self.register_event(self.k.add_table)
+        self.register_event(self.k.rm_table)
+        self.register_event(self.k.loot_tables)
+        self.register_event(self.k.show_stats)
+        self.register_event(self.k.save_as)
 
     def get_element(self) -> sg.Element:
         return self.loot_tables_column
 
-    @staticmethod
-    def _get_loot_table_name(values: dict) -> Optional[str]:
-        if not values["-LOOT_TABLES-"]:
+    def _get_loot_table_name(self, values: dict) -> Optional[str]:
+        if not values[self.k.loot_tables]:
             sg.popup("Please select a loot table")
             return None
-        return values["-LOOT_TABLES-"][0]
+        return values[self.k.loot_tables][0]
 
     def handle_event(self, event: str, values: dict) -> bool:
+        if event == self.k.save_as:
+            filename = sg.popup_get_file(
+                "",
+                save_as=True,
+                no_window=True,
+                file_types=(("JSON", "*.json")),
+                initial_folder=Path.home(),
+            )
+            if filename:
+                self.item_db.save(filename)
+                sg.popup(f"Saved item database to: {filename}")
+            return True
+        if event == self.k.table_name:
+            self.filter_loot_tables(values[self.k.table_name])
+            return True
+        if event == self.k.add_table:
+            self.add_loot_table(self.w.table_name.get())
+            return True
         loot_table = self._get_loot_table_name(values)
         if loot_table is None:
             return True
-        if event == "View Loot Table":
+        if event == self.k.rm_table:
+            del self.item_db.item_db["loot_tables"][loot_table]
+            self.w.loot_tables.update(self.item_db.get_loot_table_names())
+            return True
+        if event == self.k.loot_tables:
             self.select_cb(loot_table)
             return True
-        if event == "Show Statistics":
+        if event == self.k.show_stats:
             self.view_loot_table(loot_table)
             return True
         return False
 
+    def add_loot_table(self, loot_table_name: str) -> None:
+        if loot_table_name in self.item_db.get_loot_table_names():
+            sg.popup(f"Loot table already exists: {loot_table_name}")
+            return
+        loot_table = {
+            "rolls": 0,
+            "slots": [],
+        }
+        self.item_db.item_db["loot_tables"][loot_table_name] = loot_table
+        self.w.table_name.update("")
+        self.w.loot_tables.update(self.item_db.get_loot_table_names())
+
+    def filter_loot_tables(self, filter_str: str) -> None:
+        loot_tables = self.item_db.get_loot_table_names()
+        loot_tables = [x for x in loot_tables if filter_str in x]
+        self.w.loot_tables.update(loot_tables)
+
     def view_loot_table(self, loot_table_name: str) -> None:
+        self.item_db.save(self.loot_info_wrapper.item_db_path)
         loot_info = self.loot_info_wrapper.get_loot_info(loot_table_name)
 
         # Create bar char of loot table item rewards percentages
@@ -236,7 +298,6 @@ class LootTableSlotViewer(BaseInterface):
                         enable_events=True,
                         readonly=True,
                     ),
-                    sg.Button("Save", key=self.k.save),
                 ],
                 [
                     sg.Text("Weight:"),
@@ -258,15 +319,11 @@ class LootTableSlotViewer(BaseInterface):
         )
 
         self.register_event(self.k.tb_type)
-        self.register_event(self.k.save)
 
     def get_element(self) -> sg.Element:
         return self.loot_table_slot_column
 
     def handle_event(self, event: str, values: dict) -> bool:
-        if event == self.k.save:
-            self.save_slot()
-            return True
         if event == self.k.tb_type:
             tp = values[self.k.tb_type]
             if tp == "item":
@@ -378,6 +435,10 @@ class LootTableViewer(BaseInterface):
         self.loot_table_column = sg.Column(
             [
                 [
+                    sg.Text("Loot Table: ", key=self.k.table_name_lbl),
+                    sg.Button("Save", key=self.k.save),
+                ],
+                [
                     sg.Text("Rolls:"),
                     sg.InputText("", size=(10, 1), key=self.k.rolls),
                 ],
@@ -403,6 +464,7 @@ class LootTableViewer(BaseInterface):
         self.register_event(self.k.add_slot)
         self.register_event(self.k.rm_slot)
         self.register_event(self.k.slots)
+        self.register_event(self.k.save)
 
         self.rolls = 0
         self.slots = []
@@ -411,6 +473,9 @@ class LootTableViewer(BaseInterface):
         return self.loot_table_column
 
     def handle_event(self, event: str, values: dict) -> None:
+        if event == self.k.save:
+            self.save_table()
+            return True
         if event == self.k.add_slot:
             self.add_slot()
             return True
@@ -452,6 +517,7 @@ class LootTableViewer(BaseInterface):
         self, loot_table_name: str, slot_idx: Optional[int] = None
     ) -> None:
         self.selected_table = loot_table_name
+        self.w.table_name_lbl.update(f"Loot Table: {loot_table_name}")
         loot_table = self.item_db.get_loot_table(self.selected_table)
 
         self.rolls = loot_table["rolls"]
@@ -470,6 +536,14 @@ class LootTableViewer(BaseInterface):
         self.loot_slot.set_slot(self.selected_table, slot_idx)
         # Select first slot
         self.w.slots.update(set_to_index=[slot_idx], scroll_to_index=slot_idx)
+
+    def save_table(self) -> None:
+        if self.selected_table is None:
+            return
+        loot_table = self.item_db.get_loot_table(self.selected_table)
+        loot_table["rolls"] = int(self.w.rolls.get())
+        self.loot_slot.save_slot()
+        self.set_table(self.selected_table, self.loot_slot.slot_idx)
 
 
 class LootViewer(BaseInterface):
@@ -544,10 +618,15 @@ def main(args: List[str]) -> int:
         bin_dir_path, adapt_exc_path("loot_info")
     )
 
-    item_db = ItemDb.load(pargs.item_db)
+    item_db = ItemDb.load(item_db_path)
+
+    # Store copy of item db in temp file
+    temp_item_db_path = item_db_path + ".tmp.loot_viewer.json"
+    item_db.save(temp_item_db_path)
 
     loot_info_wrapper = LootInfoWrapper(
-        item_db_path=item_db_path, loot_info_excel_path=loot_info_wrapper_exc
+        item_db_path=temp_item_db_path,
+        loot_info_excel_path=loot_info_wrapper_exc,
     )
 
     loot_viewer = LootViewer(item_db, loot_info_wrapper)
