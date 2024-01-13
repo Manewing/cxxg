@@ -7,14 +7,16 @@ import argparse
 import subprocess
 from pathlib import Path
 
-import matplotlib
 import PySimpleGUI as sg
 from matplotlib import pyplot as plt
-from typing import List, Optional, Callable
+from typing import List, Optional, Callable, Dict, Any
 
 from xzen.ui import BaseInterface
 from xzen.ui import BaseWindow
 
+from xzen.ui_gen import JSONEditorGenerator
+from xzen.ui_gen import BaseGeneratedEditor
+from xzen.ui_gen import GeneratedArrayEditor
 
 
 class ItemDb:
@@ -39,6 +41,9 @@ class ItemDb:
 
     def get_loot_table(self, loot_table_name: str) -> dict:
         return self.item_db["loot_tables"][loot_table_name]
+
+    def set_loot_table(self, loot_table_name: str, loot_table: dict) -> None:
+        self.item_db["loot_tables"][loot_table_name] = loot_table
 
 
 class LootInfoWrapper:
@@ -131,8 +136,8 @@ class SelectLootTableViewer(BaseInterface):
                 "",
                 save_as=True,
                 no_window=True,
-                file_types=(("JSON", "*.json")),
-                initial_folder=Path.home(),
+                file_types=(("JSON *.json",)),
+                initial_folder=os.getcwd(),
             )
             if filename:
                 self.item_db.save(filename)
@@ -219,271 +224,16 @@ class SelectLootTableViewer(BaseInterface):
         plt.show(block=False)
 
 
-class LootTableSlotViewer(BaseInterface):
-    def __init__(self, parent: "LootTableViewer", item_db: ItemDb):
-        super().__init__(parent)
-        self.parent: LootTableViewer = parent
-        self.item_db = item_db
-        self.slot = None
-        self.slot_idx = None
-        self.loot_table_name = None
-        self.loot_table_slot_column = sg.Column(
-            [
-                [
-                    sg.Text("Type:"),
-                    sg.Combo(
-                        ["item", "table", "null"],
-                        size=(20, 1),
-                        key=self.k.tb_type,
-                        enable_events=True,
-                        readonly=True,
-                    ),
-                ],
-                [
-                    sg.Text("Weight:"),
-                    sg.InputText("", size=(20, 1), key=self.k.weight),
-                ],
-                [
-                    sg.Text("Name:", key=self.k.name_lbl),
-                    sg.Combo([], size=(20, 1), key=self.k.name, readonly=True),
-                ],
-                [
-                    sg.Text("Min. Count:", key=self.k.min_count_lbl),
-                    sg.InputText("", size=(20, 1), key=self.k.min_count),
-                ],
-                [
-                    sg.Text("Max. Count:", key=self.k.max_count_lbl),
-                    sg.InputText("", size=(20, 1), key=self.k.max_count),
-                ],
-            ],
-        )
-
-        self.register_event(self.k.tb_type)
-
-    def get_element(self) -> sg.Element:
-        return self.loot_table_slot_column
-
-    def handle_event(self, event: str, values: dict) -> bool:
-        if event == self.k.tb_type:
-            tp = values[self.k.tb_type]
-            if tp == "item":
-                self._set_item("", 1, 1, 1)
-            elif tp == "table":
-                self._set_table("", 1)
-            elif tp == "null":
-                self._set_null(1)
-            return True
-        return False
-
-    def save_slot(self) -> None:
-        if self.slot is None:
-            return
-        tp = self.w.tb_type.get()
-        weight = int(self.w.weight.get())
-        if "min_count" in self.slot:
-            del self.slot["min_count"]
-        if "max_count" in self.slot:
-            del self.slot["max_count"]
-        if "ref" in self.slot:
-            del self.slot["ref"]
-        if "name" in self.slot:
-            del self.slot["name"]
-
-        self.slot["type"] = tp
-        self.slot["weight"] = weight
-        if tp == "item":
-            name = self.w.name.get()
-            min_count = int(self.w.min_count.get())
-            max_count = int(self.w.max_count.get())
-            self.slot["name"] = name
-            self.slot["min_count"] = min_count
-            self.slot["max_count"] = max_count
-        elif tp == "table":
-            ref = self.w.name.get()
-            self.slot["ref"] = ref
-        elif tp == "null":
-            pass
-
-        self.parent.set_table(self.loot_table_name, self.slot_idx)
-
-    def set_slot(self, loot_table_name: str, slot_idx: int) -> None:
-        self.slot_idx = slot_idx
-        self.loot_table_name = loot_table_name
-        loot_table = self.item_db.get_loot_table(loot_table_name)
-        self.slot = loot_table["slots"][slot_idx]
-
-        tp = self.slot["type"]
-        weight = self.slot["weight"]
-        if tp == "item":
-            self._set_item(
-                self.slot["name"],
-                self.slot["min_count"],
-                self.slot["max_count"],
-                weight,
-            )
-        elif tp == "table":
-            self._set_table(self.slot["ref"], weight)
-        elif tp == "null":
-            self._set_null(weight)
-
-    def _hide_all(self):
-        self.w.name_lbl.update("", visible=False)
-        self.w.name.update([], visible=False)
-        self.w.min_count.update("", visible=False)
-        self.w.max_count.update("", visible=False)
-        self.w.min_count_lbl.update(visible=False)
-        self.w.max_count_lbl.update(visible=False)
-
-    def _set_item(
-        self, name: str, min_count: int, max_count: int, weight: int
-    ) -> None:
-        # Fill UI with item data
-        self.w.tb_type.update("item")
-        self.w.name_lbl.update("Name:", visible=True)
-        self.w.name.update(
-            name, visible=True, values=self.item_db.get_item_names()
-        )
-        self.w.min_count_lbl.update(visible=True)
-        self.w.max_count_lbl.update(visible=True)
-        self.w.min_count.update(min_count, visible=True)
-        self.w.max_count.update(max_count, visible=True)
-        self.w.weight.update(weight)
-
-    def _set_table(self, ref: str, weight: int) -> None:
-        # Fill UI with table data
-        self._hide_all()
-        self.w.tb_type.update("table")
-        self.w.name_lbl.update("Ref:", visible=True)
-        self.w.name.update(
-            ref, visible=True, values=self.item_db.get_loot_table_names()
-        )
-        self.w.weight.update(weight)
-
-    def _set_null(self, weight: int) -> None:
-        # Fill UI with null data
-        self._hide_all()
-        self.w.tb_type.update("null")
-        self.w.weight.update(weight)
-
-
-class LootTableViewer(BaseInterface):
-    def __init__(self, parent: BaseInterface, item_db: ItemDb):
-        super().__init__(parent)
-        self.item_db = item_db
-        self.loot_slot = LootTableSlotViewer(self, item_db)
-        self.selected_table = None
-        self.loot_table_column = sg.Column(
-            [
-                [
-                    sg.Text("Loot Table: ", key=self.k.table_name_lbl),
-                    sg.Button("Save", key=self.k.save),
-                ],
-                [
-                    sg.Text("Rolls:"),
-                    sg.InputText("", size=(10, 1), key=self.k.rolls),
-                ],
-                [sg.HSep()],
-                [
-                    sg.Text("Slots:"),
-                    sg.Button("+", key=self.k.add_slot),
-                    sg.Button("-", key=self.k.rm_slot),
-                ],
-                [
-                    sg.Listbox(
-                        values=[],
-                        enable_events=True,
-                        size=(39, 15),
-                        key=self.k.slots,
-                    )
-                ],
-                [sg.HSep()],
-                [self.loot_slot.get_element()],
-            ],
-        )
-
-        self.register_event(self.k.add_slot)
-        self.register_event(self.k.rm_slot)
-        self.register_event(self.k.slots)
-        self.register_event(self.k.save)
-
-        self.rolls = 0
-        self.slots = []
-
-    def get_element(self) -> sg.Element:
-        return self.loot_table_column
-
-    def handle_event(self, event: str, values: dict) -> None:
-        if event == self.k.save:
-            self.save_table()
-            return True
-        if event == self.k.add_slot:
-            self.add_slot()
-            return True
-        if event == self.k.rm_slot:
-            self.rm_slot(self.w.slots.get_indexes()[0])
-            return True
-        if event == self.k.slots:
-            self.select_slot(self.w.slots.get_indexes()[0])
-            return True
-        return False
-
-    def _get_names(self) -> List[str]:
-        names = []
-        for slot in self.slots:
-            prefix = f"({slot['weight']:3d}): "
-            if slot["type"] == "item":
-                names.append(f"{prefix} Item: {slot['name']}")
-            elif slot["type"] == "table":
-                names.append(f"{prefix} Table: {slot['ref']}")
-            elif slot["type"] == "null":
-                names.append(f"{prefix} Null")
-        return names
-
-    def add_slot(self) -> None:
-        if self.selected_table is None:
-            return
-        self.slots.append({"type": "null", "weight": -1})
-        self.set_table(self.selected_table)
-        self.select_slot(len(self.slots) - 1)
-
-    def rm_slot(self, slot_idx: int) -> None:
-        if self.selected_table is None:
-            return
-        del self.slots[slot_idx]
-        self.set_table(self.selected_table)
-        self.select_slot(len(self.slots) - 1)
-
-    def set_table(
-        self, loot_table_name: str, slot_idx: Optional[int] = None
-    ) -> None:
-        self.selected_table = loot_table_name
-        self.w.table_name_lbl.update(f"Loot Table: {loot_table_name}")
-        loot_table = self.item_db.get_loot_table(self.selected_table)
-
-        self.rolls = loot_table["rolls"]
-        self.slots = loot_table["slots"]
-
-        self.w.rolls.update(self.rolls)
-        self.w.slots.update(self._get_names())
-
-        if slot_idx is None:
-            slot_idx = 0
-        self.select_slot(slot_idx)
-
-    def select_slot(self, slot_idx: int) -> None:
-        if not len(self.slots):
-            return
-        self.loot_slot.set_slot(self.selected_table, slot_idx)
-        # Select first slot
-        self.w.slots.update(set_to_index=[slot_idx], scroll_to_index=slot_idx)
-
-    def save_table(self) -> None:
-        if self.selected_table is None:
-            return
-        loot_table = self.item_db.get_loot_table(self.selected_table)
-        loot_table["rolls"] = int(self.w.rolls.get())
-        self.loot_slot.save_slot()
-        self.set_table(self.selected_table, self.loot_slot.slot_idx)
+class LootSlotsEditor(GeneratedArrayEditor):
+    def get_item_text(self, idx: int, slot: Any) -> str:
+        prefix = f"({slot['weight']:3d}): "
+        if slot["type"] == "item":
+            return f"{prefix} Item: {slot['name']}"
+        if slot["type"] == "table":
+            return f"{prefix} Table: {slot['ref']}"
+        if slot["type"] == "null":
+            return f"{prefix} Null"
+        raise ValueError(f"Invalid slot type: {slot['type']}")
 
 
 class LootViewer(BaseWindow):
@@ -492,24 +242,50 @@ class LootViewer(BaseWindow):
         self.item_db = item_db
         self.loot_info_wrapper = loot_info_wrapper
 
-    def get_layout(self):
+        self.current_table = None
+
+        schemas_path = Path(__file__).parent.parent / "data" / "schemas"
+        schema_files = schemas_path.glob("*_schema.json")
+        self.loot_table_path = "https://rogue-todo.com/loot_tb_schema.json"
+
+        self.generator = JSONEditorGenerator.load(schema_files)
+        self.generator.register_override(
+            self.loot_table_path + "#defs/loot_table/slots",
+            LootSlotsEditor
+        )
+        self.editor: Optional[BaseGeneratedEditor] = None
+
+    def get_layout(self) -> List[List[sg.Element]]:
         self.select_loot_table = SelectLootTableViewer(
             self,
             self.item_db,
             self.loot_info_wrapper,
             self._on_select_loot_table,
         )
-        self.loot_table = LootTableViewer(self, self.item_db)
+        self.editor = self.generator.create_editor_interface_from_path(
+            self.loot_table_path + "#defs/loot_table", self
+        )
+        self.editor.register_on_change_handler(self._on_loot_table_edited)
         return [
             [
                 self.select_loot_table.get_element(),
                 sg.VSep(),
-                self.loot_table.get_element(),
+                sg.Column([self.editor.get_row()]),
             ],
         ]
 
+    def _on_loot_table_edited(self, value: dict) -> None:
+        if self.current_table is None:
+            return
+        self.item_db.set_loot_table(self.current_table, value)
+
     def _on_select_loot_table(self, loot_table_name: str) -> None:
-        self.loot_table.set_table(loot_table_name)
+        self.current_table = loot_table_name
+        self.editor.set_value(
+            self.item_db.get_loot_table(loot_table_name),
+            trigger_handlers=False,
+            update_ui=True,
+        )
 
 
 def is_windows() -> bool:

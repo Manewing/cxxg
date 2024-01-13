@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
 import abc
+import json
 import PySimpleGUI as sg
 from functools import partial
-from typing import List, Any, Dict, Type, Callable
+from typing import List, Any, Dict, Type, Callable, Optional
+
+from xzen.schema import Schema
+from xzen.schema import SchemaProcessor
 
 from xzen.ui import BaseWindow
 from xzen.ui import BaseInterface
@@ -28,13 +32,36 @@ def get_title(key: str, obj: Dict[str, Any]) -> str:
 
 class BaseGeneratedEditor(BaseInterface):
     def __init__(
-        self, key: str, obj: Dict[str, Any], prefix: str, parent: BaseInterface
+        self,
+        key: str,
+        obj: Dict[str, Any],
+        prefix: str,
+        parent: Optional[BaseInterface],
     ):
         title = get_title(key, obj)
         super().__init__(parent=parent, prefix=f"{prefix:s}_{title:s}")
         self.title = title
+        self.obj = obj
         self.description = obj.get("description")
         self._on_change_handlers: List[Callable[[Any], None]] = []
+
+    def is_required(self) -> bool:
+        if self.obj.get("required", False):
+            return True
+        return not "default" in self.obj
+
+    def needs_store(self):
+        if "default" in self.obj:
+            return self.obj["default"] != self.get_value()
+        return True
+
+    def restore_default(self, trigger_handlers: bool, update_ui: bool) -> bool:
+        if not "default" in self.obj:
+            return False
+        self.set_value(
+            self.obj["default"], trigger_handlers, update_ui=update_ui
+        )
+        return True
 
     @abc.abstractmethod
     def get_value(self) -> Any:
@@ -76,7 +103,11 @@ class BaseGeneratedEditor(BaseInterface):
 
 class GenerateConstEditor(BaseGeneratedEditor):
     def __init__(
-        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+        self,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.value = obj["const"]
@@ -108,7 +139,11 @@ class GenerateConstEditor(BaseGeneratedEditor):
 
 class GeneratedEnumEditor(BaseGeneratedEditor):
     def __init__(
-        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+        self,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.enum_values = sorted(obj["enum"])
@@ -154,7 +189,11 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
 
 class GeneratedInputEditor(BaseGeneratedEditor):
     def __init__(
-        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+        self,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.value_type = obj["type"]
@@ -200,7 +239,11 @@ class GeneratedInputEditor(BaseGeneratedEditor):
 
 class GeneratedCheckboxEditor(BaseGeneratedEditor):
     def __init__(
-        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+        self,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.value = obj.get("default", False)
@@ -242,7 +285,11 @@ class GeneratedCheckboxEditor(BaseGeneratedEditor):
 
 class GeneratedColorInputEditor(GeneratedInputEditor):
     def __init__(
-        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+        self,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.value = "#ffffff"
@@ -257,13 +304,18 @@ class GeneratedColorInputEditor(GeneratedInputEditor):
 
 class GeneratedObjectEditor(BaseGeneratedEditor):
     def __init__(
-        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+        self,
+        generator: "JSONEditorGenerator",
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.properties: Dict[str, Any] = obj["properties"]
         self.property_editors: Dict[str, BaseGeneratedEditor] = {}
         for sub_key, sub_value in self.properties.items():
-            self.property_editors[sub_key] = create_editor_interface(
+            self.property_editors[sub_key] = generator.create_editor_interface(
                 sub_key, sub_value, self, prefix=self.prefix
             )
             self.property_editors[sub_key].register_on_change_handler(
@@ -273,7 +325,8 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
     def get_value(self) -> Any:
         value = {}
         for sub_key, editor in self.property_editors.items():
-            value[sub_key] = editor.get_value()
+            if editor.needs_store():
+                value[sub_key] = editor.get_value()
         return value
 
     def set_value(
@@ -281,11 +334,14 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
     ) -> None:
         if not isinstance(obj, dict):
             raise ValueError(f"Expected dict, got: {value}")
-        super().set_value(obj, trigger_handlers, update_ui=False)
-
+        for key, editor in self.property_editors.items():
+            if key not in obj and editor.is_required():
+                raise ValueError(f"Expected required key: {key} in {obj}")
+            editor.restore_default(trigger_handlers=False, update_ui=False)
         for key, value in obj.items():
             editor = self.property_editors[key]
-            editor.set_value(value, trigger_handlers=False, update_ui=update_ui)
+            editor.set_value(value, trigger_handlers=False, update_ui=False)
+        super().set_value(obj, trigger_handlers, update_ui=update_ui)
 
     def update_ui(self) -> None:
         for editor in self.property_editors.values():
@@ -316,10 +372,15 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
 
 class GeneratedArrayEditor(BaseGeneratedEditor):
     def __init__(
-        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+        self,
+        generator: "JSONEditorGenerator",
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
-        self.item_editor = create_editor_interface(
+        self.item_editor = generator.create_editor_interface(
             key, obj["items"], self, prefix=self.prefix
         )
         self.item_editor.register_on_change_handler(self._update_item)
@@ -335,6 +396,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         if not isinstance(value, list):
             raise ValueError(f"Expected list, got: {value}")
         self.values = value
+        self._update_selected_idx(self.selected_idx)
         super().set_value(value, trigger_handlers, update_ui)
 
     def update_ui(self) -> None:
@@ -358,6 +420,8 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             ),
             sg.Button("+", key=self.k.add_item, tooltip="Add item"),
             sg.Button("-", key=self.k.rm_item, tooltip="Remove item"),
+            sg.Button("^", key=self.k.move_up, tooltip="Move up"),
+            sg.Button("v", key=self.k.move_down, tooltip="Move down"),
         ]
         layout = [
             toolbar,
@@ -383,6 +447,8 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self.register_event(self.k.listbox)
         self.register_event(self.k.add_item)
         self.register_event(self.k.rm_item)
+        self.register_event(self.k.move_up)
+        self.register_event(self.k.move_down)
         return row
 
     def _update_item(self, value: Any) -> None:
@@ -423,12 +489,39 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             self._update_selected_idx(new_idx)
             self.set_value(self.values, trigger_handlers=True, update_ui=True)
             return True
+        if event == self.k.move_up:
+            if self.selected_idx <= 0:
+                return True
+            i = self.selected_idx
+            self.values[i - 1], self.values[i] = (
+                self.values[i],
+                self.values[i - 1],
+            )
+            self._update_selected_idx(i - 1)
+            self.set_value(self.values, trigger_handlers=True, update_ui=True)
+            return True
+        if event == self.k.move_down:
+            if self.selected_idx >= len(self.values) - 1:
+                return True
+            i = self.selected_idx
+            self.values[i + 1], self.values[i] = (
+                self.values[i],
+                self.values[i + 1],
+            )
+            self._update_selected_idx(i + 1)
+            self.set_value(self.values, trigger_handlers=True, update_ui=True)
+            return True
         return False
 
 
 class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
     def __init__(
-        self, key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str
+        self,
+        generator: "JSONEditorGenerator",
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.any_of = obj.get("anyOf")
@@ -437,7 +530,7 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
         for obj in self.any_of:
             typed_info = obj["properties"]["type"]["const"]
             self.editors[typed_info] = GeneratedObjectEditor(
-                typed_info, obj, self, prefix=f"{prefix:s}_{key:s}"
+                generator, typed_info, obj, self, prefix=f"{prefix:s}_{key:s}"
             )
             self.editors[typed_info].register_on_change_handler(
                 partial(self._on_editor_changed, typed_info)
@@ -513,72 +606,145 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
         return False
 
 
-def create_string_editor_interface(
-    key: str, obj: Dict[str, Any], parent: BaseInterface, prefix: str = ""
-) -> BaseGeneratedEditor:
-    if "enum" in obj:
-        return GeneratedEnumEditor(key, obj, parent, prefix)
-    if "pattern" in obj and obj["pattern"] == "#[0-9a-fA-F]{6}":
-        return GeneratedColorInputEditor(key, obj, parent, prefix)
-    return GeneratedInputEditor(key, obj, parent, prefix)
+class JSONEditorGenerator:
+    @staticmethod
+    def create_string_editor_interface(
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str = "",
+    ) -> BaseGeneratedEditor:
+        if "enum" in obj:
+            return GeneratedEnumEditor(key, obj, parent, prefix)
+        if "pattern" in obj and obj["pattern"] == "#[0-9a-fA-F]{6}":
+            return GeneratedColorInputEditor(key, obj, parent, prefix)
+        return GeneratedInputEditor(key, obj, parent, prefix)
 
+    def _create_typed_editor_interface(
+        self,
+        obj_type: str,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str = "",
+    ) -> BaseGeneratedEditor:
+        handlers = {
+            "string": JSONEditorGenerator.create_string_editor_interface,
+            "integer": GeneratedInputEditor,
+            "number": GeneratedInputEditor,
+            "object": partial(GeneratedObjectEditor, self),
+            "array": partial(GeneratedArrayEditor, self),
+            "boolean": GeneratedCheckboxEditor,
+        }
+        if obj_type not in handlers:
+            raise ValueError(f"/{prefix}/{key}: Unsupported type: {obj_type}")
+        return handlers[obj_type](key, obj, parent, prefix)
 
-def _create_typed_editor_interface(
-    obj_type: str,
-    key: str,
-    obj: Dict[str, Any],
-    parent: BaseInterface,
-    prefix: str = "",
-) -> BaseGeneratedEditor:
-    handlers = {
-        "string": create_string_editor_interface,
-        "integer": GeneratedInputEditor,
-        "number": GeneratedInputEditor,
-        "object": GeneratedObjectEditor,
-        "array": GeneratedArrayEditor,
-        "boolean": GeneratedCheckboxEditor,
-    }
-    if obj_type not in handlers:
-        raise ValueError(f"/{prefix}/{key}: Unsupported type: {obj_type}")
-    return handlers[obj_type](key, obj, parent, prefix)
+    def _create_override(
+        self,
+        path: str,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str = "",
+    ) -> BaseGeneratedEditor:
+        try:
+            return self._overrides[path](self, key, obj, parent, prefix)
+        except Exception as e:
+            raise ValueError(
+                f"/{prefix}/{key}: {path} Failed to create override:\n"
+                f"{e}\n{obj}"
+            ) from e
 
+    def _create_editor_interface_internal(
+        self,
+        key: Any,
+        obj: Any,
+        parent: Optional[BaseInterface],
+        prefix: str = "",
+    ) -> BaseGeneratedEditor:
+        if not isinstance(key, str):
+            raise ValueError(f"/{prefix}/{key}: Expected str, got: {key}")
+        if not isinstance(obj, dict):
+            raise ValueError(f"/{prefix}/{key}: Expected dict, got: {obj}")
 
-def create_editor_interface(
-    key: Any, obj: Any, parent: BaseInterface, prefix: str = ""
-) -> BaseGeneratedEditor:
-    if not isinstance(key, str):
-        raise ValueError(f"/{prefix}/{key}: Expected str, got: {key}")
-    if not isinstance(obj, dict):
-        raise ValueError(f"/{prefix}/{key}: Expected dict, got: {obj}")
+        if self._current_path in self._overrides:
+            return self._create_override(
+                self._current_path, key, obj, parent, prefix
+            )
 
-    if "const" in obj:
-        return GenerateConstEditor(key, obj, parent, prefix)
+        if "const" in obj:
+            return GenerateConstEditor(key, obj, parent, prefix)
 
-    obj_type = obj.get("type")
-    if obj_type:
-        return _create_typed_editor_interface(
-            obj_type, key, obj, parent, prefix
+        obj_type = obj.get("type")
+        if obj_type:
+            return self._create_typed_editor_interface(
+                obj_type, key, obj, parent, prefix
+            )
+
+        any_of = obj.get("anyOf")
+        if any_of:
+            return TypedAnyOfGeneratedEditor(self, key, obj, parent, prefix)
+
+        kws = ["type", "anyOf"]
+        raise ValueError(
+            f"/{prefix}/{key}: Expected one of the keywords {kws} in object, got: {obj}"
         )
 
-    any_of = obj.get("anyOf")
-    if any_of:
-        return TypedAnyOfGeneratedEditor(key, obj, parent, prefix)
+    def create_editor_interface(
+        self,
+        key: Any,
+        obj: Any,
+        parent: Optional[BaseInterface],
+        prefix: str = "",
+    ) -> BaseGeneratedEditor:
+        path = self._current_path
+        try:
+            self._current_path = f"{self._current_path:s}/{key:s}"
+            return self._create_editor_interface_internal(
+                key, obj, parent, prefix
+            )
+        finally:
+            self._current_path = path
 
-    kws = ["type", "anyOf"]
-    raise ValueError(
-        f"/{prefix}/{key}: Expected one of the keywords {kws} in object, got: {obj}"
-    )
+    @staticmethod
+    def load(schema_files: List[str]) -> "JSONEditorGenerator":
+        schemas = []
+        for schema_file in schema_files:
+            with open(schema_file, "r") as f:
+                schema_json = json.load(f)
+            schemas.append(Schema(schema_json["$id"], schema_file, schema_json))
+        return JSONEditorGenerator(schemas)
+
+    def __init__(self, schemas: List[Schema]):
+        self.schemas = schemas
+        self.processor = SchemaProcessor(schemas)
+        self.processor.resolve_all(remove_keys=False)
+        self._overrides: Dict[str, Type] = {}
+        self._current_path: str = ""
+
+    def register_override(self, path: str, editor_type: Type) -> None:
+        if path in self._overrides:
+            raise ValueError(f"Override already registered: {path}")
+        self._overrides[path] = editor_type
+
+    def create_editor_interface_from_path(
+        self, path: str, parent: Optional[BaseInterface] = None
+    ) -> BaseGeneratedEditor:
+        self._current_path = SchemaProcessor.normalize_path(path)
+        self._current_path = "/".join(self._current_path.split("/")[:-1])
+        try:
+            ref = self.processor.resolve_external_ref(None, path)
+            return self.create_editor_interface(ref.key, ref.value, parent)
+        finally:
+            self._current_path = ""
 
 
 class GeneratedJsonEditor(BaseWindow):
-    def __init__(self, key: Any, schema_value: Any):
-        super().__init__(f"{key}")
-        self.key = key
-        self.schema_value = schema_value
-        self.editor = create_editor_interface(self.key, self.schema_value, self)
-
-    def get_key(self) -> Any:
-        return self.key
+    def __init__(self, editor: BaseGeneratedEditor):
+        super().__init__(editor.title)
+        self.editor = editor
+        self.editor.parent = self
 
     def get_value(self) -> Any:
         return self.editor.get_value()

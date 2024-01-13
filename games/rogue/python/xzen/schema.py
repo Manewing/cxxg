@@ -13,6 +13,7 @@ class Schema:
     """
     Represents a JSON schema loaded from file.
     """
+
     schema_id: str
     schema_file: Path
     data: Dict[str, Any]
@@ -146,11 +147,29 @@ class SchemaProcessor:
             self.resolve(ref_schema)
         return self.resolve_ref_path(ref_schema, ref_path)
 
+    @staticmethod
+    def normalize_path(path: str) -> str:
+        """
+        Normalizes internal or external reference path, removes leading,
+        trailing "/"
+        """
+        if path.startswith("#"):
+            return "#" + SchemaProcessor.normalize_ref_path(path[1:])
+        schema_id, ref_path = path.split("#", 1)
+        return schema_id + "#" + SchemaProcessor.normalize_ref_path(ref_path)
+
+    @staticmethod
+    def normalize_ref_path(ref_path: str) -> str:
+        """
+        Normalizes a reference path, removes leading, trailing "/"
+        """
+        return ref_path.lstrip("/").rstrip("/")
+
     def resolve_ref_path(self, schema: Schema, ref_path: str) -> SchemaRef:
         """
         Resolves a reference path.
         """
-        ref_path = ref_path.lstrip("/")
+        ref_path = self.normalize_ref_path(ref_path)
         ref_path_parts = ref_path.split("/")
         ref_value = schema.data
         ref_parent = schema.data

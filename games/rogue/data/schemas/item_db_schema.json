@@ -63,11 +63,11 @@
               "additionalProperties": false
             }
           },
-          "specialization": {
+          "specializations": {
             "type": "array",
             "items": {
               "type": "object",
-              "required": ["type", "effect"],
+              "required": ["type", "specialization"],
               "properties": {
                 "type": {
                   "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/capability_flags"

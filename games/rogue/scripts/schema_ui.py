@@ -12,6 +12,7 @@ from xzen.schema import Schema
 from xzen.schema import SchemaProcessor
 
 from xzen.ui_gen import GeneratedJsonEditor
+from xzen.ui_gen import JSONEditorGenerator
 
 
 def main(argv: List[str]) -> int:
@@ -32,24 +33,10 @@ def main(argv: List[str]) -> int:
     args = parser.parse_args(argv[1:])
 
     # Load all schemas
-    schemas: List[Schema] = []
-    for schema_file in args.schema_files:
-        with open(schema_file, "r") as f:
-            schema_json = json.load(f)
-        schemas.append(Schema(schema_json["$id"], schema_file, schema_json))
+    generator = JSONEditorGenerator.load(args.schema_files)
+    editor = generator.create_editor_interface_from_path(args.path)
+    gen_window = GeneratedJsonEditor(editor)
 
-    # Resolve all references
-    schema_processor = SchemaProcessor(schemas)
-    schema_processor.resolve_all(remove_keys=False)
-
-    ref = schema_processor.resolve_external_ref(None, args.path)
-
-    sg.theme("DarkAmber")
-    sg.set_options(font=("Courier New", 16))
-
-    gen_window = GeneratedJsonEditor(ref.key, ref.value)
-
-    print(ref.key)
     print(gen_window.get_value())
     gen_window.setup()
     gen_window.run()
