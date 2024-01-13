@@ -297,12 +297,15 @@ static void fillLootTable(const ItemDatabase &DB, const rapidjson::Value &V,
   LootTb.reset(NumRolls, Slots, PickAndReturn);
 }
 
-ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig) {
+ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig,
+                                const std::filesystem::path *SchemaPath) {
   ItemDatabase DB;
 
-  const auto SchemaPath =
+  const auto SchemaPathDefault =
       ItemDbConfig.parent_path() / "schemas" / "item_db_schema.json";
-  auto [DocStr, Doc] = loadJSON(ItemDbConfig, &SchemaPath);
+  const auto *const SchemaPathPtr =
+      SchemaPath ? SchemaPath : &SchemaPathDefault;
+  auto [DocStr, Doc] = loadJSON(ItemDbConfig, SchemaPathPtr);
 
   // Get map of item Ids and verify unique names
   DB.ItemIdsByName = getItemIdsByName(Doc["item_prototypes"]);

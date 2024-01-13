@@ -12,7 +12,8 @@ namespace rogue {
 
 class ItemDatabase {
 public:
-  static ItemDatabase load(const std::filesystem::path &ItemDbConfig);
+  static ItemDatabase load(const std::filesystem::path &ItemDbConfig,
+                           const std::filesystem::path *SchemaPath = nullptr);
 
 public:
   int getNewItemId();

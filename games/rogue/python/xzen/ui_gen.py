@@ -11,6 +11,7 @@ from xzen.schema import SchemaProcessor
 
 from xzen.ui import BaseWindow
 from xzen.ui import BaseInterface
+from xzen.ui import ListEditorBase
 
 
 def convert_snake_case_to_camel_case(s: str) -> str:
@@ -383,13 +384,22 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
+        self.list_ui = ListEditorBase(
+            select_cb=self._on_select,
+            parent=self,
+            prefix=self.prefix,
+            description=self.description,
+            values=[],
+            on_add_item=self._on_add_item,
+            on_rm_item=self._on_rm_item,
+            on_move_up=self._on_move_up,
+            on_move_down=self._on_move_down,
+        )
         self.item_editor = generator.create_editor_interface(
             key, obj["items"], self, prefix=self.prefix
         )
         self.item_editor.register_on_change_handler(self._update_item)
         self.values: List[Any] = []
-        self.selected_idx = 0
-        self.filter = ""
 
     def get_value(self) -> List[Any]:
         return self.values
@@ -400,30 +410,18 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         if not isinstance(value, list):
             raise ValueError(f"Expected list, got: {value}")
         self.values = value
-        self._update_selected_idx(self.selected_idx, update_ui)
+        if update_ui:
+            values = [
+                self.get_item_text(idx) for idx in range(len(self.values))
+            ]
+            self.list_ui.set_values(
+                values, trigger_handlers=True, update_ui=True
+            )
         super().set_value(value, trigger_handlers, update_ui)
 
-    def _get_filtered_values(self) -> List[Tuple[int, str, Any]]:
-        values = [
-            (idx, self.get_item_text(idx, x), x)
-            for idx, x in enumerate(self.values)
-        ]
-        return [
-            (idx, text, value)
-            for idx, text, value in values
-            if self.filter in text
-        ]
-
     def update_ui(self) -> None:
-        values = self._get_filtered_values()
-        self.w.listbox.update([x for _, x, _ in values])
-        if self.selected_idx >= len(values):
-            self.selected_idx = len(values) - 1 if len(values) else 0
-        if self.selected_idx < len(values):
-            self.w.listbox.update(
-                set_to_index=[self.selected_idx],
-                scroll_to_index=self.selected_idx,
-            )
+        values = [self.get_item_text(idx) for idx in range(len(self.values))]
+        self.list_ui.set_values(values, trigger_handlers=False, update_ui=True)
 
     def get_item_text(self, idx: int) -> str:
         item = self.values[idx]
@@ -433,32 +431,8 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         return f"[{idx}]: {title}"
 
     def get_row(self) -> List[sg.Element]:
-        toolbar = [
-            sg.Text("Search:"),
-            sg.InputText(
-                "",
-                expand_x=True,
-                key=self.k.search,
-                enable_events=True,
-                tooltip="Search",
-            ),
-            sg.Button("+", key=self.k.add_item, tooltip="Add item"),
-            sg.Button("-", key=self.k.rm_item, tooltip="Remove item"),
-            sg.Button("↑", key=self.k.move_up, tooltip="Move up"),
-            sg.Button("↓", key=self.k.move_down, tooltip="Move down"),
-        ]
         layout = [
-            toolbar,
-            [
-                sg.Listbox(
-                    values=[],
-                    enable_events=True,
-                    size=(40, 10),
-                    key=self.k.listbox,
-                    tooltip=self.description,
-                    expand_x=True,
-                ),
-            ],
+            [self.list_ui.get_element()],
             [sg.HSep(pad=(None, 20))],
             self.item_editor.get_row(),
         ]
@@ -468,22 +442,12 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
                 [[sg.Column(layout)]],
             )
         ]
-        self.register_event(self.k.listbox)
-        self.register_event(self.k.add_item)
-        self.register_event(self.k.rm_item)
-        self.register_event(self.k.move_up)
-        self.register_event(self.k.move_down)
-        self.register_event(self.k.search)
         return row
 
     def _update_item(
         self, value: Any, trigger_handlers: bool, update_ui: bool
     ) -> None:
-        filt_values = self._get_filtered_values()
-        if filt_values:
-            real_idx = filt_values[self.selected_idx][0]
-        else:
-            real_idx = 0
+        real_idx = self.list_ui.get_real_index()
         if real_idx >= len(self.values):
             return
         self.values[real_idx] = value
@@ -492,76 +456,36 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         )
         self.update_ui()
 
-    def _update_selected_idx(self, idx: int, update_ui: bool) -> None:
-        values = self._get_filtered_values()
-        if idx >= len(values):
-            idx = len(values) - 1
-        if idx < 0:
-            idx = 0
-        self.selected_idx = idx
-        if not values:
-            return
+    def _on_select(self, idx: int) -> None:
         self.item_editor.set_value(
-            values[self.selected_idx][2],
+            self.values[idx],
             trigger_handlers=False,
-            update_ui=update_ui,
+            update_ui=True,
         )
 
-    def handle_event(self, event: str, values: dict) -> bool:
-        filt_values = self._get_filtered_values()
-        if filt_values:
-            real_idx = filt_values[self.selected_idx][0]
-        else:
-            real_idx = 0
+    def _on_add_item(self) -> Optional[str]:
+        value = self.item_editor.get_value()
+        self.values.append(value)
+        self.set_value(self.values, trigger_handlers=True, update_ui=False)
+        return self.get_item_text(len(self.values) - 1)
 
-        if event == self.k.listbox:
-            self._update_selected_idx(self.w.listbox.get_indexes()[0], True)
-            return True
-        if event == self.k.add_item:
-            new_values = self.values + [self.item_editor.get_value()]
-            self.selected_idx = len(new_values) - 1
-            self.set_value(
-                new_values,
-                trigger_handlers=True,
-                update_ui=True,
-            )
-            return True
-        if event == self.k.rm_item:
-            if not filt_values or self.selected_idx >= len(filt_values):
-                return True
-            self.values.pop(real_idx)
-            new_idx = max(self.selected_idx, len(filt_values) - 1)
-            self._update_selected_idx(new_idx, True)
-            self.set_value(self.values, trigger_handlers=True, update_ui=True)
-            return True
-        if event == self.k.move_up:
-            if real_idx <= 0:
-                return True
-            self.values[real_idx - 1], self.values[real_idx] = (
-                self.values[real_idx],
-                self.values[real_idx - 1],
-            )
-            if (real_idx - 1) in [x[0] for x in filt_values]:
-                self._update_selected_idx(self.selected_idx - 1, True)
-            self.set_value(self.values, trigger_handlers=True, update_ui=True)
-            return True
-        if event == self.k.move_down:
-            if real_idx >= len(self.values) - 1:
-                return True
-            self.values[real_idx + 1], self.values[real_idx] = (
-                self.values[real_idx],
-                self.values[real_idx + 1],
-            )
-            if (real_idx + 1) in [x[0] for x in filt_values]:
-                self._update_selected_idx(self.selected_idx + 1, True)
-            self.set_value(self.values, trigger_handlers=True, update_ui=True)
-            return True
-        if event == self.k.search:
-            self.filter = values[self.k.search]
-            self.update_ui()
-            self._update_selected_idx(self.selected_idx, True)
-            return True
-        return False
+    def _on_rm_item(self, idx: int) -> None:
+        self.values.pop(idx)
+        self.set_value(self.values, trigger_handlers=True, update_ui=True)
+
+    def _on_move_up(self, idx: int) -> None:
+        self.values[idx - 1], self.values[idx] = (
+            self.values[idx],
+            self.values[idx - 1],
+        )
+        self.set_value(self.values, trigger_handlers=True, update_ui=False)
+
+    def _on_move_down(self, idx: int) -> None:
+        self.values[idx + 1], self.values[idx] = (
+            self.values[idx],
+            self.values[idx + 1],
+        )
+        self.set_value(self.values, trigger_handlers=True, update_ui=False)
 
 
 class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
@@ -620,7 +544,7 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
         update_ui: bool,
     ) -> None:
         self.set_value(
-            value, trigger_handlers=trigger_handlers, update_ui=update_ui
+            value, trigger_handlers=trigger_handlers, update_ui=False
         )
 
     def update_ui(self) -> None:

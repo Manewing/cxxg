@@ -6,7 +6,6 @@ import json
 import argparse
 import subprocess
 from pathlib import Path
-from types import UnionType
 
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Element
@@ -20,6 +19,9 @@ from xzen.ui import BaseWindow
 from xzen.ui_gen import JSONEditorGenerator
 from xzen.ui_gen import BaseGeneratedEditor
 from xzen.ui_gen import GeneratedArrayEditor
+
+
+SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
 
 
 class ItemDb:
@@ -51,14 +53,16 @@ class ItemDb:
 
 
 class LootInfoWrapper:
-    def __init__(self, item_db_path: str, loot_info_excel_path: str):
+    def __init__(self, item_db_path: str, schema_path: str, loot_info_excel_path: str):
         self.item_db_path = item_db_path
+        self.schema_path = schema_path
         self.loot_info_excel_path = loot_info_excel_path
 
     def get_loot_info(self, loot_table_name: str, rolls: int = 10000) -> dict:
         cmd = [
             self.loot_info_excel_path,
             self.item_db_path,
+            self.schema_path,
             "--loot-table",
             loot_table_name,
             str(rolls),
@@ -80,7 +84,7 @@ class NewSelectLootTableViewer(ListEditorBase):
         parent: BaseInterface,
         item_db: ItemDb,
         loot_info_wrapper: LootInfoWrapper,
-        select_cb: Callable[[str], None],
+        select_cb: Callable[[int], None],
     ):
         super().__init__(
             select_cb,
@@ -206,7 +210,8 @@ class NewSelectLootTableViewer(ListEditorBase):
 
 
 class LootSlotsEditor(GeneratedArrayEditor):
-    def get_item_text(self, idx: int, slot: Any) -> str:
+    def get_item_text(self, idx: int) -> str:
+        slot = self.values[idx]
         prefix = f"({slot['weight']:3d}): "
         if slot["type"] == "item":
             return f"{prefix} Item: {slot['name']}"
@@ -225,8 +230,7 @@ class LootViewer(BaseWindow):
 
         self.current_table = None
 
-        schemas_path = Path(__file__).parent.parent / "data" / "schemas"
-        schema_files = schemas_path.glob("*_schema.json")
+        schema_files = SCHEMAS_PATH.glob("*_schema.json")
         self.loot_table_path = "https://rogue-todo.com/loot_tb_schema.json"
 
         self.generator = JSONEditorGenerator.load(schema_files)
@@ -308,6 +312,7 @@ def main(args: List[str]) -> int:
 
     loot_info_wrapper = LootInfoWrapper(
         item_db_path=temp_item_db_path,
+        schema_path=str(SCHEMAS_PATH / "item_db_schema.json"),
         loot_info_excel_path=loot_info_wrapper_exc,
     )
 

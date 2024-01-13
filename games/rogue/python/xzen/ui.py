@@ -103,9 +103,11 @@ class ListEditorBase(BaseInterface):
     def get_values(self) -> List[str]:
         return self.values
 
-    def set_values(self, values: List[str], update_ui: bool) -> None:
+    def set_values(
+        self, values: List[str], trigger_handlers: bool, update_ui: bool
+    ) -> None:
         self.values = values
-        self._update_selected_idx(self.selected_idx)
+        self._update_selected_idx(self.selected_idx, trigger_handlers)
         if update_ui:
             self.update_ui()
 
@@ -176,7 +178,9 @@ class ListEditorBase(BaseInterface):
 
         return sg.Column(layout, expand_x=True, expand_y=True)
 
-    def _update_selected_idx(self, idx: int) -> None:
+    def _update_selected_idx(
+        self, idx: int, trigger_handlers: bool = True
+    ) -> None:
         filtered_values = self._get_filtered_values()
         if idx >= len(filtered_values):
             idx = len(filtered_values) - 1
@@ -184,10 +188,10 @@ class ListEditorBase(BaseInterface):
             idx = 0
         self.selected_idx = idx
 
-        if not filtered_values:
+        if not filtered_values or not trigger_handlers:
             return
-        idx, _ = filtered_values[idx]
-        self.select_cb(idx)
+        real_idx, _ = filtered_values[idx]
+        self.select_cb(real_idx)
 
     def handle_event(self, event: str, values: dict) -> bool:
         if event == self.k.listbox:
@@ -240,6 +244,7 @@ class ListEditorBase(BaseInterface):
             self.values[real_idx],
             self.values[real_idx - 1],
         )
+        self._update_selected_idx(self.selected_idx - 1, True)
         self.update_ui()
 
     def handle_move_down(self) -> None:
@@ -252,6 +257,7 @@ class ListEditorBase(BaseInterface):
             self.values[real_idx],
             self.values[real_idx + 1],
         )
+        self._update_selected_idx(self.selected_idx + 1, True)
         self.update_ui()
 
     def handle_search(self, value: str) -> None:

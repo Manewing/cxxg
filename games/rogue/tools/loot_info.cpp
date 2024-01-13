@@ -59,18 +59,18 @@ void dumpLootTableRewards(const rogue::ItemDatabase &ItemDb,
 }
 
 int handleLootTable(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
-  if (Argc != 4 && Argc != 5) {
+  if (Argc != 5 && Argc != 6) {
     std::cerr << "usage: " << Argv[0]
               << " <item_db_config> --loot-table <loot_table_name> *<rolls>"
               << std::endl;
     return 2;
   }
 
-  std::string LootTableName = Argv[3];
+  std::string LootTableName = Argv[4];
 
   unsigned Rolls = 100;
-  if (Argc == 5) {
-    Rolls = std::stoi(Argv[4]);
+  if (Argc == 6) {
+    Rolls = std::stoi(Argv[5]);
   }
 
   dumpLootTableRewards(ItemDb, LootTableName, Rolls);
@@ -106,17 +106,17 @@ void dumpItemCreations(const rogue::ItemDatabase &ItemDb,
 }
 
 int handleDumpItem(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
-  if (Argc != 4 && Argc != 5) {
+  if (Argc != 5 && Argc != 6) {
     std::cerr << "usage: <item_db_config> --dump-item <item> *<rolls>"
               << std::endl;
     return 3;
   }
 
-  std::string ItemName = Argv[3];
+  std::string ItemName = Argv[4];
 
   unsigned Rolls = 1;
-  if (Argc == 5) {
-    Rolls = std::stoi(Argv[4]);
+  if (Argc == 6) {
+    Rolls = std::stoi(Argv[5]);
   }
 
   dumpItemCreations(ItemDb, ItemName, Rolls);
@@ -126,7 +126,7 @@ int handleDumpItem(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
 
 int handleDumpLootTables(const rogue::ItemDatabase &ItemDb, int Argc,
                          char *[]) {
-  if (Argc != 3) {
+  if (Argc != 4) {
     std::cerr << "usage: <item_db_config> --dump-tables" << std::endl;
     return 4;
   }
@@ -150,7 +150,7 @@ void dumpItems(const rogue::ItemDatabase &ItemDb) {
 
 void dumpUsage(const char *PrgName) {
   std::cerr
-      << "usage: " << PrgName << " <item_db_config> *<--options>" << std::endl
+      << "usage: " << PrgName << " <item_db_config> <item_db_schema> *<--options>" << std::endl
       << std::endl
       << "options:" << std::endl
       << "  --dump-tables                           (Dumps all loot tables)"
@@ -168,7 +168,7 @@ void dumpUsage(const char *PrgName) {
 }
 
 int wrapped_main(int Argc, char *Argv[]) {
-  if (Argc < 2) {
+  if (Argc < 3) {
     dumpUsage(Argv[0]);
     return 1;
   }
@@ -180,9 +180,15 @@ int wrapped_main(int Argc, char *Argv[]) {
               << std::endl;
     return 1;
   }
-  auto ItemDb = rogue::ItemDatabase::load(ItemDbConfig);
+  std::filesystem::path ItemDbSchema = Argv[2];
+  if (!std::filesystem::exists(ItemDbSchema)) {
+    std::cerr << "error: item db schema file does not exist: " << ItemDbSchema
+              << std::endl;
+    return 1;
+  }
+  auto ItemDb = rogue::ItemDatabase::load(ItemDbConfig, &ItemDbSchema);
 
-  std::string Option = Argc >= 3 ? Argv[2] : "";
+  std::string Option = Argc >= 4 ? Argv[3] : "";
   if (Option.empty()) {
     dumpItems(ItemDb);
     return 0;
