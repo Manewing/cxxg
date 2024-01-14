@@ -20,11 +20,13 @@ from xzen.ui import BaseWindow
 from xzen.ui_gen import JSONEditorGenerator
 from xzen.ui_gen import BaseGeneratedEditor
 from xzen.ui_gen import GeneratedArrayEditor
-from xzen.ui_gen import GeneratedEnumEditor
+from xzen.ui_gen import LinkedGeneratedEnumEditor
 from xzen.ui_gen import JSONFileManagerInterface
 
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
+LOOT_TB_SID = "https://rogue-todo.com/loot_tb_schema.json"
+ITEM_DB_SID = "https://rogue-todo.com/item-db-schema.json"
 
 
 class ItemDb:
@@ -52,6 +54,12 @@ class ItemDb:
 
     def get_item_names(self) -> List[str]:
         return list(x["name"] for x in self.item_db["item_prototypes"])
+
+    def get_specialization_names(self) -> List[str]:
+        return list(x["name"] for x in self.item_db["item_specializations"])
+
+    def get_item_effect_names(self) -> List[str]:
+        return list(x["name"] for x in self.item_db["item_effects"])
 
     def get_loot_table(self, loot_table_name: str) -> dict:
         return self.item_db["loot_tables"][loot_table_name]
@@ -282,48 +290,6 @@ class LootSlotsEditor(GeneratedArrayEditor):
         raise ValueError(f"Invalid slot type: {slot['type']}")
 
 
-class TableRefEnum(GeneratedEnumEditor):
-    def __init__(
-        self,
-        item_db: ItemDb,
-        generator: JSONEditorGenerator,
-        key: str,
-        obj: Dict[str, Any],
-        parent: Optional[BaseInterface],
-        prefix: str,
-    ):
-        del generator
-        obj["enum"] = item_db.get_loot_table_names()
-        super().__init__(key, obj, parent, prefix)
-        self.item_db = item_db
-
-    def update_ui(self) -> None:
-        self.enum_values = self.item_db.get_loot_table_names()
-        self.w.combo.update(values=self.item_db.get_loot_table_names())
-        super().update_ui()
-
-
-class ItemNameEnum(GeneratedEnumEditor):
-    def __init__(
-        self,
-        item_db: ItemDb,
-        generator: JSONEditorGenerator,
-        key: str,
-        obj: Dict[str, Any],
-        parent: Optional[BaseInterface],
-        prefix: str,
-    ):
-        del generator
-        obj["enum"] = item_db.get_item_names()
-        super().__init__(key, obj, parent, prefix)
-        self.item_db = item_db
-
-    def update_ui(self) -> None:
-        self.enum_values = self.item_db.get_item_names()
-        self.w.combo.update(values=self.item_db.get_item_names())
-        super().update_ui()
-
-
 class LootViewer(BaseWindow):
     def __init__(self, item_db: ItemDb, loot_info_wrapper: LootInfoWrapper):
         super().__init__("Loot Viewer")
@@ -331,19 +297,27 @@ class LootViewer(BaseWindow):
         self.loot_info_wrapper = loot_info_wrapper
 
         schema_files = SCHEMAS_PATH.glob("*_schema.json")
-        self.loot_table_path = "https://rogue-todo.com/loot_tb_schema.json"
 
         self.generator = JSONEditorGenerator.load(schema_files)
         self.generator.register_override(
-            self.loot_table_path + "#defs/loot_table/slots", LootSlotsEditor
+            LOOT_TB_SID + "#defs/loot_table/slots", LootSlotsEditor
         )
         self.generator.register_override(
-            self.loot_table_path + "#defs/loot_table/slots/item/table/ref",
-            partial(TableRefEnum, item_db),
+            LOOT_TB_SID + "#defs/loot_table/slots/item/table/ref",
+            partial(
+                LinkedGeneratedEnumEditor, self.item_db.get_loot_table_names
+            ),
         )
         self.generator.register_override(
-            self.loot_table_path + "#defs/loot_table/slots/item/item/name",
-            partial(ItemNameEnum, item_db),
+            LOOT_TB_SID + "#defs/loot_table/slots/item/item/name",
+            partial(LinkedGeneratedEnumEditor, self.item_db.get_item_names),
+        )
+        self.generator.register_override(
+            ITEM_DB_SID + "#properties/item_prototypes/items/enhancements",
+            partial(
+                LinkedGeneratedEnumEditor,
+                self.item_db.get_loot_table_names,
+            ),
         )
 
         self.current_table = None
@@ -360,7 +334,7 @@ class LootViewer(BaseWindow):
             self._on_select_loot_table,
         )
         self.loot_editor = self.generator.create_editor_interface_from_path(
-            self.loot_table_path + "#defs/loot_table", self
+            LOOT_TB_SID + "#defs/loot_table", self
         )
         self.loot_editor.register_on_change_handler(self._on_loot_table_edited)
         return [
@@ -384,7 +358,7 @@ class LootViewer(BaseWindow):
             self._on_select_item,
         )
         self.item_editor = self.generator.create_editor_interface_from_path(
-            "https://rogue-todo.com/item-db-schema#properties/item_prototypes/items",
+            ITEM_DB_SID + "#properties/item_prototypes/items",
             self,
         )
         self.item_editor.register_on_change_handler(self._on_item_edited)
@@ -398,7 +372,7 @@ class LootViewer(BaseWindow):
                     expand_x=True,
                     expand_y=True,
                     scrollable=True,
-                    key=self.k.item_editor_col
+                    key=self.k.item_editor_col,
                 ),
             ],
         ]
@@ -407,16 +381,26 @@ class LootViewer(BaseWindow):
         self.item_db_file_manager = JSONFileManagerInterface(
             title="Item Database",
             on_save=self.item_db.save,
-            on_load=self.item_db.load_from,
+            on_load=self._handle_load,
             path=self.item_db.item_db_path,
             parent=self,
             prefix=self.prefix,
         )
-        layout = [[
-            self.item_db_file_manager.get_element()
-        ]]
+        layout = [[self.item_db_file_manager.get_element()]]
         return [[sg.Frame("File", layout, expand_x=True, expand_y=True)]]
 
+    def _handle_load(self, path: str) -> None:
+        self.item_db.load_from(path)
+        self.select_loot_table.set_values(
+            self.item_db.get_loot_table_names(),
+            trigger_handlers=False,
+            update_ui=True,
+        )
+        self.select_item_table.set_values(
+            self.item_db.get_item_names(),
+            trigger_handlers=False,
+            update_ui=True,
+        )
 
     def get_layout(self) -> List[List[Element]]:
         loot_tb_layout = self.get_loot_table_layout()
@@ -469,7 +453,6 @@ class LootViewer(BaseWindow):
     def _on_ui_refresh(self) -> None:
         self.w.loot_editor_col.contents_changed()
         self.w.item_editor_col.contents_changed()
-
 
 
 def is_windows() -> bool:

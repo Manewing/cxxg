@@ -6,6 +6,7 @@
     "loot_table": {
       "type": "object",
       "description": "A loot table consisting of a list of reward slots that are randomly picked",
+      "required": ["slots", "rolls"],
       "properties": {
         "rolls": {
           "type": "integer",

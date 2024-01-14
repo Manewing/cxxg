@@ -189,6 +189,154 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
         return False
 
 
+class LinkedGeneratedEnumEditor(GeneratedEnumEditor):
+    """
+    Selectable values of the enum are linked to the value of another JSON file
+    or editor
+    """
+
+    def __init__(
+        self,
+        get_enum_values: Callable[[], List[str]],
+        generator: "JSONEditorGenerator",
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
+    ):
+        del generator
+        obj["enum"] = get_enum_values()
+        super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
+        self.get_enum_values = get_enum_values
+        self.value = self.enum_values[0]
+
+    def update_ui(self) -> None:
+        self.enum_values = self.get_enum_values()
+        self.w.combo.update(self.value, values=self.enum_values)
+
+
+class NonRequiredEditor(BaseGeneratedEditor):
+    """
+    Selectable values of the enum are linked to the value of another JSON file
+    or editor
+    """
+
+    def __init__(
+        self,
+        editor: BaseGeneratedEditor,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
+        present: bool = True,
+    ):
+        super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
+        self.present = present
+        self.editor = editor
+        self.editor.register_on_change_handler(self._trigger_update)
+
+    def get_value(self) -> Any:
+        if self.present:
+            return self.editor.get_value()
+        return None
+
+    def set_value(
+        self, value: Any, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        present = True
+        self.set_value_and_present(
+            value, trigger_handlers, update_ui, set_present=present
+        )
+
+    def set_value_and_present(
+        self,
+        value: Any,
+        trigger_handlers: bool,
+        update_ui: bool,
+        set_present: bool,
+    ) -> None:
+        present_changed = set_present != self.present
+        self.present = set_present
+        if self.present:
+            self.editor.set_value(
+                value, trigger_handlers=False, update_ui=update_ui
+            )
+        # Force update if present changed, we need to trigger the update since the
+        # editor needs to be either visible or not
+        if present_changed:
+            update_ui = True
+        super().set_value(value, trigger_handlers, update_ui)
+
+    def _trigger_update(
+        self, value: Any, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        self.set_value(
+            value,
+            trigger_handlers=trigger_handlers,
+            update_ui=False,
+        )
+
+    def restore_default(self, trigger_handlers: bool, update_ui: bool) -> bool:
+        self.editor.restore_default(trigger_handlers, update_ui)
+        self.present = False
+
+    def is_required(self) -> bool:
+        return self.present
+
+    def get_title(self) -> str:
+        sym = sg.SYMBOL_CHECK_SMALL if self.present else sg.SYMBOL_X_SMALL
+        return f"{sym} {self.title} (Optional)"
+
+    def get_row(self) -> List[sg.Element]:
+        col = sg.Column(
+            [
+                [
+                    sg.T(
+                        self.get_title(),
+                        enable_events=True,
+                        key=self.k.collapse_col_btn,
+                    ),
+                ],
+                [
+                    sg.pin(
+                        sg.Column(
+                            [self.editor.get_row()],
+                            key=self.k.collapse_col,
+                            visible=self.present,
+                        )
+                    )
+                ],
+            ],
+            pad=(0, 0),
+        )
+        self.register_event(self.k.collapse_col_btn)
+        self.register_setup(self._handle_update)
+        return [col]
+
+    def update_ui(self) -> None:
+        self._handle_update()
+        super().update_ui()
+        self.editor.update_ui()
+
+    def _handle_update(self) -> None:
+        self.w.collapse_col_btn.update(self.get_title())
+        self.w.collapse_col.update(visible=self.present)
+        self.trigger_refresh()
+
+    def handle_event(self, event: str, values: dict) -> bool:
+        if event == self.k.collapse_col_btn:
+            # Only trigger the handlers that the value changed, UI update
+            # is handled separately based on the present state
+            self.set_value_and_present(
+                self.editor.get_value(),
+                trigger_handlers=True,
+                update_ui=False,
+                set_present=not self.present,
+            )
+            return True
+        return False
+
+
 class GeneratedInputEditor(BaseGeneratedEditor):
     def __init__(
         self,
@@ -334,15 +482,30 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
             self.property_editors[sub_key] = generator.create_editor_interface(
                 sub_key, sub_value, self, prefix=self.prefix
             )
+
+            # Handle non-required properties
+            if not self.is_key_required(sub_key):
+                self.property_editors[sub_key] = NonRequiredEditor(
+                    self.property_editors[sub_key],
+                    sub_key,
+                    sub_value,
+                    self,
+                    prefix="opt_" + self.prefix,
+                    present=False,
+                )
+
             self.property_editors[sub_key].register_on_change_handler(
                 partial(self._update_property, sub_key)
             )
 
+    def is_key_required(self, key: str) -> bool:
+        editor = self.property_editors[key]
+        return key in self.obj.get("required", []) and editor.is_required()
+
     def get_value(self) -> Any:
         value = {}
         for sub_key, editor in self.property_editors.items():
-            is_required = (sub_key in self.obj.get("required", [])) and editor.is_required()
-            if not is_required and not editor.get_value():
+            if not self.is_key_required(sub_key):
                 continue
             if editor.needs_store():
                 value[sub_key] = editor.get_value()
@@ -354,14 +517,15 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
         if not isinstance(obj, dict):
             raise ValueError(f"Expected dict, got: {value}")
         for key, editor in self.property_editors.items():
-            is_required = (key in self.obj.get("required", [])) and editor.is_required()
-            if key not in obj and is_required:
-                raise ValueError(f"Expected required key: {key} in {obj}")
             editor.restore_default(trigger_handlers=False, update_ui=False)
+            if key not in obj and self.is_key_required(key):
+                obj[key] = editor.get_value()
         for key, value in obj.items():
             editor = self.property_editors[key]
-            editor.set_value(value, trigger_handlers=False, update_ui=update_ui)
+            editor.set_value(value, trigger_handlers=False, update_ui=False)
         super().set_value(obj, trigger_handlers, update_ui=False)
+        if update_ui:
+            self.update_ui()
 
     def update_ui(self) -> None:
         for editor in self.property_editors.values():
@@ -372,8 +536,9 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
     ) -> None:
         obj = self.get_value()
         obj[key] = value
-        # Do not propagate update_ui we are reacting to a child update
-        self.set_value(obj, trigger_handlers=trigger_handlers, update_ui=False)
+        super().set_value(obj, trigger_handlers, update_ui=False)
+        if update_ui:
+            self.update_ui()
 
     def get_row(self) -> List[sg.Element]:
         if self.description:
@@ -536,7 +701,7 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
                 typed_info, obj, self, prefix=f"{prefix:s}_{key:s}"
             )
             self.editors[typed_info].register_on_change_handler(
-                partial(self._on_editor_changed, typed_info)
+                self._on_editor_changed
             )
         self.selected_type = list(self.editors.keys())[1]
 
@@ -559,23 +724,20 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
         self.editors[self.selected_type].set_value(
             value, trigger_handlers=False, update_ui=update_ui
         )
+        self._on_editor_changed(value, trigger_handlers, update_ui)
+
+    def _on_editor_changed(
+        self,
+        value: Any,
+        trigger_handlers: bool,
+        update_ui: bool,
+    ) -> None:
         super().set_value(value, trigger_handlers, update_ui)
 
         for typed_info in self.editors:
             enabled = typed_info == self.selected_type
             self.w.get(typed_info).update(visible=enabled)
         self.trigger_refresh()
-
-    def _on_editor_changed(
-        self,
-        typed_info: str,
-        value: Any,
-        trigger_handlers: bool,
-        update_ui: bool,
-    ) -> None:
-        self.set_value(
-            value, trigger_handlers=trigger_handlers, update_ui=False
-        )
 
     def update_ui(self) -> None:
         self.w.combo.update(self.selected_type)
@@ -682,6 +844,7 @@ class JSONEditorGenerator:
             raise ValueError(f"/{prefix}/{key}: Expected dict, got: {obj}")
 
         if self._current_path in self._overrides:
+            print("# Using override for:", self._current_path)
             return self._create_override(
                 self._current_path, key, obj, parent, prefix
             )

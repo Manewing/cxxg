@@ -139,9 +139,14 @@ class SchemaProcessor:
         """
         schema_id, ref_path = ref.split("#", 1)
         if schema_id not in self.schemas_by_id:
+            if schema:
+                raise ValueError(
+                    f"{schema.schema_file}: Invalid schema ID in reference: {ref}"
+                )
             raise ValueError(
-                f"{schema.schema_file}: Invalid schema ID in reference: {ref}"
+                f"Invalid schema ID in reference: {ref}"
             )
+
         ref_schema = self.schemas_by_id[schema_id]
         if schema_id not in self.resolved_schema_ids:
             self.resolve(ref_schema)

@@ -114,28 +114,25 @@ class CollapsibleSection(BaseInterface):
         self.arrows = arrows
         self.collapsed = collapsed
 
-    def get_title(self) -> str:
-        collapse_str = " (expand)" if self.collapsed else "(collapse)"
-        if self.title:
-            return f"{self.title:s} {collapse_str:s}"
-        return f"{collapse_str:s}"
-
     def get_arrow(self) -> str:
         return self.arrows[0] if self.collapsed else self.arrows[1]
+
+    def get_title(self) -> str:
+        arrow = self.get_arrow()
+        collapse_str = " (expand)" if self.collapsed else "(collapse)"
+        if self.title:
+            return f"{arrow} {self.title:s} {collapse_str:s}"
+        return f"{arrow} {collapse_str:s}"
+
 
     def get_element(self) -> sg.Element:
         col = sg.Column(
             [
                 [
                     sg.T(
-                        self.get_arrow(),
-                        enable_events=True,
-                        k=self.k.collapse_col_btn,
-                    ),
-                    sg.T(
                         self.get_title(),
                         enable_events=True,
-                        key=self.k.collapse_col_title,
+                        key=self.k.collapse_col_btn,
                     ),
                 ],
                 [
@@ -151,7 +148,6 @@ class CollapsibleSection(BaseInterface):
             pad=(0, 0),
         )
         self.register_event(self.k.collapse_col_btn)
-        self.register_event(self.k.collapse_col_title)
 
         return col
 
@@ -159,13 +155,10 @@ class CollapsibleSection(BaseInterface):
         if super().handle_event(event, values):
             return True
         if (
-            event == self.k.collapse_col_btn
-            or event == self.k.collapse_col_title
-        ):
+            event == self.k.collapse_col_btn):
             self.collapsed = not self.collapsed
             self.w.collapse_col.update(visible=not self.collapsed)
-            self.w.collapse_col_btn.update(self.get_arrow())
-            self.w.collapse_col_title.update(self.get_title())
+            self.w.collapse_col_btn.update(self.get_title())
             self.trigger_refresh()
             return True
 
