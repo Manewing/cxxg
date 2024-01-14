@@ -179,7 +179,8 @@ class SelectLootTableViewer(ListEditorBase):
         item_cp_drops = [x["cp_drop"] for x in loot_info["item_rewards"]]
         item_percentages = [x["pp_drop"] for x in loot_info["item_rewards"]]
 
-        fig = plt.figure(figsize=(20, 10))
+        fig = plt.figure(figsize=(14, 8))
+        fig.set_tight_layout(True)
 
         ax = fig.add_subplot(111)
         rolls = loot_info["rolls"]
@@ -189,7 +190,7 @@ class SelectLootTableViewer(ListEditorBase):
         ax.set_xlabel("Item")
         x_pos = [i for i, _ in enumerate(item_names)]
         ax.set_xticks(x_pos)
-        ax.set_xticklabels(item_names, rotation=45)
+        ax.set_xticklabels(item_names, rotation=90, fontsize=8)
 
         ax_cp_drops = ax
         ax_percentages = ax_cp_drops.twinx()
