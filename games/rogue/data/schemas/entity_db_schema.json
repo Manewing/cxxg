@@ -1,5 +1,5 @@
 {
-  "$id": "https://rogue-todo.com/entity-db-schema",
+  "$id": "https://rogue-todo.com/entity-db-schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "JSON Schema for the entity database",
   "type": "object",

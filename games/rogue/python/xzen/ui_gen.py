@@ -543,14 +543,16 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
         obj = self.get_value()
         self._set_value_no_editors(obj, trigger_handlers, update_ui)
 
-    def get_row(self) -> List[sg.Element]:
+    def get_header(self) -> List[List[sg.Element]]:
         if self.description:
-            layout = [
+            return [
                 [sg.Text(self.description, size=(40, None))],
                 [sg.HSep(pad=(None, 20))],
             ]
-        else:
-            layout = []
+        return []
+
+    def get_row(self) -> List[sg.Element]:
+        layout = self.get_header()
         editors = [v for _, v in sorted(self.property_editors.items())]
         for editor in editors:
             layout += [editor.get_row()]
@@ -703,18 +705,78 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
         prefix: str,
     ):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
-        self.any_of = obj.get("anyOf")
+        self.any_of: List[Dict[str, Any]] = obj["anyOf"]
+        _, typed_infos = self._get_any_of_types()
 
         self.editors: Dict[str, GeneratedObjectEditor] = {}
-        for obj in self.any_of:
-            typed_info = obj["properties"]["type"]["const"]
+        for sub_obj, typed_info in zip(self.any_of, typed_infos):
             self.editors[typed_info] = generator.create_editor_interface(
-                typed_info, obj, self, prefix=f"{prefix:s}_{key:s}"
+                typed_info, sub_obj, self, prefix=f"{prefix:s}_{key:s}"
             )
             self.editors[typed_info].register_on_change_handler(
                 self._on_editor_changed
             )
         self.selected_type = list(self.editors.keys())[1]
+
+    def _get_any_of_custom_type(self) -> Optional[List[str]]:
+        all_custom_types = []
+        for sub_obj in self.any_of:
+            if "properties" not in sub_obj:
+                continue
+            properties = sub_obj["properties"]
+            if "type" not in properties:
+                continue
+            if "const" not in properties["type"]:
+                continue
+            all_custom_types.append(properties["type"]["const"])
+        if len(all_custom_types) != len(self.any_of):
+            return None
+        return all_custom_types
+
+    def _get_any_of_from_type(self) -> List[str]:
+        all_types = []
+        for sub_obj in self.any_of:
+            if "type" not in sub_obj:
+                continue
+            all_types.append(sub_obj["type"])
+
+        # Check if all types are unique
+        if len(set(all_types)) != len(self.any_of):
+            raise ValueError(f"Duplicate types in anyOf: {all_types}")
+        return all_types
+
+    def _get_any_of_types(self) -> Tuple[bool, List[str]]:
+        all_custom_types = self._get_any_of_custom_type()
+        if all_custom_types is not None:
+            return True, all_custom_types
+        return False, self._get_any_of_from_type()
+
+    def _get_custom_type_from_value(self, value: Any) -> str:
+        if not isinstance(value, dict):
+            raise ValueError(f"Expected dict, got: {value}")
+        if "type" not in value:
+            raise ValueError(f"Expected 'type' in dict, got: {value}")
+        if value["type"] not in self.editors:
+            raise ValueError(f"Invalid type: {value['type']}")
+        return value["type"]
+
+    def _get_type_from_value(self, value: Any) -> str:
+        is_custom, typed_infos = self._get_any_of_types()
+        if is_custom:
+            return self._get_custom_type_from_value(value)
+        typed_info = {
+            bool: "boolean",
+            int: "integer",
+            float: "number",
+            str: "string",
+            dict: "object",
+            list: "array",
+        }[type(value)]
+        if typed_info not in typed_infos:
+            raise ValueError(
+                f"Invalid type: {typed_info}, allowed: {typed_infos}"
+            )
+        return typed_info
 
     def get_types(self) -> List[str]:
         return list(self.editors.keys())
@@ -725,13 +787,8 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
     def set_value(
         self, value: Any, trigger_handlers: bool, update_ui: bool
     ) -> None:
-        if not isinstance(value, dict):
-            raise ValueError(f"Expected dict, got: {value}")
-        if "type" not in value:
-            raise ValueError(f"Expected 'type' in dict, got: {value}")
-        if value["type"] not in self.editors:
-            raise ValueError(f"Invalid type: {value['type']}")
-        self.selected_type = value["type"]
+        typed_info = self._get_type_from_value(value)
+        self.selected_type = typed_info
         self.editors[self.selected_type].set_value(
             value, trigger_handlers=False, update_ui=update_ui
         )
@@ -944,36 +1001,38 @@ class JSONFileManagerInterface(BaseInterface):
         self._title = title
 
     def get_element(self) -> sg.Element:
-        is_save_enabled = self._on_save is not None
-        is_load_enabled = self._on_load is not None
-        layout = [
-            [
+        toolbar = []
+
+        if self._on_load is not None:
+            toolbar += [
                 sg.Button(
                     "Load",
                     key=self.k.load,
-                    disabled=not is_load_enabled,
                     expand_x=True,
                 ),
+            ]
+            self.register_event(self.k.load)
+
+        if self._on_save is not None:
+            toolbar += [
                 sg.Button(
                     "Save",
                     key=self.k.save,
-                    disabled=not is_save_enabled,
                     expand_x=True,
                 ),
                 sg.Button(
                     "Save As",
                     key=self.k.save_as,
-                    disabled=not is_save_enabled,
                     expand_x=True,
                 ),
-            ],
-            [sg.InputText(self._file_path, key=self.k.text, expand_x=True)],
-        ]
-        if is_load_enabled:
-            self.register_event(self.k.load)
-        if is_save_enabled:
+            ]
             self.register_event(self.k.save)
             self.register_event(self.k.save_as)
+
+        layout = [
+            toolbar,
+            [sg.InputText(self._file_path, key=self.k.text, expand_x=True)],
+        ]
         return sg.Frame(self._title, layout, expand_x=True)
 
     def _set_file_path(self, path: str) -> None:
