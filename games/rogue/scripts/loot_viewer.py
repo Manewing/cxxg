@@ -393,12 +393,12 @@ class LootViewer(BaseWindow):
         self.item_db.load_from(path)
         self.select_loot_table.set_values(
             self.item_db.get_loot_table_names(),
-            trigger_handlers=False,
+            trigger_handlers=True,
             update_ui=True,
         )
         self.select_item_table.set_values(
             self.item_db.get_item_names(),
-            trigger_handlers=False,
+            trigger_handlers=True,
             update_ui=True,
         )
 
