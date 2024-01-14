@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import abc
 import json
 import PySimpleGUI as sg
@@ -298,9 +299,23 @@ class GeneratedColorInputEditor(GeneratedInputEditor):
     def get_row(self) -> List[sg.Element]:
         row = super().get_row()
         row += [
-            sg.ColorChooserButton("Choose color", target=self.k.text),
+            sg.Button(
+                "Choose color",
+                key=self.k.button,
+            )
         ]
+        self.register_event(self.k.button)
         return row
+
+    def handle_event(self, event: str, values: dict) -> bool:
+        if super().handle_event(event, values):
+            return True
+        if event == self.k.button:
+            color = sg.askcolor(self.value, title=self.title)
+            if color:
+                self.set_value(color[1], trigger_handlers=True, update_ui=True)
+            return True
+        return False
 
 
 class GeneratedObjectEditor(BaseGeneratedEditor):
@@ -441,7 +456,8 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             layout_editor,
             title=self.item_editor.title,
             parent=self,
-            prefix=self.prefix)
+            prefix=self.prefix,
+        )
         layout = [
             [self.list_ui.get_element()],
             [self._collapsible_section.get_element()],
@@ -734,6 +750,115 @@ class JSONEditorGenerator:
             self._current_path = ""
 
 
+class JSONFileManagerInterface(BaseInterface):
+    def __init__(
+        self,
+        title: str,
+        on_save: Callable[[str], None] = None,
+        on_load: Callable[[str], None] = None,
+        path: Optional[str] = None,
+        parent: Optional[BaseInterface] = None,
+        prefix: str = "",
+    ):
+        super().__init__(parent=parent, prefix=prefix)
+        self._file_path: Optional[str] = path
+        self._on_save = on_save
+        self._on_load = on_load
+        self._title = title
+
+    def get_element(self) -> sg.Element:
+        is_save_enabled = self._on_save is not None
+        is_load_enabled = self._on_load is not None
+        layout = [
+            [
+                sg.Button(
+                    "Load",
+                    key=self.k.load,
+                    disabled=not is_load_enabled,
+                    expand_x=True,
+                ),
+                sg.Button(
+                    "Save",
+                    key=self.k.save,
+                    disabled=not is_save_enabled,
+                    expand_x=True,
+                ),
+                sg.Button(
+                    "Save As",
+                    key=self.k.save_as,
+                    disabled=not is_save_enabled,
+                    expand_x=True,
+                ),
+            ],
+            [sg.InputText(self._file_path, key=self.k.text, expand_x=True)],
+        ]
+        if is_load_enabled:
+            self.register_event(self.k.load)
+        if is_save_enabled:
+            self.register_event(self.k.save)
+            self.register_event(self.k.save_as)
+        return sg.Frame(self._title, layout, expand_x=True)
+
+    def _set_file_path(self, path: str) -> None:
+        self._file_path = path
+        self.w.text.update(path)
+
+    def _save(self) -> None:
+        if not self._on_save:
+            raise ValueError("Save callback not set")
+        self._on_save(self._file_path)
+
+    def _handle_save_as(self) -> None:
+        initial_folder = os.getcwd()
+        if self._file_path:
+            initial_folder = os.path.dirname(self._file_path)
+        filename = sg.popup_get_file(
+            "",
+            save_as=True,
+            no_window=True,
+            file_types=(("JSON *.json",)),
+            initial_folder=initial_folder,
+        )
+        if filename:
+            self._set_file_path(filename)
+            self._save()
+            sg.popup(f"Saved {self._title} database to: {filename}")
+
+    def _handle_save(self) -> None:
+        if not self._file_path:
+            self._handle_save_as()
+            return
+        self._save()
+
+    def _handle_load(self) -> None:
+        if not self._on_load:
+            raise ValueError("Load callback not set")
+        filename = sg.popup_get_file(
+            "",
+            no_window=True,
+            file_types=(("JSON *.json",)),
+            initial_folder=os.getcwd(),
+        )
+        if filename:
+            self._set_file_path(filename)
+            self._on_load(filename)
+            sg.popup(f"Loaded {self._title} from: {filename}")
+
+    def handle_event(self, event: str, values: dict) -> bool:
+        if super().handle_event(event, values):
+            return True
+        if event == self.k.save_as:
+            self._handle_save_as()
+            return True
+        if event == self.k.save:
+            self._handle_save()
+            return True
+        if event == self.k.load:
+            self._handle_load()
+            return True
+        return False
+
+
 class GeneratedJsonEditor(BaseWindow):
     def __init__(self, editor: BaseGeneratedEditor):
         super().__init__(editor.title)
@@ -743,5 +868,34 @@ class GeneratedJsonEditor(BaseWindow):
     def get_value(self) -> Any:
         return self.editor.get_value()
 
-    def get_layout(self) -> List[List[sg.Element]]:
+    def get_file_tab_layout(self) -> List[List[sg.Element]]:
+        self.file_manager = JSONFileManagerInterface(
+            "JSON File",
+            on_save=self._handle_save,
+            on_load=self._handle_load,
+            parent=self,
+            prefix=self.prefix,
+        )
+        layout = [[self.file_manager.get_element()]]
+        return [[sg.Frame("File", layout, expand_x=True, expand_y=True)]]
+
+    def get_editor_tab_layout(self) -> List[List[sg.Element]]:
         return [self.editor.get_row()]
+
+    def _handle_save(self, path: str) -> None:
+        with open(path, "w") as f:
+            json.dump(self.get_value(), f, indent=4)
+
+    def _handle_load(self, path: str) -> None:
+        with open(path, "r") as f:
+            value = json.load(f)
+        self.editor.set_value(value, trigger_handlers=True, update_ui=True)
+
+    def get_layout(self) -> List[List[sg.Element]]:
+        file_tab_layout = self.get_file_tab_layout()
+        file_tab = sg.Tab("File", file_tab_layout)
+
+        editor_tab_layout = self.get_editor_tab_layout()
+        editor_tab = sg.Tab("Editor", editor_tab_layout)
+
+        return [[sg.TabGroup([[file_tab, editor_tab]])]]

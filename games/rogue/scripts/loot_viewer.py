@@ -21,6 +21,7 @@ from xzen.ui_gen import JSONEditorGenerator
 from xzen.ui_gen import BaseGeneratedEditor
 from xzen.ui_gen import GeneratedArrayEditor
 from xzen.ui_gen import GeneratedEnumEditor
+from xzen.ui_gen import JSONFileManagerInterface
 
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
@@ -36,6 +37,11 @@ class ItemDb:
         with open(item_db_path, "r") as f:
             item_db = json.load(f)
         return ItemDb(item_db, item_db_path)
+
+    def load_from(self, item_db_path: str) -> None:
+        with open(item_db_path, "r") as f:
+            self.item_db = json.load(f)
+        self.item_db_path = item_db_path
 
     def save(self, item_db_path: str) -> None:
         with open(item_db_path, "w") as f:
@@ -115,13 +121,8 @@ class SelectLootTableViewer(ListEditorBase):
                 key=self.k.show_stats,
                 expand_x=True,
             ),
-            sg.VSep(),
-            sg.Button("Save", key=self.k.save, expand_x=True),
-            sg.Button("Save As", key=self.k.save_as, expand_x=True),
         ]
         self.register_event(self.k.show_stats)
-        self.register_event(self.k.save)
-        self.register_event(self.k.save_as)
 
         layout = [toolbar, [sg.HSep(pad=20)], [elem]]
         return sg.Frame("Loot Tables", layout)
@@ -134,21 +135,6 @@ class SelectLootTableViewer(ListEditorBase):
             return True
         if event == self.k.show_stats:
             self.show_loot_table_stat_plot(self.get_selected_loot_table())
-            return True
-        if event == self.k.save_as:
-            filename = sg.popup_get_file(
-                "",
-                save_as=True,
-                no_window=True,
-                file_types=(("JSON *.json",)),
-                initial_folder=os.getcwd(),
-            )
-            if filename:
-                self.item_db.save(filename)
-                sg.popup(f"Saved item database to: {filename}")
-            return True
-        if event == self.k.save:
-            self.item_db.save(self.item_db.item_db_path)
             return True
         return False
 
@@ -416,6 +402,21 @@ class LootViewer(BaseWindow):
             ],
         ]
 
+    def get_file_tab_layout(self) -> List[List[sg.Element]]:
+        self.item_db_file_manager = JSONFileManagerInterface(
+            title="Item Database",
+            on_save=self.item_db.save,
+            on_load=self.item_db.load_from,
+            path=self.item_db.item_db_path,
+            parent=self,
+            prefix=self.prefix,
+        )
+        layout = [[
+            self.item_db_file_manager.get_element()
+        ]]
+        return [[sg.Frame("File", layout, expand_x=True, expand_y=True)]]
+
+
     def get_layout(self) -> List[List[Element]]:
         loot_tb_layout = self.get_loot_table_layout()
         loot_tb_tab = sg.Tab("Loot Tables", loot_tb_layout)
@@ -423,7 +424,10 @@ class LootViewer(BaseWindow):
         item_tb_layout = self.get_item_tb_layout()
         item_tb_tab = sg.Tab("Items", item_tb_layout)
 
-        return [[sg.TabGroup([[loot_tb_tab, item_tb_tab]])]]
+        file_tab_layout = self.get_file_tab_layout()
+        file_tab = sg.Tab("File", file_tab_layout)
+
+        return [[sg.TabGroup([[file_tab, loot_tb_tab, item_tb_tab]])]]
 
     def _on_loot_table_edited(
         self, value: dict, trigger_handlers: bool, update_ui: bool
