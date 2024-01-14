@@ -12,6 +12,7 @@ from xzen.schema import SchemaProcessor
 from xzen.ui import BaseWindow
 from xzen.ui import BaseInterface
 from xzen.ui import ListEditorBase
+from xzen.ui import CollapsibleSection
 
 
 def convert_snake_case_to_camel_case(s: str) -> str:
@@ -432,10 +433,18 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         return f"[{idx}]: {title}"
 
     def get_row(self) -> List[sg.Element]:
-        layout = [
-            [self.list_ui.get_element()],
+        layout_editor = [
             [sg.HSep(pad=(None, 20))],
             self.item_editor.get_row(),
+        ]
+        self._collapsible_section = CollapsibleSection(
+            layout_editor,
+            title=self.item_editor.title,
+            parent=self,
+            prefix=self.prefix)
+        layout = [
+            [self.list_ui.get_element()],
+            [self._collapsible_section.get_element()],
         ]
         row = [
             sg.Frame(
@@ -536,6 +545,7 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
         for typed_info in self.editors:
             enabled = typed_info == self.selected_type
             self.w.get(typed_info).update(visible=enabled)
+        self.trigger_refresh()
 
     def _on_editor_changed(
         self,

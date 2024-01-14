@@ -102,7 +102,7 @@ class SelectLootTableViewer(ListEditorBase):
             values=sorted(item_db.get_loot_table_names()),
             on_add_item=self.on_add_item,
             on_rm_item=self.on_rm_item,
-            size=(40, 50),
+            size=(40, 35),
         )
         self.item_db = item_db
         self.loot_info_wrapper = loot_info_wrapper
@@ -243,13 +243,13 @@ class SelectItemTableViewer(ListEditorBase):
             values=item_db.get_item_names(),
             on_add_item=self.on_add_item,
             on_rm_item=self.on_rm_item,
-            size=(40, 50),
+            size=(40, 35),
         )
         self.item_db = item_db
 
     def get_element(self) -> Element:
         elem = super().get_element()
-        return sg.Frame("Loot Tables", [[elem]])
+        return sg.Frame("Items", [[elem]])
 
     def on_add_item(self) -> Optional[str]:
         item_name = sg.popup_get_text(
@@ -380,7 +380,13 @@ class LootViewer(BaseWindow):
             [
                 self.select_loot_table.get_element(),
                 sg.VSep(),
-                sg.Column([self.loot_editor.get_row()]),
+                sg.Column(
+                    [self.loot_editor.get_row()],
+                    expand_x=True,
+                    expand_y=True,
+                    scrollable=True,
+                    key=self.k.loot_editor_col,
+                ),
             ],
         ]
 
@@ -395,11 +401,18 @@ class LootViewer(BaseWindow):
             self,
         )
         self.item_editor.register_on_change_handler(self._on_item_edited)
+        self.register_refresh_handler(self._on_ui_refresh)
         return [
             [
                 self.select_item_table.get_element(),
                 sg.VSep(),
-                sg.Column([self.item_editor.get_row()]),
+                sg.Column(
+                    [self.item_editor.get_row()],
+                    expand_x=True,
+                    expand_y=True,
+                    scrollable=True,
+                    key=self.k.item_editor_col
+                ),
             ],
         ]
 
@@ -436,7 +449,8 @@ class LootViewer(BaseWindow):
         self.item_db.set_item(self.current_item, value)
         self.select_item_table.set_values(
             self.item_db.get_item_names(),
-            trigger_handlers=False, update_ui=True
+            trigger_handlers=False,
+            update_ui=True,
         )
 
     def _on_select_item(self, idx: int) -> None:
@@ -446,6 +460,11 @@ class LootViewer(BaseWindow):
             trigger_handlers=False,
             update_ui=True,
         )
+
+    def _on_ui_refresh(self) -> None:
+        self.w.loot_editor_col.contents_changed()
+        self.w.item_editor_col.contents_changed()
+
 
 
 def is_windows() -> bool:

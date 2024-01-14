@@ -37,6 +37,8 @@ class BaseInterface(abc.ABC):
     ):
         self.parent = parent
         self.events: Dict[str, "BaseInterface"] = {}
+        self.setups: List[Callable[[], None]] = []
+        self.refresh_handlers: List[Callable[[], None]] = []
         self.prefix = prefix
 
     @property
@@ -64,10 +66,108 @@ class BaseInterface(abc.ABC):
         else:
             self.events[event] = handler
 
+    def handle_setup(self) -> None:
+        for setup in self.setups:
+            setup()
+
+    def register_setup(self, setup: Callable[[], None]) -> None:
+        root = self
+        while root.parent is not None:
+            root = root.parent
+        root.setups.append(setup)
+
+    def handle_refresh(self) -> None:
+        for handler in self.refresh_handlers:
+            handler()
+
+    def register_refresh_handler(self, handler: Callable[[], None]) -> None:
+        root = self
+        while root.parent is not None:
+            root = root.parent
+        root.refresh_handlers.append(handler)
+
+    def trigger_refresh(self) -> None:
+        root = self
+        while root.parent is not None:
+            root = root.parent
+        root.handle_refresh()
+
     def get_window(self) -> sg.Window:
         if self.parent is not None:
             return self.parent.get_window()
         raise ValueError("Parent not initialized")
+
+
+class CollapsibleSection(BaseInterface):
+    def __init__(
+        self,
+        layout: List[List[sg.Element]],
+        title: str = "",
+        arrows: Tuple[str, str] = (sg.SYMBOL_DOWN, sg.SYMBOL_UP),
+        collapsed: bool = True,
+        parent: Optional["BaseInterface"] = None,
+        prefix: str = "",
+    ):
+        super().__init__(parent, prefix)
+        self.layout = layout
+        self.title = title
+        self.arrows = arrows
+        self.collapsed = collapsed
+
+    def get_title(self) -> str:
+        collapse_str = " (expand)" if self.collapsed else "(collapse)"
+        if self.title:
+            return f"{self.title:s} {collapse_str:s}"
+        return f"{collapse_str:s}"
+
+    def get_arrow(self) -> str:
+        return self.arrows[0] if self.collapsed else self.arrows[1]
+
+    def get_element(self) -> sg.Element:
+        col = sg.Column(
+            [
+                [
+                    sg.T(
+                        self.get_arrow(),
+                        enable_events=True,
+                        k=self.k.collapse_col_btn,
+                    ),
+                    sg.T(
+                        self.get_title(),
+                        enable_events=True,
+                        key=self.k.collapse_col_title,
+                    ),
+                ],
+                [
+                    sg.pin(
+                        sg.Column(
+                            self.layout,
+                            key=self.k.collapse_col,
+                            visible=not self.collapsed,
+                        )
+                    )
+                ],
+            ],
+            pad=(0, 0),
+        )
+        self.register_event(self.k.collapse_col_btn)
+        self.register_event(self.k.collapse_col_title)
+
+        return col
+
+    def handle_event(self, event: str, values: dict) -> bool:
+        if super().handle_event(event, values):
+            return True
+        if (
+            event == self.k.collapse_col_btn
+            or event == self.k.collapse_col_title
+        ):
+            self.collapsed = not self.collapsed
+            self.w.collapse_col.update(visible=not self.collapsed)
+            self.w.collapse_col_btn.update(self.get_arrow())
+            self.w.collapse_col_title.update(self.get_title())
+            self.trigger_refresh()
+            return True
 
 
 class ListEditorBase(BaseInterface):
@@ -279,7 +379,8 @@ class BaseWindow(BaseInterface):
         sg.theme("DarkAmber")
         sg.set_options(font=("Courier New", 16))
         matplotlib.use("tkagg")
-        self.window = sg.Window(self.title, self.get_layout())
+        self.window = sg.Window(self.title, self.get_layout(), finalize=True)
+        self.handle_setup()
 
     @abc.abstractmethod
     def get_layout(self) -> List[List[sg.Element]]:
@@ -298,3 +399,7 @@ class BaseWindow(BaseInterface):
         if self.window is None:
             raise ValueError("Window not initialized")
         return self.window
+
+    def handle_refresh(self) -> None:
+        self.get_window().refresh()
+        return super().handle_refresh()
