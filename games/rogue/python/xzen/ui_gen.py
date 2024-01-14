@@ -341,6 +341,9 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
     def get_value(self) -> Any:
         value = {}
         for sub_key, editor in self.property_editors.items():
+            is_required = (sub_key in self.obj.get("required", [])) and editor.is_required()
+            if not is_required and not editor.get_value():
+                continue
             if editor.needs_store():
                 value[sub_key] = editor.get_value()
         return value
@@ -351,8 +354,8 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
         if not isinstance(obj, dict):
             raise ValueError(f"Expected dict, got: {value}")
         for key, editor in self.property_editors.items():
-            is_required = key in self.obj.get("required", [])
-            if key not in obj and (is_required and editor.is_required()):
+            is_required = (key in self.obj.get("required", [])) and editor.is_required()
+            if key not in obj and is_required:
                 raise ValueError(f"Expected required key: {key} in {obj}")
             editor.restore_default(trigger_handlers=False, update_ui=False)
         for key, value in obj.items():
@@ -807,6 +810,7 @@ class JSONFileManagerInterface(BaseInterface):
         if not self._on_save:
             raise ValueError("Save callback not set")
         self._on_save(self._file_path)
+        sg.popup(f"Saved {self._title} database to: {self._file_path}")
 
     def _handle_save_as(self) -> None:
         initial_folder = os.getcwd()
@@ -822,7 +826,6 @@ class JSONFileManagerInterface(BaseInterface):
         if filename:
             self._set_file_path(filename)
             self._save()
-            sg.popup(f"Saved {self._title} database to: {filename}")
 
     def _handle_save(self) -> None:
         if not self._file_path:
