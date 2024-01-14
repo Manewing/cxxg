@@ -4,6 +4,7 @@ import os
 import abc
 import json
 import PySimpleGUI as sg
+from copy import deepcopy
 from functools import partial
 from typing import List, Any, Dict, Type, Callable, Optional, Tuple
 
@@ -505,7 +506,7 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
     def get_value(self) -> Any:
         value = {}
         for sub_key, editor in self.property_editors.items():
-            if not self.is_key_required(sub_key):
+            if not editor.is_required():
                 continue
             if editor.needs_store():
                 value[sub_key] = editor.get_value()
@@ -523,9 +524,14 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
         for key, value in obj.items():
             editor = self.property_editors[key]
             editor.set_value(value, trigger_handlers=False, update_ui=False)
-        super().set_value(obj, trigger_handlers, update_ui=False)
-        if update_ui:
-            self.update_ui()
+        self._set_value_no_editors(
+            self.get_value(), trigger_handlers, update_ui
+        )
+
+    def _set_value_no_editors(
+        self, obj: str, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        super().set_value(obj, trigger_handlers, update_ui)
 
     def update_ui(self) -> None:
         for editor in self.property_editors.values():
@@ -535,10 +541,7 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
         self, key: str, value: Any, trigger_handlers: bool, update_ui: bool
     ) -> None:
         obj = self.get_value()
-        obj[key] = value
-        super().set_value(obj, trigger_handlers, update_ui=False)
-        if update_ui:
-            self.update_ui()
+        self._set_value_no_editors(obj, trigger_handlers, update_ui)
 
     def get_row(self) -> List[sg.Element]:
         if self.description:
@@ -587,7 +590,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self.values: List[Any] = []
 
     def get_value(self) -> List[Any]:
-        return self.values
+        return deepcopy(self.values)
 
     def set_value(
         self, value: Any, trigger_handlers: bool, update_ui: bool
@@ -602,6 +605,11 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             self.list_ui.set_values(
                 values, trigger_handlers=True, update_ui=True
             )
+            real_idx = self.list_ui.get_real_index()
+        else:
+            real_idx = 0
+        if len(self.values):
+            self._on_select(real_idx, update_ui=update_ui)
         super().set_value(value, trigger_handlers, update_ui)
 
     def update_ui(self) -> None:
@@ -650,11 +658,11 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         )
         self.update_ui()
 
-    def _on_select(self, idx: int) -> None:
+    def _on_select(self, idx: int, update_ui: bool = True) -> None:
         self.item_editor.set_value(
             self.values[idx],
             trigger_handlers=False,
-            update_ui=True,
+            update_ui=update_ui,
         )
 
     def _on_add_item(self) -> Optional[str]:

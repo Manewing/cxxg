@@ -261,7 +261,7 @@ class SelectItemTableViewer(ListEditorBase):
         return item_name
 
     def on_rm_item(self, idx: int) -> None:
-        del self.item_db.item_db["item_prototypes"][idx]["name"]
+        del self.item_db.item_db["item_prototypes"][idx]
 
 
 class LootSlotsEditor(GeneratedArrayEditor):
