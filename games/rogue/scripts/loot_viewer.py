@@ -79,24 +79,61 @@ class LootInfoWrapper:
         self.schema_path = schema_path
         self.loot_info_excel_path = loot_info_excel_path
 
-    def get_loot_info(self, loot_table_name: str, rolls: int = 10000) -> dict:
+    def _run_loot_info_exc(self, args: List[str]) -> Optional[str]:
         cmd = [
             self.loot_info_excel_path,
             self.item_db_path,
             self.schema_path,
-            "--loot-table",
-            loot_table_name,
-            str(rolls),
+            *args,
         ]
-        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        try:
+            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            output = e.output.decode("utf-8")
+            if output:
+                sg.popup(f"Failed to get loot info:\n{output}")
+            else:
+                sg.popup(
+                    f"Failed to get loot info:\n{' '.join(e.cmd)}\n"
+                    f"Produced no output and returned: {e.returncode}"
+                )
+            return None
         output = output.decode("utf-8")
+        return output
+
+    def _run_loot_info_exc_json(self, args: List[str]) -> Optional[dict]:
+        output = self._run_loot_info_exc(args)
         output = output.replace("'", '"')
         try:
             return json.loads(output)
         except json.decoder.JSONDecodeError:
-            print(f"Failed to decode JSON:", file=sys.stderr)
-            print(output, file=sys.stderr)
-            raise
+            sg.popup(f"Failed to decode loot info JSON:\n{output}")
+            return None
+
+    def get_loot_info(
+        self, loot_table_name: str, rolls: int = 10000
+    ) -> Optional[dict]:
+        return self._run_loot_info_exc_json(
+            [
+                "--loot-table",
+                loot_table_name,
+                str(rolls),
+            ]
+        )
+
+    def roll_for_loot(self, loot_table_name: str) -> Optional[str]:
+        return self._run_loot_info_exc(
+            ["--loot-table", loot_table_name, str(1)]
+        )
+
+    def dump_item(self, item_name: str, rolls: int = 1) -> Optional[str]:
+        return self._run_loot_info_exc(
+            [
+                "--dump-item",
+                item_name,
+                str(rolls),
+            ]
+        )
 
 
 class SelectLootTableViewer(ListEditorBase):
@@ -129,8 +166,15 @@ class SelectLootTableViewer(ListEditorBase):
                 key=self.k.show_stats,
                 expand_x=True,
             ),
+            sg.VSep(),
+            sg.Button(
+                "Roll for Loot",
+                key=self.k.roll_for_loot,
+                expand_x=True,
+            ),
         ]
         self.register_event(self.k.show_stats)
+        self.register_event(self.k.roll_for_loot)
 
         layout = [toolbar, [sg.HSep(pad=20)], [elem]]
         return sg.Frame("Loot Tables", layout)
@@ -143,6 +187,9 @@ class SelectLootTableViewer(ListEditorBase):
             return True
         if event == self.k.show_stats:
             self.show_loot_table_stat_plot(self.get_selected_loot_table())
+            return True
+        if event == self.k.roll_for_loot:
+            self.show_roll_for_loot(self.get_selected_loot_table())
             return True
         return False
 
@@ -167,19 +214,22 @@ class SelectLootTableViewer(ListEditorBase):
     def on_rm_item(self, idx: int) -> None:
         del self.item_db.item_db["loot_tables"][self.values[idx]]
 
+    def show_roll_for_loot(self, loot_table_name: str) -> None:
+        self.item_db.save(self.loot_info_wrapper.item_db_path)
+        loot_dump = self.loot_info_wrapper.roll_for_loot(loot_table_name)
+        if not loot_dump:
+            return
+        sg.popup_scrolled(
+            loot_dump,
+            title=f"Loot Table: {loot_table_name}",
+            size=(120, 40),
+            font=("Courier New", 12),
+        )
+
     def show_loot_table_stat_plot(self, loot_table_name: str) -> None:
         self.item_db.save(self.loot_info_wrapper.item_db_path)
-        try:
-            loot_info = self.loot_info_wrapper.get_loot_info(loot_table_name)
-        except subprocess.CalledProcessError as e:
-            output = e.output.decode("utf-8")
-            if output:
-                sg.popup(f"Failed to get loot info:\n{output}")
-            else:
-                sg.popup(
-                    f"Failed to get loot info:\n{' '.join(e.cmd)}\n"
-                    f"Produced no output and returned: {e.returncode}"
-                )
+        loot_info = self.loot_info_wrapper.get_loot_info(loot_table_name)
+        if not loot_info:
             return
 
         # Create bar char of loot table item rewards percentages
@@ -227,6 +277,7 @@ class SelectItemTableViewer(ListEditorBase):
         self,
         parent: BaseInterface,
         item_db: ItemDb,
+        loot_info_wrapper: LootInfoWrapper,
         select_cb: Callable[[int], None],
     ):
         super().__init__(
@@ -241,10 +292,28 @@ class SelectItemTableViewer(ListEditorBase):
             size=(40, 35),
         )
         self.item_db = item_db
+        self.loot_info_wrapper = loot_info_wrapper
 
     def get_element(self) -> Element:
         elem = super().get_element()
-        return sg.Frame("Items", [[elem]])
+        toolbar = [
+            sg.Button(
+                "Dump Item",
+                key=self.k.dump_item,
+                expand_x=True,
+            ),
+        ]
+        self.register_event(self.k.dump_item)
+        layout = [toolbar, [sg.HSep(pad=20)], [elem]]
+        return sg.Frame("Items", layout)
+
+    def handle_event(self, event: str, values: dict) -> bool:
+        if super().handle_event(event, values):
+            return True
+        if event == self.k.dump_item:
+            self.dump_item(self.values[self.get_real_index()])
+            return True
+        return False
 
     def on_add_item(self) -> Optional[str]:
         item_name = sg.popup_get_text(
@@ -262,6 +331,19 @@ class SelectItemTableViewer(ListEditorBase):
 
     def on_rm_item(self, idx: int) -> None:
         del self.item_db.item_db["item_prototypes"][idx]
+
+
+    def dump_item(self, item_name: str, rolls: int = 1) -> None:
+        self.item_db.save(self.item_db.item_db_path)
+        item_dump = self.loot_info_wrapper.dump_item(item_name, rolls)
+        if not item_dump:
+            return
+        sg.popup_scrolled(
+            item_dump,
+            title=f"Item: {item_name}",
+            size=(80, 40),
+            font=("Courier New", 14),
+        )
 
 
 class SelectItemEffectViewer(ListEditorBase):
@@ -376,7 +458,7 @@ class LootViewer(BaseWindow):
 
         self.current_item = None
         self.item_editor: Optional[BaseGeneratedEditor] = None
-        
+
         self.current_item_effect = None
         self.item_effect_editor: Optional[BaseGeneratedEditor] = None
 
@@ -409,6 +491,7 @@ class LootViewer(BaseWindow):
         self.select_item_table = SelectItemTableViewer(
             self,
             self.item_db,
+            self.loot_info_wrapper,
             self._on_select_item,
         )
         self.item_editor = self.generator.create_editor_interface_from_path(
@@ -436,8 +519,11 @@ class LootViewer(BaseWindow):
             self.item_db,
             self._on_select_item_effect,
         )
-        self.item_effect_editor = self.generator.create_editor_interface_from_path(
-            ITEM_DB_SID + "#properties/item_effects/additionalProperties/", self
+        self.item_effect_editor = (
+            self.generator.create_editor_interface_from_path(
+                ITEM_DB_SID + "#properties/item_effects/additionalProperties/",
+                self,
+            )
         )
         self.item_effect_editor.register_on_change_handler(
             self._on_item_effect_edited
@@ -455,7 +541,6 @@ class LootViewer(BaseWindow):
                 ),
             ],
         ]
-
 
     def get_file_tab_layout(self) -> List[List[sg.Element]]:
         self.item_db_file_manager = JSONFileManagerInterface(
@@ -497,7 +582,13 @@ class LootViewer(BaseWindow):
 
         self.register_refresh_handler(self._on_ui_refresh)
 
-        return [[sg.TabGroup([[file_tab, loot_tb_tab, item_tb_tab, item_effects_tab]])]]
+        return [
+            [
+                sg.TabGroup(
+                    [[file_tab, loot_tb_tab, item_tb_tab, item_effects_tab]]
+                )
+            ]
+        ]
 
     def _on_loot_table_edited(
         self, value: dict, trigger_handlers: bool, update_ui: bool
