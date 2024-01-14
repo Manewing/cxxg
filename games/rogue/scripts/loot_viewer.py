@@ -59,7 +59,7 @@ class ItemDb:
         return list(x["name"] for x in self.item_db["item_specializations"])
 
     def get_item_effect_names(self) -> List[str]:
-        return list(x["name"] for x in self.item_db["item_effects"])
+        return list(x for x in self.item_db["item_effects"])
 
     def get_loot_table(self, loot_table_name: str) -> dict:
         return self.item_db["loot_tables"][loot_table_name]
@@ -264,6 +264,51 @@ class SelectItemTableViewer(ListEditorBase):
         del self.item_db.item_db["item_prototypes"][idx]
 
 
+class SelectItemEffectViewer(ListEditorBase):
+    def __init__(
+        self,
+        parent: BaseInterface,
+        item_db: ItemDb,
+        select_cb: Callable[[int], None],
+    ):
+        super().__init__(
+            select_cb,
+            parent,
+            modifiable=True,
+            orderable=False,
+            description="List of item effects, click to select",
+            values=item_db.get_item_effect_names(),
+            on_add_item=self.on_add_item,
+            on_rm_item=self.on_rm_item,
+            size=(40, 35),
+        )
+        self.item_db = item_db
+
+    def get_element(self) -> Element:
+        elem = super().get_element()
+        return sg.Frame("Item Effects", [[elem]])
+
+    def on_add_item(self) -> Optional[str]:
+        eff_name = sg.popup_get_text(
+            "Enter item effect name",
+            title="Add item effect",
+            default_text=self.w.search.get(),
+        )
+        if not eff_name:
+            return
+        if eff_name in self.item_db.get_item_effect_names():
+            sg.popup(f"Item effect already exists: {eff_name}")
+            return
+        self.item_db.item_db["item_effects"][eff_name] = {
+            "type": "health_item_effect"
+        }
+        return eff_name
+
+    def on_rm_item(self, idx: int) -> None:
+        name = self.values[idx]
+        del self.item_db.item_db["item_effects"][name]
+
+
 class LootSlotsEditor(GeneratedArrayEditor):
     def __init__(
         self,
@@ -299,9 +344,15 @@ class LootViewer(BaseWindow):
         schema_files = SCHEMAS_PATH.glob("*_schema.json")
 
         self.generator = JSONEditorGenerator.load(schema_files)
+
+        # Register custom editor to enhance the formatting of slots
+        # shown in the list
         self.generator.register_override(
             LOOT_TB_SID + "#defs/loot_table/slots", LootSlotsEditor
         )
+
+        # Register link enum editors to override keys referencing other data
+        # in the same or in other documents (e.g. item names, loot table names)
         self.generator.register_override(
             LOOT_TB_SID + "#defs/loot_table/slots/item/table/ref",
             partial(
@@ -325,6 +376,9 @@ class LootViewer(BaseWindow):
 
         self.current_item = None
         self.item_editor: Optional[BaseGeneratedEditor] = None
+        
+        self.current_item_effect = None
+        self.item_effect_editor: Optional[BaseGeneratedEditor] = None
 
     def get_loot_table_layout(self) -> List[List[sg.Element]]:
         self.select_loot_table = SelectLootTableViewer(
@@ -362,7 +416,6 @@ class LootViewer(BaseWindow):
             self,
         )
         self.item_editor.register_on_change_handler(self._on_item_edited)
-        self.register_refresh_handler(self._on_ui_refresh)
         return [
             [
                 self.select_item_table.get_element(),
@@ -376,6 +429,33 @@ class LootViewer(BaseWindow):
                 ),
             ],
         ]
+
+    def get_item_effects_layout(self) -> List[List[sg.Element]]:
+        self.select_item_effect = SelectItemEffectViewer(
+            self,
+            self.item_db,
+            self._on_select_item_effect,
+        )
+        self.item_effect_editor = self.generator.create_editor_interface_from_path(
+            ITEM_DB_SID + "#properties/item_effects/additionalProperties/", self
+        )
+        self.item_effect_editor.register_on_change_handler(
+            self._on_item_effect_edited
+        )
+        return [
+            [
+                self.select_item_effect.get_element(),
+                sg.VSep(),
+                sg.Column(
+                    [self.item_effect_editor.get_row()],
+                    expand_x=True,
+                    expand_y=True,
+                    scrollable=True,
+                    key=self.k.item_effect_editor_col,
+                ),
+            ],
+        ]
+
 
     def get_file_tab_layout(self) -> List[List[sg.Element]]:
         self.item_db_file_manager = JSONFileManagerInterface(
@@ -412,7 +492,12 @@ class LootViewer(BaseWindow):
         file_tab_layout = self.get_file_tab_layout()
         file_tab = sg.Tab("File", file_tab_layout)
 
-        return [[sg.TabGroup([[file_tab, loot_tb_tab, item_tb_tab]])]]
+        item_effects_layout = self.get_item_effects_layout()
+        item_effects_tab = sg.Tab("Item Effects", item_effects_layout)
+
+        self.register_refresh_handler(self._on_ui_refresh)
+
+        return [[sg.TabGroup([[file_tab, loot_tb_tab, item_tb_tab, item_effects_tab]])]]
 
     def _on_loot_table_edited(
         self, value: dict, trigger_handlers: bool, update_ui: bool
@@ -449,6 +534,21 @@ class LootViewer(BaseWindow):
             trigger_handlers=False,
             update_ui=True,
         )
+
+    def _on_select_item_effect(self, idx: int) -> None:
+        self.current_item_effect = self.select_item_effect.values[idx]
+        self.item_effect_editor.set_value(
+            self.item_db.item_db["item_effects"][self.current_item_effect],
+            trigger_handlers=False,
+            update_ui=True,
+        )
+
+    def _on_item_effect_edited(
+        self, value: dict, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        if self.current_item_effect is None:
+            return
+        self.item_db.item_db["item_effects"][self.current_item_effect] = value
 
     def _on_ui_refresh(self) -> None:
         self.w.loot_editor_col.contents_changed()

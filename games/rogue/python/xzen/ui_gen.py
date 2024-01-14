@@ -523,7 +523,7 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
                 obj[key] = editor.get_value()
         for key, value in obj.items():
             editor = self.property_editors[key]
-            editor.set_value(value, trigger_handlers=False, update_ui=False)
+            editor.set_value(value, trigger_handlers=False, update_ui=update_ui)
         self._set_value_no_editors(
             self.get_value(), trigger_handlers, update_ui
         )
@@ -599,22 +599,25 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             raise ValueError(f"Expected list, got: {value}")
         self.values = value
         if update_ui:
-            values = [
-                self.get_item_text(idx) for idx in range(len(self.values))
-            ]
-            self.list_ui.set_values(
-                values, trigger_handlers=True, update_ui=True
-            )
+            self._update_list_ui(trigger_handlers=True)
             real_idx = self.list_ui.get_real_index()
         else:
             real_idx = 0
-        if len(self.values):
+        if len(self.values) and update_ui:
             self._on_select(real_idx, update_ui=update_ui)
         super().set_value(value, trigger_handlers, update_ui)
 
+    def _update_list_ui(self, trigger_handlers: bool) -> None:
+        str_values = [
+            self.get_item_text(idx) for idx in range(len(self.values))
+        ]
+        self.list_ui.set_values(
+            str_values, trigger_handlers=trigger_handlers, update_ui=True
+        )
+
     def update_ui(self) -> None:
-        values = [self.get_item_text(idx) for idx in range(len(self.values))]
-        self.list_ui.set_values(values, trigger_handlers=False, update_ui=True)
+        self._update_list_ui(trigger_handlers=False)
+        self.item_editor.update_ui()
 
     def get_item_text(self, idx: int) -> str:
         item = self.values[idx]
@@ -656,7 +659,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
         self.set_value(
             self.values, trigger_handlers=trigger_handlers, update_ui=False
         )
-        self.update_ui()
+        self._update_list_ui(trigger_handlers=False)
 
     def _on_select(self, idx: int, update_ui: bool = True) -> None:
         self.item_editor.set_value(
