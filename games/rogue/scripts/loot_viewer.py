@@ -6,6 +6,7 @@ import json
 import argparse
 import subprocess
 from pathlib import Path
+from functools import partial
 
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Element
@@ -19,6 +20,7 @@ from xzen.ui import BaseWindow
 from xzen.ui_gen import JSONEditorGenerator
 from xzen.ui_gen import BaseGeneratedEditor
 from xzen.ui_gen import GeneratedArrayEditor
+from xzen.ui_gen import GeneratedEnumEditor
 
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
@@ -53,7 +55,9 @@ class ItemDb:
 
 
 class LootInfoWrapper:
-    def __init__(self, item_db_path: str, schema_path: str, loot_info_excel_path: str):
+    def __init__(
+        self, item_db_path: str, schema_path: str, loot_info_excel_path: str
+    ):
         self.item_db_path = item_db_path
         self.schema_path = schema_path
         self.loot_info_excel_path = loot_info_excel_path
@@ -67,7 +71,7 @@ class LootInfoWrapper:
             loot_table_name,
             str(rolls),
         ]
-        output = subprocess.check_output(cmd)
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         output = output.decode("utf-8")
         output = output.replace("'", '"')
         try:
@@ -78,7 +82,7 @@ class LootInfoWrapper:
             raise
 
 
-class NewSelectLootTableViewer(ListEditorBase):
+class SelectLootTableViewer(ListEditorBase):
     def __init__(
         self,
         parent: BaseInterface,
@@ -168,7 +172,18 @@ class NewSelectLootTableViewer(ListEditorBase):
 
     def show_loot_table_stat_plot(self, loot_table_name: str) -> None:
         self.item_db.save(self.loot_info_wrapper.item_db_path)
-        loot_info = self.loot_info_wrapper.get_loot_info(loot_table_name)
+        try:
+            loot_info = self.loot_info_wrapper.get_loot_info(loot_table_name)
+        except subprocess.CalledProcessError as e:
+            output = e.output.decode("utf-8")
+            if output:
+                sg.popup(f"Failed to get loot info:\n{output}")
+            else:
+                sg.popup(
+                    f"Failed to get loot info:\n{' '.join(e.cmd)}\n"
+                    f"Produced no output and returned: {e.returncode}"
+                )
+            return
 
         # Create bar char of loot table item rewards percentages
         item_names = [x["name"] for x in loot_info["item_rewards"]]
@@ -214,12 +229,57 @@ class LootSlotsEditor(GeneratedArrayEditor):
         slot = self.values[idx]
         prefix = f"({slot['weight']:3d}): "
         if slot["type"] == "item":
-            return f"{prefix} Item: {slot['name']}"
+            min_count = slot["min_count"]
+            max_count = slot["max_count"]
+            return f"{prefix} Item: {slot['name']} ({min_count}-{max_count})"
         if slot["type"] == "table":
             return f"{prefix} Table: {slot['ref']}"
         if slot["type"] == "null":
             return f"{prefix} Null"
         raise ValueError(f"Invalid slot type: {slot['type']}")
+
+
+class TableRefEnum(GeneratedEnumEditor):
+    def __init__(
+        self,
+        item_db: ItemDb,
+        generator: JSONEditorGenerator,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
+    ):
+        del generator
+        obj["enum"] = item_db.get_loot_table_names()
+        super().__init__(key, obj, parent, prefix)
+        self.item_db = item_db
+
+
+    def update_ui(self) -> None:
+        self.enum_values = self.item_db.get_loot_table_names()
+        self.w.combo.update(values=self.item_db.get_loot_table_names())
+        super().update_ui()
+
+
+class ItemNameEnum(GeneratedEnumEditor):
+    def __init__(
+        self,
+        item_db: ItemDb,
+        generator: JSONEditorGenerator,
+        key: str,
+        obj: Dict[str, Any],
+        parent: Optional[BaseInterface],
+        prefix: str,
+    ):
+        del generator
+        obj["enum"] = item_db.get_item_names()
+        super().__init__(key, obj, parent, prefix)
+        self.item_db = item_db
+
+    def update_ui(self) -> None:
+        self.enum_values = self.item_db.get_item_names()
+        self.w.combo.update(values=self.item_db.get_item_names())
+        super().update_ui()
 
 
 class LootViewer(BaseWindow):
@@ -237,10 +297,18 @@ class LootViewer(BaseWindow):
         self.generator.register_override(
             self.loot_table_path + "#defs/loot_table/slots", LootSlotsEditor
         )
+        self.generator.register_override(
+            self.loot_table_path + "#defs/loot_table/slots/item/table/ref",
+            partial(TableRefEnum, item_db),
+        )
+        self.generator.register_override(
+            self.loot_table_path + "#defs/loot_table/slots/item/item/name",
+            partial(ItemNameEnum, item_db),
+        )
         self.editor: Optional[BaseGeneratedEditor] = None
 
     def get_layout(self) -> List[List[sg.Element]]:
-        self.select_loot_table = NewSelectLootTableViewer(
+        self.select_loot_table = SelectLootTableViewer(
             self,
             self.item_db,
             self.loot_info_wrapper,
@@ -312,6 +380,7 @@ def main(args: List[str]) -> int:
 
     loot_info_wrapper = LootInfoWrapper(
         item_db_path=temp_item_db_path,
+        # FIXME we need to use the build schema here
         schema_path=str(SCHEMAS_PATH / "item_db_schema.json"),
         loot_info_excel_path=loot_info_wrapper_exc,
     )

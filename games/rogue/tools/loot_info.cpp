@@ -34,7 +34,7 @@ void dumpLootTableRewards(const rogue::ItemDatabase &ItemDb,
   std::sort(SortedCounts.begin(), SortedCounts.end(), std::greater<>());
 
   std::cout << "{\n'item_rewards': [" << std::endl;
-  const char *Pred = "  ";
+  const char *Pred = "  ", *Suf = "";
   for (auto &[Count, ItId] : SortedCounts) {
     auto Occurrences = ItemIdOccurrences.at(ItId);
     auto PercentagePerDrop = static_cast<double>(Occurrences) / Rolls * 100.0;
@@ -50,8 +50,9 @@ void dumpLootTableRewards(const rogue::ItemDatabase &ItemDb,
               << CountPerDrop << ", 'ac_drop':" << std::setw(4)
               << std::setprecision(2) << AverageCountPerDrop << std::endl;
     Pred = "},";
+    Suf = "}";
   }
-  std::cout << "}]," << std::endl;
+  std::cout << Suf << "]," << std::endl;
 
   std::cout << "'total': " << Total << ", " << std::endl
             << "'rolls': " << Rolls << std::endl

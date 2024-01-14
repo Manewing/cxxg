@@ -195,7 +195,10 @@ class ListEditorBase(BaseInterface):
 
     def handle_event(self, event: str, values: dict) -> bool:
         if event == self.k.listbox:
-            self._update_selected_idx(self.w.listbox.get_indexes()[0])
+            indexes = self.w.listbox.get_indexes()
+            if not indexes:
+                return True
+            self._update_selected_idx(indexes[0])
             return True
         if event == self.k.add_item:
             self.handle_add_item()

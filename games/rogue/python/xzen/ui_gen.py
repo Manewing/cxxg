@@ -396,7 +396,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             on_move_down=self._on_move_down,
         )
         self.item_editor = generator.create_editor_interface(
-            key, obj["items"], self, prefix=self.prefix
+            "item", obj["items"], self, prefix=self.prefix
         )
         self.item_editor.register_on_change_handler(self._update_item)
         self.values: List[Any] = []
@@ -503,8 +503,8 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
         self.editors: Dict[str, GeneratedObjectEditor] = {}
         for obj in self.any_of:
             typed_info = obj["properties"]["type"]["const"]
-            self.editors[typed_info] = GeneratedObjectEditor(
-                generator, typed_info, obj, self, prefix=f"{prefix:s}_{key:s}"
+            self.editors[typed_info] = generator.create_editor_interface(
+                typed_info, obj, self, prefix=f"{prefix:s}_{key:s}"
             )
             self.editors[typed_info].register_on_change_handler(
                 partial(self._on_editor_changed, typed_info)
@@ -645,6 +645,7 @@ class JSONEditorGenerator:
         parent: Optional[BaseInterface],
         prefix: str = "",
     ) -> BaseGeneratedEditor:
+        print("# Creating editor interface for:", self._current_path)
         if not isinstance(key, str):
             raise ValueError(f"/{prefix}/{key}: Expected str, got: {key}")
         if not isinstance(obj, dict):
