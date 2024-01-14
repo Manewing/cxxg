@@ -45,13 +45,16 @@ class ItemDb:
         return sorted(self.item_db["loot_tables"].keys())
 
     def get_item_names(self) -> List[str]:
-        return sorted(x["name"] for x in self.item_db["item_prototypes"])
+        return list(x["name"] for x in self.item_db["item_prototypes"])
 
     def get_loot_table(self, loot_table_name: str) -> dict:
         return self.item_db["loot_tables"][loot_table_name]
 
     def set_loot_table(self, loot_table_name: str, loot_table: dict) -> None:
         self.item_db["loot_tables"][loot_table_name] = loot_table
+
+    def set_item(self, item_idx: int, item: dict) -> None:
+        self.item_db["item_prototypes"][item_idx] = item
 
 
 class LootInfoWrapper:
@@ -224,7 +227,60 @@ class SelectLootTableViewer(ListEditorBase):
         plt.show(block=False)
 
 
+class SelectItemTableViewer(ListEditorBase):
+    def __init__(
+        self,
+        parent: BaseInterface,
+        item_db: ItemDb,
+        select_cb: Callable[[int], None],
+    ):
+        super().__init__(
+            select_cb,
+            parent,
+            modifiable=True,
+            orderable=False,
+            description="List of items, click to select",
+            values=item_db.get_item_names(),
+            on_add_item=self.on_add_item,
+            on_rm_item=self.on_rm_item,
+            size=(40, 50),
+        )
+        self.item_db = item_db
+
+    def get_element(self) -> Element:
+        elem = super().get_element()
+        return sg.Frame("Loot Tables", [[elem]])
+
+    def on_add_item(self) -> Optional[str]:
+        item_name = sg.popup_get_text(
+            "Enter item name",
+            title="Add Item",
+            default_text=self.w.search.get(),
+        )
+        if not item_name:
+            return
+        if item_name in self.item_db.get_item_names():
+            sg.popup(f"Item already exists: {item_name}")
+            return
+        self.item_db.item_db["item_prototypes"].append({"name": item_name})
+        return item_name
+
+    def on_rm_item(self, idx: int) -> None:
+        del self.item_db.item_db["item_prototypes"][idx]["name"]
+
+
 class LootSlotsEditor(GeneratedArrayEditor):
+    def __init__(
+        self,
+        generator: JSONEditorGenerator,
+        key: str,
+        obj: dict,
+        parent: BaseInterface,
+        prefix: str,
+    ):
+        super().__init__(generator, key, obj, parent, prefix)
+        self.list_ui.size = (40, 10)
+
     def get_item_text(self, idx: int) -> str:
         slot = self.values[idx]
         prefix = f"({slot['weight']:3d}): "
@@ -253,7 +309,6 @@ class TableRefEnum(GeneratedEnumEditor):
         obj["enum"] = item_db.get_loot_table_names()
         super().__init__(key, obj, parent, prefix)
         self.item_db = item_db
-
 
     def update_ui(self) -> None:
         self.enum_values = self.item_db.get_loot_table_names()
@@ -288,8 +343,6 @@ class LootViewer(BaseWindow):
         self.item_db = item_db
         self.loot_info_wrapper = loot_info_wrapper
 
-        self.current_table = None
-
         schema_files = SCHEMAS_PATH.glob("*_schema.json")
         self.loot_table_path = "https://rogue-todo.com/loot_tb_schema.json"
 
@@ -305,26 +358,59 @@ class LootViewer(BaseWindow):
             self.loot_table_path + "#defs/loot_table/slots/item/item/name",
             partial(ItemNameEnum, item_db),
         )
-        self.editor: Optional[BaseGeneratedEditor] = None
 
-    def get_layout(self) -> List[List[sg.Element]]:
+        self.current_table = None
+        self.loot_editor: Optional[BaseGeneratedEditor] = None
+
+        self.current_item = None
+        self.item_editor: Optional[BaseGeneratedEditor] = None
+
+    def get_loot_table_layout(self) -> List[List[sg.Element]]:
         self.select_loot_table = SelectLootTableViewer(
             self,
             self.item_db,
             self.loot_info_wrapper,
             self._on_select_loot_table,
         )
-        self.editor = self.generator.create_editor_interface_from_path(
+        self.loot_editor = self.generator.create_editor_interface_from_path(
             self.loot_table_path + "#defs/loot_table", self
         )
-        self.editor.register_on_change_handler(self._on_loot_table_edited)
+        self.loot_editor.register_on_change_handler(self._on_loot_table_edited)
         return [
             [
                 self.select_loot_table.get_element(),
                 sg.VSep(),
-                sg.Column([self.editor.get_row()]),
+                sg.Column([self.loot_editor.get_row()]),
             ],
         ]
+
+    def get_item_tb_layout(self) -> List[List[sg.Element]]:
+        self.select_item_table = SelectItemTableViewer(
+            self,
+            self.item_db,
+            self._on_select_item,
+        )
+        self.item_editor = self.generator.create_editor_interface_from_path(
+            "https://rogue-todo.com/item-db-schema#properties/item_prototypes/items",
+            self,
+        )
+        self.item_editor.register_on_change_handler(self._on_item_edited)
+        return [
+            [
+                self.select_item_table.get_element(),
+                sg.VSep(),
+                sg.Column([self.item_editor.get_row()]),
+            ],
+        ]
+
+    def get_layout(self) -> List[List[Element]]:
+        loot_tb_layout = self.get_loot_table_layout()
+        loot_tb_tab = sg.Tab("Loot Tables", loot_tb_layout)
+
+        item_tb_layout = self.get_item_tb_layout()
+        item_tb_tab = sg.Tab("Items", item_tb_layout)
+
+        return [[sg.TabGroup([[loot_tb_tab, item_tb_tab]])]]
 
     def _on_loot_table_edited(
         self, value: dict, trigger_handlers: bool, update_ui: bool
@@ -335,8 +421,28 @@ class LootViewer(BaseWindow):
 
     def _on_select_loot_table(self, idx: int) -> None:
         self.current_table = self.select_loot_table.values[idx]
-        self.editor.set_value(
+        self.loot_editor.set_value(
             self.item_db.get_loot_table(self.current_table),
+            trigger_handlers=False,
+            update_ui=True,
+        )
+
+    def _on_item_edited(
+        self, value: dict, trigger_handlers: bool, update_ui: bool
+    ) -> None:
+        if self.current_item is None:
+            return
+        self.loot_editor.update_ui()
+        self.item_db.set_item(self.current_item, value)
+        self.select_item_table.set_values(
+            self.item_db.get_item_names(),
+            trigger_handlers=False, update_ui=True
+        )
+
+    def _on_select_item(self, idx: int) -> None:
+        self.current_item = idx
+        self.item_editor.set_value(
+            self.item_db.item_db["item_prototypes"][self.current_item],
             trigger_handlers=False,
             update_ui=True,
         )

@@ -47,8 +47,6 @@ class BaseGeneratedEditor(BaseInterface):
         self._on_change_handlers: List[Callable[[Any, bool, bool], None]] = []
 
     def is_required(self) -> bool:
-        if self.obj.get("required", False):
-            return True
         return not "default" in self.obj
 
     def needs_store(self):
@@ -157,7 +155,8 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
         self, value: str, trigger_handlers: bool, update_ui: bool
     ) -> None:
         if value not in self.enum_values:
-            raise ValueError(f"Invalid enum value: {value}")
+            print(f"Invalid enum value: {value}")
+            value = self.enum_values[0]
         self.value = value
         super().set_value(value, trigger_handlers, update_ui)
 
@@ -336,7 +335,8 @@ class GeneratedObjectEditor(BaseGeneratedEditor):
         if not isinstance(obj, dict):
             raise ValueError(f"Expected dict, got: {value}")
         for key, editor in self.property_editors.items():
-            if key not in obj and editor.is_required():
+            is_required = key in self.obj.get("required", [])
+            if key not in obj and (is_required and editor.is_required()):
                 raise ValueError(f"Expected required key: {key} in {obj}")
             editor.restore_default(trigger_handlers=False, update_ui=False)
         for key, value in obj.items():
@@ -394,6 +394,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
             on_rm_item=self._on_rm_item,
             on_move_up=self._on_move_up,
             on_move_down=self._on_move_down,
+            size=(None, 5),
         )
         self.item_editor = generator.create_editor_interface(
             "item", obj["items"], self, prefix=self.prefix
@@ -471,7 +472,7 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
 
     def _on_rm_item(self, idx: int) -> None:
         self.values.pop(idx)
-        self.set_value(self.values, trigger_handlers=True, update_ui=True)
+        self.set_value(self.values, trigger_handlers=True, update_ui=False)
 
     def _on_move_up(self, idx: int) -> None:
         self.values[idx - 1], self.values[idx] = (
