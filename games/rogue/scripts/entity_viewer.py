@@ -2,7 +2,6 @@
 
 import os
 import sys
-import json
 import argparse
 from pathlib import Path
 from functools import partial
@@ -22,53 +21,12 @@ from xzen.ui_gen import LinkedGeneratedEnumEditor
 from xzen.ui_gen import JSONFileManagerInterface
 
 from pyrogue.item_db import ItemDb
+from pyrogue.entity_db import EntityDb
+from pyrogue.entity_db import InheritanceResolver
 
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
 ENTITY_DB_SID = "https://rogue-todo.com/entity-db-schema.json"
-
-
-class EntityDb:
-    def __init__(self, entity_db: dict, entity_db_path: Optional[str] = None):
-        self.entity_db = entity_db
-        self.entity_db_path = entity_db_path
-
-    @staticmethod
-    def load(entity_db_path: str) -> "EntityDb":
-        with open(entity_db_path, "r") as f:
-            entity_db = json.load(f)
-        return EntityDb(entity_db, entity_db_path)
-
-    def load_from(self, entity_db_path: str) -> None:
-        with open(entity_db_path, "r") as f:
-            self.entity_db = json.load(f)
-        self.entity_db_path = entity_db_path
-
-    def save(self, entity_db_path: str) -> None:
-        with open(entity_db_path, "w") as f:
-            json.dump(self.entity_db, f, indent=2, sort_keys=True)
-
-    def get_entity_names(self) -> List[str]:
-        return list(x["name"] for x in self.entity_db["entity_templates"])
-
-    def set_entity(self, entity_idx: int, entity: dict) -> None:
-        self.entity_db["entity_templates"][entity_idx] = entity
-
-    def get_entity(self, entity_idx: int) -> dict:
-        return self.entity_db["entity_templates"][entity_idx]
-
-    def add_entity(self, entity: dict) -> None:
-        self.entity_db["entity_templates"].append(entity)
-
-    def create_new_entity(self, name: str) -> dict:
-        entity = {
-            "name": name,
-            "assemblers": {},
-        }
-        if name in self.get_entity_names():
-            raise ValueError(f"Entity already exists: {name}")
-        self.add_entity(entity)
-        return entity
 
 
 class TileEditor(GeneratedObjectEditor):
@@ -97,7 +55,7 @@ class TileEditor(GeneratedObjectEditor):
                             text_color=color,
                             background_color=bg_color,
                             font=("Courier New", 30),
-                            key=self.k.char_disp
+                            key=self.k.char_disp,
                         )
                     ]
                 ],
@@ -187,6 +145,7 @@ class EntityViewer(BaseWindow):
         super().__init__("Loot Viewer")
         self.item_db = item_db
         self.entity_db = entity_db
+        self.entity_db.resolve_inheritance()
 
         schema_files = SCHEMAS_PATH.glob("*_schema.json")
 
@@ -211,7 +170,10 @@ class EntityViewer(BaseWindow):
         ]
         for path in loot_table_paths:
             self.generator.register_override(
-                path, partial(LinkedGeneratedEnumEditor, self.item_db.get_loot_table_names)
+                path,
+                partial(
+                    LinkedGeneratedEnumEditor, self.item_db.get_loot_table_names
+                ),
             )
 
         self.current_entity = None
@@ -254,7 +216,7 @@ class EntityViewer(BaseWindow):
         )
         self.entity_db_file_manager = JSONFileManagerInterface(
             title="Entity Database",
-            on_save=self.entity_db.save,
+            on_save=self._handle_save,
             on_load=self._handle_load,
             path=self.entity_db.entity_db_path,
             parent=self,
@@ -275,8 +237,14 @@ class EntityViewer(BaseWindow):
             update_ui=True,
         )
 
+    def _handle_save(self, path: str) -> None:
+        copy = self.entity_db.copy()
+        copy.compress_inheritance()
+        copy.save(path)
+
     def _handle_load(self, path: str) -> None:
         self.entity_db.load_from(path)
+        self.entity_db.resolve_inheritance()
         self.select_viewer.set_values(
             self.entity_db.get_entity_names(),
             trigger_handlers=True,
