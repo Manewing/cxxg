@@ -2,6 +2,7 @@
 
 import os
 import sys
+import yaml
 import argparse
 from pathlib import Path
 from functools import partial
@@ -99,14 +100,28 @@ class SelectEntityViewer(ListEditorBase):
         elem = super().get_element()
         toolbar = [
             sg.Text("todo"),
+            sg.Button(
+                "Show Cfg",
+                tooltip="Show fully resolved entity configuration",
+                key=self.k.show_cfg,
+            ),
             sg.VSep(),
         ]
+        self.register_event(self.k.show_cfg)
         layout = [toolbar, [sg.HSep(pad=20)], [elem]]
         return sg.Frame("Entities", layout)
 
     def handle_event(self, event: str, values: dict) -> bool:
         if super().handle_event(event, values):
             return True
+        if event == self.k.show_cfg:
+            idx = self.get_real_index()
+            if idx >= len(self.values):
+                return True
+            entity = self.entity_db.get_fully_defined_entity(idx)
+            entity_str = yaml.dump(entity, indent=2, sort_keys=True)
+            sg.popup_scrolled(entity_str, title="Entity Configuration")
+
         return False
 
     def on_add_item(self) -> Optional[str]:

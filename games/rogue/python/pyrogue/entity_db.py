@@ -57,6 +57,34 @@ class InheritanceResolver:
             self.resolve_from(entity_template, base_entity_template)
             from_template = base_entity_template.get("from_template")
 
+    def build(self, entity_template: EntityTemplate) -> EntityTemplate:
+        """
+        Builds inherited parameters for the entity template.
+        """
+        from_template = entity_template.get("from_template")
+        if from_template is None:
+            return entity_template
+
+        # Create list from parent to the current entity template
+        entity_template_list = [entity_template]
+        while from_template is not None:
+            from_entity_tmpl = self.entity_templates_by_name[from_template]
+            entity_template_list.append(from_entity_tmpl)
+            from_template = from_entity_tmpl.get("from_template")
+
+        # Reverse the list so that the current entity template is first
+        entity_template_list.reverse()
+        build_entity_template = dict()
+        for entity_tmpl in entity_template_list:
+            for key, value in entity_tmpl.items():
+                if key == "assemblers":
+                    build_entity_template.setdefault(key, dict())
+                    build_entity_template[key].update(value)
+                else:
+                    build_entity_template[key] = value
+
+        return build_entity_template
+
     @staticmethod
     def resolve_from(
         entity_template: EntityTemplate,
@@ -170,6 +198,10 @@ class EntityDb:
 
     def get_entity(self, entity_idx: int) -> dict:
         return self.entity_db["entity_templates"][entity_idx]
+
+    def get_fully_defined_entity(self, entity_idx: int) -> dict:
+        resolver = InheritanceResolver(self.get_templates())
+        return resolver.build(self.get_entity(entity_idx))
 
     def add_entity(self, entity: dict) -> None:
         self.entity_db["entity_templates"].append(entity)
