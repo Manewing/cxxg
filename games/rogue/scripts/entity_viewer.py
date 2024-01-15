@@ -140,10 +140,11 @@ class SelectEntityViewer(ListEditorBase):
     def get_element(self) -> Element:
         elem = super().get_element()
         toolbar = [
+            sg.Text("todo"),
             sg.VSep(),
         ]
         layout = [toolbar, [sg.HSep(pad=20)], [elem]]
-        return sg.Frame("Loot Tables", layout)
+        return sg.Frame("Entities", layout)
 
     def handle_event(self, event: str, values: dict) -> bool:
         if super().handle_event(event, values):
@@ -176,6 +177,11 @@ class SelectEntityViewer(ListEditorBase):
         values[idx + 1], values[idx] = values[idx], values[idx + 1]
 
 
+# TODO:
+# - YAML viewer for resolved entity templates
+# - Use entity template resolver to resolve partial templates and compress them again
+# - Integrate map viewer to watch entity in action
+# - Add arena option to fight entity in arena
 class EntityViewer(BaseWindow):
     def __init__(self, item_db: ItemDb, entity_db: EntityDb):
         super().__init__("Loot Viewer")
@@ -229,9 +235,11 @@ class EntityViewer(BaseWindow):
                     [self.entity_editor.get_row()],
                     expand_x=True,
                     expand_y=True,
-                    scrollable=True,
+                    scrollable=(False, True),
+                    justification="left",
                     key=self.k.entity_editor_col,
-                    size=(800, 350),
+                    size=(900, None),
+                    vertical_scroll_only=True,
                 ),
             ],
         ]

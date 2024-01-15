@@ -90,7 +90,7 @@ class BaseInterface(abc.ABC):
         root = self
         while root.parent is not None:
             root = root.parent
-        root.handle_refresh()
+        root.needs_refresh = True
 
     def get_window(self) -> sg.Window:
         if self.parent is not None:
@@ -367,6 +367,7 @@ class BaseWindow(BaseInterface):
         super().__init__()
         self.title = title
         self.window: Optional[sg.Window] = None
+        self.needs_refresh = False
 
     def setup(self) -> None:
         sg.theme("DarkAmber")
@@ -387,6 +388,9 @@ class BaseWindow(BaseInterface):
                 break
             if not self.handle_event(event, values):
                 print(f"Unhandled event: {event}", file=sys.stderr)
+            if self.needs_refresh:
+                self.needs_refresh = False
+                self.handle_refresh()
 
     def get_window(self) -> sg.Window:
         if self.window is None:
