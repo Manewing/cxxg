@@ -34,7 +34,9 @@ void updatePlayerPosition(Level &L, entt::registry &Reg, EventHubConnector &EHC,
 
   if (auto Et = L.getEntityAt(NewPos);
       Et != entt::null && Reg.all_of<HealthComp, FactionComp>(Et)) {
-    Reg.emplace<CombatActionComp>(PlayerEt, Et);
+    auto &CAC = Reg.get_or_emplace<CombatActionComp>(PlayerEt);
+    CAC.Target = Et;
+    CAC.RangedPos = std::nullopt;
     return;
   }
 

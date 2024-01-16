@@ -165,10 +165,9 @@ bool Game::handleInput(int Char) {
       const auto &PC = getLvlReg().get<PositionComp>(getPlayer());
       // No range, allow investigate entire level
       UICtrl.setTargetUI(PC, {}, Lvl, [&Lvl, SrcEt](auto TgEt, auto TPos) {
-        CombatActionComp CC;
-        CC.Target = TgEt;
-        CC.RangedPos = TPos;
-        Lvl.Reg.template emplace<CombatActionComp>(SrcEt, CC);
+        auto &CAC = Lvl.Reg.template get_or_emplace<CombatActionComp>(SrcEt);
+        CAC.Target = TgEt;
+        CAC.RangedPos = TPos;
       });
     }
     return true;

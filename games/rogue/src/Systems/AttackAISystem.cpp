@@ -39,7 +39,9 @@ void AttackAISystem::update(UpdateType Type) {
       auto Dist =
           std::abs(Pos.Pos.X - TPos.Pos.X) + std::abs(Pos.Pos.Y - TPos.Pos.Y);
       if (Dist <= 1 && Ag.hasEnoughAP(APCost)) {
-        Reg.emplace<CombatActionComp>(Entity, TEntity);
+        auto &CAC = Reg.get_or_emplace<CombatActionComp>(Entity);
+        CAC.Target = TEntity;
+        CAC.RangedPos = std::nullopt;
       }
     });
   });
