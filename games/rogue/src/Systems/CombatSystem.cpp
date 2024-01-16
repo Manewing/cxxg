@@ -165,8 +165,8 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
     CanRemove = performMeleeAttack(Reg, Attacker, CC.Target, EHC);
   }
   if (CanRemove) {
-    Reg.erase<CombatActionComp>(Attacker);
     applyCombatComps(Reg, Attacker, CC.Target);
+    Reg.erase<CombatActionComp>(Attacker);
   }
 }
 
