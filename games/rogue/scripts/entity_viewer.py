@@ -2,6 +2,7 @@
 
 import os
 import sys
+import json
 import yaml
 import argparse
 from pathlib import Path
@@ -23,7 +24,6 @@ from xzen.ui_gen import JSONFileManagerInterface
 
 from pyrogue.item_db import ItemDb
 from pyrogue.entity_db import EntityDb
-from pyrogue.entity_db import InheritanceResolver
 
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
@@ -106,8 +106,14 @@ class SelectEntityViewer(ListEditorBase):
                 key=self.k.show_cfg,
             ),
             sg.VSep(),
+            sg.Button(
+                "Arena",
+                tooltip="",
+                key=self.k.arena,
+            ),
         ]
         self.register_event(self.k.show_cfg)
+        self.register_event(self.k.arena)
         layout = [toolbar, [sg.HSep(pad=20)], [elem]]
         return sg.Frame("Entities", layout)
 

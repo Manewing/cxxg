@@ -27,7 +27,16 @@
     }
   },
   "entities": {
-    "t": "troll",
+    "0": "troll",
+    "1": "troll",
+    "2": "troll",
+    "3": "troll",
+    "4": "troll",
+    "5": "troll",
+    "6": "troll",
+    "7": "troll",
+    "8": "troll",
+    "9": "troll",
     "H": "level_entry",
     "<": "level_exit"
   }
