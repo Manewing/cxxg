@@ -52,7 +52,13 @@ class InheritanceResolver:
         """
         from_template = entity_template.get("from_template")
 
+        visited_templates = set()
         while from_template is not None:
+            if from_template in visited_templates:
+                raise ValueError(
+                    f"Circular inheritance detected for entity template: {from_template}"
+                )
+            visited_templates.add(from_template)
             base_entity_template = self.entity_templates_by_name[from_template]
             self.resolve_from(entity_template, base_entity_template)
             from_template = base_entity_template.get("from_template")
@@ -189,6 +195,12 @@ class EntityDb:
 
     def get_templates(self) -> List[dict]:
         return self.entity_db["entity_templates"]
+
+    def get_entity_by_name(self, name: str) -> dict:
+        for entity in self.entity_db["entity_templates"]:
+            if entity["name"] == name:
+                return entity
+        raise ValueError(f"Entity not found: {name}")
 
     def get_entity_names(self) -> List[str]:
         return list(x["name"] for x in self.entity_db["entity_templates"])

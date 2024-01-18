@@ -272,3 +272,5 @@ install(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/
   DESTINATION shared/data
 )
+
+add_subdirectory(python)
