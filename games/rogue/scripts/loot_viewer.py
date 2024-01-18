@@ -4,14 +4,13 @@ import os
 import sys
 import json
 import argparse
-import subprocess
 from pathlib import Path
 from functools import partial
 
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Element
 from matplotlib import pyplot as plt
-from typing import List, Optional, Callable, Dict, Any
+from typing import List, Optional, Callable
 
 from xzen.ui import ListEditorBase
 from xzen.ui import BaseInterface
@@ -23,117 +22,15 @@ from xzen.ui_gen import GeneratedArrayEditor
 from xzen.ui_gen import LinkedGeneratedEnumEditor
 from xzen.ui_gen import JSONFileManagerInterface
 
+from pyrogue.tools import RogueToolPaths
+from pyrogue.tools import ToolError
+from pyrogue.tools import LootInfoWrapper
+from pyrogue.item_db import ItemDb
+
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
 LOOT_TB_SID = "https://rogue-todo.com/loot_tb_schema.json"
 ITEM_DB_SID = "https://rogue-todo.com/item-db-schema.json"
-
-
-class ItemDb:
-    def __init__(self, item_db: dict, item_db_path: Optional[str] = None):
-        self.item_db = item_db
-        self.item_db_path = item_db_path
-
-    @staticmethod
-    def load(item_db_path: str) -> "ItemDb":
-        with open(item_db_path, "r") as f:
-            item_db = json.load(f)
-        return ItemDb(item_db, item_db_path)
-
-    def load_from(self, item_db_path: str) -> None:
-        with open(item_db_path, "r") as f:
-            self.item_db = json.load(f)
-        self.item_db_path = item_db_path
-
-    def save(self, item_db_path: str) -> None:
-        with open(item_db_path, "w") as f:
-            json.dump(self.item_db, f, indent=2, sort_keys=True)
-
-    def get_loot_table_names(self) -> List[str]:
-        return sorted(self.item_db["loot_tables"].keys())
-
-    def get_item_names(self) -> List[str]:
-        return list(x["name"] for x in self.item_db["item_prototypes"])
-
-    def get_specialization_names(self) -> List[str]:
-        return list(x["name"] for x in self.item_db["item_specializations"])
-
-    def get_item_effect_names(self) -> List[str]:
-        return list(x for x in self.item_db["item_effects"])
-
-    def get_loot_table(self, loot_table_name: str) -> dict:
-        return self.item_db["loot_tables"][loot_table_name]
-
-    def set_loot_table(self, loot_table_name: str, loot_table: dict) -> None:
-        self.item_db["loot_tables"][loot_table_name] = loot_table
-
-    def set_item(self, item_idx: int, item: dict) -> None:
-        self.item_db["item_prototypes"][item_idx] = item
-
-
-class LootInfoWrapper:
-    def __init__(
-        self, item_db_path: str, schema_path: str, loot_info_excel_path: str
-    ):
-        self.item_db_path = item_db_path
-        self.schema_path = schema_path
-        self.loot_info_excel_path = loot_info_excel_path
-
-    def _run_loot_info_exc(self, args: List[str]) -> Optional[str]:
-        cmd = [
-            self.loot_info_excel_path,
-            self.item_db_path,
-            self.schema_path,
-            *args,
-        ]
-        try:
-            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError as e:
-            output = e.output.decode("utf-8")
-            if output:
-                sg.popup(f"Failed to get loot info:\n{output}")
-            else:
-                sg.popup(
-                    f"Failed to get loot info:\n{' '.join(e.cmd)}\n"
-                    f"Produced no output and returned: {e.returncode}"
-                )
-            return None
-        output = output.decode("utf-8")
-        return output
-
-    def _run_loot_info_exc_json(self, args: List[str]) -> Optional[dict]:
-        output = self._run_loot_info_exc(args)
-        output = output.replace("'", '"')
-        try:
-            return json.loads(output)
-        except json.decoder.JSONDecodeError:
-            sg.popup(f"Failed to decode loot info JSON:\n{output}")
-            return None
-
-    def get_loot_info(
-        self, loot_table_name: str, rolls: int = 10000
-    ) -> Optional[dict]:
-        return self._run_loot_info_exc_json(
-            [
-                "--loot-table",
-                loot_table_name,
-                str(rolls),
-            ]
-        )
-
-    def roll_for_loot(self, loot_table_name: str) -> Optional[str]:
-        return self._run_loot_info_exc(
-            ["--loot-table", loot_table_name, str(1)]
-        )
-
-    def dump_item(self, item_name: str, rolls: int = 1) -> Optional[str]:
-        return self._run_loot_info_exc(
-            [
-                "--dump-item",
-                item_name,
-                str(rolls),
-            ]
-        )
 
 
 class SelectLootTableViewer(ListEditorBase):
@@ -216,8 +113,10 @@ class SelectLootTableViewer(ListEditorBase):
 
     def show_roll_for_loot(self, loot_table_name: str) -> None:
         self.item_db.save(self.loot_info_wrapper.item_db_path)
-        loot_dump = self.loot_info_wrapper.roll_for_loot(loot_table_name)
-        if not loot_dump:
+        try:
+            loot_dump = self.loot_info_wrapper.roll_for_loot(loot_table_name)
+        except ToolError as e:
+            sg.popup(str(e))
             return
         sg.popup_scrolled(
             loot_dump,
@@ -228,8 +127,10 @@ class SelectLootTableViewer(ListEditorBase):
 
     def show_loot_table_stat_plot(self, loot_table_name: str) -> None:
         self.item_db.save(self.loot_info_wrapper.item_db_path)
-        loot_info = self.loot_info_wrapper.get_loot_info(loot_table_name)
-        if not loot_info:
+        try:
+            loot_info = self.loot_info_wrapper.get_loot_info(loot_table_name)
+        except ToolError as e:
+            sg.popup(str(e))
             return
 
         # Create bar char of loot table item rewards percentages
@@ -332,11 +233,12 @@ class SelectItemTableViewer(ListEditorBase):
     def on_rm_item(self, idx: int) -> None:
         del self.item_db.item_db["item_prototypes"][idx]
 
-
     def dump_item(self, item_name: str, rolls: int = 1) -> None:
         self.item_db.save(self.item_db.item_db_path)
-        item_dump = self.loot_info_wrapper.dump_item(item_name, rolls)
-        if not item_dump:
+        try:
+            item_dump = self.loot_info_wrapper.dump_item(item_name, rolls)
+        except ToolError as e:
+            sg.popup(str(e))
             return
         sg.popup_scrolled(
             item_dump,
@@ -646,16 +548,6 @@ class LootViewer(BaseWindow):
         self.w.item_editor_col.contents_changed()
 
 
-def is_windows() -> bool:
-    return os.name == "nt"
-
-
-def adapt_exc_path(path: str) -> str:
-    if is_windows():
-        return path + ".exe"
-    return path
-
-
 def main(args: List[str]) -> int:
     parser = argparse.ArgumentParser(description="View loot data from Rogue")
     parser.add_argument("item_db", help="Path to item database")
@@ -666,27 +558,19 @@ def main(args: List[str]) -> int:
     if not os.path.exists(item_db_path):
         print(f"Item database does not exist: {item_db_path}")
         return 1
-
-    bin_dir_path = os.path.abspath(pargs.bin_dir)
-    if not os.path.exists(bin_dir_path):
-        print(f"Bin directory does not exist: {bin_dir_path}")
-        return 1
-
-    loot_info_wrapper_exc = os.path.join(
-        bin_dir_path, adapt_exc_path("loot_info")
-    )
-
     item_db = ItemDb.load(item_db_path)
 
+    tool_paths = RogueToolPaths(pargs.bin_dir)
+
     # Store copy of item db in temp file
-    temp_item_db_path = item_db_path + ".tmp.loot_viewer.json"
+    temp_item_db_path = os.path.abspath(".tmp.loot_viewer.json")
     item_db.save(temp_item_db_path)
 
     loot_info_wrapper = LootInfoWrapper(
         item_db_path=temp_item_db_path,
         # FIXME we need to use the build schema here
         schema_path=str(SCHEMAS_PATH / "item_db_schema.json"),
-        loot_info_excel_path=loot_info_wrapper_exc,
+        loot_info_excel_path=tool_paths.loot_info,
     )
 
     loot_viewer = LootViewer(item_db, loot_info_wrapper)
