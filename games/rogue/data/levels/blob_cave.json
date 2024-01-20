@@ -1,12 +1,12 @@
 {
-  "map": {
-    "type": "generated",
-    "config": "blob_cave.cfg"
-  },
   "entities": {
-    "b": "blob",
+    "<": "level_exit",
     "C": "common_chest",
     "H": "level_entry",
-    "<": "level_exit"
+    "b": "blob"
+  },
+  "map": {
+    "config": "blob_cave.cfg",
+    "type": "generated"
   }
 }

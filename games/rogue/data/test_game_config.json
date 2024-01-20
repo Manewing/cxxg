@@ -1,70 +1,78 @@
 {
-  "item_db_config": "item_db.json",
-  "entity_db_config": "entity_db.json",
-  "level_db_config": "level_db.json",
   "crafting_db_config": "crafting_db.json",
+  "entity_db_config": "entity_db.json",
   "initial_game_world": "dungeon_sweeper",
-  "initial_level_config": "levels/default.json",
   "initial_items": [
     {
-      "name": "Small Sword",
-      "count": 1
+      "count": 1,
+      "name": "Small Sword"
     },
     {
-      "name": "Arcane Shardblade",
-      "count": 1
+      "count": 1,
+      "name": "Arcane Shardblade"
     },
     {
-      "name": "Blueberry",
-      "count": 10
+      "count": 10,
+      "name": "Blueberry"
     },
     {
-      "name": "Green Goo",
-      "count": 10
+      "count": 10,
+      "name": "Green Goo"
     },
     {
-      "name": "Venomous Fang",
-      "count": 10
+      "count": 10,
+      "name": "Venomous Fang"
     },
     {
-      "name": "Scroll of mind vision",
-      "count": 10
+      "count": 10,
+      "name": "Scroll of mind vision"
     },
     {
-      "name": "Scroll of invisibility",
-      "count": 10
+      "count": 10,
+      "name": "Scroll of invisibility"
     },
     {
-      "name": "Great Helm",
-      "count": 1
+      "count": 1,
+      "name": "Great Helm"
     },
     {
-      "name": "Leather Tunic",
-      "count": 1
+      "count": 1,
+      "name": "Leather Tunic"
     },
     {
-      "name": "Arcane Potion",
-      "count": 1
+      "count": 1,
+      "name": "Arcane Potion"
     },
     {
-      "name": "Leather Pants",
-      "count": 1
+      "count": 1,
+      "name": "Leather Pants"
     },
     {
-      "name": "Wooden Bow",
-      "count": 1
+      "count": 1,
+      "name": "Wooden Bow"
     },
     {
-      "name": "L1 Key",
-      "count": 1
+      "count": 1,
+      "name": "L1 Key"
     },
     {
-      "name": "L2 Key",
-      "count": 1
+      "count": 1,
+      "name": "L2 Key"
     },
     {
-      "name": "L3 Key",
-      "count": 1
+      "count": 1,
+      "name": "L3 Key"
+    },
+    {
+      "count": 1,
+      "name": "Orb of Upgrade"
+    },
+    {
+      "count": 1,
+      "name": "Scroll of striking"
     }
-  ]
+  ],
+  "initial_level_config": "levels/default.json",
+  "item_db_config": "item_db.json",
+  "level_db_config": "level_db.json"
 }

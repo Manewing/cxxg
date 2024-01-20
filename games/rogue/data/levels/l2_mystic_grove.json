@@ -1,20 +1,20 @@
 {
+  "entities": {},
   "map": {
-    "type": "composite",
     "levels": [
       {
-        "end": 0,
-        "config": "mystic_grove.json"
+        "config": "mystic_grove.json",
+        "end": 0
       },
       {
-        "end": 1,
-        "config": "mystic_garden_meadow.json"
+        "config": "mystic_garden_meadow.json",
+        "end": 1
       },
       {
-        "end": 2,
-        "config": "mystic_grove.json"
+        "config": "mystic_grove.json",
+        "end": 2
       }
-    ]
-  },
-  "entities": {}
+    ],
+    "type": "composite"
+  }
 }

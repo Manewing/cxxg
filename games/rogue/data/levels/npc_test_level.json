@@ -1,55 +1,57 @@
 {
+  "entities": {},
   "map": {
-    "type": "designed",
-    "map_file": "npc_test_level.map",
-    "default_char": {
-      "tile":{ "char":" ",
-      "color": "#000000",
-      "bg_color": "#645032"}, "layer": "ground"
-
-    },
     "char_info": {
       " ": {
+        "layer": "ground",
         "tile": {
+          "bg_color": "#645032",
           "char": " ",
-          "color": "#000000",
-          "bg_color": "#645032"
-        },
-        "layer": "ground"
+          "color": "#000000"
+        }
       },
       "#": {
+        "layer": "walls",
         "tile": {
+          "bg_color": "#2d2d2d",
           "char": "#",
-          "color": "#3c3c3c",
-          "bg_color": "#2d2d2d"
-        },
-        "layer": "walls"
-      },
-      "~": {
-        "tile": {
-          "char": "~",
-          "color": "#2885bf",
-          "bg_color": "#1e6e96"
-        },
-        "layer": "objects"
+          "color": "#3c3c3c"
+        }
       },
       "A": {
+        "layer": "objects",
         "tile": {
+          "bg_color": "#645032",
           "char": "A",
-          "color": "#0a320f",
-          "bg_color": "#645032"
-        },
-        "layer": "objects"
+          "color": "#0a320f"
+        }
       },
       "B": {
+        "layer": "objects",
         "tile": {
+          "bg_color": "#0a320f",
           "char": "B",
-          "color": "#8c0a32",
-          "bg_color": "#0a320f"
-        },
-        "layer": "objects"
+          "color": "#8c0a32"
+        }
+      },
+      "~": {
+        "layer": "objects",
+        "tile": {
+          "bg_color": "#1e6e96",
+          "char": "~",
+          "color": "#2885bf"
+        }
       }
-    }
-  },
-  "entities": {}
+    },
+    "default_char": {
+      "layer": "ground",
+      "tile": {
+        "bg_color": "#645032",
+        "char": " ",
+        "color": "#000000"
+      }
+    },
+    "map_file": "npc_test_level.map",
+    "type": "designed"
+  }
 }

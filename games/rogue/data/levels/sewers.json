@@ -1,13 +1,13 @@
 {
-  "map": {
-    "type": "generated",
-    "config": "sewers.cfg"
-  },
   "entities": {
-    "r": "sewer_rat",
-    "R": "toxic_rat",
     "<": "level_entry",
     "H": "level_exit",
+    "R": "toxic_rat",
+    "r": "sewer_rat",
     "v": "common_vase"
+  },
+  "map": {
+    "config": "sewers.cfg",
+    "type": "generated"
   }
 }
