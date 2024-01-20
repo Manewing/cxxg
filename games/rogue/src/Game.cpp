@@ -17,6 +17,7 @@
 #include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
+#include <rogue/UI/Item.h>
 #include <rogue/UI/TargetUI.h>
 
 namespace rogue {
@@ -425,6 +426,22 @@ ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
   PI.MaxMana = Mana.MaxValue;
   if (Interact) {
     PI.InteractStr = "[e] " + Interact->Msg;
+  }
+
+  const auto &Equip = Reg.get<EquipmentComp>(Player).Equip;
+  for (std::size_t Idx = 0; Idx < Equip.all().size(); ++Idx) {
+    auto *Slot = Equip.all().at(Idx);
+    if (!Slot->It) {
+      continue;
+    }
+    if (!Slot->It->hasEffect(CapabilityFlags::Skill)) {
+      continue;
+    }
+    ui::Controller::SkillInfo SI;
+    SI.Key = std::to_string(Idx + 1);
+    SI.Name = Slot->It->getName();
+    SI.NameColor = ui::getColorForItem(*Slot->It);
+    PI.Skills.push_back(SI);
   }
 
   return PI;

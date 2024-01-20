@@ -28,12 +28,19 @@ namespace rogue::ui {
 
 class Controller : public EventHubConnector {
 public:
+  struct SkillInfo {
+    std::string Key;
+    std::string Name;
+    cxxg::types::TermColor NameColor;
+  };
+
   struct PlayerInfo {
     int Health;
     int MaxHealth;
     int Mana;
     int MaxMana;
     std::string InteractStr;
+    std::vector<SkillInfo> Skills;
   };
 
   struct TargetInfo {

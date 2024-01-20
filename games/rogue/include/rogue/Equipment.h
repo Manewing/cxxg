@@ -36,6 +36,11 @@ public:
             &Pants, &Boots,  &Weapon, &OffHand};
   }
 
+  inline std::array<const EquipmentSlot *, 8> all() const {
+    return {&Ring,  &Amulet, &Helmet, &ChestPlate,
+            &Pants, &Boots,  &Weapon, &OffHand};
+  }
+
   EquipmentSlot &getSlot(ItemType It);
   const EquipmentSlot &getSlot(ItemType It) const;
 

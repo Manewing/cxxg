@@ -66,6 +66,17 @@ void Controller::draw(int LevelIdx, const PlayerInfo &PI,
   Acc << " | " << InterColor.underline() << InteractStr;
   Acc.flushBuffer();
 
+  auto SecondAcc = Scr[1][0];
+  SecondAcc << HasInterColor.underline() << "[Skills]:";
+  for (const auto &SI : PI.Skills) {
+    SecondAcc << HasInterColor << " [" << SI.Key << "] " << SI.NameColor
+              << SI.Name;
+  }
+  if (PI.Skills.empty()) {
+    SecondAcc << NoInterColor.underline() << " Nothing";
+  }
+  SecondAcc.flushBuffer();
+
   WdwContainer.draw(Scr);
 }
 
