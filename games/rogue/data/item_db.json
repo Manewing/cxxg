@@ -211,6 +211,10 @@
       "health_value": 5,
       "type": "health_item_effect"
     },
+    "minor_health_effect_potition": {
+      "health_value": 18.0,
+      "type": "health_item_effect"
+    },
     "minor_health_regen_effect": {
       "buff": {
         "regen_amount": 0.5,
@@ -221,6 +225,10 @@
     },
     "minor_mana_effect": {
       "mana_value": 5,
+      "type": "mana_item_effect"
+    },
+    "minor_mana_effect_potion": {
+      "mana_value": 16.0,
       "type": "mana_item_effect"
     },
     "minor_poison_effect": {
@@ -1666,6 +1674,32 @@
       "types": [
         "quest"
       ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "minor_health_effect_potition",
+          "type": "use_on"
+        }
+      ],
+      "description": "This entry-level potion offers a modest restoration of health, making it a valuable asset for those embarking on their initial quests. Its instability, however, limits its effectiveness, preventing further enhancements or extensions beyond its fundamental healing capabilities.",
+      "name": "Minor Health Potion",
+      "types": [
+        "consumable"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "minor_mana_effect_potion",
+          "type": "use_on"
+        }
+      ],
+      "description": "Offering a minor replenishment of magical energy, it proves invaluable for early adventures in the arcane arts. However, its instability limits any attempts to enhance its effects, keeping its utility confined to fundamental mana restoration.\n",
+      "name": "Minor Mana Potion",
+      "types": [
+        "consumable"
+      ]
     }
   ],
   "item_specializations": {
@@ -1803,14 +1837,19 @@
           "weight": 20
         },
         {
-          "ref": "l2_key",
+          "ref": "common_potion",
           "type": "table",
-          "weight": 10
+          "weight": 5
         },
         {
           "ref": "rare_equip",
           "type": "table",
           "weight": 5
+        },
+        {
+          "ref": "l2_key",
+          "type": "table",
+          "weight": 3
         }
       ]
     },
@@ -2070,6 +2109,64 @@
         {
           "type": "null",
           "weight": 1
+        }
+      ]
+    },
+    "common_potion": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 40
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Nature Brew",
+          "type": "item",
+          "weight": 10
+        },
+        {
+          "max_count": 5,
+          "min_count": 3,
+          "name": "Arcane Liquid",
+          "type": "item",
+          "weight": 10
+        },
+        {
+          "max_count": 5,
+          "min_count": 3,
+          "name": "Glass Vial",
+          "type": "item",
+          "weight": 10
+        },
+        {
+          "max_count": 2,
+          "min_count": 1,
+          "name": "Minor Health Potion",
+          "type": "item",
+          "weight": 10
+        },
+        {
+          "max_count": 2,
+          "min_count": 1,
+          "name": "Minor Mana Potion",
+          "type": "item",
+          "weight": 10
+        },
+        {
+          "max_count": 5,
+          "min_count": 3,
+          "name": "Blueberry",
+          "type": "item",
+          "weight": 10
+        },
+        {
+          "max_count": 5,
+          "min_count": 3,
+          "name": "Dragon Fruit",
+          "type": "item",
+          "weight": 10
         }
       ]
     },

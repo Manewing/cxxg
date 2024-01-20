@@ -210,6 +210,7 @@ class LinkedGeneratedEnumEditor(GeneratedEnumEditor):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.get_enum_values = get_enum_values
         self.value = self.enum_values[0]
+        self.register_refresh_handler(self.update_ui)
 
     def update_ui(self) -> None:
         self.enum_values = self.get_enum_values()

@@ -135,6 +135,20 @@ recipes:
     results:
       - Nature Brew
   - ingredients:
+      - Glass Vial
+      - Arcane Liquid
+      - Blueberry
+    name: Minor Health Potion
+    results:
+      - Minor Health Potion
+  - ingredients:
+      - Glass Vial
+      - Arcane Liquid
+      - Dragon Fruit
+    name: Minor Mana Potion
+    results:
+      - Minor Mana Potion
+  - ingredients:
       - Fairy Dust
       - Fire Stone
     name: Rune Dust
@@ -216,11 +230,9 @@ recipes:
       - Fire Stone
   - ingredients:
       - Glass Vial
-      - Rune Dust
-      - Rune Dust
-      - Rune Dust
-      - Rune Dust
-      - Rune Dust
+      - Rune Stone
+      - Rune Stone
+      - Rune Stone
       - Arcane Liquid
       - Arcane Liquid
       - Arcane Liquid

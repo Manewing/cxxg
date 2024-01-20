@@ -258,9 +258,6 @@
           "loot_table": "rare_silk_cocoon"
         },
         "stats": {
-          "dex": 0,
-          "int": 0,
-          "str": 0,
           "vit": 3
         },
         "tile": {
@@ -487,8 +484,7 @@
         "stats": {
           "dex": 5,
           "int": 2,
-          "str": 0,
-          "vit": 1
+          "str": 0
         },
         "tile": {
           "color": "#c86464"
@@ -583,13 +579,9 @@
           "loot_table": "ltb_iron_pine_tree"
         },
         "stats": {
-          "dex": 0,
-          "int": 0,
-          "str": 0,
           "vit": 40
         },
         "tile": {
-          "char": "A",
           "color": "#5a5a5a"
         }
       },
@@ -853,6 +845,29 @@
       "display_name": "Level 3",
       "from_template": "base_world_entry",
       "name": "level_3"
+    },
+    {
+      "assemblers": {
+        "inventory": {
+          "loot_table": "common_potion"
+        },
+        "loot_interact": {
+          "default_tile": {
+            "char": "W",
+            "color": "#45c5b0"
+          },
+          "interact_text": "Search Workshop",
+          "loot_name": "Workshop",
+          "looted_tile": {
+            "char": "w",
+            "color": "#329c8c"
+          }
+        }
+      },
+      "description": "An abandond arcane workshop",
+      "display_name": "Arcane Workshop",
+      "from_template": "base_chest",
+      "name": "common_arcane_workshop"
     }
   ]
 }

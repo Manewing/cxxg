@@ -33,7 +33,7 @@ class ItemDb:
         return list(x["name"] for x in self.item_db["item_specializations"])
 
     def get_item_effect_names(self) -> List[str]:
-        return list(x for x in self.item_db["item_effects"])
+        return sorted(x for x in self.item_db["item_effects"])
 
     def get_loot_table(self, loot_table_name: str) -> dict:
         return self.item_db["loot_tables"][loot_table_name]
