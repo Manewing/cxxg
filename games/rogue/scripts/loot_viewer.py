@@ -354,6 +354,13 @@ class LootViewer(BaseWindow):
                 self.item_db.get_loot_table_names,
             ),
         )
+        self.generator.register_override(
+            ITEM_DB_SID + "#properties/item_prototypes/items/capabilities/item/effect",
+            partial(
+                LinkedGeneratedEnumEditor,
+                self.item_db.get_item_effect_names,
+            ),
+        )
 
         self.current_table = None
         self.loot_editor: Optional[BaseGeneratedEditor] = None
