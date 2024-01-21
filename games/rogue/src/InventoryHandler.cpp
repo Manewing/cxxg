@@ -202,13 +202,13 @@ bool InventoryHandler::tryUseItemOnTarget(std::size_t InvItemIdx,
   It.applyTo(Entity, TargetEt, Reg, FlagsAdj);
   It.applyTo(Entity, TargetEt, Reg, FlagsRanged);
 
-  Inv->takeItem(InvItemIdx, /*Count=*/1);
-
   if (IsPlayer && Reg.any_of<NameComp>(TargetEt)) {
     std::stringstream SS;
     SS << "Used " << It.getName() << " on " << getNameOrNone(Reg, TargetEt);
     publish(PlayerInfoMessageEvent() << SS.str());
   }
+
+  Inv->takeItem(InvItemIdx, /*Count=*/1);
 
   return true;
 }
