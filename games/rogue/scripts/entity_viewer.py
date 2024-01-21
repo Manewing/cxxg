@@ -24,7 +24,10 @@ from xzen.ui_gen import JSONFileManagerInterface
 
 from pyrogue.item_db import ItemDb
 from pyrogue.entity_db import EntityDb
-
+from pyrogue.tools import ToolError
+from pyrogue.tools import RogueToolPaths
+from pyrogue.tools import RogueToolWrapper
+from pyrogue.tools import TempJsonFile
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
 ENTITY_DB_SID = "https://rogue-todo.com/entity-db-schema.json"
@@ -80,6 +83,7 @@ class SelectEntityViewer(ListEditorBase):
         parent: BaseInterface,
         entity_db: EntityDb,
         select_cb: Callable[[int], None],
+        tool_paths: RogueToolPaths,
     ):
         super().__init__(
             select_cb,
@@ -95,6 +99,7 @@ class SelectEntityViewer(ListEditorBase):
             size=(40, 35),
         )
         self.entity_db = entity_db
+        self.tool_paths = tool_paths
 
     def get_element(self) -> Element:
         elem = super().get_element()
@@ -108,12 +113,19 @@ class SelectEntityViewer(ListEditorBase):
             sg.VSep(),
             sg.Button(
                 "Arena",
-                tooltip="",
+                tooltip="View arena with entity",
                 key=self.k.arena,
+            ),
+            sg.VSep(),
+            sg.Button(
+                "Player Arena",
+                tooltip="View arena with player and entity",
+                key=self.k.player_arena,
             ),
         ]
         self.register_event(self.k.show_cfg)
         self.register_event(self.k.arena)
+        self.register_event(self.k.player_arena)
         layout = [toolbar, [sg.HSep(pad=20)], [elem]]
         return sg.Frame("Entities", layout)
 
@@ -127,6 +139,62 @@ class SelectEntityViewer(ListEditorBase):
             entity = self.entity_db.get_fully_defined_entity(idx)
             entity_str = yaml.dump(entity, indent=2, sort_keys=True)
             sg.popup_scrolled(entity_str, title="Entity Configuration")
+
+        if event == self.k.player_arena:
+            idx = self.get_real_index()
+            if idx >= len(self.values):
+                return True
+
+            wrapper = RogueToolWrapper(self.tool_paths)
+            wrapper.build()
+
+            arena_json_config = self.tool_paths.data.get_level("arena")
+            arena_json = TempJsonFile(arena_json_config)
+
+            test_game_config = self.tool_paths.data.test_game_config
+            test_game_json = TempJsonFile(test_game_config)
+
+            entity = self.values[idx]
+            for str_idx in range(0, 10):
+                arena_json.data["entities"][str(str_idx)] = "null"
+            arena_json.data["entities"]["4"] = entity
+
+            arena_path = arena_json.write()
+            test_game_json.data["initial_level_config"] = str(
+                arena_path.relative_to(test_game_config.parent)
+            )
+
+            try:
+                test_game_path = test_game_json.write()
+                wrapper.rogue([test_game_path], new_window=True)
+            except ToolError as e:
+                sg.popup_scrolled(e.output, title="Tool Error")
+            return True
+
+        if event == self.k.arena:
+            idx = self.get_real_index()
+            if idx >= len(self.values):
+                return True
+
+            # Create new terminal window for map viewer console application
+            wrapper = RogueToolWrapper(self.tool_paths)
+            wrapper.build()
+
+            # Create a temporary file for the arena configuration
+            arena_json_config = self.tool_paths.data.get_level("arena")
+            arena_json = TempJsonFile(arena_json_config)
+
+            entity = self.values[idx]
+            for str_idx in range(1, 6):
+                arena_json.data["entities"][str(str_idx)] = entity
+
+            try:
+                arena_path = arena_json.write()
+                cmd = [self.tool_paths.data.test_game_config, arena_path]
+                wrapper.map_viewer(cmd, new_window=True)
+            except ToolError as e:
+                sg.popup_scrolled(e.output, title="Tool Error")
+            return True
 
         return False
 
@@ -162,11 +230,14 @@ class SelectEntityViewer(ListEditorBase):
 # - Integrate map viewer to watch entity in action
 # - Add arena option to fight entity in arena
 class EntityViewer(BaseWindow):
-    def __init__(self, item_db: ItemDb, entity_db: EntityDb):
+    def __init__(
+        self, item_db: ItemDb, entity_db: EntityDb, tool_paths: RogueToolPaths
+    ):
         super().__init__("Loot Viewer")
         self.item_db = item_db
         self.entity_db = entity_db
         self.entity_db.resolve_inheritance()
+        self.tool_paths = tool_paths
 
         schema_files = SCHEMAS_PATH.glob("*_schema.json")
 
@@ -202,9 +273,7 @@ class EntityViewer(BaseWindow):
 
     def get_entity_layout(self) -> List[List[sg.Element]]:
         self.select_viewer = SelectEntityViewer(
-            self,
-            self.entity_db,
-            self._on_select_entity,
+            self, self.entity_db, self._on_select_entity, self.tool_paths
         )
         self.entity_editor = self.generator.create_editor_interface_from_path(
             ENTITY_DB_SID + "#defs/entity_template", self
@@ -329,6 +398,9 @@ def main(args: List[str]) -> int:
     parser.add_argument(
         "--entity_db", required=True, help="Path to entity database"
     )
+    parser.add_argument(
+        "--bin_dir", required=True, help="Path to Rogue bin directory"
+    )
     pargs = parser.parse_args(args)
 
     item_db_path = os.path.abspath(pargs.item_db)
@@ -341,10 +413,12 @@ def main(args: List[str]) -> int:
         print(f"Entity database does not exist: {entity_db_path}")
         return 1
 
+    tool_paths = RogueToolPaths(pargs.bin_dir)
+
     item_db = ItemDb.load(item_db_path)
     entity_db = EntityDb.load(entity_db_path)
 
-    viewer = EntityViewer(item_db, entity_db)
+    viewer = EntityViewer(item_db, entity_db, tool_paths)
     viewer.setup()
     viewer.run()
 

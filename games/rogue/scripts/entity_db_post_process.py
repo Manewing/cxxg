@@ -20,8 +20,7 @@ def main(argv: List[str]) -> int:
     args = parser.parse_args(argv)
 
     entity_db = EntityDb.load(args.entity_db)
-    resolver = InheritanceResolver(entity_db.get_templates())
-    resolver.resolve_all()
+    entity_db.resolve_inheritance()
 
     entity_db.save(args.output)
 
