@@ -209,6 +209,7 @@ add_custom_target(
 )
 
 set(RUN_PYTHON
+  ${CMAKE_COMMAND} -E env
   "PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}/python:${PYTHONPATH}"
   ${PYTHON_EXECUTABLE}
 )
