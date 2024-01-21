@@ -1683,6 +1683,7 @@
         }
       ],
       "description": "This entry-level potion offers a modest restoration of health, making it a valuable asset for those embarking on their initial quests. Its instability, however, limits its effectiveness, preventing further enhancements or extensions beyond its fundamental healing capabilities.",
+      "max_stack_size": 99,
       "name": "Minor Health Potion",
       "types": [
         "consumable"
@@ -1696,6 +1697,7 @@
         }
       ],
       "description": "Offering a minor replenishment of magical energy, it proves invaluable for early adventures in the arcane arts. However, its instability limits any attempts to enhance its effects, keeping its utility confined to fundamental mana restoration.\n",
+      "max_stack_size": 99,
       "name": "Minor Mana Potion",
       "types": [
         "consumable"
@@ -1856,6 +1858,11 @@
           "weight": 20
         },
         {
+          "ref": "common_stat_orb",
+          "type": "table",
+          "weight": 10
+        },
+        {
           "ref": "common_potion",
           "type": "table",
           "weight": 5
@@ -1918,7 +1925,7 @@
           "weight": 15
         },
         {
-          "max_count": 1,
+          "max_count": 2,
           "min_count": 1,
           "name": "Book of crafting",
           "type": "item",

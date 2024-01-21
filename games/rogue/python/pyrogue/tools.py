@@ -206,11 +206,12 @@ class LootInfoWrapper:
             self.schema_path,
             *args,
         ]
+        cmd = [str(x) for x in cmd]
         try:
             output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             output = e.output.decode("utf-8")
-            raise ToolError(self.loot_info_excel_path, output, e.returncode)
+            raise ToolError(cmd, output, e.returncode)
         output = output.decode("utf-8")
         return output
 
@@ -221,7 +222,7 @@ class LootInfoWrapper:
             return json.loads(output)
         except json.decoder.JSONDecodeError:
             raise ToolError(
-                self.loot_info_excel_path,
+                [self.loot_info_excel_path],
                 f"Failed to decode loot info JSON: {output}",
                 1,
             )

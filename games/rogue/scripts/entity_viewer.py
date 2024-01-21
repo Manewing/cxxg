@@ -233,7 +233,7 @@ class EntityViewer(BaseWindow):
     def __init__(
         self, item_db: ItemDb, entity_db: EntityDb, tool_paths: RogueToolPaths
     ):
-        super().__init__("Loot Viewer")
+        super().__init__("Entity Viewer")
         self.item_db = item_db
         self.entity_db = entity_db
         self.entity_db.resolve_inheritance()
