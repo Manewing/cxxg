@@ -34,6 +34,9 @@ using MindVisionBuffEffect = ApplyBuffItemEffect<MindVisionBuffComp, false>;
 
 using InvisibilityBuffEffect = ApplyBuffItemEffect<InvisibilityBuffComp, false>;
 
+using StatsTimedBuffEffect =
+    ApplyBuffItemEffect<StatsTimedBuffComp, false, StatsComp>;
+
 using StatsBuffPerHitEffect =
     ApplyBuffItemEffect<StatsBuffPerHitComp, false, StatsComp>;
 

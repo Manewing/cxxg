@@ -34,6 +34,9 @@
             "$ref": "#/defs/effect/stats_buff_per_hit_comp"
           },
           {
+            "$ref": "#/defs/effect/stats_timed_buff_comp"
+          },
+          {
             "$ref": "#/defs/effect/armor_buff_comp"
           },
           {
@@ -197,6 +200,23 @@
           }
         },
         "required": ["stats", "max_stacks", "ticks", "type"],
+        "additionalProperties": false
+      },
+      "stats_timed_buff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "stats_timed_buff_comp"
+          },
+          "stats": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/stat_points"
+          },
+          "ticks": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["stats", "ticks", "type"],
         "additionalProperties": false
       },
       "armor_buff_comp": {

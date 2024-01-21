@@ -80,6 +80,14 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              Buff.Bonus = P;
              return std::make_shared<StatsBuffEffect>(Buff);
            }},
+          {"stats_timed_buff_comp",
+           [](const auto &, const auto &V) {
+             StatPoints P = parseStatPoints(V["stats"]);
+             StatsTimedBuffComp Buff;
+             Buff.Bonus = P;
+             Buff.TicksLeft = V["ticks"].GetUint();
+             return std::make_shared<StatsTimedBuffEffect>(Buff);
+           }},
           {"armor_buff_comp",
            [](const auto &, const auto &V) {
              ArmorBuffComp Armor;

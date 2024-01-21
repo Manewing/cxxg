@@ -91,7 +91,12 @@ public:
 struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
   std::string getName() const override;
   std::string getDescription() const override;
+
+  /// Will increase the buff but the duration will be minimum of the two
   void add(const StatsTimedBuffComp &Other);
+
+  /// Removes an added buff, returns true if component can be removed
+  bool remove(const StatsTimedBuffComp &Other);
 };
 
 // TODO:

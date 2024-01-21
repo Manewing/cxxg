@@ -159,9 +159,16 @@ bool StatsBuffComp::remove(const StatsBuffComp &Other) {
 }
 
 void StatsTimedBuffComp::add(const StatsTimedBuffComp &Other) {
-  // Only one stats buff is allowed, can however boost all stats
-  Bonus = Other.Bonus;
-  TicksLeft = Other.TicksLeft;
+  StatsBuffComp::add(Other);
+  TicksLeft = std::min(TicksLeft, Other.TicksLeft);
+}
+
+bool StatsTimedBuffComp::remove(const StatsTimedBuffComp &Other) {
+  if (StatsBuffComp::remove(Other)) {
+    TicksLeft = 0;
+    return true;
+  }
+  return false;
 }
 
 std::string PoisonDebuffComp::getName() const { return "Poison debuff"; }
