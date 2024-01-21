@@ -234,7 +234,7 @@ class SelectItemTableViewer(ListEditorBase):
         del self.item_db.item_db["item_prototypes"][idx]
 
     def dump_item(self, item_name: str, rolls: int = 1) -> None:
-        self.item_db.save(self.item_db.item_db_path)
+        self.item_db.save(self.loot_info_wrapper.item_db_path)
         try:
             item_dump = self.loot_info_wrapper.dump_item(item_name, rolls)
         except ToolError as e:

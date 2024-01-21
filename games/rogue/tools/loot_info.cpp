@@ -4,6 +4,7 @@
 #include <map>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/UI/Item.h>
 #include <string>
 
 void dumpLootTableRewards(const rogue::ItemDatabase &ItemDb,
@@ -102,7 +103,10 @@ void dumpItemCreations(const rogue::ItemDatabase &ItemDb,
       std::cout << " - Attrs: " << EffInfo.Attributes << std::endl
                 << "   Effect: " << EffInfo.Effect->getName() << std::endl;
     }
-    std::cout << std::endl;
+    std::cout << std::endl << LineSep << std::endl
+              << "In Game Description:" << std::endl
+              << LineSep << std::endl
+              << rogue::ui::getItemText(Item) << std::endl;
   }
 }
 
@@ -151,7 +155,8 @@ void dumpItems(const rogue::ItemDatabase &ItemDb) {
 
 void dumpUsage(const char *PrgName) {
   std::cerr
-      << "usage: " << PrgName << " <item_db_config> <item_db_schema> *<--options>" << std::endl
+      << "usage: " << PrgName
+      << " <item_db_config> <item_db_schema> *<--options>" << std::endl
       << std::endl
       << "options:" << std::endl
       << "  --dump-tables                           (Dumps all loot tables)"
