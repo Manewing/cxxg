@@ -165,6 +165,13 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              Effect.Buff.TicksLeft = V["buff"]["ticks"].GetUint();
              return std::make_shared<CoHTargetBlindedDebuffEffect>(Effect);
            }},
+          {"life_steal",
+           [](const auto &, const auto &V) {
+             LifeStealBuffComp LSBC;
+             LSBC.Percent = V["percent"].GetDouble();
+             LSBC.BonusHP = V["bonus_hp"].GetDouble();
+             return std::make_shared<LifeStealBuffEffect>(LSBC);
+           }},
           {"dismantle", [](const auto &DB, const auto &V) {
              std::vector<DismantleEffect::DismantleResult> Results;
              for (const auto &ItemJson : V["items"].GetArray()) {
@@ -179,7 +186,8 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
   const auto EffectType = std::string(V["type"].GetString());
   const auto It = Factories.find(EffectType);
   if (It == Factories.end()) {
-    throw std::out_of_range("Unknown item effect: " + std::string(EffectType));
+    throw std::out_of_range("ItemDatabase: Unknown item effect: " +
+                            std::string(EffectType));
   }
 
   return It->second(DB, V);
@@ -190,8 +198,9 @@ static void addDefaultConstructEffect(
     const std::string &EffectName, const std::shared_ptr<ItemEffect> &Effect) {
   const auto It = Effects.find(EffectName);
   if (It != Effects.end()) {
-    throw std::out_of_range("Conflicting special effect (reserved name): " +
-                            EffectName);
+    throw std::out_of_range(
+        "ItemDatabase: Conflicting special effect (reserved name): " +
+        EffectName);
   }
   Effects[EffectName] = Effect;
 }

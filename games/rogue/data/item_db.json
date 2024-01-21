@@ -223,6 +223,11 @@
       },
       "type": "health_regen_buff_comp"
     },
+    "minor_life_steal": {
+      "bonus_hp": 2.0,
+      "percent": 5.0,
+      "type": "life_steal"
+    },
     "minor_mana_effect": {
       "mana_value": 5,
       "type": "mana_item_effect"
@@ -1006,6 +1011,10 @@
         {
           "effect": "low_chance_to_apply_bleeding",
           "type": "equipment"
+        },
+        {
+          "effect": "minor_life_steal",
+          "type": "equipment"
         }
       ],
       "description": "Head of blood fairy",
@@ -1701,6 +1710,29 @@
       "name": "Minor Mana Potion",
       "types": [
         "consumable"
+      ]
+    },
+    {
+      "capabilities": [],
+      "description": "Blood of a cursed creature. Its unholy properties, when harnessed with care, infuse crafted items with a sinister vitality.",
+      "max_stack_size": 99,
+      "name": "Cursed Blood",
+      "types": [
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "minor_life_steal",
+          "type": "equipment"
+        }
+      ],
+      "description": "A shard that can be used to enchant equipment with lifesteal",
+      "max_stack_size": 99,
+      "name": "Vampiric Shard",
+      "types": [
+        "crafting"
       ]
     }
   ],
@@ -2527,7 +2559,7 @@
       ]
     },
     "ltb_blood_fairy": {
-      "rolls": 2,
+      "rolls": 1,
       "slots": [
         {
           "max_count": 1,
@@ -2540,6 +2572,17 @@
           "ref": "ltb_fairy",
           "type": "table",
           "weight": -1
+        },
+        {
+          "type": "null",
+          "weight": 80
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Cursed Blood",
+          "type": "item",
+          "weight": 20
         }
       ]
     },

@@ -37,9 +37,29 @@ void tryApplyChanceOnHitBuff(entt::registry &Reg, entt::entity Target,
   }
 }
 
+void applyLifeSteal(entt::registry &Reg, entt::entity Source,
+                    const DamageComp &AppliedDC, EventHubConnector &EHC) {
+  auto *LSBC = Reg.try_get<LifeStealBuffComp>(Source);
+  if (!LSBC) {
+    return;
+  }
+  auto LifeStealValue = LSBC->getEffectiveLifeSteal(AppliedDC.total());
+  if (LifeStealValue == 0) {
+    return;
+  }
+  auto *HC = Reg.try_get<HealthComp>(Source);
+  if (!HC) {
+    return;
+  }
+  HC->restore(LifeStealValue);
+  EHC.publish(RestoreHealthEvent{
+      {}, Source, &Reg, static_cast<unsigned>(LifeStealValue), "Life steal"});
+}
+
 std::optional<unsigned> applyDamage(entt::registry &Reg,
                                     const entt::entity Target,
-                                    HealthComp &THealth, const DamageComp &DC) {
+                                    HealthComp &THealth, const DamageComp &DC,
+                                    EventHubConnector &EHC) {
   if (auto *BC = Reg.try_get<BlockBuffComp>(Target)) {
     // Increase the block chance if the attacker is blinded
     StatValue MaxChance =
@@ -61,6 +81,7 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
   tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source);
   tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source);
   tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source);
+  applyLifeSteal(Reg, DC.Source, NewDC, EHC);
 
   THealth.reduce(NewDC.PhysDamage);
   THealth.reduce(NewDC.MagicDamage);
@@ -181,7 +202,7 @@ void applyDamageComp(entt::registry &Reg, DamageComp &DC,
         if (DC.Hits-- == 0) {
           return;
         }
-        auto Damage = applyDamage(Reg, TEt, THC, DC);
+        auto Damage = applyDamage(Reg, TEt, THC, DC, EHC);
 
         // Applying damage may cause update attack/target components
         applyCombatComps(Reg, DC.Source, TEt);
@@ -225,7 +246,7 @@ void CombatSystem::handleMeleeAttack(entt::registry &Reg, entt::entity Attacker,
   DC.PhysDamage = EffMA.PhysDamage;
   DC.PhysDamage *= DamageFactor;
   DC.MagicDamage *= DamageFactor;
-  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC);
+  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC, EHC);
 
   // Check for on hit buffs and apply stacks
   if (auto *SBPH = Reg.try_get<StatsBuffPerHitComp>(Attacker);

@@ -64,6 +64,9 @@
             "$ref": "#/defs/effect/chance_on_hit_to_apply_blinded"
           },
           {
+            "$ref": "#/defs/effect/life_steal"
+          },
+          {
             "$ref": "#/defs/effect/dismantle"
           }
         ]
@@ -378,6 +381,25 @@
           }
         },
         "required": ["buff", "type", "chance"],
+        "additionalProperties": false
+      },
+      "life_steal": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "life_steal"
+          },
+          "percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "bonus_hp": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": ["percent", "bonus_hp", "type"],
         "additionalProperties": false
       },
       "dismantle": {

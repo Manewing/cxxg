@@ -142,6 +142,15 @@ recipes:
     results:
       - Minor Health Potion
   - ingredients:
+      - Rune Stone
+      - Cursed Blood
+      - Cursed Blood
+      - Cursed Blood
+      - Rune Dust
+    name: Vampiric Shard
+    results:
+      - Vampiric Shard
+  - ingredients:
       - Glass Vial
       - Arcane Liquid
       - Dragon Fruit

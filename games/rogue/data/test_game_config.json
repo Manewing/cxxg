@@ -68,8 +68,8 @@
       "name": "Orb of Upgrade"
     },
     {
-      "count": 1,
-      "name": "Scroll of striking"
+      "count": 99,
+      "name": "Book of crafting"
     }
   ],
   "initial_level_config": "levels/default.json",

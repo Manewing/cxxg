@@ -46,6 +46,9 @@ using CoHTargetPoisonDebuffEffect =
 using CoHTargetBlindedDebuffEffect =
     ApplyBuffItemEffect<CoHTargetBlindedDebuffComp, false>;
 
+using LifeStealBuffEffect =
+    ApplyBuffItemEffect<LifeStealBuffComp, false, HealthComp>;
+
 // Set component effects
 
 class SetMeleeCompEffect : public SetComponentEffect<MeleeAttackComp, false> {

@@ -138,7 +138,7 @@ class RogueToolWrapper:
             raise ToolError(cmd, None, e.returncode)
 
     def _run_cmd_in_new_window_linux(self, cmd: str) -> str:
-        self._run_cmd_no_wait(["xterm", "-e", cmd])
+        self._run_cmd_no_wait(["gnome-terminal", "--", cmd])
         return ""
 
     def _run_cmd_in_new_window_macos(self, cmd: str) -> str:

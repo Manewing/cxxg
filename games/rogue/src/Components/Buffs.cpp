@@ -352,7 +352,7 @@ void BuffApplyHelperBase::publishBuffAppliedEvent(const entt::entity &SrcEt,
 }
 
 std::string StatsBuffPerHitComp::getName() const {
-  return "Stats buff per hit";
+  return "Stats per hit";
 }
 
 std::string StatsBuffPerHitComp::getDescription() const {
@@ -406,6 +406,36 @@ StatsBuffComp StatsBuffPerHitComp::getEffectiveBuff(StatPoint S) const {
   }
   B.SourceCount = 1;
   return B;
+}
+
+std::string LifeStealBuffComp::getName() const { return "Life steal"; }
+
+std::string LifeStealBuffComp::getDescription() const {
+  std::stringstream SS;
+  SS << "Life steal";
+  if (Percent) {
+    SS << " " << Percent << "% of damage";
+  }
+  if (BonusHP) {
+    SS << " +" << BonusHP << " HP";
+  }
+  return SS.str();
+}
+
+void LifeStealBuffComp::add(const LifeStealBuffComp &Other) {
+  Percent += Other.Percent;
+  BonusHP += Other.BonusHP;
+  AdditiveBuff::add(Other);
+}
+
+bool LifeStealBuffComp::remove(const LifeStealBuffComp &Other) {
+  Percent -= Other.Percent;
+  BonusHP -= Other.BonusHP;
+  return AdditiveBuff::remove(Other);
+}
+
+StatValue LifeStealBuffComp::getEffectiveLifeSteal(StatValue Damage) const {
+  return Percent * Damage / 100.0 + BonusHP;
 }
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,

@@ -7,6 +7,8 @@
 
 namespace rogue {
 
+static constexpr auto NameColor = cxxg::types::RgbColor{140, 130, 72};
+
 HistoryMessageAssembler::HistoryMessageAssembler(History &Hist,
                                                  cxxg::RowAccessor Rw)
     : Hist(Hist), Row(std::move(Rw)) {}
@@ -46,6 +48,7 @@ void EventHistoryWriter::setEventHub(EventHub *Hub) {
   subscribe(*this, &EventHistoryWriter::onEntityDiedEvent);
   subscribe(*this, &EventHistoryWriter::onBuffAppliedEvent);
   subscribe(*this, &EventHistoryWriter::onBuffApplyEffectEvent);
+  subscribe(*this, &EventHistoryWriter::onRestoreHealthEvent);
   subscribe(*this, &EventHistoryWriter::onBuffExpiredEvent);
   subscribe(*this, &EventHistoryWriter::onPlayerInfoMessageEvent);
   subscribe(*this, &EventHistoryWriter::onWarningMessageEvent);
@@ -63,17 +66,14 @@ void EventHistoryWriter::onEntityAttackEvent(const EntityAttackEvent &EAE) {
     return;
   }
   if (EAE.Damage) {
-    Hist.info() << cxxg::types::RgbColor{140, 130, 72} << AttackerNC->Name
-                << cxxg::types::Color::NONE << " dealt "
-                << cxxg::types::Color::RED << *EAE.Damage << " damage"
-                << cxxg::types::Color::NONE << " to "
-                << cxxg::types::RgbColor{140, 130, 72} << TargetNC->Name
-                << cxxg::types::Color::NONE;
+    Hist.info() << NameColor << AttackerNC->Name << cxxg::types::Color::NONE
+                << " dealt " << cxxg::types::Color::RED << *EAE.Damage
+                << " damage" << cxxg::types::Color::NONE << " to " << NameColor
+                << TargetNC->Name << cxxg::types::Color::NONE;
     return;
   }
-  Hist.info() << cxxg::types::RgbColor{140, 130, 72} << TargetNC->Name
-              << cxxg::types::Color::NONE << " blocked attack of "
-              << cxxg::types::RgbColor{140, 130, 72} << AttackerNC->Name
+  Hist.info() << NameColor << TargetNC->Name << cxxg::types::Color::NONE
+              << " blocked attack of " << NameColor << AttackerNC->Name
               << cxxg::types::Color::NONE;
 }
 
@@ -97,11 +97,10 @@ void EventHistoryWriter::onBuffAppliedEvent(const BuffAppliedEvent &BAE) {
   if (BAE.IsCombat) {
     BuffColor = cxxg::types::Color::RED;
   }
-  Hist.info() << cxxg::types::RgbColor{140, 130, 72} << SrcNC->Name
-              << cxxg::types::Color::NONE << " applied " << BuffColor
-              << BAE.Buff->getName() << cxxg::types::Color::NONE << " to "
-              << cxxg::types::RgbColor{140, 130, 72} << TargetNC->Name
-              << cxxg::types::Color::NONE;
+  Hist.info() << NameColor << SrcNC->Name << cxxg::types::Color::NONE
+              << " applied " << BuffColor << BAE.Buff->getName()
+              << cxxg::types::Color::NONE << " to " << NameColor
+              << TargetNC->Name << cxxg::types::Color::NONE;
 }
 
 void EventHistoryWriter::onBuffApplyEffectEvent(
@@ -118,8 +117,21 @@ void EventHistoryWriter::onBuffApplyEffectEvent(
     BuffColor = cxxg::types::Color::RED;
   }
   Hist.info() << BuffColor << BAEE.Buff->getApplyDesc()
-              << cxxg::types::Color::NONE << " on "
-              << cxxg::types::RgbColor{140, 130, 72} << NC->Name;
+              << cxxg::types::Color::NONE << " on " << NameColor << NC->Name;
+}
+
+void EventHistoryWriter::onRestoreHealthEvent(const RestoreHealthEvent &RHE) {
+  if ((!RHE.isPlayerAffected() && !Debug) || !RHE.Registry) {
+    return;
+  }
+  const auto *NC = RHE.Registry->try_get<NameComp>(RHE.Entity);
+  if (!NC) {
+    return;
+  }
+  Hist.info() << NameColor << NC->Name << cxxg::types::Color::NONE
+              << " restored " << cxxg::types::Color::GREEN << RHE.Amount
+              << " health" << cxxg::types::Color::NONE << " from " << NameColor
+              << RHE.RestoreSource << cxxg::types::Color::NONE;
 }
 
 void EventHistoryWriter::onBuffExpiredEvent(const BuffExpiredEvent &BEE) {
@@ -132,8 +144,8 @@ void EventHistoryWriter::onBuffExpiredEvent(const BuffExpiredEvent &BEE) {
   }
   Hist.info() << "Buff " << cxxg::types::RgbColor{201, 198, 139}
               << BEE.Buff->getName() << cxxg::types::Color::NONE
-              << " expired on " << cxxg::types::RgbColor{140, 130, 72}
-              << NC->Name << cxxg::types::Color::NONE;
+              << " expired on " << NameColor << NC->Name
+              << cxxg::types::Color::NONE;
 }
 
 void EventHistoryWriter::onPlayerInfoMessageEvent(

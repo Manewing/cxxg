@@ -16,6 +16,7 @@ struct EntityDiedEvent;
 struct BuffAppliedEvent;
 struct BuffApplyEffectEvent;
 struct BuffExpiredEvent;
+struct RestoreHealthEvent;
 struct PlayerInfoMessageEvent;
 struct WarningMessageEvent;
 struct ErrorMessageEvent;
@@ -76,6 +77,7 @@ private:
   void onEntityDiedEvent(const EntityDiedEvent &EDE);
   void onBuffAppliedEvent(const BuffAppliedEvent &BAE);
   void onBuffApplyEffectEvent(const BuffApplyEffectEvent &BAEE);
+  void onRestoreHealthEvent(const RestoreHealthEvent &RHE);
   void onBuffExpiredEvent(const BuffExpiredEvent &BEE);
   void onPlayerInfoMessageEvent(const PlayerInfoMessageEvent &PIME);
   void onWarningMessageEvent(const WarningMessageEvent &WarnEv);

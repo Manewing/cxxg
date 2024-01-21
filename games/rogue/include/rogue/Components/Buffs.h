@@ -333,6 +333,19 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
   std::optional<StatPoint> AppliedStack = std::nullopt;
 };
 
+struct LifeStealBuffComp : public AdditiveBuff, public BuffBase {
+  std::string getName() const override;
+  std::string getDescription() const override;
+
+  void add(const LifeStealBuffComp &Other);
+  bool remove(const LifeStealBuffComp &Other);
+
+  StatValue getEffectiveLifeSteal(StatValue Damage) const;
+
+  StatValue Percent = 0.0;
+  StatValue BonusHP = 0.0;
+};
+
 // Chance to apply on hit to target
 using CoHTargetPoisonDebuffComp =
     ChanceToApplyBuffComp<PoisonDebuffComp, HealthComp>;
@@ -341,12 +354,27 @@ using CoHTargetBleedingDebuffComp =
 using CoHTargetBlindedDebuffComp =
     ChanceToApplyBuffComp<BlindedDebuffComp, LineOfSightComp>;
 
+// clang-format off
+// Keep this list sorted alphabetically
 using BuffTypeList = ComponentList<
-    StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
-    CoHTargetPoisonDebuffComp, BleedingDebuffComp, CoHTargetBleedingDebuffComp,
-    HealthRegenBuffComp, ManaRegenBuffComp, BlindedDebuffComp,
-    CoHTargetBlindedDebuffComp, MindVisionBuffComp, InvisibilityBuffComp,
-    ArmorBuffComp, BlockBuffComp, StatsBuffPerHitComp>;
+ ArmorBuffComp,
+ BleedingDebuffComp,
+ BlindedDebuffComp,
+ BlockBuffComp,
+ CoHTargetBleedingDebuffComp,
+ CoHTargetBlindedDebuffComp,
+ CoHTargetPoisonDebuffComp,
+ HealthRegenBuffComp,
+ InvisibilityBuffComp,
+ LifeStealBuffComp,
+ ManaRegenBuffComp,
+ MindVisionBuffComp,
+ PoisonDebuffComp,
+ StatsBuffComp,
+ StatsBuffPerHitComp,
+ StatsTimedBuffComp
+>;
+// clang-format on
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);
