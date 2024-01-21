@@ -158,6 +158,16 @@
       "damage_value": 50,
       "type": "damage_item_effect"
     },
+    "major_dex_timed_buff": {
+      "stats": {
+        "dex": 5,
+        "int": 0,
+        "str": 0,
+        "vit": 0
+      },
+      "ticks": 600,
+      "type": "stats_timed_buff_comp"
+    },
     "major_health_regen_effect": {
       "buff": {
         "regen_amount": 1.5,
@@ -165,6 +175,16 @@
         "ticks": 20
       },
       "type": "health_regen_buff_comp"
+    },
+    "major_int_timed_buff": {
+      "stats": {
+        "dex": 0,
+        "int": 5,
+        "str": 0,
+        "vit": 0
+      },
+      "ticks": 600,
+      "type": "stats_timed_buff_comp"
     },
     "major_mana_effect": {
       "mana_value": 25,
@@ -177,6 +197,26 @@
         "ticks": 10
       },
       "type": "poison_debuff_comp"
+    },
+    "major_str_timed_buff": {
+      "stats": {
+        "dex": 0,
+        "int": 0,
+        "str": 5,
+        "vit": 0
+      },
+      "ticks": 600,
+      "type": "stats_timed_buff_comp"
+    },
+    "major_vit_timed_buff": {
+      "stats": {
+        "dex": 0,
+        "int": 0,
+        "str": 0,
+        "vit": 5
+      },
+      "ticks": 600,
+      "type": "stats_timed_buff_comp"
     },
     "melee_10": {
       "ap_cost": 10,
@@ -1734,6 +1774,58 @@
       "types": [
         "crafting"
       ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "major_vit_timed_buff",
+          "type": "use_on"
+        }
+      ],
+      "description": "Gain extra vitality for a period of time",
+      "name": "Herb of Vitality",
+      "types": [
+        "consumable"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "major_str_timed_buff",
+          "type": "use_on"
+        }
+      ],
+      "description": "Gain extra strength for a period of time",
+      "name": "Herb of Strength",
+      "types": [
+        "consumable"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "major_int_timed_buff",
+          "type": "use_on"
+        }
+      ],
+      "description": "Gain extra intelligence for a period of time",
+      "name": "Herb of Intelligence",
+      "types": [
+        "consumable"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "major_dex_timed_buff",
+          "type": "use_on"
+        }
+      ],
+      "description": "Gain extra dexterity for a period of time",
+      "name": "Herb of Dexterity",
+      "types": [
+        "consumable"
+      ]
     }
   ],
   "item_specializations": {
@@ -1891,6 +1983,11 @@
         },
         {
           "ref": "common_stat_orb",
+          "type": "table",
+          "weight": 10
+        },
+        {
+          "ref": "common_herbs",
           "type": "table",
           "weight": 10
         },
@@ -2089,6 +2186,39 @@
           "name": "Elder Flower",
           "type": "item",
           "weight": 30
+        }
+      ]
+    },
+    "common_herbs": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Herb of Dexterity",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Herb of Vitality",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Herb of Strength",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Herb of Intelligence",
+          "type": "item",
+          "weight": 5
         }
       ]
     },
