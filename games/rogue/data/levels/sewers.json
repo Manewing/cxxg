@@ -4,7 +4,8 @@
     "H": "level_exit",
     "R": "toxic_rat",
     "r": "sewer_rat",
-    "v": "common_vase"
+    "v": "common_vase",
+    "w": "common_arcane_workshop"
   },
   "map": {
     "config": "sewers.cfg",

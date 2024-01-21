@@ -849,7 +849,7 @@
     {
       "assemblers": {
         "inventory": {
-          "loot_table": "common_potion"
+          "loot_table": "common_arcane_workshop"
         },
         "loot_interact": {
           "default_tile": {
@@ -868,6 +868,14 @@
       "display_name": "Arcane Workshop",
       "from_template": "base_chest",
       "name": "common_arcane_workshop"
+    },
+    {
+      "assemblers": {
+        "inventory": {
+          "loot_table": "null"
+        }
+      },
+      "name": "null"
     }
   ]
 }

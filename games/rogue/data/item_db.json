@@ -1720,6 +1720,25 @@
     }
   },
   "loot_tables": {
+    "common_arcane_workshop": {
+      "rolls": 1,
+      "slots": [
+        {
+          "ref": "common_potion",
+          "type": "table",
+          "weight": -1
+        },
+        {
+          "type": "null",
+          "weight": 90
+        },
+        {
+          "ref": "common_scroll",
+          "type": "table",
+          "weight": 10
+        }
+      ]
+    },
     "common_armor_enhancements": {
       "rolls": 2,
       "slots": [
@@ -2113,7 +2132,7 @@
       ]
     },
     "common_potion": {
-      "rolls": 2,
+      "rolls": 3,
       "slots": [
         {
           "type": "null",
