@@ -143,6 +143,22 @@ public:
                entt::registry &Reg) const final;
 };
 
+class SpawnEntityEffect : public ItemEffect {
+public:
+  SpawnEntityEffect(std::string EntityName, double Chance);
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &Et, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+
+private:
+  std::string EntityName;
+  double Chance;
+};
+
 } // namespace rogue
 
 #endif // ROGUE_ITEM_EFFECT_IMPL_H

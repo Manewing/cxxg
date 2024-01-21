@@ -876,6 +876,59 @@
         }
       },
       "name": "null"
+    },
+    {
+      "assemblers": {
+        "drop_equipment": false,
+        "faction": "enemy",
+        "inventory": {
+          "loot_table": "ltb_ghost"
+        },
+        "race": "undead",
+        "stats": {
+          "dex": 8,
+          "int": 4,
+          "str": 0,
+          "vit": 3
+        },
+        "tile": {
+          "char": "g",
+          "color": "#bcdbeb"
+        }
+      },
+      "description": "A woken spirit that haunts the surroundings",
+      "display_name": "Ghost",
+      "from_template": "base_enemy",
+      "name": "ghost"
+    },
+    {
+      "assemblers": {
+        "collision": false,
+        "inventory": {
+          "loot_table": "rare_chest"
+        },
+        "loot_interact": {
+          "default_tile": {
+            "char": "%",
+            "color": "#d9c4b3",
+            "z_index": -2
+          },
+          "interact_text": "Search bones",
+          "loot_name": "Bones",
+          "looted_tile": {
+            "char": "%",
+            "color": "#867b80",
+            "z_index": -2
+          }
+        },
+        "spawn_entity_post_interaction": {
+          "entity_name": "ghost"
+        }
+      },
+      "description": "Remains of a dead humanoid, better not to disrupt the grave",
+      "display_name": "Skeletal Remains",
+      "from_template": "base_chest",
+      "name": "common_skeletal_remains"
     }
   ]
 }

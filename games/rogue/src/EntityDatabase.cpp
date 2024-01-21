@@ -192,6 +192,18 @@ makeLevelEntryExitAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   return std::make_shared<LevelEntryExitAssembler>(IsExit, LevelId);
 }
 
+std::shared_ptr<SpawnEntityPostInteractionAssembler>
+makeSpawnEntityPostInteraction(ItemDatabase &, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  std::string EntityName = JsonObj["entity_name"].GetString();
+  double Chance = 0;
+  if (JsonObj.HasMember("chance")) {
+    Chance = JsonObj["chance"].GetDouble();
+  }
+  return std::make_shared<SpawnEntityPostInteractionAssembler>(EntityName,
+                                                               Chance);
+}
+
 std::shared_ptr<StatsCompAssembler>
 makeStatsCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   auto SP = parseStatPoints(Json);
@@ -233,6 +245,7 @@ const auto &getEntityAssemblerFactories() {
       {"tile", makeTileCompAssembler},
       {"world_entry", makeWorldEntryAssembler},
       {"level_entry_exit", makeLevelEntryExitAssembler},
+      {"spawn_entity_post_interaction", makeSpawnEntityPostInteraction},
       {"loot_interact", makeLootInteractCompAssembler}};
   return Factories;
 }
@@ -374,7 +387,8 @@ entt::entity EntityFactory::createEntity(EntityTemplateId Id) const {
   auto Entity = Reg.create();
   auto &EtTmpl = EntityDb.getEntityTemplate(Id);
 
-  Reg.emplace<NameComp>(Entity, EtTmpl.getDisplayName(), EtTmpl.getDescription());
+  Reg.emplace<NameComp>(Entity, EtTmpl.getDisplayName(),
+                        EtTmpl.getDescription());
 
   // Assemble entity
   try {

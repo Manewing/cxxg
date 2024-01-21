@@ -2749,6 +2749,18 @@
         }
       ]
     },
+    "ltb_ghost": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Arcane Shardblade",
+          "type": "item",
+          "weight": -1
+        }
+      ]
+    },
     "ltb_iron_pine_tree": {
       "rolls": 2,
       "slots": [

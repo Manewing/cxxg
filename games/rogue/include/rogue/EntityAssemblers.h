@@ -136,6 +136,17 @@ public:
   bool isPostProcess() const override;
 };
 
+class SpawnEntityPostInteractionAssembler : public EntityAssembler {
+public:
+  SpawnEntityPostInteractionAssembler(const std::string &EntityName,
+                                      double Chance);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  std::string EntityName;
+  double Chance;
+};
+
 class StatsCompAssembler : public EntityAssembler {
 public:
   explicit StatsCompAssembler(StatPoints Stats);

@@ -325,6 +325,10 @@ bool Game::tryInteract() {
       auto &PC = getLvlReg().get<PlayerComp>(Player);
       PC.CurrentInteraction = Interactable.Actions.front();
 
+      for (auto &PostFn : Interactable.PostActionExecuteFns) {
+        PostFn(World->getCurrentLevelOrFail(), Player, getLvlReg());
+      }
+
       // This may switch level so needs to be last thing that is done
       Interactable.Actions.front().Execute(World->getCurrentLevelOrFail(),
                                            Player, getLvlReg());

@@ -1,5 +1,6 @@
 {
   "entities": {
+    "%": "common_skeletal_remains",
     "0": "large_silk_cocoon",
     "<": "level_entry",
     "B": "arachnoth_broodguard",

@@ -1,5 +1,6 @@
 {
   "entities": {
+    "%": "common_skeletal_remains",
     "<": "level_entry",
     "H": "level_exit",
     "R": "toxic_rat",

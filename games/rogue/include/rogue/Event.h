@@ -91,6 +91,11 @@ struct BuffExpiredEvent : public BaseEvent {
   bool isPlayerAffected() const;
 };
 
+struct SpawnEntityEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
+  entt::registry *Registry = nullptr;
+};
+
 struct SwitchLevelEvent : public BaseEvent {
   int Level = 0;
   bool ToEntry = false;

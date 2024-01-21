@@ -178,6 +178,17 @@
                 }
               ]
             },
+            "spawn_entity_post_interaction": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/spawn_entity_post_interaction"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
             "damage": {
               "anyOf": [
                 {
@@ -290,6 +301,23 @@
           "level_name": {
             "type": "string",
             "description": "Name of the level to enter"
+          }
+        },
+        "additionalProperties": false
+      },
+      "spawn_entity_post_interaction": {
+        "type": "object",
+        "required": ["entity_name"],
+        "properties": {
+          "entity_name": {
+            "type": "string",
+            "description": "Name of the entity to spawn"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Chance of spawning the entity"
           }
         },
         "additionalProperties": false

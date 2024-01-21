@@ -14,15 +14,17 @@ class EventHubConnector;
 
 namespace rogue {
 
+using InteractionExecuteFn = std::function<void(EventHubConnector &, entt::entity, entt::registry &)>;
+
 struct Interaction {
   std::string Msg;
-  std::function<void(EventHubConnector &, entt::entity, entt::registry &)>
-      Execute = [](auto &, auto, auto &) {};
+  InteractionExecuteFn Execute = [](auto &, auto, auto &) {};
 };
 
 // FIXME allow having multiple action being caused by one interaction
 struct InteractableComp {
   std::vector<Interaction> Actions;
+  std::vector<InteractionExecuteFn> PostActionExecuteFns;
 };
 
 struct PlayerComp {

@@ -34,13 +34,13 @@
           "game_world": "multi_level_dungeon",
           "level_config": "levels/l2_mystic_grove.json",
           "type": "level",
-          "weight": 5
+          "weight": 10
         },
         {
           "game_world": "multi_level_dungeon",
           "level_config": "levels/spider_lair.json",
           "type": "level",
-          "weight": 5
+          "weight": 10
         }
       ]
     },

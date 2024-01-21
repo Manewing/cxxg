@@ -4,6 +4,7 @@
 #include <rogue/Event.h>
 #include <rogue/InventoryHandler.h>
 #include <rogue/ItemDatabase.h>
+#include <rogue/ItemEffectImpl.h>
 
 namespace rogue {
 
@@ -207,8 +208,10 @@ void LootedInteractCompAssembler::assemble(entt::registry &Reg,
   auto &TC = Reg.get_or_emplace<TileComp>(Entity);
   if (IsLooted) {
     TC.T = LootedTile;
+    TC.ZIndex = LootedTile.ZIndex;
   } else {
     TC.T = DefaultTile;
+    TC.ZIndex = DefaultTile.ZIndex;
   }
 }
 
@@ -290,6 +293,19 @@ void WorkbenchAssembler::assemble(entt::registry &Reg,
                            CE.Registry = &Reg;
                            EHC.publish(CE);
                          }});
+}
+
+SpawnEntityPostInteractionAssembler::SpawnEntityPostInteractionAssembler(
+    const std::string &EntityName, double Chance)
+    : EntityName(EntityName), Chance(Chance) {}
+
+void SpawnEntityPostInteractionAssembler::assemble(entt::registry &Reg,
+                                                   entt::entity Entity) const {
+  auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
+  ITC.PostActionExecuteFns.push_back([this](auto &, auto SrcEt, auto &Reg) {
+    SpawnEntityEffect SEE(EntityName, Chance);
+    SEE.applyTo(SrcEt, SrcEt, Reg);
+  });
 }
 
 bool WorkbenchAssembler::isPostProcess() const { return true; }

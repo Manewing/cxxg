@@ -83,6 +83,7 @@ std::shared_ptr<Level> EmptyLevelGenerator::generateLevel(int LevelId) const {
   auto NewLevel = std::make_shared<Level>(LevelId, Cfg.Size);
 
   NewLevel->Reg.ctx().emplace<GameContext>(Ctx);
+  NewLevel->Reg.ctx().emplace<Level *>(NewLevel.get());
 
   return NewLevel;
 }
@@ -100,6 +101,7 @@ DesignedMapLevelGenerator::generateLevel(int LevelId) const {
   spawnEntities(Cfg.EntityConfig, *NewLevel);
 
   NewLevel->Reg.ctx().emplace<GameContext>(Ctx);
+  NewLevel->Reg.ctx().emplace<Level *>(NewLevel.get());
 
   return NewLevel;
 }
@@ -142,6 +144,7 @@ GeneratedMapLevelGenerator::generateLevel(int LevelId) const {
   spawnEntities(Cfg.EntityConfig, *NewLevel);
 
   NewLevel->Reg.ctx().emplace<GameContext>(Ctx);
+  NewLevel->Reg.ctx().emplace<Level *>(NewLevel.get());
 
   return NewLevel;
 }

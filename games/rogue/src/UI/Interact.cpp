@@ -85,6 +85,11 @@ void Interact::handleInteraction() {
   auto &PC = Lvl.Reg.get<PlayerComp>(SrcEt);
   PC.CurrentInteraction = Info.Action;
 
+  auto &Interactable = Lvl.Reg.get<InteractableComp>(Info.Entity);
+  for (const auto &PostFn : Interactable.PostActionExecuteFns) {
+    PostFn(Lvl, Info.Entity, Lvl.Reg);
+  }
+
   // This may switch level so needs to be last thing that is done
   Info.Action.Execute(Lvl, SrcEt, Lvl.Reg);
 }

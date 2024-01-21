@@ -50,6 +50,7 @@ void EventHistoryWriter::setEventHub(EventHub *Hub) {
   subscribe(*this, &EventHistoryWriter::onBuffApplyEffectEvent);
   subscribe(*this, &EventHistoryWriter::onRestoreHealthEvent);
   subscribe(*this, &EventHistoryWriter::onBuffExpiredEvent);
+  subscribe(*this, &EventHistoryWriter::onSpawnEntityEvent);
   subscribe(*this, &EventHistoryWriter::onPlayerInfoMessageEvent);
   subscribe(*this, &EventHistoryWriter::onWarningMessageEvent);
   subscribe(*this, &EventHistoryWriter::onErrorMessageEvent);
@@ -145,6 +146,15 @@ void EventHistoryWriter::onBuffExpiredEvent(const BuffExpiredEvent &BEE) {
   Hist.info() << "Buff " << cxxg::types::RgbColor{201, 198, 139}
               << BEE.Buff->getName() << cxxg::types::Color::NONE
               << " expired on " << NameColor << NC->Name
+              << cxxg::types::Color::NONE;
+}
+
+void EventHistoryWriter::onSpawnEntityEvent(const SpawnEntityEvent &SEE) {
+  const auto *NC = SEE.Registry->try_get<NameComp>(SEE.Entity);
+  if (!NC) {
+    return;
+  }
+  Hist.info() << "A " << NameColor << NC->Name << " appeared"
               << cxxg::types::Color::NONE;
 }
 

@@ -1,14 +1,19 @@
+#include <random>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
 #include <rogue/CraftingDatabase.h>
+#include <rogue/EntityDatabase.h>
 #include <rogue/Event.h>
 #include <rogue/EventHub.h>
 #include <rogue/ItemEffectImpl.h>
+#include <rogue/Level.h>
 #include <rogue/Systems/CombatSystem.h>
 #include <sstream>
 
 namespace rogue {
+
+static std::random_device RandomEngine;
 
 std::shared_ptr<ItemEffect> SetMeleeCompEffect::clone() const {
   return std::make_shared<SetMeleeCompEffect>(*this);
@@ -226,6 +231,65 @@ void LearnRecipeEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
   PC->KnownRecipes.insert(RecipeId);
   EvHub.publish(PlayerInfoMessageEvent()
                 << "You learned: " << Recipes.at(RecipeId).getName());
+}
+
+SpawnEntityEffect::SpawnEntityEffect(std::string EntityName, double Chance)
+    : EntityName(std::move(EntityName)), Chance(Chance) {}
+
+std::shared_ptr<ItemEffect> SpawnEntityEffect::clone() const {
+  return std::make_shared<SpawnEntityEffect>(*this);
+}
+
+std::string SpawnEntityEffect::getName() const { return "Spawn " + EntityName; }
+
+std::string SpawnEntityEffect::getDescription() const {
+  std::stringstream SS;
+  SS << "Spawns " << EntityName;
+  if (Chance != 0) {
+    SS << " with " << Chance * 100 << "% chance.";
+  }
+  return SS.str();
+}
+
+bool SpawnEntityEffect::canApplyTo(const entt::entity &,
+                                   const entt::entity &DstEt,
+                                   entt::registry &Reg) const {
+  return Reg.all_of<PositionComp>(DstEt);
+}
+
+void SpawnEntityEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
+                                entt::registry &Reg) const {
+  auto *Lvl = Reg.ctx().get<Level *>();
+  assert(Lvl && "No level set in registry");
+
+  if (Chance != 0) {
+    std::uniform_real_distribution<double> Dist(0, 1);
+    if (Dist(RandomEngine) > Chance) {
+      return;
+    }
+  }
+
+  auto &Pos = Reg.get<PositionComp>(DstEt).Pos;
+  auto &EvHub = Reg.ctx().get<GameContext>().EvHub;
+
+  const auto &EntityDb = Reg.ctx().get<GameContext>().EntityDb;
+  EntityFactory EF(Reg, EntityDb);
+
+  auto EtTmplId = EntityDb.getEntityTemplateId(EntityName);
+  auto NewEntity = EF.createEntity(EtTmplId);
+
+  if (auto *PC = Reg.try_get<PositionComp>(NewEntity)) {
+    auto NewPosOrNone = Lvl->getNonBodyBlockedPosNextTo(Pos);
+    if (!NewPosOrNone) {
+      EvHub.publish(PlayerInfoMessageEvent()
+                    << "Could not spawn " << EntityName << " at " << Pos
+                    << " because there is no free space.");
+      return;
+    }
+    PC->Pos = *NewPosOrNone;
+  }
+
+  EvHub.publish(SpawnEntityEvent{{}, NewEntity, &Reg});
 }
 
 } // namespace rogue

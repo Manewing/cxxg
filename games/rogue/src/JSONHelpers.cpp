@@ -24,8 +24,12 @@ Tile parseTile(const rapidjson::Value &V) {
     CxxColor.BgG = BgColor.G;
     CxxColor.BgB = BgColor.B;
   }
+  int ZIndex = 0;
+  if (V.HasMember("z_index")) {
+    ZIndex = V["z_index"].GetInt();
+  }
 
-  return Tile{{Char, CxxColor}};
+  return Tile{{Char, CxxColor}, ZIndex};
 }
 
 } // namespace rogue
