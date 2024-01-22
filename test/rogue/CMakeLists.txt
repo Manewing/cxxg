@@ -135,3 +135,43 @@ add_schema_test(
   JSON_FILES ${LEVEL_FILES}
   SCHEMA ${BUILD_SCHEMAS_DIR}/level_config_schema.json
 )
+
+# Dump all items to stdout
+add_cxxg_test(
+  NAME rogue_loot_info_dump_items
+  COMMAND ${CMAKE_BINARY_DIR}/games/rogue/loot_info
+    ${BUILD_DATA_DIR}/item_db.json ${BUILD_SCHEMAS_DIR}/item_db_schema.json
+)
+
+# Dump specifc item
+add_cxxg_test(
+  NAME rogue_loot_info_dump_item
+  COMMAND ${CMAKE_BINARY_DIR}/games/rogue/loot_info
+    ${BUILD_DATA_DIR}/item_db.json ${BUILD_SCHEMAS_DIR}/item_db_schema.json
+    --dump-item Blueberry
+)
+
+# Dump all loot tables
+add_cxxg_test(
+  NAME rogue_loot_info_dump_tables
+  COMMAND ${CMAKE_BINARY_DIR}/games/rogue/loot_info
+    ${BUILD_DATA_DIR}/item_db.json ${BUILD_SCHEMAS_DIR}/item_db_schema.json
+    --dump-tables
+)
+
+# Dump specific loot table
+add_cxxg_test(
+  NAME rogue_loot_info_loot_table
+  COMMAND ${CMAKE_BINARY_DIR}/games/rogue/loot_info
+    ${BUILD_DATA_DIR}/item_db.json ${BUILD_SCHEMAS_DIR}/item_db_schema.json
+    --loot-table common_chest 1000
+)
+
+# Run sanity check creating all items multiple times
+add_cxxg_test(
+  NAME rogue_loot_info_create_all_items
+  COMMAND
+    ${CMAKE_BINARY_DIR}/games/rogue/loot_info
+    ${BUILD_DATA_DIR}/item_db.json ${BUILD_SCHEMAS_DIR}/item_db_schema.json
+    --create-all-items 1000
+)

@@ -7,6 +7,11 @@
 #include <rogue/UI/Item.h>
 #include <string>
 
+std::ostream &subUsage(std::ostream &Out, const char *PrgName) {
+  Out << "usage: " << PrgName << " <item_db_config> <item_db_schema> ";
+  return Out;
+}
+
 void dumpLootTableRewards(const rogue::ItemDatabase &ItemDb,
                           const std::string &LootTableName, unsigned Rolls) {
   const auto &LootTable = ItemDb.getLootTable(LootTableName);
@@ -49,22 +54,23 @@ void dumpLootTableRewards(const rogue::ItemDatabase &ItemDb,
               << PercentagePerDrop << " ,'oc':" << std::setw(6) << Occurrences
               << ", 'cp_drop':" << std::setw(4) << std::setprecision(2)
               << CountPerDrop << ", 'ac_drop':" << std::setw(4)
-              << std::setprecision(2) << AverageCountPerDrop << std::endl;
+              << std::setprecision(2) << AverageCountPerDrop << "\n";
     Pred = "},";
     Suf = "}";
   }
-  std::cout << Suf << "]," << std::endl;
+  std::cout << Suf << "],"
+            << "\n";
 
-  std::cout << "'total': " << Total << ", " << std::endl
-            << "'rolls': " << Rolls << std::endl
+  std::cout << "'total': " << Total << ", "
+            << "\n"
+            << "'rolls': " << Rolls << "\n"
             << "}" << std::endl;
 }
 
 int handleLootTable(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
   if (Argc != 5 && Argc != 6) {
-    std::cerr << "usage: " << Argv[0]
-              << " <item_db_config> --loot-table <loot_table_name> *<rolls>"
-              << std::endl;
+    subUsage(std::cerr, Argv[0])
+        << "--loot-table <loot_table_name> *<rolls>" << std::endl;
     return 2;
   }
 
@@ -80,40 +86,41 @@ int handleLootTable(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
   return 0;
 }
 
-void dumpItemCreations(const rogue::ItemDatabase &ItemDb,
-                       const std::string &ItemName, unsigned Rolls) {
-  const auto ItemId = ItemDb.getItemId(ItemName);
-
-  const std::string LineSep(80, '-');
+void dumpItemCreations(const rogue::ItemDatabase &ItemDb, int ItemId,
+                       unsigned Rolls) {
+  static const std::string LineSep(80, '-');
   for (std::size_t I = 0; I < Rolls; I++) {
     auto Item = ItemDb.createItem(ItemId);
 
-    std::cout << LineSep << std::endl
+    std::cout << LineSep << "\n"
               << "[" << I << "]: Id: " << Item.getId() << " " << Item.getName()
-              << " | " << Item.getQualifierName() << std::endl
-              << LineSep << std::endl
-              << Item.getDescription() << std::endl
-              << LineSep << std::endl
-              << "Type: " << Item.getType() << std::endl
+              << " | " << Item.getQualifierName() << "\n"
+              << LineSep << "\n"
+              << Item.getDescription() << "\n"
+              << LineSep << "\n"
+              << "Type: " << Item.getType() << "\n"
               << "Capabilities: " << Item.getCapabilityFlags().flagString()
-              << std::endl
-              << LineSep << std::endl
-              << "Effects:" << std::endl;
+              << "\n"
+              << LineSep << "\n"
+              << "Effects:"
+              << "\n";
     for (auto &EffInfo : Item.getAllEffects()) {
-      std::cout << " - Attrs: " << EffInfo.Attributes << std::endl
-                << "   Effect: " << EffInfo.Effect->getName() << std::endl;
+      std::cout << " - Attrs: " << EffInfo.Attributes << "\n"
+                << "   Effect: " << EffInfo.Effect->getName() << "\n";
     }
-    std::cout << std::endl << LineSep << std::endl
-              << "In Game Description:" << std::endl
-              << LineSep << std::endl
-              << rogue::ui::getItemText(Item) << std::endl;
+    std::cout << "\n"
+              << LineSep << "\n"
+              << "In Game Description:"
+              << "\n"
+              << LineSep << "\n"
+              << rogue::ui::getItemText(Item) << "\n";
   }
+  std::cout << std::endl;
 }
 
 int handleDumpItem(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
   if (Argc != 5 && Argc != 6) {
-    std::cerr << "usage: <item_db_config> --dump-item <item> *<rolls>"
-              << std::endl;
+    subUsage(std::cerr, Argv[0]) << "--dump-item <item> *<rolls>" << std::endl;
     return 3;
   }
 
@@ -124,15 +131,16 @@ int handleDumpItem(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
     Rolls = std::stoi(Argv[5]);
   }
 
-  dumpItemCreations(ItemDb, ItemName, Rolls);
+  const auto ItemId = ItemDb.getItemId(ItemName);
+  dumpItemCreations(ItemDb, ItemId, Rolls);
 
   return 0;
 }
 
 int handleDumpLootTables(const rogue::ItemDatabase &ItemDb, int Argc,
-                         char *[]) {
+                         char *Argv[]) {
   if (Argc != 4) {
-    std::cerr << "usage: <item_db_config> --dump-tables" << std::endl;
+    subUsage(std::cerr, Argv[0]) << "--dump-tables" << std::endl;
     return 4;
   }
 
@@ -141,6 +149,25 @@ int handleDumpLootTables(const rogue::ItemDatabase &ItemDb, int Argc,
               << ("'" + Name + "'") << " Rolls=" << std::setw(2)
               << LootTable->getRolls() << " Slots=" << std::setw(2)
               << LootTable->getSlots().size() << std::endl;
+  }
+
+  return 0;
+}
+
+int handleCreateAllItems(const rogue::ItemDatabase &ItemDb, int Argc,
+                         char *Argv[]) {
+  if (Argc != 4 && Argc != 5) {
+    subUsage(std::cerr, Argv[0]) << "--create-all-items *<rolls>" << std::endl;
+    return 5;
+  }
+
+  unsigned Rolls = 1;
+  if (Argc == 5) {
+    Rolls = std::stoi(Argv[4]);
+  }
+
+  for (auto &[Id, Proto] : ItemDb.getItemProtos()) {
+    dumpItemCreations(ItemDb, Id, Rolls);
   }
 
   return 0;
@@ -167,6 +194,11 @@ void dumpUsage(const char *PrgName) {
       << "  --dump-item <item> *<rolls>             (Creates the specified "
          "items for the given number of rolls and dumps it)"
       << std::endl
+      << "  --create-all-items *<rolls>             (Creates all items and "
+         "dumps them)"
+      << std::endl
+      << "  -h,--help                               (Prints this help message)"
+      << std::endl
       << std::endl
       << std::endl
       << "If no options are specified, names of all items are dumped."
@@ -174,6 +206,13 @@ void dumpUsage(const char *PrgName) {
 }
 
 int wrapped_main(int Argc, char *Argv[]) {
+  if (Argc == 2) {
+    std::string Option = Argv[1];
+    if (Option == "--help" || Option == "-h") {
+      dumpUsage(Argv[0]);
+      return 0;
+    }
+  }
   if (Argc < 3) {
     dumpUsage(Argv[0]);
     return 1;
@@ -215,6 +254,10 @@ int wrapped_main(int Argc, char *Argv[]) {
 
   if (Option == "--dump-tables") {
     return handleDumpLootTables(ItemDb, Argc, Argv);
+  }
+
+  if (Option == "--create-all-items") {
+    return handleCreateAllItems(ItemDb, Argc, Argv);
   }
 
   std::cerr << "error: unknown option: " << Option << std::endl;
