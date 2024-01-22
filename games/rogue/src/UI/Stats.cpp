@@ -91,12 +91,18 @@ void StatsController::draw(cxxg::Screen &Scr) const {
 
   BaseRectDecorator::draw(Scr);
 
-  auto DP = Pos + cxxg::types::Position{2, static_cast<int>(getSize().Y) - 6};
+  auto DP = Pos + cxxg::types::Position{2, static_cast<int>(getSize().Y) - 7};
   addHealthInfo(Scr, DP, Reg, Entity);
   DP.Y++;
   addManaInfo(Scr, DP, Reg, Entity);
   DP.Y++;
   addAgilityInfo(Scr, DP, Reg, Entity);
+  DP.Y++;
+  addArmorInfo(Scr, DP, Reg, Entity);
+  DP.Y++;
+  addMeleeInfo(Scr, DP, Reg, Entity);
+  DP.Y++;
+  addRangedInfo(Scr, DP, Reg, Entity);
 }
 
 } // namespace rogue::ui

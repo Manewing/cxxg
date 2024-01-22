@@ -27,6 +27,15 @@ void addManaInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
 void addAgilityInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
                     entt::registry &Reg, entt::entity Entity);
 
+void addArmorInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                  entt::registry &Reg, entt::entity Entity);
+
+void addMeleeInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                  entt::registry &Reg, entt::entity Entity);
+
+void addRangedInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                   entt::registry &Reg, entt::entity Entity);
+
 } // namespace rogue::ui
 
 #endif // ROGUE_UI_COMP_HELPERS_H

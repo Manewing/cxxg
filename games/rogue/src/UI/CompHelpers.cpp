@@ -1,5 +1,7 @@
 #include <cxxg/Screen.h>
 #include <iomanip>
+#include <rogue/Components/Buffs.h>
+#include <rogue/Components/Combat.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/UI/CompHelpers.h>
 
@@ -73,6 +75,48 @@ void addAgilityInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
                       << AC->Agility;
   } else {
     Scr[Pos.Y][Pos.X] << "AG:    --- | AG:   ---";
+  }
+}
+
+void addArmorInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                  entt::registry &Reg, entt::entity Entity) {
+  if (const auto *AC = Reg.try_get<ArmorBuffComp>(Entity)) {
+    auto *SC = Reg.try_get<StatsComp>(Entity);
+    auto PhysArmor = AC->getPhysEffectiveArmor(SC->effective());
+    auto MagicArmor = AC->getMagicEffectiveArmor(SC->effective());
+    Scr[Pos.Y][Pos.X] << "Armor   : Ph. " << std::fixed << std::setprecision(1)
+                      << std::setprecision(1) << std::setw(6) << PhysArmor
+                      << " | Ma. " << std::setprecision(1) << std::setw(5)
+                      << MagicArmor;
+  } else {
+    Scr[Pos.Y][Pos.X] << "Armor   : ---";
+  }
+}
+
+void addMeleeInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                  entt::registry &Reg, entt::entity Entity) {
+  if (const auto *MAC = Reg.try_get<MeleeAttackComp>(Entity)) {
+    auto *SC = Reg.try_get<StatsComp>(Entity);
+    auto EffMAC = MAC->getEffective(SC);
+    Scr[Pos.Y][Pos.X] << "Melee   : Ph. " << std::fixed << std::setprecision(1)
+                      << std::setw(6) << EffMAC.PhysDamage << " | Ma. "
+                      << std::setprecision(1) << std::setw(5)
+                      << EffMAC.MagicDamage;
+  } else {
+    Scr[Pos.Y][Pos.X] << "Melee   : ---";
+  }
+}
+
+void addRangedInfo(cxxg::Screen &Scr, cxxg::types::Position Pos, entt::registry &Reg, entt::entity Entity) {
+  if (const auto *RAC = Reg.try_get<RangedAttackComp>(Entity)) {
+    auto *SC = Reg.try_get<StatsComp>(Entity);
+    auto EffRAC = RAC->getEffective(SC);
+    Scr[Pos.Y][Pos.X] << "Ranged  : Ph. " << std::fixed << std::setprecision(1)
+                      << std::setw(6) << EffRAC.PhysDamage << " | Ma. "
+                      << std::setprecision(1) << std::setw(5)
+                      << EffRAC.MagicDamage;
+  } else {
+    Scr[Pos.Y][Pos.X] << "Ranged  : ---";
   }
 }
 

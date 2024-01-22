@@ -83,9 +83,9 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
   tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source);
   applyLifeSteal(Reg, DC.Source, NewDC, EHC);
 
-  THealth.reduce(NewDC.PhysDamage);
-  THealth.reduce(NewDC.MagicDamage);
-  return static_cast<unsigned>(NewDC.total());
+  auto DamageValue = NewDC.total();
+  THealth.reduce(DamageValue);
+  return static_cast<unsigned>(DamageValue);
 }
 
 bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
