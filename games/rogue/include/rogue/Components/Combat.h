@@ -62,7 +62,7 @@ struct MeleeAttackComp {
 
 struct DamageComp {
   entt::entity Source = entt::null;
-  StatValue PhysDamage = 10;
+  StatValue PhysDamage = 0;
   StatValue MagicDamage = 0;
   int Hits = 1;
 

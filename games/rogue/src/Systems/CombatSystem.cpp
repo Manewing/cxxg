@@ -75,7 +75,7 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
   if (auto *ABC = Reg.try_get<ArmorBuffComp>(Target)) {
     auto *SC = Reg.try_get<StatsComp>(Target);
     NewDC.PhysDamage = ABC->getPhysEffectiveDamage(NewDC.PhysDamage, SC);
-    NewDC.PhysDamage = ABC->getMagicEffectiveDamage(NewDC.PhysDamage, SC);
+    NewDC.MagicDamage = ABC->getMagicEffectiveDamage(NewDC.MagicDamage, SC);
   }
 
   tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source);

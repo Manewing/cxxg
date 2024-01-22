@@ -7,12 +7,18 @@
 namespace rogue {
 
 StatValue RangedAttackComp::getPhysEffectiveDamage(const StatPoints &SP) const {
+  if (PhysDamage == 0) {
+    return 0;
+  }
   auto Dex = StatValue(SP.Dex);
   return (PhysDamage + Dex) * (100.0 + Dex) / 100.0;
 }
 
 StatValue
 RangedAttackComp::getMagicEffectiveDamage(const StatPoints &SP) const {
+  if (MagicDamage == 0) {
+    return 0;
+  }
   auto Int = StatValue(SP.Int);
   return (MagicDamage + Int) * (100.0 + Int) / 100.0;
 }
@@ -29,11 +35,17 @@ RangedAttackComp RangedAttackComp::getEffective(const StatsComp *SC) const {
 }
 
 StatValue MeleeAttackComp::getPhysEffectiveDamage(const StatPoints &SP) const {
+  if (PhysDamage == 0) {
+    return 0;
+  }
   auto Str = StatValue(SP.Str);
   return (PhysDamage + Str) * (100.0 + Str) / 100.0;
 }
 
 StatValue MeleeAttackComp::getMagicEffectiveDamage(const StatPoints &SP) const {
+  if (MagicDamage == 0) {
+    return 0;
+  }
   auto Int = StatValue(SP.Int);
   return (MagicDamage + Int) * (100.0 + Int) / 100.0;
 }
