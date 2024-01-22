@@ -308,8 +308,8 @@ void DiscAreaHitEffect::applyTo(const entt::entity &SrcEt, const entt::entity &,
                                 entt::registry &Reg) const {
   auto &PC = Reg.get<PositionComp>(SrcEt);
 
-  // Special case for radius 1
-  if (Radius > 1) {
+  // Special case for radius 1-2
+  if (Radius >= 1) {
     for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
       createDamageEt(Reg, SrcEt, PC.Pos + Dir, 1.0);
     }

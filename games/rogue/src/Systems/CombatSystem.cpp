@@ -30,8 +30,8 @@ void applyCombatComps(entt::registry &Reg, entt::entity Attacker,
 
 template <typename ChanceOnHitBuffType>
 void tryApplyChanceOnHitBuff(entt::registry &Reg, entt::entity Target,
-                             entt::entity Source) {
-  if (auto *COHB = Reg.try_get<ChanceOnHitBuffType>(Source)) {
+                             entt::entity Source, entt::entity StorageEt) {
+  if (auto *COHB = Reg.try_get<ChanceOnHitBuffType>(StorageEt)) {
     if (COHB->canApplyTo(Source, Target, Reg)) {
       COHB->applyTo(Source, Target, Reg);
     }
@@ -79,13 +79,19 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
     NewDC.MagicDamage = ABC->getMagicEffectiveDamage(NewDC.MagicDamage, SC);
   }
 
-  tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source);
-  tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source);
-  tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source);
+  tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source,
+                                                       DC.Source);
+  tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source,
+                                                      DC.Source);
+  tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source,
+                                                     DC.Source);
   if (DCEt != entt::null) {
-    tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DCEt);
-    tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DCEt);
-    tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DCEt);
+    tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source,
+                                                         DCEt);
+    tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source,
+                                                        DCEt);
+    tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source,
+                                                       DCEt);
   }
   applyLifeSteal(Reg, DC.Source, NewDC, EHC);
 

@@ -4,8 +4,9 @@
       "decrease_percent": 0.0,
       "effect_tile": {
         "bg_color": "#0b4f0b",
-        "char": " ",
-        "color": "#00c400"
+        "char": "~",
+        "color": "#00c400",
+        "z_index": -2
       },
       "magic_damage": 0.0,
       "name": "Acid Splash I",
@@ -19,7 +20,7 @@
         "chance": 70.0,
         "type": "chance_on_hit_to_apply_poison"
       },
-      "radius": 4,
+      "radius": 3,
       "type": "disc_area_hit_effect"
     },
     "armor_10": {
@@ -336,6 +337,26 @@
       "phys_damage": 0,
       "type": "ranged_attack_comp"
     },
+    "shield_flare_i": {
+      "blinded": {
+        "buff": {
+          "ticks": 100
+        },
+        "chance": 100.0,
+        "type": "chance_on_hit_to_apply_blinded"
+      },
+      "decrease_percent": 0.0,
+      "effect_tile": {
+        "bg_color": "#bfdab5",
+        "char": "*",
+        "color": "#f9fcff"
+      },
+      "magic_damage": 0.0,
+      "name": "Shield Flare I",
+      "phys_damage": 0.0,
+      "radius": 4,
+      "type": "disc_area_hit_effect"
+    },
     "smite_i": {
       "damage_percent": 250.0,
       "name": "Smite I",
@@ -354,7 +375,8 @@
       "decrease_percent": 0.0,
       "effect_tile": {
         "char": "^",
-        "color": "#90002b"
+        "color": "#90002b",
+        "z_index": -2
       },
       "magic_damage": 0.0,
       "name": "Spikes I",
@@ -363,15 +385,16 @@
       "type": "disc_area_hit_effect"
     },
     "stomp_i": {
-      "decrease_percent": 0.0,
+      "decrease_percent": 30.0,
       "effect_tile": {
         "char": "~",
-        "color": "#948171"
+        "color": "#948171",
+        "z_index": -2
       },
       "magic_damage": 0.0,
       "name": "Stomp I",
-      "phys_damage": 5.0,
-      "radius": 4,
+      "phys_damage": 10.0,
+      "radius": 3,
       "type": "disc_area_hit_effect"
     },
     "str_5": {
@@ -664,7 +687,7 @@
           "type": "equipment"
         },
         {
-          "effect": "null",
+          "effect": "stomp_i",
           "type": "skill"
         }
       ],

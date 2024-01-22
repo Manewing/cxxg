@@ -67,6 +67,9 @@ void EventHistoryWriter::onEntityAttackEvent(const EntityAttackEvent &EAE) {
     return;
   }
   if (EAE.Damage) {
+    if (*EAE.Damage == 0) {
+      return;
+    }
     Hist.info() << NameColor << AttackerNC->Name << cxxg::types::Color::NONE
                 << " dealt " << cxxg::types::Color::RED << *EAE.Damage
                 << " damage" << cxxg::types::Color::NONE << " to " << NameColor
