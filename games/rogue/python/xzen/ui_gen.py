@@ -817,7 +817,7 @@ class TypedAnyOfGeneratedEditor(BaseGeneratedEditor):
             [
                 sg.Text("Any Of", tooltip=self.description),
                 sg.Combo(
-                    self.get_types(),
+                    sorted(self.get_types()),
                     default_value=self.selected_type,
                     enable_events=True,
                     readonly=True,

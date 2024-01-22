@@ -2,7 +2,6 @@
 
 import os
 import sys
-import json
 import argparse
 from pathlib import Path
 from functools import partial
@@ -26,6 +25,7 @@ from pyrogue.tools import RogueToolPaths
 from pyrogue.tools import ToolError
 from pyrogue.tools import LootInfoWrapper
 from pyrogue.item_db import ItemDb
+from pyrogue.tile_edit import TileEditor
 
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
@@ -361,6 +361,14 @@ class LootViewer(BaseWindow):
                 self.item_db.get_item_effect_names_and_defaults,
             ),
         )
+
+        # Custom handling for tiles
+        item_effect_path =  ITEM_DB_SID + "#properties/item_effects/additionalProperties"
+        tile_paths = [
+            f"{item_effect_path}/stomp_effect/effect_tile",
+        ]
+        for path in tile_paths:
+            self.generator.register_override(path, TileEditor)
 
         self.current_table = None
         self.loot_editor: Optional[BaseGeneratedEditor] = None

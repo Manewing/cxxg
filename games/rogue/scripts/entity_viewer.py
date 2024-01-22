@@ -2,7 +2,6 @@
 
 import os
 import sys
-import json
 import yaml
 import argparse
 from pathlib import Path
@@ -10,7 +9,7 @@ from functools import partial
 
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import Element
-from typing import List, Optional, Callable, Dict, Any
+from typing import List, Optional, Callable
 
 from xzen.ui import ListEditorBase
 from xzen.ui import BaseInterface
@@ -18,7 +17,6 @@ from xzen.ui import BaseWindow
 
 from xzen.ui_gen import JSONEditorGenerator
 from xzen.ui_gen import BaseGeneratedEditor
-from xzen.ui_gen import GeneratedObjectEditor
 from xzen.ui_gen import LinkedGeneratedEnumEditor
 from xzen.ui_gen import JSONFileManagerInterface
 
@@ -28,53 +26,10 @@ from pyrogue.tools import ToolError
 from pyrogue.tools import RogueToolPaths
 from pyrogue.tools import RogueToolWrapper
 from pyrogue.tools import TempJsonFile
+from pyrogue.tile_edit import TileEditor
 
 SCHEMAS_PATH = Path(__file__).parent.parent / "data" / "schemas"
 ENTITY_DB_SID = "https://rogue-todo.com/entity-db-schema.json"
-
-
-class TileEditor(GeneratedObjectEditor):
-    def __init__(
-        self,
-        generator: JSONEditorGenerator,
-        key: str,
-        obj: Dict[str, Any],
-        parent: Optional[BaseInterface] = None,
-        prefix: str = "",
-    ):
-        super().__init__(generator, key, obj, parent, prefix)
-        self.description = "Tile" if not self.description else self.description
-
-    def get_header(self) -> List[List[Element]]:
-        header = super().get_header()
-        color = self.obj.get("color", "#FFFFFF")
-        bg_color = self.obj.get("bg_color", "#000000")
-        header[0].append(
-            sg.Frame(
-                "Char",
-                [
-                    [
-                        sg.Text(
-                            self.obj.get("char", "@"),
-                            text_color=color,
-                            background_color=bg_color,
-                            font=("Courier New", 30),
-                            key=self.k.char_disp,
-                        )
-                    ]
-                ],
-            )
-        )
-        return header
-
-    def update_ui(self) -> None:
-        super().update_ui()
-        obj = self.get_value()
-        self.w.char_disp.update(
-            obj.get("char", "@"),
-            text_color=obj.get("color", "#FFFFFF"),
-            background_color=obj.get("bg_color", "#000000"),
-        )
 
 
 class SelectEntityViewer(ListEditorBase):
