@@ -41,6 +41,12 @@ class ItemDb:
             "null",
             "remove_poison_effect",
             "remove_poison_debuff",
+            "remove_bleeding_effect",
+            "remove_bleeding_debuff",
+            "remove_health_regen_effect",
+            "remove_health_regen_buff",
+            "remove_mana_reg_effect",
+            "remove_mana_regen_buff",
             "learn_crafting_recipe",
         ]
         return sorted(defaults + self.get_item_effect_names())

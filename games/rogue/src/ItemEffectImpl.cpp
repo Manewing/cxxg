@@ -69,29 +69,46 @@ std::string SetRangedCompEffect::getDescription() const {
                            Comp.ManaCost, "ranged");
 }
 
-std::shared_ptr<ItemEffect> RemovePoisonEffect::clone() const {
-  return std::make_shared<RemovePoisonEffect>(*this);
-}
+#define ROGUE_REMOVE_EFFECT_IMPL(CLASS_NAME, NAME, DESC)                       \
+  std::shared_ptr<ItemEffect> CLASS_NAME::clone() const {                      \
+    return std::make_shared<CLASS_NAME>(*this);                                \
+  }                                                                            \
+  std::string CLASS_NAME::getName() const { return NAME; }                     \
+  std::string CLASS_NAME::getDescription() const { return DESC; }
 
-std::string RemovePoisonEffect::getName() const {
-  return "Remove poison effect";
-}
+ROGUE_REMOVE_EFFECT_IMPL(RemovePoisonEffect, "Remove poison effect",
+                         "Removes poison effect")
+ROGUE_REMOVE_EFFECT_IMPL(RemoveBleedingEffect, "Remove bleeding effect",
+                         "Removes bleeding effect")
+ROGUE_REMOVE_EFFECT_IMPL(RemoveBlindedEffect, "Remove blinded effect",
+                         "Removes blinded effect")
+ROGUE_REMOVE_EFFECT_IMPL(RemoveHealthRegenEffect, "Remove health regen effect",
+                         "Removes health regen effect")
+ROGUE_REMOVE_EFFECT_IMPL(RemoveManaRegenEffect, "Remove mana regen effect",
+                         "Removes mana regen effect")
 
-std::string RemovePoisonEffect::getDescription() const {
-  return "Removes poison effect";
-}
+#define ROGUE_REMOVE_BUFF_EFFECT_IMPL(CLASS_NAME, NAME, DESC)                  \
+  std::shared_ptr<ItemEffect> CLASS_NAME::clone() const {                      \
+    return std::make_shared<CLASS_NAME>(*this);                                \
+  }                                                                            \
+  std::string CLASS_NAME::getName() const { return NAME; }                     \
+  std::string CLASS_NAME::getDescription() const { return DESC; }
 
-std::shared_ptr<ItemEffect> RemovePoisonDebuffEffect::clone() const {
-  return std::make_shared<RemovePoisonDebuffEffect>(*this);
-}
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemovePoisonDebuffEffect, "Remove poison debuff",
+                              "Removes poison debuff")
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemoveBleedingDebuffEffect,
+                              "Remove bleeding debuff",
+                              "Removes bleeding debuff")
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemoveBlindedDebuffEffect,
+                              "Remove blinded debuff", "Removes blinded debuff")
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemoveHealthRegenBuffEffect,
+                              "Remove health regen buff",
+                              "Removes health regen buff")
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemoveManaRegenBuffEffect,
+                              "Remove mana regen buff",
+                              "Removes mana regen buff")
 
-std::string RemovePoisonDebuffEffect::getName() const {
-  return "Remove poison debuff";
-}
-
-std::string RemovePoisonDebuffEffect::getDescription() const {
-  return "Removes poison debuff";
-}
+#undef ROGUE_REMOVE_BUFF_EFFECT_IMPL
 
 ManaItemEffect::ManaItemEffect(StatValue Amount) : Amount(Amount) {}
 
@@ -317,7 +334,7 @@ void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
                                        const entt::entity &SrcEt,
                                        ymir::Point2d<int> Pos,
                                        double DecreaseFactor) const {
-  if (Reg.ctx().get<Level*>()->isWallBlocked(Pos)) {
+  if (Reg.ctx().get<Level *>()->isWallBlocked(Pos)) {
     return;
   }
   DamageComp DC;

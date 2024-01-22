@@ -276,6 +276,20 @@ static void addDefaultConstructEffects(
                             std::make_shared<RemovePoisonEffect>());
   addDefaultConstructEffect(Effects, "remove_poison_debuff",
                             std::make_shared<RemovePoisonDebuffEffect>());
+  addDefaultConstructEffect(Effects, "remove_bleeding_effect",
+                            std::make_shared<RemoveBleedingEffect>());
+  addDefaultConstructEffect(Effects, "remove_bleeding_debuff",
+                            std::make_shared<RemoveBleedingDebuffEffect>());
+  addDefaultConstructEffect(Effects, "remove_blinded_debuff",
+                            std::make_shared<RemoveBlindedDebuffEffect>());
+  addDefaultConstructEffect(Effects, "remove_health_regen_effect",
+                            std::make_shared<RemoveHealthRegenEffect>());
+  addDefaultConstructEffect(Effects, "remove_health_regen_buff",
+                            std::make_shared<RemoveHealthRegenBuffEffect>());
+  addDefaultConstructEffect(Effects, "remove_mana_regen_effect",
+                            std::make_shared<RemoveManaRegenEffect>());
+  addDefaultConstructEffect(Effects, "remove_mana_regen_buff",
+                            std::make_shared<RemoveManaRegenBuffEffect>());
   addDefaultConstructEffect(Effects, "learn_crafting_recipe",
                             std::make_shared<LearnRecipeEffect>());
 }

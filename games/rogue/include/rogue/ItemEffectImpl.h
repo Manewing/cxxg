@@ -73,24 +73,39 @@ public:
 
 // Removal effects
 
-class RemovePoisonEffect : public RemoveEffect<PoisonDebuffEffect> {
-public:
-  using RemoveEffect<PoisonDebuffEffect>::RemoveEffect;
-  std::shared_ptr<ItemEffect> clone() const final;
-  std::string getName() const final;
-  std::string getDescription() const final;
-};
+#define ROGUE_REMOVE_EFFECT(NAME, COMP)                                        \
+  class NAME : public RemoveEffect<COMP> {                                     \
+  public:                                                                      \
+    using RemoveEffect<COMP>::RemoveEffect;                                    \
+    std::shared_ptr<ItemEffect> clone() const final;                           \
+    std::string getName() const final;                                         \
+    std::string getDescription() const final;                                  \
+  };
+
+ROGUE_REMOVE_EFFECT(RemovePoisonEffect, PoisonDebuffComp)
+ROGUE_REMOVE_EFFECT(RemoveBleedingEffect, BleedingDebuffComp)
+ROGUE_REMOVE_EFFECT(RemoveBlindedEffect, BlindedDebuffComp)
+ROGUE_REMOVE_EFFECT(RemoveHealthRegenEffect, HealthRegenBuffComp)
+ROGUE_REMOVE_EFFECT(RemoveManaRegenEffect, ManaRegenBuffComp)
 
 // Remove buff effects
 
-class RemovePoisonDebuffEffect
-    : public RemoveComponentEffect<PoisonDebuffComp, false> {
-public:
-  using RemoveComponentEffect<PoisonDebuffComp, false>::RemoveComponentEffect;
-  std::shared_ptr<ItemEffect> clone() const final;
-  std::string getName() const final;
-  std::string getDescription() const final;
-};
+#define ROGUE_REMOVE_BUFF_EFFECT(NAME, BUFF, COMBAT)                           \
+  class NAME : public RemoveComponentEffect<BUFF, COMBAT> {                    \
+  public:                                                                      \
+    using RemoveComponentEffect<BUFF, COMBAT>::RemoveComponentEffect;          \
+    std::shared_ptr<ItemEffect> clone() const final;                           \
+    std::string getName() const final;                                         \
+    std::string getDescription() const final;                                  \
+  };
+
+ROGUE_REMOVE_BUFF_EFFECT(RemovePoisonDebuffEffect, PoisonDebuffComp, false)
+ROGUE_REMOVE_BUFF_EFFECT(RemoveBleedingDebuffEffect, BleedingDebuffComp, false)
+ROGUE_REMOVE_BUFF_EFFECT(RemoveBlindedDebuffEffect, BlindedDebuffComp, false)
+ROGUE_REMOVE_BUFF_EFFECT(RemoveHealthRegenBuffEffect, HealthRegenBuffComp, true)
+ROGUE_REMOVE_BUFF_EFFECT(RemoveManaRegenBuffEffect, ManaRegenBuffComp, true)
+
+#undef ROGUE_REMOVE_BUFF_EFFECT
 
 // Combat
 
