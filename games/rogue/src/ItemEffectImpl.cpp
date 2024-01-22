@@ -1,4 +1,5 @@
 #include <random>
+#include <rogue/Components/Entity.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
@@ -153,8 +154,10 @@ void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
   DC.MagicDamage = EffMA.MagicDamage;
   DC.PhysDamage = EffMA.PhysDamage;
 
+  static constexpr auto TempDamageTile =
+      Tile{{'*', cxxg::types::RgbColor{175, 175, 175}}};
   for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
-    createTempDamage(Reg, DC, PC.Pos + Dir);
+    createTempDamage(Reg, DC, PC.Pos + Dir, TempDamageTile);
   }
 
   // Make sure effect will be rendered
@@ -182,6 +185,85 @@ void SmiteEffect::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
   EventHubConnector EHC;
   EHC.setEventHub(&Reg.ctx().get<GameContext>().EvHub);
   CombatSystem::handleMeleeAttack(Reg, SrcEt, DstEt, EHC, 2.5);
+}
+
+StompEffect::StompEffect(unsigned Radius, StatValue Damage, Tile EffectTile,
+                         double DecreasePercent)
+    : Radius(Radius), Damage(Damage), EffectTile(EffectTile),
+      DecreasePercent(DecreasePercent) {}
+
+std::shared_ptr<ItemEffect> StompEffect::clone() const {
+  return std::make_shared<StompEffect>(*this);
+}
+
+std::string StompEffect::getName() const { return "Stomp"; }
+
+std::string StompEffect::getDescription() const {
+  std::stringstream SS;
+  SS << "Stomps all enemies in a " << static_cast<unsigned>(Radius)
+     << " tile radius for " << static_cast<unsigned>(Damage)
+     << " phys. damage.";
+  if (DecreasePercent > 0) {
+    SS << " Damage decreases by " << static_cast<unsigned>(DecreasePercent)
+       << "% per tile.";
+  }
+  return SS.str();
+}
+
+bool StompEffect::canApplyTo(const entt::entity &SrcEt, const entt::entity &,
+                             entt::registry &Reg) const {
+  return Reg.all_of<PositionComp>(SrcEt);
+}
+
+namespace {
+
+template <typename HandlerFunc>
+void doForEachTileInCircleAt(ymir::Point2d<int> AtPos, int Radius,
+                             const HandlerFunc &Handler) {
+  // Visit all tiles in radius exactly once
+  int X = -Radius, Y = 0, Error = 2 - 2 * Radius; /* II. Quadrant */
+  do {
+    Handler(AtPos + ymir::Point2d<int>{-X, +Y}); /*   I. Quadrant */
+    Handler(AtPos + ymir::Point2d<int>{-Y, -X}); /*  II. Quadrant */
+    Handler(AtPos + ymir::Point2d<int>{+X, -Y}); /* III. Quadrant */
+    Handler(AtPos + ymir::Point2d<int>{+Y, +X}); /*  IV. Quadrant */
+    Radius = Error;
+    if (Radius <= Y)
+      Error += ++Y * 2 + 1; /* e_xy+e_y < 0 */
+    if (Radius > X || Error > Y)
+      Error += ++X * 2 + 1; /* e_xy+e_x > 0 or no 2nd y-step */
+  } while (X < 0);
+}
+
+} // namespace
+
+void StompEffect::applyTo(const entt::entity &SrcEt, const entt::entity &,
+                          entt::registry &Reg) const {
+  auto &PC = Reg.get<PositionComp>(SrcEt);
+
+  DamageComp DC;
+  DC.Source = SrcEt;
+  DC.PhysDamage = Damage;
+
+  // Special case for radius 1
+  if (Radius > 1) {
+    for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
+      createTempDamage(Reg, DC, PC.Pos + Dir, EffectTile);
+    }
+  }
+
+  // Visit all tiles in radius exactly once
+  static const auto DecreaseFactor = (1 - DecreasePercent / 100.0);
+  for (unsigned X = 2; X < Radius; ++X) {
+    // Phsyical damage decreases by given percentage per tile
+    DC.PhysDamage *= DecreaseFactor;
+    doForEachTileInCircleAt(PC.Pos, X, [this, &Reg, &DC](ymir::Point2d<int> P) {
+      createTempDamage(Reg, DC, P, EffectTile);
+    });
+  }
+
+  // Make sure effect will be rendered
+  Reg.ctx().get<GameContext>().EvHub.publish(EffectDelayEvent{});
 }
 
 std::shared_ptr<ItemEffect> LearnRecipeEffect::clone() const {

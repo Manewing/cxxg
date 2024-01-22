@@ -70,6 +70,9 @@
             "$ref": "#/defs/effect/life_steal"
           },
           {
+            "$ref": "#/defs/effect/stomp_effect"
+          },
+          {
             "$ref": "#/defs/effect/dismantle"
           }
         ]
@@ -420,6 +423,39 @@
           }
         },
         "required": ["percent", "bonus_hp", "type"],
+        "additionalProperties": false
+      },
+      "stomp_effect": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "stomp_effect"
+          },
+          "radius": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "damage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "decrease_percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Damage decrease percent per tile distance"
+          },
+          "effect_tile": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "required": [
+          "type",
+          "radius",
+          "damage",
+          "effect_tile",
+          "decrease_percent"
+        ],
         "additionalProperties": false
       },
       "dismantle": {

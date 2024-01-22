@@ -180,6 +180,15 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              LSBC.BonusHP = V["bonus_hp"].GetDouble();
              return std::make_shared<LifeStealBuffEffect>(LSBC);
            }},
+          {"stomp_effect",
+           [](const auto &, const auto &V) {
+             auto Radius = V["radius"].GetUint();
+             auto Damage = V["damage"].GetDouble();
+             auto DecreasePercent = V["decrease_percent"].GetDouble();
+             auto T = parseTile(V["effect_tile"]);
+             return std::make_shared<StompEffect>(Radius, Damage, T,
+                                                  DecreasePercent);
+           }},
           {"dismantle", [](const auto &DB, const auto &V) {
              std::vector<DismantleEffect::DismantleResult> Results;
              for (const auto &ItemJson : V["items"].GetArray()) {

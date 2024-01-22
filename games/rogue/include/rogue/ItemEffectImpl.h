@@ -5,6 +5,7 @@
 #include <rogue/Components/Combat.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/ItemEffect.h>
+#include <rogue/Tile.h>
 
 namespace rogue {
 
@@ -128,6 +129,25 @@ public:
                   entt::registry &Reg) const final;
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
+};
+
+class StompEffect : public ItemEffect {
+public:
+  StompEffect(unsigned Radius, StatValue Damage, Tile EffectTile,
+              double DecreasePercent);
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+
+private:
+  unsigned Radius;
+  StatValue Damage;
+  Tile EffectTile;
+  double DecreasePercent;
 };
 
 // Knowledge
