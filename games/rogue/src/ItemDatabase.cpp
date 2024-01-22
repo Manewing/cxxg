@@ -182,12 +182,27 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
            }},
           {"stomp_effect",
            [](const auto &, const auto &V) {
+             auto Name = std::string(V["name"].GetString());
              auto Radius = V["radius"].GetUint();
              auto Damage = V["damage"].GetDouble();
              auto DecreasePercent = V["decrease_percent"].GetDouble();
              auto T = parseTile(V["effect_tile"]);
-             return std::make_shared<StompEffect>(Radius, Damage, T,
+             return std::make_shared<StompEffect>(Name, Radius, Damage, T,
                                                   DecreasePercent);
+           }},
+          {"smite_effect",
+           [](const auto &, const auto &V) {
+             auto Name = std::string(V["name"].GetString());
+             auto DamagePercent = V["damage_percent"].GetDouble();
+             return std::make_shared<SmiteEffect>(Name, DamagePercent);
+           }},
+          {"sweeping_strike_effect",
+           [](const auto &, const auto &V) {
+             auto Name = std::string(V["name"].GetString());
+             auto DamagePercent = V["damage_percent"].GetDouble();
+             auto T = parseTile(V["effect_tile"]);
+             return std::make_shared<SweepingStrikeEffect>(Name, DamagePercent,
+                                                           T);
            }},
           {"dismantle", [](const auto &DB, const auto &V) {
              std::vector<DismantleEffect::DismantleResult> Results;
@@ -225,10 +240,6 @@ static void addDefaultConstructEffect(
 static void addDefaultConstructEffects(
     std::map<std::string, std::shared_ptr<ItemEffect>> &Effects) {
   addDefaultConstructEffect(Effects, "null", std::make_shared<NullEffect>());
-  addDefaultConstructEffect(Effects, "sweeping_strike_effect",
-                            std::make_shared<SweepingStrikeEffect>());
-  addDefaultConstructEffect(Effects, "smite_effect",
-                            std::make_shared<SmiteEffect>());
   addDefaultConstructEffect(Effects, "remove_poison_effect",
                             std::make_shared<RemovePoisonEffect>());
   addDefaultConstructEffect(Effects, "remove_poison_debuff",

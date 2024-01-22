@@ -70,6 +70,12 @@
             "$ref": "#/defs/effect/life_steal"
           },
           {
+            "$ref": "#/defs/effect/smite_effect"
+          },
+          {
+            "$ref": "#/defs/effect/sweeping_strike_effect"
+          },
+          {
             "$ref": "#/defs/effect/stomp_effect"
           },
           {
@@ -425,6 +431,52 @@
         "required": ["percent", "bonus_hp", "type"],
         "additionalProperties": false
       },
+      "sweeping_strike_effect": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "sweeping_strike_effect"
+          },
+          "damage_percent": {
+            "type": "number",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "effect_tile": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "required": [
+          "type",
+          "name",
+          "damage_percent",
+          "effect_tile"
+        ],
+        "additionalProperties": false
+      },
+      "smite_effect": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "smite_effect"
+          },
+          "damage_percent": {
+            "type": "number",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "name",
+          "damage_percent"
+        ],
+        "additionalProperties": false
+      },
       "stomp_effect": {
         "type": "object",
         "properties": {
@@ -444,6 +496,9 @@
             "minimum": 0,
             "maximum": 100,
             "description": "Damage decrease percent per tile distance"
+          },
+          "name": {
+            "type": "string"
           },
           "effect_tile": {
             "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"

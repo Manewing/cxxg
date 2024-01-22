@@ -39,8 +39,6 @@ class ItemDb:
     def get_item_effect_names_and_defaults(self) -> List[str]:
         defaults = [
             "null",
-            "sweeping_strike_effect",
-            "smite_effect",
             "remove_poison_effect",
             "remove_poison_debuff",
             "learn_crafting_recipe",

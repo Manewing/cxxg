@@ -314,6 +314,23 @@
       "phys_damage": 0,
       "type": "ranged_attack_comp"
     },
+    "smite_i": {
+      "damage_percent": 250.0,
+      "name": "Smite I",
+      "type": "smite_effect"
+    },
+    "stomp_i": {
+      "damage": 5.0,
+      "decrease_percent": 0.0,
+      "effect_tile": {
+        "bg_color": "#5c5046",
+        "char": "~",
+        "color": "#3b413e"
+      },
+      "name": "Stomp I",
+      "radius": 4,
+      "type": "stomp_effect"
+    },
     "str_5": {
       "stats": {
         "dex": 0,
@@ -333,6 +350,15 @@
       },
       "ticks": 20,
       "type": "stats_buff_per_hit_comp"
+    },
+    "sweeping_strike_i": {
+      "damage_percent": 50.0,
+      "effect_tile": {
+        "char": "*",
+        "color": "#aaaaaa"
+      },
+      "name": "Sweeping Strike I",
+      "type": "sweeping_strike_effect"
     },
     "vit_5": {
       "stats": {
@@ -763,13 +789,13 @@
     {
       "capabilities": [
         {
-          "effect": "sweeping_strike_effect",
+          "effect": "sweeping_strike_i",
           "mana_cost": 10,
           "type": "use_on"
         },
         {
           "ap_cost": 12,
-          "effect": "sweeping_strike_effect",
+          "effect": "sweeping_strike_i",
           "mana_cost": 20,
           "type": "skill"
         }
@@ -785,13 +811,13 @@
     {
       "capabilities": [
         {
-          "effect": "smite_effect",
+          "effect": "smite_i",
           "mana_cost": 10,
           "type": "adjacent_use"
         },
         {
           "ap_cost": 15,
-          "effect": "smite_effect",
+          "effect": "smite_i",
           "mana_cost": 10,
           "type": "skill_adjacent"
         }

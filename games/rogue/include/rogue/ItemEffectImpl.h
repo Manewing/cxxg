@@ -111,30 +111,8 @@ private:
 
 class SweepingStrikeEffect : public ItemEffect {
 public:
-  std::shared_ptr<ItemEffect> clone() const final;
-  std::string getName() const final;
-  std::string getDescription() const final;
-  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
-                  entt::registry &Reg) const final;
-  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
-               entt::registry &Reg) const final;
-};
+  SweepingStrikeEffect(std::string Name, double DamagePercent, Tile EffectTile);
 
-class SmiteEffect : public ItemEffect {
-public:
-  std::shared_ptr<ItemEffect> clone() const final;
-  std::string getName() const final;
-  std::string getDescription() const final;
-  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
-                  entt::registry &Reg) const final;
-  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
-               entt::registry &Reg) const final;
-};
-
-class StompEffect : public ItemEffect {
-public:
-  StompEffect(unsigned Radius, StatValue Damage, Tile EffectTile,
-              double DecreasePercent);
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
   std::string getDescription() const final;
@@ -144,6 +122,43 @@ public:
                entt::registry &Reg) const final;
 
 private:
+  std::string Name;
+  double DamagePercent;
+  Tile EffectTile;
+};
+
+class SmiteEffect : public ItemEffect {
+public:
+  /// Smite effect deals melee damage scaled with the given percent
+  explicit SmiteEffect(std::string Name, double DamagePercent);
+
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+
+private:
+  std::string Name;
+  double DamagePercent;
+};
+
+class StompEffect : public ItemEffect {
+public:
+  StompEffect(std::string Name, unsigned Radius, StatValue Damage,
+              Tile EffectTile, double DecreasePercent);
+  std::shared_ptr<ItemEffect> clone() const final;
+  std::string getName() const final;
+  std::string getDescription() const final;
+  bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+                  entt::registry &Reg) const final;
+  void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
+               entt::registry &Reg) const final;
+
+private:
+  std::string Name;
   unsigned Radius;
   StatValue Damage;
   Tile EffectTile;
@@ -163,6 +178,8 @@ public:
                entt::registry &Reg) const final;
 };
 
+// TODO create new effect similar to stomp effect creating damage entities
+// in an area, this should allow to add chance on hit effects etc.
 class SpawnEntityEffect : public ItemEffect {
 public:
   SpawnEntityEffect(std::string EntityName, double Chance);
@@ -178,6 +195,7 @@ private:
   std::string EntityName;
   double Chance;
 };
+
 
 } // namespace rogue
 

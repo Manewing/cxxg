@@ -122,10 +122,19 @@ std::shared_ptr<ItemEffect> SweepingStrikeEffect::clone() const {
   return std::make_shared<SweepingStrikeEffect>(*this);
 }
 
-std::string SweepingStrikeEffect::getName() const { return "Sweeping Strike"; }
+SweepingStrikeEffect::SweepingStrikeEffect(std::string Name,
+                                           double DamagePercent,
+                                           Tile EffectTile)
+    : Name(std::move(Name)), DamagePercent(DamagePercent),
+      EffectTile(EffectTile) {}
+
+std::string SweepingStrikeEffect::getName() const { return Name; }
 
 std::string SweepingStrikeEffect::getDescription() const {
-  return "Hits all surrounding enemies as melee damage.";
+  std::stringstream SS;
+  SS << "Hits all surrounding enemies with "
+     << static_cast<unsigned>(DamagePercent) << "% melee damage.";
+  return SS.str();
 }
 
 bool SweepingStrikeEffect::canApplyTo(const entt::entity &SrcEt,
@@ -151,13 +160,11 @@ void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
   auto EffMA = MA.getEffective(Reg.try_get<StatsComp>(SrcEt));
   DamageComp DC;
   DC.Source = SrcEt;
-  DC.MagicDamage = EffMA.MagicDamage;
-  DC.PhysDamage = EffMA.PhysDamage;
+  DC.MagicDamage = EffMA.MagicDamage * DamagePercent / 100.0;
+  DC.PhysDamage = EffMA.PhysDamage * DamagePercent / 100.0;
 
-  static constexpr auto TempDamageTile =
-      Tile{{'*', cxxg::types::RgbColor{175, 175, 175}}};
   for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
-    createTempDamage(Reg, DC, PC.Pos + Dir, TempDamageTile);
+    createTempDamage(Reg, DC, PC.Pos + Dir, EffectTile);
   }
 
   // Make sure effect will be rendered
@@ -168,10 +175,16 @@ std::shared_ptr<ItemEffect> SmiteEffect::clone() const {
   return std::make_shared<SmiteEffect>(*this);
 }
 
-std::string SmiteEffect::getName() const { return "Smite"; }
+SmiteEffect::SmiteEffect(std::string Name, double DamagePercent)
+    : Name(std::move(Name)), DamagePercent(DamagePercent) {}
+
+std::string SmiteEffect::getName() const { return Name; }
 
 std::string SmiteEffect::getDescription() const {
-  return "Smite a single target with 250% melee damage.";
+  std::stringstream SS;
+  SS << "Smite a single target with " << static_cast<unsigned>(DamagePercent)
+     << "% melee damage.";
+  return SS.str();
 }
 
 bool SmiteEffect::canApplyTo(const entt::entity &SrcEt,
@@ -184,19 +197,20 @@ void SmiteEffect::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                           entt::registry &Reg) const {
   EventHubConnector EHC;
   EHC.setEventHub(&Reg.ctx().get<GameContext>().EvHub);
-  CombatSystem::handleMeleeAttack(Reg, SrcEt, DstEt, EHC, 2.5);
+  CombatSystem::handleMeleeAttack(Reg, SrcEt, DstEt, EHC,
+                                  DamagePercent / 100.0);
 }
 
-StompEffect::StompEffect(unsigned Radius, StatValue Damage, Tile EffectTile,
-                         double DecreasePercent)
-    : Radius(Radius), Damage(Damage), EffectTile(EffectTile),
-      DecreasePercent(DecreasePercent) {}
+StompEffect::StompEffect(std::string Name, unsigned Radius, StatValue Damage,
+                         Tile EffectTile, double DecreasePercent)
+    : Name(std::move(Name)), Radius(Radius), Damage(Damage),
+      EffectTile(EffectTile), DecreasePercent(DecreasePercent) {}
 
 std::shared_ptr<ItemEffect> StompEffect::clone() const {
   return std::make_shared<StompEffect>(*this);
 }
 
-std::string StompEffect::getName() const { return "Stomp"; }
+std::string StompEffect::getName() const { return Name; }
 
 std::string StompEffect::getDescription() const {
   std::stringstream SS;
