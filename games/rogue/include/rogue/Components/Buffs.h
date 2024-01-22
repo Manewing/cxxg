@@ -105,7 +105,6 @@ struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
 //  Debuffs:
 //      - Burning
 //      - Slow
-//      - Blinded
 
 struct PoisonDebuffComp : public DiminishingReturnsValueGenBuff,
                           public BuffBase {

@@ -365,7 +365,8 @@ class LootViewer(BaseWindow):
         # Custom handling for tiles
         item_effect_path =  ITEM_DB_SID + "#properties/item_effects/additionalProperties"
         tile_paths = [
-            f"{item_effect_path}/stomp_effect/effect_tile",
+            f"{item_effect_path}/sweeping_strike_effect/effect_tile",
+            f"{item_effect_path}/disc_area_hit_effect/effect_tile",
         ]
         for path in tile_paths:
             self.generator.register_override(path, TileEditor)
@@ -561,6 +562,7 @@ class LootViewer(BaseWindow):
     def _on_ui_refresh(self) -> None:
         self.w.loot_editor_col.contents_changed()
         self.w.item_editor_col.contents_changed()
+        self.w.item_effect_editor_col.contents_changed()
 
 
 def main(args: List[str]) -> int:

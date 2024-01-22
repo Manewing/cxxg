@@ -60,7 +60,7 @@ void applyLifeSteal(entt::registry &Reg, entt::entity Source,
 std::optional<unsigned> applyDamage(entt::registry &Reg,
                                     const entt::entity Target,
                                     HealthComp &THealth, const DamageComp &DC,
-                                    EventHubConnector &EHC) {
+                                    EventHubConnector &EHC, entt::entity DCEt) {
   if (auto *BC = Reg.try_get<BlockBuffComp>(Target)) {
     // Increase the block chance if the attacker is blinded
     StatValue MaxChance =
@@ -82,6 +82,11 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
   tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source);
   tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source);
   tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source);
+  if (DCEt != entt::null) {
+    tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DCEt);
+    tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DCEt);
+    tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DCEt);
+  }
   applyLifeSteal(Reg, DC.Source, NewDC, EHC);
 
   auto DamageValue = NewDC.total();
@@ -192,10 +197,10 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
   }
 }
 
-void applyDamageComp(entt::registry &Reg, DamageComp &DC,
+void applyDamageComp(entt::registry &Reg, DamageComp &DC, entt::entity DcEt,
                      const PositionComp &PC, EventHubConnector &EHC) {
   Reg.view<PositionComp, HealthComp>().each(
-      [&Reg, &PC, &DC, &EHC](const auto &TEt, auto &TPC, auto &THC) {
+      [&Reg, &PC, &DC, &DcEt, &EHC](const auto &TEt, auto &TPC, auto &THC) {
         auto *TMC = Reg.try_get<MovementComp>(TEt);
         if (PC.Pos != TPC.Pos && (!TMC || (TPC.Pos + TMC->Dir) != PC.Pos)) {
           return;
@@ -203,7 +208,7 @@ void applyDamageComp(entt::registry &Reg, DamageComp &DC,
         if (DC.Hits-- == 0) {
           return;
         }
-        auto Damage = applyDamage(Reg, TEt, THC, DC, EHC);
+        auto Damage = applyDamage(Reg, TEt, THC, DC, EHC, DcEt);
 
         // Applying damage may cause update attack/target components
         applyCombatComps(Reg, DC.Source, TEt);
@@ -247,7 +252,7 @@ void CombatSystem::handleMeleeAttack(entt::registry &Reg, entt::entity Attacker,
   DC.PhysDamage = EffMA.PhysDamage;
   DC.PhysDamage *= DamageFactor;
   DC.MagicDamage *= DamageFactor;
-  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC, EHC);
+  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC, EHC, entt::null);
 
   // Check for on hit buffs and apply stacks
   if (auto *SBPH = Reg.try_get<StatsBuffPerHitComp>(Attacker);
@@ -279,8 +284,8 @@ void CombatSystem::update(UpdateType Type) {
 
   // Deal with damages, removing damage entities is handled by the death system
   Reg.view<DamageComp, PositionComp>().each(
-      [this](const auto &, auto &DC, auto &PC) {
-        applyDamageComp(Reg, DC, PC, *this);
+      [this](const auto &DcEt, auto &DC, auto &PC) {
+        applyDamageComp(Reg, DC, DcEt, PC, *this);
       });
 }
 

@@ -61,7 +61,7 @@
             "$ref": "#/defs/effect/chance_on_hit_to_apply_poison"
           },
           {
-            "$ref": "#/defs/effect/chance_on_hit_to_bleeding"
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_bleeding"
           },
           {
             "$ref": "#/defs/effect/chance_on_hit_to_apply_blinded"
@@ -76,7 +76,7 @@
             "$ref": "#/defs/effect/sweeping_strike_effect"
           },
           {
-            "$ref": "#/defs/effect/stomp_effect"
+            "$ref": "#/defs/effect/disc_area_hit_effect"
           },
           {
             "$ref": "#/defs/effect/dismantle"
@@ -376,7 +376,7 @@
         "required": ["buff", "type", "chance"],
         "additionalProperties": false
       },
-      "chance_on_hit_to_bleeding": {
+      "chance_on_hit_to_apply_bleeding": {
         "type": "object",
         "properties": {
           "type": {
@@ -477,19 +477,32 @@
         ],
         "additionalProperties": false
       },
-      "stomp_effect": {
+      "disc_area_hit_effect": {
         "type": "object",
         "properties": {
           "type": {
-            "const": "stomp_effect"
+            "const": "disc_area_hit_effect"
           },
           "radius": {
             "type": "integer",
             "minimum": 1
           },
-          "damage": {
+          "phys_damage": {
             "type": "number",
             "minimum": 0
+          },
+          "magic_damage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "bleeding": {
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_bleeding"
+          },
+          "poison": {
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_poison"
+          },
+          "blinded": {
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_blinded"
           },
           "decrease_percent": {
             "type": "number",
@@ -506,10 +519,12 @@
         },
         "required": [
           "type",
+          "name",
+          "phys_damage",
+          "magic_damage",
+          "decrease_percent",
           "radius",
-          "damage",
-          "effect_tile",
-          "decrease_percent"
+          "effect_tile"
         ],
         "additionalProperties": false
       },

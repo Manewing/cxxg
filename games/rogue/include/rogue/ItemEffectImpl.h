@@ -145,10 +145,15 @@ private:
   double DamagePercent;
 };
 
-class StompEffect : public ItemEffect {
+class DiscAreaHitEffect : public ItemEffect {
 public:
-  StompEffect(std::string Name, unsigned Radius, StatValue Damage,
-              Tile EffectTile, double DecreasePercent);
+  DiscAreaHitEffect(std::string Name, unsigned Radius, StatValue PhysDamage,
+                    StatValue MagicDamage,
+                    std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff,
+                    std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
+                    std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff,
+                    Tile EffectTile, double DecreasePercent);
+
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
   std::string getDescription() const final;
@@ -157,10 +162,20 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+protected:
+  void createDamageEt(entt::registry &Reg, const entt::entity &SrcEt,
+                      ymir::Point2d<int> Pos, double DecreaseFactor) const;
+
 private:
   std::string Name;
   unsigned Radius;
-  StatValue Damage;
+  StatValue PhysDamage;
+  StatValue MagicDamage;
+
+  std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff;
+  std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff;
+  std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff;
+
   Tile EffectTile;
   double DecreasePercent;
 };
@@ -195,7 +210,6 @@ private:
   std::string EntityName;
   double Chance;
 };
-
 
 } // namespace rogue
 

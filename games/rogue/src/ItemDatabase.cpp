@@ -28,6 +28,30 @@ static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
   return ItemIdsByName;
 }
 
+CoHTargetPoisonDebuffComp
+parseCoHTargetPoisonDebuffComp(const rapidjson::Value &V) {
+  CoHTargetPoisonDebuffComp Effect;
+  Effect.Chance = V["chance"].GetDouble();
+  parseReductionBuff(V["buff"], Effect.Buff);
+  return Effect;
+}
+
+CoHTargetBleedingDebuffComp
+parseCoHTargetBleedingDebuffComp(const rapidjson::Value &V) {
+  CoHTargetBleedingDebuffComp Effect;
+  Effect.Chance = V["chance"].GetDouble();
+  parseReductionBuff(V["buff"], Effect.Buff);
+  return Effect;
+}
+
+CoHTargetBlindedDebuffComp
+parseCoHTargetBlindedDebuffComp(const rapidjson::Value &V) {
+  CoHTargetBlindedDebuffComp Effect;
+  Effect.Chance = V["chance"].GetDouble();
+  Effect.Buff.TicksLeft = V["buff"]["ticks"].GetUint();
+  return Effect;
+}
+
 static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
                                                 const rapidjson::Value &V) {
   static const std::map<std::string,
@@ -154,24 +178,18 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
            }},
           {"chance_on_hit_to_apply_poison",
            [](const auto &, const auto &V) {
-             CoHTargetPoisonDebuffComp Effect;
-             Effect.Chance = V["chance"].GetDouble();
-             parseReductionBuff(V["buff"], Effect.Buff);
-             return std::make_shared<CoHTargetPoisonDebuffEffect>(Effect);
+             auto Buff = parseCoHTargetPoisonDebuffComp(V);
+             return std::make_shared<CoHTargetPoisonDebuffEffect>(Buff);
            }},
           {"chance_on_hit_to_apply_bleeding",
            [](const auto &, const auto &V) {
-             CoHTargetBleedingDebuffComp Effect;
-             Effect.Chance = V["chance"].GetDouble();
-             parseReductionBuff(V["buff"], Effect.Buff);
-             return std::make_shared<CoHTargetBleedingDebuffEffect>(Effect);
+             auto Buff = parseCoHTargetBleedingDebuffComp(V);
+             return std::make_shared<CoHTargetBleedingDebuffEffect>(Buff);
            }},
           {"chance_on_hit_to_apply_blinded",
            [](const auto &, const auto &V) {
-             CoHTargetBlindedDebuffComp Effect;
-             Effect.Chance = V["chance"].GetDouble();
-             Effect.Buff.TicksLeft = V["buff"]["ticks"].GetUint();
-             return std::make_shared<CoHTargetBlindedDebuffEffect>(Effect);
+             auto Buff = parseCoHTargetBlindedDebuffComp(V);
+             return std::make_shared<CoHTargetBlindedDebuffEffect>(Buff);
            }},
           {"life_steal",
            [](const auto &, const auto &V) {
@@ -180,15 +198,29 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              LSBC.BonusHP = V["bonus_hp"].GetDouble();
              return std::make_shared<LifeStealBuffEffect>(LSBC);
            }},
-          {"stomp_effect",
+          {"disc_area_hit_effect",
            [](const auto &, const auto &V) {
              auto Name = std::string(V["name"].GetString());
              auto Radius = V["radius"].GetUint();
-             auto Damage = V["damage"].GetDouble();
+             auto PhysDamage = V["phys_damage"].GetDouble();
+             auto MagicDamage = V["magic_damage"].GetDouble();
+             std::optional<CoHTargetBleedingDebuffComp> Bleeding;
+             if (V.HasMember("bleeding")) {
+               Bleeding = parseCoHTargetBleedingDebuffComp(V["bleeding"]);
+             }
+             std::optional<CoHTargetPoisonDebuffComp> Poison;
+             if (V.HasMember("poison")) {
+               Poison = parseCoHTargetPoisonDebuffComp(V["poison"]);
+             }
+             std::optional<CoHTargetBlindedDebuffComp> Blinded;
+             if (V.HasMember("blinded")) {
+               Blinded = parseCoHTargetBlindedDebuffComp(V["blinded"]);
+             }
              auto DecreasePercent = V["decrease_percent"].GetDouble();
              auto T = parseTile(V["effect_tile"]);
-             return std::make_shared<StompEffect>(Name, Radius, Damage, T,
-                                                  DecreasePercent);
+             return std::make_shared<DiscAreaHitEffect>(
+                 Name, Radius, PhysDamage, MagicDamage, Bleeding, Poison,
+                 Blinded, T, DecreasePercent);
            }},
           {"smite_effect",
            [](const auto &, const auto &V) {

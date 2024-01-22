@@ -201,31 +201,67 @@ void SmiteEffect::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                                   DamagePercent / 100.0);
 }
 
-StompEffect::StompEffect(std::string Name, unsigned Radius, StatValue Damage,
-                         Tile EffectTile, double DecreasePercent)
-    : Name(std::move(Name)), Radius(Radius), Damage(Damage),
+DiscAreaHitEffect::DiscAreaHitEffect(
+    std::string Name, unsigned Radius, StatValue PhysDamage,
+    StatValue MagicDamage,
+    std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff,
+    std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
+    std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff, Tile EffectTile,
+    double DecreasePercent)
+    : Name(std::move(Name)), Radius(Radius), PhysDamage(PhysDamage),
+      MagicDamage(MagicDamage), BleedingDebuff(BleedingDebuff),
+      PoisonDebuff(PoisonDebuff), BlindedDebuff(BlindedDebuff),
       EffectTile(EffectTile), DecreasePercent(DecreasePercent) {}
 
-std::shared_ptr<ItemEffect> StompEffect::clone() const {
-  return std::make_shared<StompEffect>(*this);
+std::shared_ptr<ItemEffect> DiscAreaHitEffect::clone() const {
+  return std::make_shared<DiscAreaHitEffect>(*this);
 }
 
-std::string StompEffect::getName() const { return Name; }
+std::string DiscAreaHitEffect::getName() const { return Name; }
 
-std::string StompEffect::getDescription() const {
+std::string DiscAreaHitEffect::getDescription() const {
   std::stringstream SS;
-  SS << "Stomps all enemies in a " << static_cast<unsigned>(Radius)
-     << " tile radius for " << static_cast<unsigned>(Damage)
-     << " phys. damage.";
+  SS << "Hits all enemies in a " << static_cast<unsigned>(Radius)
+     << " tile radius";
+  const char *Pred = " for ";
+  if (MagicDamage > 0) {
+    SS << Pred << static_cast<unsigned>(MagicDamage) << " magic";
+    Pred = " and ";
+  }
+  if (PhysDamage > 0) {
+    SS << Pred << static_cast<unsigned>(PhysDamage) << " phys.";
+    Pred = " and ";
+  }
+  if (MagicDamage > 0 || PhysDamage > 0) {
+    SS << " damage";
+  }
+  SS << ".";
+
   if (DecreasePercent > 0) {
     SS << " Damage decreases by " << static_cast<unsigned>(DecreasePercent)
        << "% per tile.";
   }
+
+  Pred = " ";
+  if (BleedingDebuff) {
+    SS << Pred << BleedingDebuff->getDescription();
+    Pred = " and ";
+  }
+  if (PoisonDebuff) {
+    SS << Pred << PoisonDebuff->getDescription();
+    Pred = " and ";
+  }
+  if (BlindedDebuff) {
+    SS << Pred << BlindedDebuff->getDescription();
+    Pred = " and ";
+  }
+
   return SS.str();
 }
 
-bool StompEffect::canApplyTo(const entt::entity &SrcEt, const entt::entity &,
-                             entt::registry &Reg) const {
+bool DiscAreaHitEffect::canApplyTo(const entt::entity &SrcEt,
+                                   const entt::entity &,
+                                   entt::registry &Reg) const {
   return Reg.all_of<PositionComp>(SrcEt);
 }
 
@@ -251,33 +287,57 @@ void doForEachTileInCircleAt(ymir::Point2d<int> AtPos, int Radius,
 
 } // namespace
 
-void StompEffect::applyTo(const entt::entity &SrcEt, const entt::entity &,
-                          entt::registry &Reg) const {
+void DiscAreaHitEffect::applyTo(const entt::entity &SrcEt, const entt::entity &,
+                                entt::registry &Reg) const {
   auto &PC = Reg.get<PositionComp>(SrcEt);
-
-  DamageComp DC;
-  DC.Source = SrcEt;
-  DC.PhysDamage = Damage;
 
   // Special case for radius 1
   if (Radius > 1) {
     for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
-      createTempDamage(Reg, DC, PC.Pos + Dir, EffectTile);
+      createDamageEt(Reg, SrcEt, PC.Pos + Dir, 1.0);
     }
   }
 
   // Visit all tiles in radius exactly once
   static const auto DecreaseFactor = (1 - DecreasePercent / 100.0);
+  auto Factor = 1.0;
   for (unsigned X = 2; X < Radius; ++X) {
-    // Phsyical damage decreases by given percentage per tile
-    DC.PhysDamage *= DecreaseFactor;
-    doForEachTileInCircleAt(PC.Pos, X, [this, &Reg, &DC](ymir::Point2d<int> P) {
-      createTempDamage(Reg, DC, P, EffectTile);
-    });
+    Factor *= DecreaseFactor;
+    doForEachTileInCircleAt(PC.Pos, X,
+                            [this, &Reg, SrcEt, Factor](ymir::Point2d<int> P) {
+                              createDamageEt(Reg, SrcEt, P, Factor);
+                            });
   }
 
   // Make sure effect will be rendered
   Reg.ctx().get<GameContext>().EvHub.publish(EffectDelayEvent{});
+}
+
+void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
+                                       const entt::entity &SrcEt,
+                                       ymir::Point2d<int> Pos,
+                                       double DecreaseFactor) const {
+  if (Reg.ctx().get<Level*>()->isWallBlocked(Pos)) {
+    return;
+  }
+  DamageComp DC;
+  DC.Source = SrcEt;
+  DC.PhysDamage = PhysDamage * DecreaseFactor;
+  DC.MagicDamage = MagicDamage * DecreaseFactor;
+
+  auto Et = createTempDamage(Reg, DC, Pos, EffectTile);
+
+  if (BleedingDebuff) {
+    Reg.emplace<CoHTargetBleedingDebuffComp>(Et, *BleedingDebuff);
+  }
+
+  if (PoisonDebuff) {
+    Reg.emplace<CoHTargetPoisonDebuffComp>(Et, *PoisonDebuff);
+  }
+
+  if (BlindedDebuff) {
+    Reg.emplace<CoHTargetBlindedDebuffComp>(Et, *BlindedDebuff);
+  }
 }
 
 std::shared_ptr<ItemEffect> LearnRecipeEffect::clone() const {

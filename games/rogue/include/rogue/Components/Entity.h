@@ -3,8 +3,8 @@
 
 #include <entt/entt.hpp>
 #include <filesystem>
-#include <rogue/Components/Stats.h>
 #include <rogue/Components/Combat.h>
+#include <rogue/Components/Stats.h>
 #include <rogue/Tile.h>
 #include <string>
 #include <ymir/Types.hpp>
@@ -19,8 +19,8 @@ namespace rogue {
 void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
                       const Inventory &Inv);
 
-void createTempDamage(entt::registry &Reg, const DamageComp &DC,
-                      ymir::Point2d<int> Pos, Tile T);
+entt::entity createTempDamage(entt::registry &Reg, const DamageComp &DC,
+                              ymir::Point2d<int> Pos, Tile T);
 
 void createProjectile(entt::registry &Reg, const DamageComp &DC,
                       ymir::Point2d<int> Pos, ymir::Point2d<int> TargetPos,

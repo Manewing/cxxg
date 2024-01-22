@@ -1,5 +1,27 @@
 {
   "item_effects": {
+    "acid_splash_i": {
+      "decrease_percent": 0.0,
+      "effect_tile": {
+        "bg_color": "#0b4f0b",
+        "char": " ",
+        "color": "#00c400"
+      },
+      "magic_damage": 0.0,
+      "name": "Acid Splash I",
+      "phys_damage": 3.0,
+      "poison": {
+        "buff": {
+          "reduce_amount": 5.0,
+          "tick_period": 20,
+          "ticks": 4
+        },
+        "chance": 70.0,
+        "type": "chance_on_hit_to_apply_poison"
+      },
+      "radius": 4,
+      "type": "disc_area_hit_effect"
+    },
     "armor_10": {
       "magic_armor": 0,
       "phys_armor": 10,
@@ -319,17 +341,38 @@
       "name": "Smite I",
       "type": "smite_effect"
     },
-    "stomp_i": {
-      "damage": 5.0,
+    "spikes_i": {
+      "bleeding": {
+        "buff": {
+          "reduce_amount": 1.0,
+          "tick_period": 20,
+          "ticks": 10
+        },
+        "chance": 0.0,
+        "type": "chance_on_hit_to_apply_bleeding"
+      },
       "decrease_percent": 0.0,
       "effect_tile": {
-        "bg_color": "#5c5046",
-        "char": "~",
-        "color": "#3b413e"
+        "char": "^",
+        "color": "#90002b"
       },
-      "name": "Stomp I",
+      "magic_damage": 0.0,
+      "name": "Spikes I",
+      "phys_damage": 2.0,
       "radius": 4,
-      "type": "stomp_effect"
+      "type": "disc_area_hit_effect"
+    },
+    "stomp_i": {
+      "decrease_percent": 0.0,
+      "effect_tile": {
+        "char": "~",
+        "color": "#948171"
+      },
+      "magic_damage": 0.0,
+      "name": "Stomp I",
+      "phys_damage": 5.0,
+      "radius": 4,
+      "type": "disc_area_hit_effect"
     },
     "str_5": {
       "stats": {
