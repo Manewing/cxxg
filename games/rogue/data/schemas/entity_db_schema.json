@@ -318,6 +318,11 @@
             "minimum": 0,
             "maximum": 100,
             "description": "Chance of spawning the entity"
+          },
+          "uses": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of times the entity can be spawned from the interaction, 0 means infinite"
           }
         },
         "additionalProperties": false

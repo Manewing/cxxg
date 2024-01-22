@@ -86,7 +86,7 @@ void Interact::handleInteraction() {
   PC.CurrentInteraction = Info.Action;
 
   auto &Interactable = Lvl.Reg.get<InteractableComp>(Info.Entity);
-  for (const auto &PostFn : Interactable.PostActionExecuteFns) {
+  for (const auto &PostFn : Interactable.PreActionExecuteFns) {
     PostFn(Lvl, Info.Entity, Lvl.Reg);
   }
 

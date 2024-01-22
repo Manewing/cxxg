@@ -296,16 +296,29 @@ void WorkbenchAssembler::assemble(entt::registry &Reg,
 }
 
 SpawnEntityPostInteractionAssembler::SpawnEntityPostInteractionAssembler(
-    const std::string &EntityName, double Chance)
-    : EntityName(EntityName), Chance(Chance) {}
+    const std::string &EntityName, double Chance, unsigned Uses)
+    : EntityName(EntityName), Chance(Chance), Uses(Uses) {}
 
 void SpawnEntityPostInteractionAssembler::assemble(entt::registry &Reg,
                                                    entt::entity Entity) const {
   auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
-  ITC.PostActionExecuteFns.push_back([this](auto &, auto SrcEt, auto &Reg) {
-    SpawnEntityEffect SEE(EntityName, Chance);
-    SEE.applyTo(SrcEt, SrcEt, Reg);
-  });
+  if (Uses == 0) {
+    ITC.PreActionExecuteFns.push_back(
+        [this](auto &, auto SrcEt, auto &Reg) mutable {
+          SpawnEntityEffect SEE(EntityName, Chance);
+          SEE.applyTo(SrcEt, SrcEt, Reg);
+        });
+    return;
+  }
+  ITC.PreActionExecuteFns.push_back(
+      [this, Uses = Uses](auto &, auto SrcEt, auto &Reg) mutable {
+        if (Uses == 0) {
+          return;
+        }
+        Uses--;
+        SpawnEntityEffect SEE(EntityName, Chance);
+        SEE.applyTo(SrcEt, SrcEt, Reg);
+      });
 }
 
 bool WorkbenchAssembler::isPostProcess() const { return true; }

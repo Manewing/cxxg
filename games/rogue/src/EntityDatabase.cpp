@@ -200,8 +200,12 @@ makeSpawnEntityPostInteraction(ItemDatabase &, const rapidjson::Value &Json) {
   if (JsonObj.HasMember("chance")) {
     Chance = JsonObj["chance"].GetDouble();
   }
+  unsigned Uses = 1;
+  if (JsonObj.HasMember("uses")) {
+    Uses = JsonObj["uses"].GetUint();
+  }
   return std::make_shared<SpawnEntityPostInteractionAssembler>(EntityName,
-                                                               Chance);
+                                                               Chance, Uses);
 }
 
 std::shared_ptr<StatsCompAssembler>

@@ -138,13 +138,18 @@ public:
 
 class SpawnEntityPostInteractionAssembler : public EntityAssembler {
 public:
+  /// @brief Spawn an entity after interacting with this entity
+  /// @param EntityName Name of the entity to spawn
+  /// @param Chance Chance to spawn the entity, 0 means always spawn
+  /// @param Uses Number of times the action can be performed, 0 means infinite
   SpawnEntityPostInteractionAssembler(const std::string &EntityName,
-                                      double Chance);
+                                      double Chance, unsigned Uses);
   void assemble(entt::registry &Reg, entt::entity Entity) const override;
 
 private:
   std::string EntityName;
   double Chance;
+  unsigned Uses;
 };
 
 class StatsCompAssembler : public EntityAssembler {
