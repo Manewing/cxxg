@@ -28,9 +28,9 @@ void BuffsInfo::draw(cxxg::Screen &Scr) const {
   });
   auto *SC = Reg.try_get<StatsComp>(Entity);
 
+  const char *Pred = "-> ";
   if (const auto *MA = Reg.try_get<MeleeAttackComp>(Entity)) {
     const auto EffMA = MA->getEffective(SC);
-    const char *Pred = "";
     if (MA->PhysDamage > 0) {
       SS << Pred << MA->PhysDamage << " melee phys. dmg. (eff. "
          << static_cast<int>(EffMA.PhysDamage) << ")";
@@ -42,16 +42,18 @@ void BuffsInfo::draw(cxxg::Screen &Scr) const {
       Pred = ", ";
     }
     if (EffMA.APCost > 0) {
-      SS << " " << EffMA.APCost << "AP";
+      SS << Pred << EffMA.APCost << "AP";
+      Pred = ", ";
     }
     if (EffMA.ManaCost > 0) {
-      SS << " " << EffMA.ManaCost << "MP";
+      SS << Pred << EffMA.ManaCost << "MP";
+      Pred = ", ";
     }
     SS << "\n";
   }
+  Pred = "-> ";
   if (const auto *RA = Reg.try_get<RangedAttackComp>(Entity)) {
     const auto EffRA = RA->getEffective(SC);
-    const char *Pred = "";
     if (RA->PhysDamage > 0) {
       SS << Pred << RA->PhysDamage << " ranged phys. dmg. (eff. "
          << EffRA.PhysDamage << ")";
@@ -63,10 +65,12 @@ void BuffsInfo::draw(cxxg::Screen &Scr) const {
       Pred = ", ";
     }
     if (EffRA.APCost > 0) {
-      SS << EffRA.APCost << " AP";
+      SS << Pred << EffRA.APCost << "AP";
+      Pred = ", ";
     }
     if (EffRA.ManaCost > 0) {
-      SS << EffRA.ManaCost << " MP";
+      SS << Pred << EffRA.ManaCost << "MP";
+      Pred = ", ";
     }
     SS << "\n";
   }
