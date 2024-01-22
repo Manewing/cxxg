@@ -3,6 +3,7 @@
 import json
 from typing import List, Optional
 
+
 class ItemDb:
     def __init__(self, item_db: dict, item_db_path: Optional[str] = None):
         self.item_db = item_db
@@ -34,6 +35,17 @@ class ItemDb:
 
     def get_item_effect_names(self) -> List[str]:
         return sorted(x for x in self.item_db["item_effects"])
+
+    def get_item_effect_names_and_defaults(self) -> List[str]:
+        defaults = [
+            "null",
+            "sweeping_strike_effect",
+            "smite_effect",
+            "remove_poison_effect",
+            "remove_poison_debuff",
+            "learn_crafting_recipe",
+        ]
+        return sorted(defaults + self.get_item_effect_names())
 
     def get_loot_table(self, loot_table_name: str) -> dict:
         return self.item_db["loot_tables"][loot_table_name]

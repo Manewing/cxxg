@@ -280,7 +280,7 @@ class SelectItemEffectViewer(ListEditorBase):
         )
         if not eff_name:
             return
-        if eff_name in self.item_db.get_item_effect_names():
+        if eff_name in self.item_db.get_item_effect_names_and_defaults():
             sg.popup(f"Item effect already exists: {eff_name}")
             return
         self.item_db.item_db["item_effects"][eff_name] = {
@@ -358,7 +358,7 @@ class LootViewer(BaseWindow):
             ITEM_DB_SID + "#properties/item_prototypes/items/capabilities/item/effect",
             partial(
                 LinkedGeneratedEnumEditor,
-                self.item_db.get_item_effect_names,
+                self.item_db.get_item_effect_names_and_defaults,
             ),
         )
 
