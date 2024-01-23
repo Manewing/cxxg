@@ -224,7 +224,8 @@ DiscAreaHitEffect::DiscAreaHitEffect(
     std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff,
     std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
     std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff, Tile EffectTile,
-    double DecreasePercent, unsigned MinTicks, unsigned MaxTicks, bool CanHurtSource)
+    double DecreasePercent, unsigned MinTicks, unsigned MaxTicks,
+    bool CanHurtSource)
     : Name(std::move(Name)), Radius(Radius), PhysDamage(PhysDamage),
       MagicDamage(MagicDamage), BleedingDebuff(BleedingDebuff),
       PoisonDebuff(PoisonDebuff), BlindedDebuff(BlindedDebuff),

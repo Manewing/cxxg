@@ -22,7 +22,8 @@ void resetStats(entt::registry &Reg) {
 }
 
 void updateStatsTimedBuffComp(entt::entity Entity, entt::registry &Reg,
-                              StatsComp &S, StatsTimedBuffComp &STB, bool IsTick) {
+                              StatsComp &S, StatsTimedBuffComp &STB,
+                              bool IsTick) {
   if (!IsTick) {
     S.add(STB.Bonus);
     return;

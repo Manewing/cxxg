@@ -358,9 +358,7 @@ void BuffApplyHelperBase::publishBuffAppliedEvent(const entt::entity &SrcEt,
   }
 }
 
-std::string StatsBuffPerHitComp::getName() const {
-  return "Stats per hit";
-}
+std::string StatsBuffPerHitComp::getName() const { return "Stats per hit"; }
 
 std::string StatsBuffPerHitComp::getDescription() const {
   std::stringstream SS;

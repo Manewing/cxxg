@@ -107,7 +107,8 @@ void addMeleeInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
   }
 }
 
-void addRangedInfo(cxxg::Screen &Scr, cxxg::types::Position Pos, entt::registry &Reg, entt::entity Entity) {
+void addRangedInfo(cxxg::Screen &Scr, cxxg::types::Position Pos,
+                   entt::registry &Reg, entt::entity Entity) {
   if (const auto *RAC = Reg.try_get<RangedAttackComp>(Entity)) {
     auto *SC = Reg.try_get<StatsComp>(Entity);
     auto EffRAC = RAC->getEffective(SC);

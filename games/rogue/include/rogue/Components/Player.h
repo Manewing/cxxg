@@ -14,7 +14,8 @@ class EventHubConnector;
 
 namespace rogue {
 
-using InteractionExecuteFn = std::function<void(EventHubConnector &, entt::entity, entt::registry &)>;
+using InteractionExecuteFn =
+    std::function<void(EventHubConnector &, entt::entity, entt::registry &)>;
 
 struct Interaction {
   std::string Msg;

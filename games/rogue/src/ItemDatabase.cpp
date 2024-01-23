@@ -224,14 +224,15 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
                MaxTicks = V["max_ticks"].GetUint();
              }
              bool CanHurtSource = true;
-              if (V.HasMember("can_hurt_source")) {
-                CanHurtSource = V["can_hurt_source"].GetBool();
-              }
+             if (V.HasMember("can_hurt_source")) {
+               CanHurtSource = V["can_hurt_source"].GetBool();
+             }
              auto DecreasePercent = V["decrease_percent"].GetDouble();
              auto T = parseTile(V["effect_tile"]);
              return std::make_shared<DiscAreaHitEffect>(
                  Name, Radius, PhysDamage, MagicDamage, Bleeding, Poison,
-                 Blinded, T, DecreasePercent, MinTicks, MaxTicks, CanHurtSource);
+                 Blinded, T, DecreasePercent, MinTicks, MaxTicks,
+                 CanHurtSource);
            }},
           {"smite_effect",
            [](const auto &, const auto &V) {

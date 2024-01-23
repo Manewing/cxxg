@@ -58,7 +58,8 @@ void applyLifeSteal(entt::registry &Reg, entt::entity Source,
 }
 
 /// Applies the damage defined by a damage component to the given target
-/// \return Returns the damage value that was applied or nullptr if the damage was blocked
+/// \return Returns the damage value that was applied or nullptr if the damage
+/// was blocked
 std::optional<unsigned> applyDamage(entt::registry &Reg,
                                     const entt::entity Target,
                                     HealthComp &THealth, const DamageComp &DC,

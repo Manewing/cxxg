@@ -111,8 +111,7 @@ bool CommandLineController::handleCommandLine(const std::string &Cmd) {
   } else if (Cmd == "debug_targets") {
     TargetInfo::DebugTargets = !TargetInfo::DebugTargets;
     publish(DebugMessageEvent()
-            << "Debug targets: " +
-                   std::to_string(TargetInfo::DebugTargets));
+            << "Debug targets: " + std::to_string(TargetInfo::DebugTargets));
   } else if (Cmd == "debug_rooms") {
     GeneratedMapLevelGenerator::DebugRooms =
         !GeneratedMapLevelGenerator::DebugRooms;
