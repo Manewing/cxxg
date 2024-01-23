@@ -279,12 +279,18 @@ struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
   BuffType Buff;
 
   std::string getName() const override {
-    return std::to_string(int(Chance)) + "% chance to apply " + Buff.getName();
+    if (Chance != 100) {
+      return std::to_string(int(Chance)) + "% chance on hit " + Buff.getName();
+    }
+    return std::to_string(int(Chance)) + "On hit " + Buff.getName();
   }
 
   std::string getDescription() const override {
-    return std::to_string(int(Chance)) + "% chance to apply " +
-           Buff.getDescription();
+    if (Chance != 100) {
+      return std::to_string(int(Chance)) +
+             "% chance on hit to apply: " + Buff.getDescription();
+    }
+    return "On hit apply " + Buff.getDescription();
   }
 
   void add(const ChanceToApplyBuffComp &Other) {

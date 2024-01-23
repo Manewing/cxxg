@@ -624,8 +624,16 @@ class GeneratedArrayEditor(BaseGeneratedEditor):
 
     def get_item_text(self, idx: int) -> str:
         item = self.values[idx]
-        if isinstance(item, (str, int, float, bool)):
+
+        scalar_types = (str, int, float, bool)
+        if isinstance(item, scalar_types):
             return f"[{idx}]: {item}"
+        if isinstance(item, dict) and all(
+            isinstance(value, scalar_types) for value in item.values()
+        ):
+            txt = ", ".join(f"{k}: {v}" for k, v in item.items())
+            return f"[{idx}]: {txt}"
+
         title = self.item_editor.title
         return f"[{idx}]: {title}"
 

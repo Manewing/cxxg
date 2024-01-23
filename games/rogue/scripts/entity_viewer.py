@@ -222,6 +222,16 @@ class EntityViewer(BaseWindow):
                     LinkedGeneratedEnumEditor, self.item_db.get_loot_table_names
                 ),
             )
+        item_effect_paths = [
+            f"{assembler_path}/effect_executor/object/effects/item/effect_name",
+        ]
+        for path in item_effect_paths:
+            self.generator.register_override(
+                path,
+                partial(
+                    LinkedGeneratedEnumEditor, self.item_db.get_item_effect_names
+                ),
+            )
 
         self.current_entity = None
         self.entity_editor: Optional[BaseGeneratedEditor] = None

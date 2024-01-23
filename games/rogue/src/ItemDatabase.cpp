@@ -406,18 +406,17 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig,
   DB.ItemIdsByName = getItemIdsByName(Doc["item_prototypes"]);
 
   // Create effects
-  std::map<std::string, std::shared_ptr<ItemEffect>> Effects;
   const auto &EffectsJson = Doc["item_effects"].GetObject();
   for (const auto &[K, V] : EffectsJson) {
     const auto EffectName = std::string(K.GetString());
     // Check if already registered
-    if (Effects.count(EffectName) != 0) {
+    if (DB.Effects.count(EffectName) != 0) {
       throw std::runtime_error("Duplicate item effect: " + EffectName);
     }
     auto Effect = createEffect(DB, V);
-    Effects.emplace(EffectName, Effect);
+    DB.Effects.emplace(EffectName, Effect);
   }
-  addDefaultConstructEffects(Effects);
+  addDefaultConstructEffects(DB.Effects);
 
   // Create specializations
   std::map<std::string, std::shared_ptr<ItemSpecialization>> Specializations;
@@ -458,11 +457,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig,
       const auto &CapInfo = CapJson.GetObject();
       const auto Attrs = createEffectAttrs(CapJson);
       const auto EffectName = std::string(CapInfo["effect"].GetString());
-      const auto It = Effects.find(EffectName);
-      if (It == Effects.end()) {
-        throw std::out_of_range("Unknown item effect: " + EffectName);
-      }
-      EffectInfos.push_back({Attrs, It->second});
+      EffectInfos.push_back({Attrs, DB.getItemEffect(EffectName)});
     }
 
     std::unique_ptr<ItemSpecializations> Specialization;
@@ -617,6 +612,15 @@ ItemDatabase::getLootTable(const std::string &Name) const {
 const std::map<std::string, std::shared_ptr<LootTable>> &
 ItemDatabase::getLootTables() const {
   return LootTables;
+}
+
+const std::shared_ptr<ItemEffect> &
+ItemDatabase::getItemEffect(const std::string &Name) const {
+  const auto It = Effects.find(Name);
+  if (It == Effects.end()) {
+    throw std::out_of_range("Unknown item effect: " + Name);
+  }
+  return It->second;
 }
 
 } // namespace rogue

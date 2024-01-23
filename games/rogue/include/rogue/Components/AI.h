@@ -4,7 +4,12 @@
 #include <iosfwd>
 #include <optional>
 #include <rogue/Tile.h>
+#include <rogue/EffectInfo.h>
 #include <ymir/Types.hpp>
+
+namespace rogue {
+  class ItemEffect;
+}
 
 namespace rogue {
 
@@ -27,6 +32,18 @@ struct WanderAIComp {
 const char *getWanderAIStateStr(WanderAIState State);
 
 struct AttackAIComp {};
+
+
+struct EffectExecutorComp {
+  struct Info {
+    std::shared_ptr<ItemEffect> Effect;
+    std::uniform_int_distribution<unsigned> DelayDist;
+  };
+
+  std::vector<Info> Effects;
+  std::size_t NextEffect = 0;
+  unsigned DelayLeft = 0;
+};
 
 enum class NeedKind {
   // Model needs like Maslow

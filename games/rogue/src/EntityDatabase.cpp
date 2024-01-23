@@ -208,6 +208,22 @@ makeSpawnEntityPostInteraction(ItemDatabase &, const rapidjson::Value &Json) {
                                                                Chance, Uses);
 }
 
+std::shared_ptr<EffectExecutorCompAssembler>
+makeEffectExecutorCompAssembler(ItemDatabase &ItemDb, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  EffectExecutorComp Comp;
+  for (const auto &EffectJson : JsonObj["effects"].GetArray()) {
+    unsigned MinDelay = EffectJson["min_delay"].GetUint();
+    unsigned MaxDelay = EffectJson["max_delay"].GetUint();
+
+    EffectExecutorComp::Info Info;
+    Info.Effect = ItemDb.getItemEffect(EffectJson["effect_name"].GetString());
+    Info.DelayDist = std::uniform_int_distribution<unsigned>(MinDelay, MaxDelay);
+    Comp.Effects.emplace_back(std::move(Info));
+  }
+  return std::make_shared<EffectExecutorCompAssembler>(std::move(Comp));
+}
+
 std::shared_ptr<StatsCompAssembler>
 makeStatsCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   auto SP = parseStatPoints(Json);
@@ -250,6 +266,7 @@ const auto &getEntityAssemblerFactories() {
       {"world_entry", makeWorldEntryAssembler},
       {"level_entry_exit", makeLevelEntryExitAssembler},
       {"spawn_entity_post_interaction", makeSpawnEntityPostInteraction},
+      {"effect_executor", makeEffectExecutorCompAssembler},
       {"loot_interact", makeLootInteractCompAssembler}};
   return Factories;
 }

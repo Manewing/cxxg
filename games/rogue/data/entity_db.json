@@ -209,6 +209,15 @@
     {
       "assemblers": {
         "auto_equip": true,
+        "effect_executor": {
+          "effects": [
+            {
+              "effect_name": "spikes_i",
+              "max_delay": 90,
+              "min_delay": 80
+            }
+          ]
+        },
         "equipment": true,
         "inventory": {
           "loot_table": "ltb_fat_rat"

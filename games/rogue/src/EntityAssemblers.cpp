@@ -339,4 +339,13 @@ void DamageCompAssembler::assemble(entt::registry &Reg,
   Reg.emplace<DamageComp>(Entity, NewDC);
 }
 
+EffectExecutorCompAssembler::EffectExecutorCompAssembler(
+    EffectExecutorComp Executer)
+    : Executer(std::move(Executer)) {}
+
+void EffectExecutorCompAssembler::assemble(entt::registry &Reg,
+                                           entt::entity Entity) const {
+  Reg.emplace<EffectExecutorComp>(Entity, Executer);
+}
+
 } // namespace rogue

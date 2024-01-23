@@ -172,6 +172,15 @@ private:
   DamageComp DC;
 };
 
+class EffectExecutorCompAssembler : public EntityAssembler {
+public:
+  explicit EffectExecutorCompAssembler(EffectExecutorComp Executer);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  EffectExecutorComp Executer;
+};
+
 // Keep sorted
 using AttackAICompAssembler = DefaultConstructEntityAssembler<AttackAIComp>;
 using BlockLOSCompAssembler = DefaultConstructEntityAssembler<BlocksLOS>;

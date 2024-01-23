@@ -199,6 +199,17 @@
                   "const": false
                 }
               ]
+            },
+            "effect_executor": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/effect_executor"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -347,6 +358,37 @@
           "ticks": {
             "type": "integer",
             "description": "Number of ticks before the entity is destroyed, default -1 (never)"
+          }
+        },
+        "additionalProperties": false
+      },
+      "effect_executor": {
+        "type": "object",
+        "required": ["effects"],
+        "properties": {
+          "effects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["effect_name", "min_delay", "max_delay"],
+              "properties": {
+                "effect_name": {
+                  "type": "string",
+                  "description": "Name of the effect to execute"
+                },
+                "min_delay": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Minimum delay before executing the effect"
+                },
+                "max_delay": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Maximum delay before executing the effect"
+                }
+              },
+              "additionalProperties": false
+            }
           }
         },
         "additionalProperties": false
