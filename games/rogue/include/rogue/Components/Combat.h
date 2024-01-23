@@ -69,6 +69,9 @@ struct DamageComp {
   /// Number of ticks before the damage component will be removed
   unsigned Ticks = -1U;
 
+  // If the damage component can hurt the source entity
+  bool CanHurtSource = true;
+
   StatValue total() const { return PhysDamage + MagicDamage; }
 };
 

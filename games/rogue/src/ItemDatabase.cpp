@@ -216,11 +216,22 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              if (V.HasMember("blinded")) {
                Blinded = parseCoHTargetBlindedDebuffComp(V["blinded"]);
              }
+             unsigned MinTicks = 1, MaxTicks = 1;
+             if (V.HasMember("min_ticks")) {
+               MinTicks = V["min_ticks"].GetUint();
+             }
+             if (V.HasMember("max_ticks")) {
+               MaxTicks = V["max_ticks"].GetUint();
+             }
+             bool CanHurtSource = true;
+              if (V.HasMember("can_hurt_source")) {
+                CanHurtSource = V["can_hurt_source"].GetBool();
+              }
              auto DecreasePercent = V["decrease_percent"].GetDouble();
              auto T = parseTile(V["effect_tile"]);
              return std::make_shared<DiscAreaHitEffect>(
                  Name, Radius, PhysDamage, MagicDamage, Bleeding, Poison,
-                 Blinded, T, DecreasePercent);
+                 Blinded, T, DecreasePercent, MinTicks, MaxTicks, CanHurtSource);
            }},
           {"smite_effect",
            [](const auto &, const auto &V) {

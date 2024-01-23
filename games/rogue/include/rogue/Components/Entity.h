@@ -20,7 +20,7 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
                       const Inventory &Inv);
 
 entt::entity createTempDamage(entt::registry &Reg, const DamageComp &DC,
-                              ymir::Point2d<int> Pos, Tile T);
+                              ymir::Point2d<int> Pos, Tile T, unsigned Ticks);
 
 void createProjectile(entt::registry &Reg, const DamageComp &DC,
                       ymir::Point2d<int> Pos, ymir::Point2d<int> TargetPos,

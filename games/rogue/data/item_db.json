@@ -369,9 +369,10 @@
           "tick_period": 20,
           "ticks": 10
         },
-        "chance": 0.0,
+        "chance": 20.0,
         "type": "chance_on_hit_to_apply_bleeding"
       },
+      "can_hurt_source": false,
       "decrease_percent": 0.0,
       "effect_tile": {
         "char": "^",
@@ -379,6 +380,8 @@
         "z_index": -2
       },
       "magic_damage": 0.0,
+      "max_ticks": 40,
+      "min_ticks": 8,
       "name": "Spikes I",
       "phys_damage": 2.0,
       "radius": 4,
@@ -687,7 +690,7 @@
           "type": "equipment"
         },
         {
-          "effect": "stomp_i",
+          "effect": "null",
           "type": "skill"
         }
       ],

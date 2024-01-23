@@ -57,6 +57,8 @@ void applyLifeSteal(entt::registry &Reg, entt::entity Source,
       {}, Source, &Reg, static_cast<unsigned>(LifeStealValue), "Life steal"});
 }
 
+/// Applies the damage defined by a damage component to the given target
+/// \return Returns the damage value that was applied or nullptr if the damage was blocked
 std::optional<unsigned> applyDamage(entt::registry &Reg,
                                     const entt::entity Target,
                                     HealthComp &THealth, const DamageComp &DC,
@@ -212,6 +214,9 @@ void applyDamageComp(entt::registry &Reg, DamageComp &DC, entt::entity DcEt,
           return;
         }
         if (DC.Hits-- == 0) {
+          return;
+        }
+        if (!DC.CanHurtSource && TEt == DC.Source) {
           return;
         }
         auto Damage = applyDamage(Reg, TEt, THC, DC, EHC, DcEt);

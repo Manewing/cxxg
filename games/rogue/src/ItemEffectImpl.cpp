@@ -181,7 +181,7 @@ void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
   DC.PhysDamage = EffMA.PhysDamage * DamagePercent / 100.0;
 
   for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
-    createTempDamage(Reg, DC, PC.Pos + Dir, EffectTile);
+    createTempDamage(Reg, DC, PC.Pos + Dir, EffectTile, 1);
   }
 
   // Make sure effect will be rendered
@@ -224,11 +224,15 @@ DiscAreaHitEffect::DiscAreaHitEffect(
     std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff,
     std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
     std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff, Tile EffectTile,
-    double DecreasePercent)
+    double DecreasePercent, unsigned MinTicks, unsigned MaxTicks, bool CanHurtSource)
     : Name(std::move(Name)), Radius(Radius), PhysDamage(PhysDamage),
       MagicDamage(MagicDamage), BleedingDebuff(BleedingDebuff),
       PoisonDebuff(PoisonDebuff), BlindedDebuff(BlindedDebuff),
-      EffectTile(EffectTile), DecreasePercent(DecreasePercent) {}
+      EffectTile(EffectTile), DecreasePercent(DecreasePercent),
+      MinTicks(MinTicks), MaxTicks(MaxTicks), CanHurtSource(CanHurtSource) {
+  MaxTicks = std::max(MaxTicks, 1U);
+  MinTicks = std::min(MinTicks, MaxTicks);
+}
 
 std::shared_ptr<ItemEffect> DiscAreaHitEffect::clone() const {
   return std::make_shared<DiscAreaHitEffect>(*this);
@@ -251,6 +255,9 @@ std::string DiscAreaHitEffect::getDescription() const {
   }
   if (MagicDamage > 0 || PhysDamage > 0) {
     SS << " damage";
+  }
+  if (MinTicks > 0) {
+    SS << " lasting " << MinTicks << "-" << MaxTicks << " ticks";
   }
   SS << ".";
 
@@ -339,10 +346,12 @@ void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
   }
   DamageComp DC;
   DC.Source = SrcEt;
+  DC.CanHurtSource = CanHurtSource;
   DC.PhysDamage = PhysDamage * DecreaseFactor;
   DC.MagicDamage = MagicDamage * DecreaseFactor;
 
-  auto Et = createTempDamage(Reg, DC, Pos, EffectTile);
+  unsigned Ticks = std::rand() % (MaxTicks - MinTicks + 1) + MinTicks;
+  auto Et = createTempDamage(Reg, DC, Pos, EffectTile, Ticks);
 
   if (BleedingDebuff) {
     Reg.emplace<CoHTargetBleedingDebuffComp>(Et, *BleedingDebuff);

@@ -504,6 +504,21 @@
           "blinded": {
             "$ref": "#/defs/effect/chance_on_hit_to_apply_blinded"
           },
+          "min_ticks": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Minimum ticks the damage component persists after the effect is applied"
+          },
+          "max_ticks": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Maximum ticks the damage component persists after the effect is applied"
+          },
+          "can_hurt_source": {
+            "type": "boolean",
+            "default": true,
+            "description": "If the damage component created can hurt the source entity of the effect"
+          },
           "decrease_percent": {
             "type": "number",
             "minimum": 0,

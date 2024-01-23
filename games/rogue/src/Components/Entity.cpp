@@ -39,9 +39,9 @@ void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
 }
 
 entt::entity createTempDamage(entt::registry &Reg, const DamageComp &DC,
-                              ymir::Point2d<int> Pos, Tile T) {
+                              ymir::Point2d<int> Pos, Tile T, unsigned Ticks) {
   auto E = Reg.create();
-  Reg.emplace<DamageComp>(E, DC).Ticks = 1;
+  Reg.emplace<DamageComp>(E, DC).Ticks = Ticks;
   Reg.emplace<PositionComp>(E, Pos);
   Reg.emplace<TileComp>(E, T);
   Reg.emplace<NameComp>(E, "Damage", "Damage");

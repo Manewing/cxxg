@@ -167,7 +167,8 @@ public:
                     std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff,
                     std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
                     std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff,
-                    Tile EffectTile, double DecreasePercent);
+                    Tile EffectTile, double DecreasePercent, unsigned MinTicks,
+                    unsigned MaxTicks, bool CanHurtSource);
 
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
@@ -193,6 +194,9 @@ private:
 
   Tile EffectTile;
   double DecreasePercent;
+  unsigned MinTicks;
+  unsigned MaxTicks;
+  bool CanHurtSource;
 };
 
 // Knowledge
