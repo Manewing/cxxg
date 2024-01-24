@@ -55,6 +55,9 @@
             "wander_ai": {
               "$ref": "#/defs/assembler_types/on_off"
             },
+            "search_ai": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
             "line_of_sight": {
               "$ref": "#/defs/assembler_types/on_off"
             },

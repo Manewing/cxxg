@@ -96,6 +96,7 @@ EntityAssemblerCache getDefaultEntityAssemblerCache() {
   Cache.add<ManaCompAssembler>("mana");
   Cache.add<PlayerCompAssembler>("player");
   Cache.add<PositionCompAssembler>("position");
+  Cache.add<SearchAICompAssembler>("search_ai");
   Cache.add<VisibleCompAssembler>("visible");
   Cache.add<WanderAICompAssembler>("wander_ai");
 

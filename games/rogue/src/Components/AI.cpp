@@ -9,10 +9,18 @@ const char *getWanderAIStateStr(WanderAIState State) {
     return "Idle";
   case WanderAIState::Wander:
     return "Wander";
-  case WanderAIState::Chase:
-    return "Chase";
-  case WanderAIState::Search:
+  }
+  return "<invalid>";
+}
+
+const char *getSearchAIStateStr(SearchAIState State) {
+  switch (State) {
+  case SearchAIState::Idle:
+    return "Idle";
+  case SearchAIState::Search:
     return "Search";
+  case SearchAIState::Chase:
+    return "Chase";
   }
   return "<invalid>";
 }

@@ -191,6 +191,7 @@ using HealthCompAssembler = DefaultConstructEntityAssembler<HealthComp>;
 using ManaCompAssembler = DefaultConstructEntityAssembler<ManaComp>;
 using PlayerCompAssembler = DefaultConstructEntityAssembler<PlayerComp>;
 using PositionCompAssembler = DefaultConstructEntityAssembler<PositionComp>;
+using SearchAICompAssembler = DefaultConstructEntityAssembler<SearchAIComp>;
 using VisibleCompAssembler = DefaultConstructEntityAssembler<VisibleComp>;
 using WanderAICompAssembler = DefaultConstructEntityAssembler<WanderAIComp>;
 

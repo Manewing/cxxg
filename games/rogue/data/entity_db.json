@@ -97,6 +97,7 @@
         "health": true,
         "line_of_sight": true,
         "position": true,
+        "search_ai": true,
         "visible": true,
         "wander_ai": true
       },

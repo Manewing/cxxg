@@ -1,14 +1,7 @@
 #include <rogue/Components/AI.h>
-#include <rogue/Components/LOS.h>
-#include <rogue/Components/RaceFaction.h>
-#include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
-#include <rogue/Event.h>
-#include <rogue/History.h>
 #include <rogue/Level.h>
 #include <rogue/Systems/WanderAISystem.h>
-#include <ymir/Algorithm/Dijkstra.hpp>
-#include <ymir/Algorithm/LineOfSight.hpp>
 #include <ymir/Noise.hpp>
 
 // FIXME move this, also should this be based on the level seed?
@@ -31,76 +24,29 @@ void WanderAISystem::update(UpdateType Type) {
 
 void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
                                   WanderAIComp &AI) {
+  // TODO flee from attacker
+  // auto *CAC = Reg.try_get<CombatTargetComp>(Entity);
+  // if (CAC && Reg.valid(CAC->Attacker)) {
+  //  AI.State = WanderAIState::Flee;
+  //}
+
   switch (AI.State) {
   case WanderAIState::Idle: {
-    if (auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
-        TargetEt != entt::null) {
-      break;
-    }
-
-    if (AI.IdleDelayLeft-- == 0) {
+    if (AI.StateDelayLeft-- == 0) {
       AI.State = WanderAIState::Wander;
-      AI.IdleDelayLeft = AI.IdleDelay;
+      AI.StateDelayLeft = AI.WanderDelay;
     }
   } break;
   case WanderAIState::Wander: {
-    if (auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
-        TargetEt != entt::null) {
-      break;
+    if (AI.StateDelayLeft-- == 0) {
+      AI.State = WanderAIState::Idle;
+      AI.StateDelayLeft = AI.IdleDelay;
     }
-
-    AI.State = WanderAIState::Wander;
-
-    auto NextPos = wander(PC);
+    auto NextPos = findRandomNonBlockedPosNextTo(PC);
     MovementComp MC;
     MC.Dir = ymir::Dir2d::fromMaxComponent(NextPos - PC.Pos);
     Reg.emplace<MovementComp>(Entity, MC);
   } break;
-
-  case WanderAIState::Search: {
-    // If lost agro stop the search
-    if (AI.SearchDurationLeft-- == 0) {
-      AI.State = WanderAIState::Wander;
-      AI.LastTargetPos = std::nullopt;
-      AI.SearchDurationLeft = 0;
-      break;
-    }
-
-    // If in range chase otherwise continue to last seen pos
-    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
-    std::optional<ymir::Point2d<int>> NextPosOrNone;
-    if (TargetEt != entt::null) {
-      NextPosOrNone = chaseTarget(TargetEt, PC, *LOS);
-    } else {
-      assert(AI.LastTargetPos && "No last target pos for wander system");
-      NextPosOrNone = findPathToPoint(*AI.LastTargetPos, *AI.LastTargetPos, PC,
-                                      LOS->LOSRange);
-    }
-    if (!NextPosOrNone) {
-      break;
-    }
-
-    MovementComp MC;
-    MC.Dir = ymir::Dir2d::fromMaxComponent(*NextPosOrNone - PC.Pos);
-    Reg.emplace<MovementComp>(Entity, MC);
-    break;
-  }
-  case WanderAIState::Chase: {
-    // If in range stay, otherwise chase
-    auto [TargetEt, LOS, FC] = checkForTarget(Entity, PC, AI);
-    if (TargetEt == entt::null) {
-      break;
-    }
-
-    auto NextPosOrNone = chaseTarget(TargetEt, PC, *LOS);
-    if (!NextPosOrNone) {
-      break;
-    }
-    MovementComp MC;
-    MC.Dir = ymir::Dir2d::fromMaxComponent(*NextPosOrNone - PC.Pos);
-    Reg.emplace<MovementComp>(Entity, MC);
-  } break;
-
   default:
     assert(false && "Should never be reached");
     break;
@@ -114,78 +60,8 @@ void WanderAISystem::updateEntity(entt::entity Entity, PositionComp &PC,
   }
 }
 
-std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
-WanderAISystem::checkForTarget(entt::entity Entity, PositionComp &PC,
-                               WanderAIComp &AI) {
-  auto [TargetEt, LOS, FC] = findTarget(Entity, PC);
-
-  // Deal with case we lost the target
-  if (TargetEt == entt::null) {
-
-    // Check if we changed the state
-    if (AI.State == WanderAIState::Chase) {
-      LostTargetEvent LTE;
-      LTE.Entity = Entity;
-      LTE.Registry = &Reg;
-      publish(LTE);
-
-      AI.State = WanderAIState::Search;
-    }
-
-    return {TargetEt, LOS, FC};
-  }
-
-  // Check if we changed the state
-  if (AI.State != WanderAIState::Chase) {
-    DetectTargetEvent DTE;
-    DTE.Entity = Entity;
-    DTE.Target = TargetEt;
-    DTE.Registry = &Reg;
-    publish(DTE);
-  }
-  AI.State = WanderAIState::Chase;
-  AI.LastTargetPos = Reg.get<PositionComp>(TargetEt).Pos;
-  AI.SearchDurationLeft = AI.SearchDuration;
-  return {TargetEt, LOS, FC};
-}
-
-std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
-WanderAISystem::findTarget(entt::entity Entity,
-                           const ymir::Point2d<int> &AtPos) {
-  auto LOSComp = Reg.try_get<LineOfSightComp>(Entity);
-  auto FacComp = Reg.try_get<FactionComp>(Entity);
-  if (!LOSComp || !FacComp) {
-    return {entt::null, nullptr, nullptr};
-  }
-
-  // FIXME only finds single target, no ordering of distance
-  entt::entity TargetEt = entt::null;
-  Reg.view<PositionComp, FactionComp, VisibleComp>().each(
-      [this, &TargetEt, &LOSComp, &FacComp, AtPos](
-          entt::entity TEt, const auto &TPC, const auto &TFC, const auto &VC) {
-        if (!VC.IsVisible || TFC.Faction == FacComp->Faction) {
-          return;
-        }
-
-        if ((TPC.Pos - AtPos).length() > double(LOSComp->LOSRange)) {
-          return;
-        }
-        auto const Offset = ymir::Point2d<double>(0.5, 0.5);
-        ymir::Algorithm::rayCastDDA<int>(
-            [&TargetEt, TPC, TEt](auto Pos) {
-              if (TPC.Pos == Pos) {
-                TargetEt = TEt;
-              }
-            },
-            [this](auto Pos) { return L.isLOSBlocked(Pos); }, LOSComp->LOSRange,
-            AtPos.template to<double>() + Offset,
-            TPC.Pos.template to<double>() + Offset);
-      });
-
-  return {TargetEt, LOSComp, FacComp};
-}
-
-ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
+ymir::Point2d<int>
+WanderAISystem::findRandomNonBlockedPosNextTo(ymir::Point2d<int> AtPos) const {
   auto AllNextPos = L.getAllNonBodyBlockedPosNextTo(AtPos);
   auto It =
       ymir::randomIterator(AllNextPos.begin(), AllNextPos.end(), RandomEngine);
@@ -193,90 +69,6 @@ ymir::Point2d<int> WanderAISystem::wander(const ymir::Point2d<int> AtPos) {
     return AtPos;
   }
   return *It;
-}
-
-std::optional<ymir::Point2d<int>> WanderAISystem::findPathToPoint(
-    const ymir::Point2d<int> ToPos, const ymir::Point2d<int> FutureToPos,
-    const ymir::Point2d<int> AtPos, const unsigned LOSRange) {
-  if (static_cast<unsigned>((ToPos - AtPos).length()) > LOSRange) {
-    return std::nullopt;
-  }
-  ymir::Size2d<int> DMSize(LOSRange * 2 + 1, LOSRange * 2 + 1);
-  ymir::Point2d<int> DMMidPos(LOSRange + 1, LOSRange + 1);
-
-  // FIXME avoid recomputing this every time
-  auto DM = ymir::Algorithm::getDijkstraMap(
-      DMSize, DMMidPos,
-      [this, &ToPos, &FutureToPos, &DMMidPos](auto Pos) {
-        auto RealPos = Pos + FutureToPos - DMMidPos;
-        if (RealPos == ToPos) {
-          return false;
-        }
-        return L.isBodyBlocked(RealPos, /*Hard=*/true);
-      },
-      ymir::FourTileDirections<int>());
-
-  std::uniform_int_distribution<int> OneZero(0, 1);
-  // FIXME only consider this if the path is not significantly longer than one
-  // taken if the entity was not body blocked
-  auto PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
-      DM, DMMidPos, AtPos - FutureToPos + DMMidPos,
-      ymir::FourTileDirections<int>(), 1, OneZero(RandomEngine));
-
-  // FIXME avoid recomputing this every time
-  if (PathToTarget.empty()) {
-    DM = ymir::Algorithm::getDijkstraMap(
-        DMSize, DMMidPos,
-        [this, &ToPos, &FutureToPos, &DMMidPos](auto Pos) {
-          auto RealPos = Pos + FutureToPos - DMMidPos;
-          if (RealPos == ToPos) {
-            return false;
-          }
-          return L.isBodyBlocked(RealPos, /*Hard=*/false);
-        },
-        ymir::FourTileDirections<int>());
-
-    std::uniform_int_distribution<int> OneZero(0, 1);
-    PathToTarget = ymir::Algorithm::getPathFromDijkstraMap(
-        DM, DMMidPos, AtPos - FutureToPos + DMMidPos,
-        ymir::FourTileDirections<int>(), 1, OneZero(RandomEngine));
-  }
-  if (PathToTarget.empty()) {
-    // FIXME this can happen when the targeted entity moves out of range of the
-    // LOS, this means that the dijkstra map is too small to be able to find a
-    // path to the target. Could be avoided by switching to an A* algorithm.
-    publish(ErrorMessageEvent()
-            << "can't find path from " << AtPos << " to " << FutureToPos);
-    return AtPos;
-  }
-  auto TargetPos = PathToTarget.at(0) + FutureToPos - DMMidPos;
-
-  if (!L.isBodyBlocked(TargetPos)) {
-    return TargetPos;
-  }
-  return std::nullopt;
-}
-
-std::optional<ymir::Point2d<int>>
-WanderAISystem::chaseTarget(entt::entity TargetEt,
-                            const ymir::Point2d<int> AtPos,
-                            const LineOfSightComp &LOS) {
-  const auto &TPC = Reg.get<PositionComp>(TargetEt);
-  auto TPos = TPC.Pos;
-  if (ymir::FourTileDirections<int>::isNextTo(AtPos, TPos)) {
-    return std::nullopt;
-  }
-
-  const auto &TMC = Reg.try_get<MovementComp>(TargetEt);
-  if (TMC) {
-    TPos += TMC->Dir;
-  }
-
-  if (ymir::FourTileDirections<int>::isNextTo(AtPos, TPos)) {
-    return std::nullopt;
-  }
-
-  return findPathToPoint(TPC.Pos, TPos, AtPos, LOS.LOSRange);
 }
 
 } // namespace rogue

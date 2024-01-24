@@ -49,6 +49,7 @@ set(HEADER_FILES
   include/rogue/Systems/NPCSystem.h
   include/rogue/Systems/PlayerSystem.h
   include/rogue/Systems/RegenSystem.h
+  include/rogue/Systems/SearchAISystem.h
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
@@ -126,6 +127,7 @@ set(SOURCE_FILES
   src/Systems/NPCSystem.cpp
   src/Systems/PlayerSystem.cpp
   src/Systems/RegenSystem.cpp
+  src/Systems/SearchAISystem.cpp
   src/Systems/StatsSystem.cpp
   src/Systems/WanderAISystem.cpp
   src/UI/Buffs.cpp
