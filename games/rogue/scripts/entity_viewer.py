@@ -93,7 +93,18 @@ class SelectEntityViewer(ListEditorBase):
                 return True
             entity = self.entity_db.get_fully_defined_entity(idx)
             entity_str = yaml.dump(entity, indent=2, sort_keys=True)
-            sg.popup_scrolled(entity_str, title="Entity Configuration")
+
+            line_sep = ("=" * 40) + "\n"
+            popup_text = f"{line_sep}Configuration:\n{line_sep}{entity_str}"
+
+            from_template = entity.get("from_template")
+            while from_template:
+                entity = self.entity_db.get_entity_by_name(from_template)
+                entity_str = yaml.dump(entity, indent=2, sort_keys=True)
+                popup_text += f"\n{line_sep}From template '{from_template}':\n{line_sep}{entity_str}"
+                from_template = entity.get("from_template")
+
+            sg.popup_scrolled(popup_text, title="Entity Configuration")
 
         if event == self.k.player_arena:
             idx = self.get_real_index()
@@ -229,7 +240,8 @@ class EntityViewer(BaseWindow):
             self.generator.register_override(
                 path,
                 partial(
-                    LinkedGeneratedEnumEditor, self.item_db.get_item_effect_names
+                    LinkedGeneratedEnumEditor,
+                    self.item_db.get_item_effect_names,
                 ),
             )
 
