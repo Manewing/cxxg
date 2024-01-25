@@ -43,6 +43,9 @@
             "health": {
               "$ref": "#/defs/assembler_types/on_off"
             },
+            "mana": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
             "block_los": {
               "$ref": "#/defs/assembler_types/on_off"
             },

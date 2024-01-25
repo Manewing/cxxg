@@ -181,6 +181,7 @@ bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
   DC.Source = Attacker;
   DC.MagicDamage = EffRAC.MagicDamage;
   DC.PhysDamage = EffRAC.PhysDamage;
+  DC.CanHurtSource = false;
 
   // Create projectile in the move direction
   auto Diff = TargetPos - AttackerPC->Pos;

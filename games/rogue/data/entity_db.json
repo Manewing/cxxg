@@ -119,7 +119,8 @@
       "assemblers": {
         "auto_equip": true,
         "drop_equipment": true,
-        "equipment": true
+        "equipment": true,
+        "mana": true
       },
       "from_template": "hostile_creature",
       "name": "base_enemy"
