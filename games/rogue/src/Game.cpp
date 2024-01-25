@@ -270,7 +270,7 @@ bool Game::handleUpdates(bool IsTick) {
 
     auto SleepAfterDraw = REC.hasEvents();
     handleDrawLevel(true);
-    if (SleepAfterDraw) {
+    if (UICtrl.DelayTicks || SleepAfterDraw) {
       cxxg::utils::sleep(200000);
     }
 

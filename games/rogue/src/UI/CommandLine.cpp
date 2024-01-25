@@ -118,6 +118,10 @@ bool CommandLineController::handleCommandLine(const std::string &Cmd) {
     publish(DebugMessageEvent()
             << "Debug rooms: " +
                    std::to_string(GeneratedMapLevelGenerator::DebugRooms));
+  } else if (Cmd == "delay_ticks") {
+    Ctrl.DelayTicks = !Ctrl.DelayTicks;
+    publish(DebugMessageEvent()
+              << "Delaying ticks: " + std::to_string(Ctrl.DelayTicks));
   } else {
     publish(DebugMessageEvent() << "Unknown command: " + Cmd);
   }

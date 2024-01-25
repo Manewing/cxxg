@@ -134,6 +134,9 @@ public:
 
   void handleResize(cxxg::types::Size Size);
 
+public:
+  bool DelayTicks = false;
+
 private:
   cxxg::Screen &Scr;
   WindowContainer WdwContainer;

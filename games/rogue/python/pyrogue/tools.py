@@ -120,9 +120,11 @@ class RogueToolWrapper:
 
     def _run_cmd(self, cmd: List[str]) -> str:
         cmd = [str(x) for x in cmd]
+        env = os.environ.copy()
+        env["ROGUE_DEBUG"] = "1"
         print(f"# Running: {' '.join(cmd)}", file=sys.stderr)
         try:
-            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT, env=env)
         except subprocess.CalledProcessError as e:
             output = e.output.decode("utf-8")
             raise ToolError(cmd, output, e.returncode)
@@ -131,9 +133,11 @@ class RogueToolWrapper:
 
     def _run_cmd_no_wait(self, cmd: List[str]) -> None:
         cmd = [str(x) for x in cmd]
+        env = os.environ.copy()
+        env["ROGUE_DEBUG"] = "1"
         print(f"# Running: {' '.join(cmd)}", file=sys.stderr)
         try:
-            subprocess.Popen(cmd)
+            subprocess.Popen(cmd, env=env)
         except subprocess.CalledProcessError as e:
             raise ToolError(cmd, None, e.returncode)
 
@@ -150,7 +154,7 @@ class RogueToolWrapper:
         temp_sh = tempfile.mktemp(suffix=".sh")
         with open(temp_sh, "w") as f:
             f.write("#!/bin/bash\n")
-            f.write(" ".join(cmd))
+            f.write("ROGUE_DEBUG=1 " + " ".join(cmd))
             f.write("\n")
             f.write("echo Press enter to exit\n")
             f.write("read\n")
