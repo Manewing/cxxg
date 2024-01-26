@@ -80,6 +80,9 @@
           },
           {
             "$ref": "#/defs/effect/dismantle"
+          },
+          {
+            "$ref": "#/defs/effect/spawn_entity_effect"
           }
         ]
       },
@@ -448,12 +451,7 @@
             "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
           }
         },
-        "required": [
-          "type",
-          "name",
-          "damage_percent",
-          "effect_tile"
-        ],
+        "required": ["type", "name", "damage_percent", "effect_tile"],
         "additionalProperties": false
       },
       "smite_effect": {
@@ -470,11 +468,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "type",
-          "name",
-          "damage_percent"
-        ],
+        "required": ["type", "name", "damage_percent"],
         "additionalProperties": false
       },
       "disc_area_hit_effect": {
@@ -518,6 +512,11 @@
             "type": "boolean",
             "default": true,
             "description": "If the damage component created can hurt the source entity of the effect"
+          },
+          "can_hurt_faction": {
+            "type": "boolean",
+            "default": true,
+            "description": "If the damage component created can hurt any other entity of the faction of the entity"
           },
           "decrease_percent": {
             "type": "number",
@@ -568,6 +567,26 @@
           }
         },
         "required": ["items", "type"],
+        "additionalProperties": false
+      },
+      "spawn_entity_effect": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "spawn_entity_effect"
+          },
+          "entity_name": {
+            "type": "string",
+            "description": "Name of the entity in the entity database to spawn"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Chance to spawn the entity"
+          }
+        },
+        "required": ["entity_name", "chance", "type"],
         "additionalProperties": false
       }
     },

@@ -1,6 +1,8 @@
 {
   "item_effects": {
     "acid_splash_i": {
+      "can_hurt_faction": false,
+      "can_hurt_source": false,
       "decrease_percent": 0.0,
       "effect_tile": {
         "bg_color": "#0b4f0b",
@@ -345,6 +347,8 @@
         "chance": 100.0,
         "type": "chance_on_hit_to_apply_blinded"
       },
+      "can_hurt_faction": false,
+      "can_hurt_source": false,
       "decrease_percent": 0.0,
       "effect_tile": {
         "bg_color": "#bfdab5",
@@ -362,6 +366,11 @@
       "name": "Smite I",
       "type": "smite_effect"
     },
+    "spawn_sewer_rat": {
+      "chance": 100.0,
+      "entity_name": "sewer_rat",
+      "type": "spawn_entity_effect"
+    },
     "spikes_i": {
       "bleeding": {
         "buff": {
@@ -372,6 +381,7 @@
         "chance": 20.0,
         "type": "chance_on_hit_to_apply_bleeding"
       },
+      "can_hurt_faction": false,
       "can_hurt_source": false,
       "decrease_percent": 0.0,
       "effect_tile": {

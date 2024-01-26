@@ -198,6 +198,13 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              LSBC.BonusHP = V["bonus_hp"].GetDouble();
              return std::make_shared<LifeStealBuffEffect>(LSBC);
            }},
+           {"spawn_entity_effect",
+           [](const auto &, const auto &V) {
+            auto EntityName = std::string(V["entity_name"].GetString());
+            double Chance = V["chance"].GetDouble();
+            return std::make_shared<SpawnEntityEffect>(EntityName, Chance);
+           }
+           },
           {"disc_area_hit_effect",
            [](const auto &, const auto &V) {
              auto Name = std::string(V["name"].GetString());
@@ -227,12 +234,16 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              if (V.HasMember("can_hurt_source")) {
                CanHurtSource = V["can_hurt_source"].GetBool();
              }
+             bool CanHurtFaction = true;
+              if (V.HasMember("can_hurt_faction")) {
+                CanHurtFaction = V["can_hurt_faction"].GetBool();
+              }
              auto DecreasePercent = V["decrease_percent"].GetDouble();
              auto T = parseTile(V["effect_tile"]);
              return std::make_shared<DiscAreaHitEffect>(
                  Name, Radius, PhysDamage, MagicDamage, Bleeding, Poison,
                  Blinded, T, DecreasePercent, MinTicks, MaxTicks,
-                 CanHurtSource);
+                 CanHurtSource, CanHurtFaction);
            }},
           {"smite_effect",
            [](const auto &, const auto &V) {

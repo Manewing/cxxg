@@ -214,7 +214,12 @@
         "effect_executor": {
           "effects": [
             {
-              "effect_name": "spikes_i",
+              "effect_name": "null",
+              "max_delay": 100,
+              "min_delay": 80
+            },
+            {
+              "effect_name": "major_health_regen_effect",
               "max_delay": 90,
               "min_delay": 80
             }

@@ -182,6 +182,9 @@ bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
   DC.MagicDamage = EffRAC.MagicDamage;
   DC.PhysDamage = EffRAC.PhysDamage;
   DC.CanHurtSource = false;
+  if (auto *FC = Reg.try_get<FactionComp>(Attacker)) {
+    DC.Faction = FC->Faction;
+  }
 
   // Create projectile in the move direction
   auto Diff = TargetPos - AttackerPC->Pos;
@@ -215,10 +218,15 @@ void applyDamageComp(entt::registry &Reg, DamageComp &DC, entt::entity DcEt,
         if (PC.Pos != TPC.Pos && (!TMC || (TPC.Pos + TMC->Dir) != PC.Pos)) {
           return;
         }
-        if (DC.Hits-- == 0) {
+        if (!DC.CanHurtSource && TEt == DC.Source) {
           return;
         }
-        if (!DC.CanHurtSource && TEt == DC.Source) {
+        if (auto *TFC = Reg.try_get<FactionComp>(TEt)) {
+          if (DC.Faction == TFC->Faction) {
+            return;
+          }
+        }
+        if (DC.Hits-- == 0) {
           return;
         }
         auto Damage = applyDamage(Reg, TEt, THC, DC, EHC, DcEt);

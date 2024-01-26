@@ -4,6 +4,7 @@
 #include <entt/entt.hpp>
 #include <rogue/Components/Stats.h>
 #include <ymir/Types.hpp>
+#include <rogue/Components/RaceFaction.h>
 
 namespace rogue {
 
@@ -71,6 +72,9 @@ struct DamageComp {
 
   // If the damage component can hurt the source entity
   bool CanHurtSource = true;
+
+  /// If set the damage component will not affect an entity of the faction
+  std::optional<FactionKind> Faction = std::nullopt;
 
   StatValue total() const { return PhysDamage + MagicDamage; }
 };

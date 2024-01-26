@@ -225,12 +225,13 @@ DiscAreaHitEffect::DiscAreaHitEffect(
     std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
     std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff, Tile EffectTile,
     double DecreasePercent, unsigned MinTicks, unsigned MaxTicks,
-    bool CanHurtSource)
+    bool CanHurtSource, bool CanHurtFaction)
     : Name(std::move(Name)), Radius(Radius), PhysDamage(PhysDamage),
       MagicDamage(MagicDamage), BleedingDebuff(BleedingDebuff),
       PoisonDebuff(PoisonDebuff), BlindedDebuff(BlindedDebuff),
       EffectTile(EffectTile), DecreasePercent(DecreasePercent),
-      MinTicks(MinTicks), MaxTicks(MaxTicks), CanHurtSource(CanHurtSource) {
+      MinTicks(MinTicks), MaxTicks(MaxTicks), CanHurtSource(CanHurtSource),
+      CanHurtFaction(CanHurtFaction) {
   MaxTicks = std::max(MaxTicks, 1U);
   MinTicks = std::min(MinTicks, MaxTicks);
 }
@@ -350,6 +351,9 @@ void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
   DC.CanHurtSource = CanHurtSource;
   DC.PhysDamage = PhysDamage * DecreaseFactor;
   DC.MagicDamage = MagicDamage * DecreaseFactor;
+  if (!CanHurtFaction && Reg.all_of<FactionComp>(SrcEt)) {
+    DC.Faction = Reg.get<FactionComp>(SrcEt).Faction;
+  }
 
   unsigned Ticks = std::rand() % (MaxTicks - MinTicks + 1) + MinTicks;
   auto Et = createTempDamage(Reg, DC, Pos, EffectTile, Ticks);
