@@ -241,7 +241,7 @@ class EntityViewer(BaseWindow):
                 path,
                 partial(
                     LinkedGeneratedEnumEditor,
-                    self.item_db.get_item_effect_names,
+                    self.item_db.get_item_effect_names_and_defaults,
                 ),
             )
 
@@ -298,6 +298,8 @@ class EntityViewer(BaseWindow):
 
     def _handle_item_db_load(self, path: str) -> None:
         self.item_db.load_from(path)
+        if self.current_entity is None:
+            return
         self.entity_editor.set_value(
             self.entity_db.get_entity(self.current_entity),
             trigger_handlers=False,
