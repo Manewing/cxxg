@@ -83,7 +83,10 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   // We could update the level here, but we want to draw the initial state.
   handleUpdates(/*IsTick=*/false);
 
-  UICtrl.setMenuUI(World->getCurrentLevelOrFail());
+  UICtrl.setMenuUI(
+      World->getCurrentLevelOrFail(),
+          [this](const std::filesystem::path &Path) { loadSaveGame(Path); },
+          [this](const std::filesystem::path &Path) { storeSaveGame(Path); });
 
   handleDraw();
 }
@@ -175,7 +178,10 @@ bool Game::handleInput(int Char) {
   }
   case ui::Controls::CloseWindow.Char: {
     if (!UICtrl.isUIActive()) {
-      UICtrl.setMenuUI(World->getCurrentLevelOrFail());
+      UICtrl.setMenuUI(
+          World->getCurrentLevelOrFail(),
+          [this](const std::filesystem::path &Path) { loadSaveGame(Path); },
+          [this](const std::filesystem::path &Path) { storeSaveGame(Path); });
       return true;
     } else if (UICtrl.hasMenuUI()) {
       UICtrl.closeMenuUI();
@@ -342,6 +348,20 @@ bool Game::tryInteract() {
                        World->getCurrentLevelOrFail());
 
   return true;
+}
+
+void Game::loadSaveGame(const std::filesystem::path &SaveGamePath) {
+  UICtrl.closeAll();
+  REC.clear();
+
+  World->loadSaveGame(SaveGamePath);
+
+  // We could update the level here, but we want to draw the initial state.
+  handleUpdates(/*IsTick=*/false);
+}
+
+void Game::storeSaveGame(const std::filesystem::path &SaveGamePath) {
+  World->storeSaveGame(SaveGamePath);
 }
 
 entt::registry &Game::getLvlReg() { return World->getCurrentLevelOrFail().Reg; }

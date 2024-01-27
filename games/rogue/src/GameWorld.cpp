@@ -3,6 +3,7 @@
 #include <rogue/Level.h>
 #include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
+#include <rogue/Serialization.h>
 
 namespace rogue {
 
@@ -50,6 +51,14 @@ void MultiLevelDungeon::switchWorld(unsigned, const std::string &LevelName,
                                     entt::entity) {
   throw std::runtime_error("MultiLevelDungeon: switchWorld not implemented: " +
                            std::string(LevelName));
+}
+
+void MultiLevelDungeon::loadSaveGame(const std::filesystem::path &) {
+  throw std::runtime_error("MultiLevelDungeon: loadSaveGame not implemented");
+}
+
+void MultiLevelDungeon::storeSaveGame(const std::filesystem::path &) {
+  throw std::runtime_error("MultiLevelDungeon: storeSaveGame not implemented");
 }
 
 std::size_t MultiLevelDungeon::getCurrentLevelIdx() const {
@@ -117,6 +126,26 @@ Level &DungeonSweeper::switchLevel(std::size_t LevelIdx, bool ToEntry) {
 
   // We did not switch levels so no need to move player
   return *Lvl;
+}
+
+void DungeonSweeper::loadSaveGame(const std::filesystem::path &SaveGamePath) {
+  CurrSubWorld = nullptr;
+  Lvl = nullptr;
+  switchLevel(0, true);
+
+  auto &CurrLvl = getCurrentLevelOrFail();
+  CurrLvl.createPlayer();
+
+  bool DebugJson = true; // FIXME make this debug a command line option
+  auto SaveGame = serialize::SaveGame::loadFromFile(SaveGamePath, DebugJson);
+  SaveGame.apply(CurrLvl);
+}
+
+void DungeonSweeper::storeSaveGame(const std::filesystem::path &SaveGamePath) {
+  auto &CurrLvl = getCurrentLevelOrFail();
+
+  bool DebugJson = true; // FIXME make this debug a command line option
+  serialize::SaveGame::create(CurrLvl).saveToFile(SaveGamePath, DebugJson);
 }
 
 void DungeonSweeper::switchWorld(unsigned Seed, const std::string &LevelName,

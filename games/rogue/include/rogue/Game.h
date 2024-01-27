@@ -55,6 +55,9 @@ public:
   void movePlayer(ymir::Dir2d Dir);
   bool tryInteract();
 
+  void loadSaveGame(const std::filesystem::path &SaveGamePath);
+  void storeSaveGame(const std::filesystem::path &SaveGamePath);
+
 private:
   entt::registry &getLvlReg();
 

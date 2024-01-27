@@ -58,7 +58,7 @@ void handlePotentialTarget(Level &L, entt::registry &Reg, entt::entity Entity,
               }
               return L.isBodyBlocked(P, /*Hard=*/true);
             },
-            Pos, TPos, LOS->LOSRange, Offset)) {
+            Pos.Pos, TPos.Pos, LOS->LOSRange, Offset)) {
       return;
     }
 

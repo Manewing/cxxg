@@ -111,6 +111,7 @@ ROGUE_REMOVE_BUFF_EFFECT(RemoveManaRegenBuffEffect, ManaRegenBuffComp, true)
 
 class ManaItemEffect : public ItemEffect {
 public:
+  ManaItemEffect() = default;
   explicit ManaItemEffect(StatValue Amount);
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
@@ -120,12 +121,15 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+  template <class Archive> void serialize(Archive &Ar) { Ar(Amount); }
+
 private:
-  StatValue Amount;
+  StatValue Amount = 0;
 };
 
 class SweepingStrikeEffect : public ItemEffect {
 public:
+  SweepingStrikeEffect() = default;
   SweepingStrikeEffect(std::string Name, double DamagePercent, Tile EffectTile);
 
   std::shared_ptr<ItemEffect> clone() const final;
@@ -136,15 +140,20 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(Name, DamagePercent, EffectTile);
+  }
+
 private:
   std::string Name;
-  double DamagePercent;
+  double DamagePercent = 0.0;
   Tile EffectTile;
 };
 
 class SmiteEffect : public ItemEffect {
 public:
   /// Smite effect deals melee damage scaled with the given percent
+  SmiteEffect() = default;
   explicit SmiteEffect(std::string Name, double DamagePercent);
 
   std::shared_ptr<ItemEffect> clone() const final;
@@ -155,13 +164,18 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(Name, DamagePercent);
+  }
+
 private:
   std::string Name;
-  double DamagePercent;
+  double DamagePercent = 0.0;
 };
 
 class DiscAreaHitEffect : public ItemEffect {
 public:
+  DiscAreaHitEffect() = default;
   DiscAreaHitEffect(std::string Name, unsigned Radius, StatValue PhysDamage,
                     StatValue MagicDamage,
                     std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff,
@@ -178,26 +192,32 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(Name, Radius, PhysDamage, MagicDamage, BleedingDebuff, PoisonDebuff,
+       BlindedDebuff, EffectTile, DecreasePercent, MinTicks, MaxTicks,
+       CanHurtSource, CanHurtFaction);
+  }
+
 protected:
   void createDamageEt(entt::registry &Reg, const entt::entity &SrcEt,
                       ymir::Point2d<int> Pos, double DecreaseFactor) const;
 
 private:
   std::string Name;
-  unsigned Radius;
-  StatValue PhysDamage;
-  StatValue MagicDamage;
+  unsigned Radius = 0;
+  StatValue PhysDamage = 0;
+  StatValue MagicDamage = 0;
 
   std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff;
   std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff;
   std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff;
 
   Tile EffectTile;
-  double DecreasePercent;
-  unsigned MinTicks;
-  unsigned MaxTicks;
-  bool CanHurtSource;
-  bool CanHurtFaction;
+  double DecreasePercent = 0;
+  unsigned MinTicks = 0;
+  unsigned MaxTicks = 0;
+  bool CanHurtSource = true;
+  bool CanHurtFaction = true;
 };
 
 // Knowledge
@@ -211,12 +231,15 @@ public:
                   entt::registry &Reg) const final;
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
+
+  template <class Archive> void serialize(Archive &) {}
 };
 
 // TODO create new effect similar to stomp effect creating damage entities
 // in an area, this should allow to add chance on hit effects etc.
 class SpawnEntityEffect : public ItemEffect {
 public:
+  SpawnEntityEffect() = default;
   SpawnEntityEffect(std::string EntityName, double Chance);
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
@@ -226,9 +249,13 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(EntityName, Chance);
+  }
+
 private:
   std::string EntityName;
-  double Chance;
+  double Chance = 0.0;
 };
 
 } // namespace rogue

@@ -38,6 +38,10 @@ struct EffectAttributes {
 
   /// Applies the costs to the entity
   void applyCosts(const entt::entity &Entity, entt::registry &Reg) const;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(Flags, APCost, ManaCost, HealthCost);
+  }
 };
 
 inline bool operator==(const EffectAttributes &LHS,
@@ -60,6 +64,10 @@ struct EffectInfo {
                      entt::registry &Reg, CapabilityFlags Flags) const;
   void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
                   entt::registry &Reg, CapabilityFlags Flags) const;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(Attributes, Effect);
+  }
 };
 
 std::ostream &operator<<(std::ostream &OS, const EffectInfo &Info);

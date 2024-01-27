@@ -265,9 +265,9 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
                const auto ItemName = std::string(ItemJson["name"].GetString());
                const auto ItemId = DB.getItemId(ItemName);
                const auto Amount = ItemJson["amount"].GetUint();
-               Results.push_back({ItemId, Amount});
+               Results.push_back({ItemId, Amount, ItemName});
              }
-             return std::make_shared<DismantleEffect>(DB, std::move(Results));
+             return std::make_shared<DismantleEffect>(std::move(Results));
            }}};
 
   const auto EffectType = std::string(V["type"].GetString());

@@ -100,8 +100,8 @@ void Controller::addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows,
   }
 }
 
-void Controller::setMenuUI(Level &Lvl) {
-  WdwContainer.addWindow<MenuController>(*this, Lvl);
+void Controller::setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb, const SaveGameCbTy &SaveGameCb) {
+  WdwContainer.addWindow<MenuController>(*this, Lvl, LoadGameCb, SaveGameCb);
   WdwContainer.centerSingleWindow();
 }
 

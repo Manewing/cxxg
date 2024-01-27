@@ -181,6 +181,15 @@ private:
   EffectExecutorComp Executer;
 };
 
+class SerializationIdCompAssembler : public EntityAssembler {
+public:
+  explicit SerializationIdCompAssembler(std::size_t Id);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  std::size_t Id;
+};
+
 // Keep sorted
 using AttackAICompAssembler = DefaultConstructEntityAssembler<AttackAIComp>;
 using BlockLOSCompAssembler = DefaultConstructEntityAssembler<BlocksLOS>;

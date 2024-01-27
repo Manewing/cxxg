@@ -45,6 +45,8 @@ struct StatPoints {
   inline auto tie() const { return std::tie(Int, Str, Dex, Vit); }
 
   std::ostream &dump(std::ostream &Out, bool DumpZero) const;
+
+  template <class Archive> void serialize(Archive &Ar) { Ar(Int, Str, Dex, Vit); }
 };
 
 std::ostream &operator<<(std::ostream &Out, const StatPoints &SP);
@@ -78,6 +80,8 @@ struct StatsComp {
   inline void reset() { Bonus = {0, 0, 0, 0}; }
   inline void add(StatPoints Bonus) { this->Bonus += Bonus; }
   inline StatPoints effective() const { return Base + Bonus; }
+
+  template <class Archive> void serialize(Archive &Ar) { Ar(Base, Bonus); }
 };
 
 struct ValueRegenCompBase {

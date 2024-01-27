@@ -2,6 +2,7 @@
 #define ROGUE_UI_CONTROLLER_H
 
 #include <entt/entt.hpp>
+#include <filesystem>
 #include <memory>
 #include <rogue/EventHub.h>
 #include <rogue/UI/TargetUI.h>
@@ -49,6 +50,9 @@ public:
     int MaxHealth;
   };
 
+  using LoadGameCbTy = std::function<void(const std::filesystem::path &)>;
+  using SaveGameCbTy = std::function<void(const std::filesystem::path &)>;
+
 public:
   Controller(cxxg::Screen &Scr);
   void draw(int LevelIdx, const PlayerInfo &PI,
@@ -67,7 +71,7 @@ public:
     return WdwContainer.getWindowOfType<T>();
   }
 
-  void setMenuUI(Level &Lvl);
+  void setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb, const SaveGameCbTy &SaveGameCb);
   bool hasMenuUI() const;
   void closeMenuUI();
 

@@ -68,6 +68,8 @@ public:
 
   std::string str() const;
 
+  template <class Archive> void serialize(Archive &Ar) { Ar(Value); }
+
 private:
   ValueType Value = None;
 };
@@ -141,6 +143,8 @@ public:
 
   const char *str() const;
   std::string flagString() const;
+
+  template <class Archive> void serialize(Archive &Ar) { Ar(Value); }
 
 private:
   ValueType Value = None;

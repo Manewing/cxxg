@@ -6,7 +6,7 @@
 namespace rogue {
 
 Item::Item(const ItemPrototype &Proto, int StackSize,
-           const std::shared_ptr<ItemPrototype> &Spec, bool SpecOverrides)
+           const std::shared_ptr<const ItemPrototype> &Spec, bool SpecOverrides)
     : StackSize(StackSize), Proto(&Proto), Specialization(Spec),
       SpecOverrides(SpecOverrides) {}
 
@@ -204,5 +204,9 @@ void Item::removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
 }
 
 const ItemPrototype &Item::getProto() const { return *Proto; }
+
+const std::shared_ptr<const ItemPrototype> &Item::getSpecialization() const {
+  return Specialization;
+}
 
 } // namespace rogue

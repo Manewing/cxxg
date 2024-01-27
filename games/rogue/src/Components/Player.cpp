@@ -9,6 +9,7 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Components/Serialization.h>
 
 namespace rogue {
 namespace {
@@ -33,6 +34,8 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   // Fixed values
   Reg.emplace<TileComp>(Entity, PlayerTile);
   Reg.emplace<FactionComp>(Entity, FactionKind::Player);
+
+  Reg.emplace<serialize::IdComp>(Entity, serialize::IdComp{9999});
 
   // Copy values
   Reg.emplace<PlayerComp>(Entity, PC);

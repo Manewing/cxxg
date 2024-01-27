@@ -1,6 +1,7 @@
 #ifndef ROGUE_COMPONENTS_BUFFS_H
 #define ROGUE_COMPONENTS_BUFFS_H
 
+#include <cereal/types/base_class.hpp>
 #include <entt/entt.hpp>
 #include <optional>
 #include <rogue/Components/Helpers.h>
@@ -28,6 +29,8 @@ struct AdditiveBuff {
   unsigned SourceCount = 1;
   void add(const AdditiveBuff &Other);
   bool remove(const AdditiveBuff &Other);
+
+  template <class Archive> void serialize(Archive &Ar) { Ar(SourceCount); }
 };
 
 struct TimedBuff {
@@ -43,6 +46,10 @@ struct TimedBuff {
   unsigned totalTicksLeft() const;
 
   bool remove(const TimedBuff &) { return false; }
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(TicksLeft, TickPeriod, TickPeriodsLeft);
+  }
 };
 
 struct DiminishingReturnsValueGenBuff : public TimedBuff {
@@ -59,6 +66,10 @@ public:
   StatValue total() const;
 
   virtual std::string getApplyDesc() const = 0;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<TimedBuff>(this), TickAmount, RealDuration);
+  }
 
 protected:
   std::string getParamApplyDesc(std::string_view Prologue,
@@ -84,6 +95,10 @@ public:
   void add(const StatsBuffComp &Other);
   bool remove(const StatsBuffComp &Other);
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), Bonus);
+  }
+
 public:
   StatPoints Bonus;
 };
@@ -97,6 +112,11 @@ struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
 
   /// Removes an added buff, returns true if component can be removed
   bool remove(const StatsTimedBuffComp &Other);
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<StatsBuffComp>(this),
+       cereal::base_class<TimedBuff>(this));
+  }
 };
 
 // TODO:
@@ -155,6 +175,10 @@ public:
   std::string getDescription() const override;
   void add(const MindVisionBuffComp &Other);
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<TimedBuff>(this), Range);
+  }
+
 public:
   unsigned Range = 100;
 };
@@ -187,6 +211,10 @@ struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
 
   // Magic armor reduces damage by 1/x where x is armor * 0.5
   StatValue getMagicEffectiveDamage(StatValue Damage, StatsComp *DstSC) const;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), PhysArmor, MagicArmor);
+  }
 };
 
 struct BlockBuffComp : public AdditiveBuff, public BuffBase {
@@ -198,6 +226,10 @@ struct BlockBuffComp : public AdditiveBuff, public BuffBase {
 
   void add(const BlockBuffComp &Other);
   bool remove(const BlockBuffComp &Other);
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), BlockChance);
+  }
 };
 
 class BuffApplyHelperBase {
@@ -318,6 +350,10 @@ struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
     }
     Helper::applyTo(Buff, SrcEt, DstEt, Reg);
   }
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), Chance, Buff);
+  }
 };
 
 /// Applies a time based stats buff every time the entity hits sth, only one can
@@ -341,6 +377,10 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
 
   StatsBuffComp *Applied = nullptr;
   std::optional<StatPoint> AppliedStack = std::nullopt;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<TimedBuff>(this), Stacks, MaxStacks, SBC);
+  }
 };
 
 struct LifeStealBuffComp : public AdditiveBuff, public BuffBase {
@@ -354,6 +394,10 @@ struct LifeStealBuffComp : public AdditiveBuff, public BuffBase {
 
   StatValue Percent = 0.0;
   StatValue BonusHP = 0.0;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), Percent, BonusHP);
+  }
 };
 
 // Chance to apply on hit to target

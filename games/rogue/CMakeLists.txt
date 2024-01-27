@@ -8,6 +8,7 @@ set(HEADER_FILES
   include/rogue/Components/Level.h
   include/rogue/Components/Player.h
   include/rogue/Components/RaceFaction.h
+  include/rogue/Components/Serialization.h
   include/rogue/Components/Stats.h
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h
@@ -38,6 +39,7 @@ set(HEADER_FILES
   include/rogue/LevelDatabase.h
   include/rogue/LevelGenerator.h
   include/rogue/LootTable.h
+  include/rogue/Serialization.h
   include/rogue/Parser.h
   include/rogue/RenderEventCollector.h
   include/rogue/Renderer.h
@@ -85,6 +87,7 @@ set(SOURCE_FILES
   src/Components/Buffs.cpp
   src/Components/Combat.cpp
   src/Components/Entity.cpp
+  src/Components/Level.cpp
   src/Components/Player.cpp
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
@@ -115,6 +118,7 @@ set(SOURCE_FILES
   src/LevelDatabase.cpp
   src/LevelGenerator.cpp
   src/LootTable.cpp
+  src/Serialization.cpp
   src/Parser.cpp
   src/RenderEventCollector.cpp
   src/Renderer.cpp
@@ -166,7 +170,7 @@ add_library(
 target_include_directories(lib${TARGET} PUBLIC include)
 
 target_link_libraries(lib${TARGET}
-  cxxg ymir EnTT::EnTT
+  cxxg ymir EnTT::EnTT cereal::cereal
 )
 
 target_include_directories(lib${TARGET}

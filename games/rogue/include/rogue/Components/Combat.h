@@ -43,6 +43,10 @@ struct RangedAttackComp {
 
   /// Returns the effective ranged attack component based on the given stats
   RangedAttackComp getEffective(const StatsComp *SC) const;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(PhysDamage, MagicDamage, APCost, ManaCost);
+  }
 };
 
 struct MeleeAttackComp {
@@ -59,6 +63,10 @@ struct MeleeAttackComp {
 
   /// Returns the effective melee attack component based on the given stats
   MeleeAttackComp getEffective(const StatsComp *SP) const;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(PhysDamage, MagicDamage, APCost, ManaCost);
+  }
 };
 
 struct DamageComp {

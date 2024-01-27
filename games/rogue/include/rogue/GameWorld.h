@@ -32,6 +32,9 @@ public:
   virtual void switchWorld(unsigned Seed, const std::string &LevelName,
                            entt::entity SwitchEt) = 0;
 
+  virtual void loadSaveGame(const std::filesystem::path &SaveGamePath) = 0;
+  virtual void storeSaveGame(const std::filesystem::path &SaveGamePath) = 0;
+
   /// Return the index of the currently active level
   virtual std::size_t getCurrentLevelIdx() const = 0;
 
@@ -58,6 +61,9 @@ public:
   void switchWorld(unsigned Seed, const std::string &LevelName,
                    entt::entity SwitchEt) override;
 
+  void loadSaveGame(const std::filesystem::path &SaveGamePath) override;
+  void storeSaveGame(const std::filesystem::path &SaveGamePath) override;
+
   /// Return the index of the currently active level
   std::size_t getCurrentLevelIdx() const override;
 
@@ -71,12 +77,6 @@ private:
   LevelGenerator &LevelGen;
   std::size_t CurrentLevelIdx = 0;
   std::vector<std::shared_ptr<Level>> Levels;
-};
-
-/// Arena to allow watching NPC vs NPC fights
-class ArenaView : public GameWorld {
-public:
-  // TODO
 };
 
 /// Single map level that allows to switch between multi-level dungeons
@@ -98,6 +98,9 @@ public:
   // FIXME
   void switchWorld(unsigned Seed, const std::string &LevelName,
                    entt::entity SwitchEt) override;
+
+  void loadSaveGame(const std::filesystem::path &SaveGamePath) override;
+  void storeSaveGame(const std::filesystem::path &SaveGamePath) override;
 
   // FIXME
   /// Return the index of the currently active level
@@ -122,12 +125,6 @@ private:
   std::size_t CurrMaxLevel = 0;
   entt::entity CurrSwitchEntity = entt::null;
   int SwitchedWorldCount = 0;
-};
-
-/// A chunk based procedurally generated infinite world
-class OverWorld : public GameWorld {
-public:
-  // TODO
 };
 
 } // namespace rogue

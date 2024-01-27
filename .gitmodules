@@ -10,3 +10,6 @@
 [submodule "third-party/ymir"]
 	path = third-party/ymir
 	url = https://github.com/Manewing/ymir.git
+[submodule "third-party/cereal"]
+	path = third-party/cereal
+	url = https://github.com/USCiLab/cereal.git

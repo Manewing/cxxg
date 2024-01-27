@@ -206,6 +206,17 @@
                 }
               ]
             },
+            "serialization_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/serialization_id"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
             "effect_executor": {
               "anyOf": [
                 {
@@ -364,6 +375,18 @@
           "ticks": {
             "type": "integer",
             "description": "Number of ticks before the entity is destroyed, default -1 (never)"
+          }
+        },
+        "additionalProperties": false
+      },
+      "serialization_id": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id to use for serialization",
+            "minimum": 0
           }
         },
         "additionalProperties": false

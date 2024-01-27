@@ -209,6 +209,13 @@ makeSpawnEntityPostInteraction(ItemDatabase &, const rapidjson::Value &Json) {
                                                                Chance, Uses);
 }
 
+std::shared_ptr<SerializationIdCompAssembler>
+makeSerializationIdCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  std::size_t Id = JsonObj["id"].GetUint64();
+  return std::make_shared<SerializationIdCompAssembler>(Id);
+}
+
 std::shared_ptr<EffectExecutorCompAssembler>
 makeEffectExecutorCompAssembler(ItemDatabase &ItemDb, const rapidjson::Value &Json) {
   const auto &JsonObj = Json.GetObject();
@@ -267,6 +274,7 @@ const auto &getEntityAssemblerFactories() {
       {"world_entry", makeWorldEntryAssembler},
       {"level_entry_exit", makeLevelEntryExitAssembler},
       {"spawn_entity_post_interaction", makeSpawnEntityPostInteraction},
+      {"serialization_id", makeSerializationIdCompAssembler},
       {"effect_executor", makeEffectExecutorCompAssembler},
       {"loot_interact", makeLootInteractCompAssembler}};
   return Factories;

@@ -1,5 +1,6 @@
 #include <array>
 #include <cxxg/Screen.h>
+#include <rogue/Level.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
@@ -15,13 +16,15 @@ struct MenuItemInfo {
   const char *Text = "<unimp. text>";
   bool Debug = false;
 };
-static constexpr std::array<MenuItemInfo, 6> MenuItemInfos = {{
+static constexpr std::array<MenuItemInfo, 8> MenuItemInfos = {{
     {{(DefaultSize.X - 6) / 2, 2}, "Resume", false},
     {{(DefaultSize.X - 8) / 2, 4}, "Controls", false},
     {{(DefaultSize.X - 4) / 2, 6}, "Help", false},
     {{(DefaultSize.X - 11) / 2, 8}, "Help Combat", false},
     {{(DefaultSize.X - 13) / 2, 10}, "Help Crafting", false},
-    {{(DefaultSize.X - 12) / 2, 12}, "Command Line", true},
+    {{(DefaultSize.X - 9) / 2, 12}, "Save Game", false},
+    {{(DefaultSize.X - 9) / 2, 14}, "Load Game", false},
+    {{(DefaultSize.X - 12) / 2, 16}, "Command Line", true},
 }};
 
 static constexpr std::array<const rogue::ui::KeyOption *, 6> GameCtrlInfos = {
@@ -134,8 +137,11 @@ std::shared_ptr<Widget> makeHelpCraftingWindow() {
 
 } // namespace
 
-MenuController::MenuController(Controller &C, Level &L)
-    : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Ctrl(C), Lvl(L) {
+MenuController::MenuController(Controller &C, Level &L, LoadGameCbTy Ld, SaveGameCbTy Sv)
+    : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Ctrl(C), Lvl(L),
+      LoadGameCb(std::move(Ld)),
+      SaveGameCb(std::move(Sv))
+      {
   MenuItSel = std::make_shared<ItemSelect>(Pos);
 
   const bool Debug = getenv("ROGUE_DEBUG") != nullptr;
@@ -176,6 +182,10 @@ MenuController::MenuController(Controller &C, Level &L)
     } else if (S.getValue() == "Help Crafting") {
       Ctrl.addWindow(makeHelpCraftingWindow(), false, true);
       Ctrl.closeMenuUI();
+    } else if (S.getValue() == "Load Game") {
+      LoadGameCb("todo");
+    } else if (S.getValue() == "Save Game") {
+      SaveGameCb("todo");
     } else if (S.getValue() == "Command Line") {
       Ctrl.setCommandLineUI(Lvl);
     }

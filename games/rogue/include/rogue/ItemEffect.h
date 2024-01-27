@@ -91,10 +91,13 @@ public:
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
   std::string getDescription() const final;
+
+  template <class Archive> void serialize(Archive &) {}
 };
 
 class HealItemEffect : public ItemEffect {
 public:
+  HealItemEffect() = default;
   explicit HealItemEffect(StatValue Amount);
   StatValue getAmount() const { return Amount; }
 
@@ -111,12 +114,15 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+  template <class Archive> void serialize(Archive &Ar) { Ar(Amount); }
+
 private:
-  StatValue Amount;
+  StatValue Amount = 0;
 };
 
 class DamageItemEffect : public ItemEffect {
 public:
+  DamageItemEffect() = default;
   explicit DamageItemEffect(StatValue Amount);
   StatValue getAmount() const { return Amount; }
 
@@ -131,8 +137,10 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+  template <class Archive> void serialize(Archive &Ar) { Ar(Amount); }
+
 private:
-  StatValue Amount;
+  StatValue Amount = 0;
 };
 
 class DismantleEffect : public ItemEffect {
@@ -140,11 +148,14 @@ public:
   struct DismantleResult {
     int ItemId = -1;
     unsigned Amount = 0;
+    std::string Name;
+
+    template <class Archive> void serialize(Archive &Ar) { Ar(ItemId, Amount, Name); }
   };
 
 public:
-  explicit DismantleEffect(const ItemDatabase &ItemDb,
-                           std::vector<DismantleResult> Results);
+  DismantleEffect() = default;
+  explicit DismantleEffect(                           std::vector<DismantleResult> Results);
 
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
@@ -157,8 +168,9 @@ public:
   void applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                entt::registry &Reg) const final;
 
+  template <class Archive> void serialize(Archive &Ar) { Ar(Results); }
+
 private:
-  const ItemDatabase &ItemDb;
   std::vector<DismantleResult> Results;
 };
 
@@ -226,6 +238,8 @@ public:
     }
   }
 
+  template <class Archive> void serialize(Archive &Ar) { Ar(Comp); }
+
 protected:
   CompType Comp;
 };
@@ -244,6 +258,7 @@ public:
   using Helper = BuffApplyHelper<BuffType, IsCombat, RequiredComps...>;
 
 public:
+  ApplyBuffItemEffect() = default;
   explicit ApplyBuffItemEffect(const BuffType &Buff) : Buff(Buff) {}
 
   const BuffBase &getBuff() const final { return Buff; }
@@ -284,6 +299,8 @@ public:
     Buff.add(OtherPtr->Buff);
   }
 
+  template <class Archive> void serialize(Archive &Ar) { Ar(Buff); }
+
 private:
   BuffType Buff;
 };
@@ -309,6 +326,8 @@ public:
   bool removesEffect(const ItemEffect &Other) const final {
     return dynamic_cast<const ItemEffectType *>(&Other) != nullptr;
   }
+
+  template <class Archive> void serialize(Archive &) {}
 };
 
 template <typename CompType, bool IsCombat, typename... RequiredComps>
@@ -354,6 +373,8 @@ public:
       markCombat(SrcEt, DstEt, Reg);
     }
   }
+
+  template <class Archive> void serialize(Archive &) {}
 };
 
 } // namespace rogue
