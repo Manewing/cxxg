@@ -270,6 +270,15 @@
     },
     {
       "assemblers": {
+        "effect_executor": {
+          "effects": [
+            {
+              "effect_name": "spawn_hatchling",
+              "max_delay": 60,
+              "min_delay": 40
+            }
+          ]
+        },
         "inventory": {
           "loot_table": "rare_silk_cocoon"
         },

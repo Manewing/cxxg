@@ -366,6 +366,11 @@
       "name": "Smite I",
       "type": "smite_effect"
     },
+    "spawn_hatchling": {
+      "chance": 100.0,
+      "entity_name": "arachnoth_hatchling",
+      "type": "spawn_entity_effect"
+    },
     "spawn_sewer_rat": {
       "chance": 100.0,
       "entity_name": "sewer_rat",
@@ -390,8 +395,8 @@
         "z_index": -2
       },
       "magic_damage": 0.0,
-      "max_ticks": 40,
-      "min_ticks": 8,
+      "max_ticks": 80,
+      "min_ticks": 40,
       "name": "Spikes I",
       "phys_damage": 2.0,
       "radius": 4,
@@ -431,7 +436,7 @@
       "type": "stats_buff_per_hit_comp"
     },
     "sweeping_strike_i": {
-      "damage_percent": 50.0,
+      "damage_percent": 70.0,
       "effect_tile": {
         "char": "*",
         "color": "#aaaaaa"
@@ -700,7 +705,9 @@
           "type": "equipment"
         },
         {
+          "ap_cost": 12,
           "effect": "null",
+          "mana_cost": 10.0,
           "type": "skill"
         }
       ],
@@ -875,7 +882,7 @@
         {
           "ap_cost": 12,
           "effect": "sweeping_strike_i",
-          "mana_cost": 20,
+          "mana_cost": 10.0,
           "type": "skill"
         }
       ],

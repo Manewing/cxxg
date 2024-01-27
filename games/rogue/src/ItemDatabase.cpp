@@ -368,13 +368,13 @@ static EffectAttributes createEffectAttrs(const rapidjson::Value &V) {
   EffectAttributes Attrs;
   Attrs.Flags = CapabilityFlags::fromString(V["type"].GetString());
   if (V.HasMember("ap_cost")) {
-    Attrs.APCost = V["ap_cost"].GetUint();
+    Attrs.APCost = V["ap_cost"].GetDouble();
   }
   if (V.HasMember("mana_cost")) {
-    Attrs.ManaCost = V["mana_cost"].GetUint();
+    Attrs.ManaCost = V["mana_cost"].GetDouble();
   }
   if (V.HasMember("health_cost")) {
-    Attrs.HealthCost = V["health_cost"].GetUint();
+    Attrs.HealthCost = V["health_cost"].GetDouble();
   }
   return Attrs;
 }
