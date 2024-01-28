@@ -1,7 +1,7 @@
 #ifndef ROGUE_COMPONENTS_SERIALIZATION_H
 #define ROGUE_COMPONENTS_SERIALIZATION_H
 
-#include <cstdint>
+#include <string>
 
 namespace rogue::serialize {
 
