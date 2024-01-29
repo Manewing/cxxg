@@ -13,6 +13,7 @@
 #include <rogue/UI/Menu.h>
 #include <rogue/UI/Stats.h>
 #include <rogue/UI/TargetUI.h>
+#include <rogue/UI/Tooltip.h>
 
 // FIXME get rid of dep
 #include <rogue/Components/Items.h>
@@ -100,7 +101,8 @@ void Controller::addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows,
   }
 }
 
-void Controller::setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb, const SaveGameCbTy &SaveGameCb) {
+void Controller::setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb,
+                           const SaveGameCbTy &SaveGameCb) {
   WdwContainer.addWindow<MenuController>(*this, Lvl, LoadGameCb, SaveGameCb);
   WdwContainer.centerSingleWindow();
 }
@@ -111,6 +113,17 @@ bool Controller::hasMenuUI() const {
 
 void Controller::closeMenuUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<MenuController>());
+}
+
+void Controller::tooltip(std::string Text, std::string Header) {
+  auto TooltipSize = cxxg::types::Size{30, 7};
+  if (TooltipSize.X > Text.size() + 6) {
+    TooltipSize.X = Text.size() + 6;
+    TooltipSize.Y = 4;
+  }
+  auto &Wdw = WdwContainer.addWindow<Tooltip>(cxxg::types::Position{0, 2},
+                                              TooltipSize, Text, Header);
+  WdwContainer.centerWindow(Wdw);
 }
 
 void Controller::setCommandLineUI(Level &Lvl) {

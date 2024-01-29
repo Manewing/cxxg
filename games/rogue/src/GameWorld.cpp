@@ -53,11 +53,11 @@ void MultiLevelDungeon::switchWorld(unsigned, const std::string &LevelName,
                            std::string(LevelName));
 }
 
-void MultiLevelDungeon::loadSaveGame(const std::filesystem::path &) {
+void MultiLevelDungeon::loadSaveGame(const SaveGameInfo &) {
   throw std::runtime_error("MultiLevelDungeon: loadSaveGame not implemented");
 }
 
-void MultiLevelDungeon::storeSaveGame(const std::filesystem::path &) {
+void MultiLevelDungeon::storeSaveGame(const SaveGameInfo &) {
   throw std::runtime_error("MultiLevelDungeon: storeSaveGame not implemented");
 }
 
@@ -128,7 +128,7 @@ Level &DungeonSweeper::switchLevel(std::size_t LevelIdx, bool ToEntry) {
   return *Lvl;
 }
 
-void DungeonSweeper::loadSaveGame(const std::filesystem::path &SaveGamePath) {
+void DungeonSweeper::loadSaveGame(const SaveGameInfo &SGI) {
   CurrSubWorld = nullptr;
   Lvl = nullptr;
   switchLevel(0, true);
@@ -136,16 +136,14 @@ void DungeonSweeper::loadSaveGame(const std::filesystem::path &SaveGamePath) {
   auto &CurrLvl = getCurrentLevelOrFail();
   CurrLvl.createPlayer();
 
-  bool DebugJson = true; // FIXME make this debug a command line option
-  auto SaveGame = serialize::SaveGame::loadFromFile(SaveGamePath, DebugJson);
+  auto SaveGame = serialize::SaveGameSerializer::loadFromFile(SGI);
   SaveGame.apply(CurrLvl);
 }
 
-void DungeonSweeper::storeSaveGame(const std::filesystem::path &SaveGamePath) {
+void DungeonSweeper::storeSaveGame(const SaveGameInfo &SGI) {
   auto &CurrLvl = getCurrentLevelOrFail();
 
-  bool DebugJson = true; // FIXME make this debug a command line option
-  serialize::SaveGame::create(CurrLvl).saveToFile(SaveGamePath, DebugJson);
+  serialize::SaveGameSerializer::create(CurrLvl).saveToFile(SGI);
 }
 
 void DungeonSweeper::switchWorld(unsigned Seed, const std::string &LevelName,

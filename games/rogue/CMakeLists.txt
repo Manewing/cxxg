@@ -39,6 +39,7 @@ set(HEADER_FILES
   include/rogue/LevelDatabase.h
   include/rogue/LevelGenerator.h
   include/rogue/LootTable.h
+  include/rogue/SaveGame.h
   include/rogue/Serialization.h
   include/rogue/Parser.h
   include/rogue/RenderEventCollector.h
@@ -118,6 +119,7 @@ set(SOURCE_FILES
   src/LevelDatabase.cpp
   src/LevelGenerator.cpp
   src/LootTable.cpp
+  src/SaveGame.cpp
   src/Serialization.cpp
   src/Parser.cpp
   src/RenderEventCollector.cpp

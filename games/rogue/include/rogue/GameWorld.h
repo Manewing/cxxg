@@ -12,6 +12,7 @@ class Level;
 struct Interaction;
 class LevelGenerator;
 class LevelDatabase;
+struct SaveGameInfo;
 } // namespace rogue
 
 namespace rogue {
@@ -32,8 +33,8 @@ public:
   virtual void switchWorld(unsigned Seed, const std::string &LevelName,
                            entt::entity SwitchEt) = 0;
 
-  virtual void loadSaveGame(const std::filesystem::path &SaveGamePath) = 0;
-  virtual void storeSaveGame(const std::filesystem::path &SaveGamePath) = 0;
+  virtual void loadSaveGame(const SaveGameInfo &SGI) = 0;
+  virtual void storeSaveGame(const SaveGameInfo &SGI) = 0;
 
   /// Return the index of the currently active level
   virtual std::size_t getCurrentLevelIdx() const = 0;
@@ -61,8 +62,8 @@ public:
   void switchWorld(unsigned Seed, const std::string &LevelName,
                    entt::entity SwitchEt) override;
 
-  void loadSaveGame(const std::filesystem::path &SaveGamePath) override;
-  void storeSaveGame(const std::filesystem::path &SaveGamePath) override;
+  void loadSaveGame(const SaveGameInfo &SGI) override;
+  void storeSaveGame(const SaveGameInfo &SGI) override;
 
   /// Return the index of the currently active level
   std::size_t getCurrentLevelIdx() const override;
@@ -99,8 +100,8 @@ public:
   void switchWorld(unsigned Seed, const std::string &LevelName,
                    entt::entity SwitchEt) override;
 
-  void loadSaveGame(const std::filesystem::path &SaveGamePath) override;
-  void storeSaveGame(const std::filesystem::path &SaveGamePath) override;
+  void loadSaveGame(const SaveGameInfo &SGI) override;
+  void storeSaveGame(const SaveGameInfo &SGI) override;
 
   // FIXME
   /// Return the index of the currently active level

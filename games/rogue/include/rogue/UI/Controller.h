@@ -23,6 +23,7 @@ struct StatsComp;
 class Level;
 class CraftingDatabase;
 class CraftingHandler;
+struct SaveGameInfo;
 } // namespace rogue
 
 namespace rogue::ui {
@@ -50,8 +51,8 @@ public:
     int MaxHealth;
   };
 
-  using LoadGameCbTy = std::function<void(const std::filesystem::path &)>;
-  using SaveGameCbTy = std::function<void(const std::filesystem::path &)>;
+  using LoadGameCbTy = std::function<void(const SaveGameInfo &)>;
+  using SaveGameCbTy = std::function<void(const SaveGameInfo &)>;
 
 public:
   Controller(cxxg::Screen &Scr);
@@ -74,6 +75,8 @@ public:
   void setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb, const SaveGameCbTy &SaveGameCb);
   bool hasMenuUI() const;
   void closeMenuUI();
+
+  void tooltip(std::string Text, std::string Header = "");
 
   void setCommandLineUI(Level &Lvl);
   bool hasCommandLineUI() const;

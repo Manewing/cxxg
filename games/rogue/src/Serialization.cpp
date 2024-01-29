@@ -3,8 +3,8 @@
 #include <cereal/types/map.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/optional.hpp>
-#include <cereal/types/string.hpp>
 #include <cereal/types/set.hpp>
+#include <cereal/types/string.hpp>
 #include <cereal/types/variant.hpp>
 #include <cereal/types/vector.hpp>
 #include <fstream>
@@ -105,23 +105,16 @@ void EquipmentInfo::applyTo(const ItemDatabase &ItemDb, EquipmentComp &EC,
   }
 }
 
-SaveGame SaveGame::loadFromFile(const std::filesystem::path &SaveGamePath,
-                                bool JSON) {
-  auto Path = SaveGamePath;
-  if (JSON && Path.extension() != JsonExt) {
-    Path.replace_extension(JsonExt);
-  } else if (!JSON && Path.extension() != BinExt) {
-    Path.replace_extension(BinExt);
-  }
-
-  std::ifstream InFile(Path);
+SaveGameSerializer SaveGameSerializer::loadFromFile(const SaveGameInfo &SGI) {
+  std::ifstream InFile(SGI.Path);
   if (!InFile) {
-    throw std::runtime_error("SaveGame: Failed to open file: " + Path.string());
+    throw std::runtime_error("SaveGame: Failed to open file: " +
+                             SGI.Path.string());
   }
 
-  SaveGame SaveGame;
+  SaveGameSerializer SaveGame;
 
-  if (JSON) {
+  if (SGI.JSON) {
     cereal::JSONInputArchive Ar(InFile);
     Ar(SaveGame);
   } else {
@@ -132,8 +125,8 @@ SaveGame SaveGame::loadFromFile(const std::filesystem::path &SaveGamePath,
   return SaveGame;
 }
 
-SaveGame SaveGame::create(Level &Lvl) {
-  SaveGame SaveGame;
+SaveGameSerializer SaveGameSerializer::create(Level &Lvl) {
+  SaveGameSerializer SaveGame;
   Lvl.Reg.view<const IdComp, const DoorComp>().each(
       [&SaveGame](const auto &IdC, const auto &DC) {
         SaveGame.Doors[IdC.Id] = DC;
@@ -157,7 +150,7 @@ SaveGame SaveGame::create(Level &Lvl) {
   return SaveGame;
 }
 
-void SaveGame::apply(Level &Lvl) {
+void SaveGameSerializer::apply(Level &Lvl) {
   auto &ItemDb = Lvl.Reg.ctx().get<GameContext>().ItemDb;
 
   Lvl.Reg.view<const IdComp, DoorComp>().each(
@@ -196,32 +189,24 @@ void SaveGame::apply(Level &Lvl) {
         It->second.applyTo(ItemDb, IC);
       });
 
-  Lvl.Reg.view<const IdComp, PlayerComp>().each(
-      [this](auto &IdC, auto &PC) {
-        auto It = PlayerInfos.find(IdC.Id);
-        if (It == PlayerInfos.end()) {
-          throw std::runtime_error("SaveGame: Player not found: Id=" +
-                                   std::to_string(IdC.Id));
-        }
-        PC.KnownRecipes = It->second.KnownRecipes;
-      });
+  Lvl.Reg.view<const IdComp, PlayerComp>().each([this](auto &IdC, auto &PC) {
+    auto It = PlayerInfos.find(IdC.Id);
+    if (It == PlayerInfos.end()) {
+      throw std::runtime_error("SaveGame: Player not found: Id=" +
+                               std::to_string(IdC.Id));
+    }
+    PC.KnownRecipes = It->second.KnownRecipes;
+  });
 }
 
-void SaveGame::saveToFile(const std::filesystem::path &SaveGamePath,
-                          bool JSON) const {
-  auto Path = SaveGamePath;
-  if (JSON && Path.extension() != JsonExt) {
-    Path.replace_extension(JsonExt);
-  } else if (!JSON && Path.extension() != BinExt) {
-    Path.replace_extension(BinExt);
-  }
-
-  std::ofstream OutFile(Path);
+void SaveGameSerializer::saveToFile(const SaveGameInfo &SGI) const {
+  std::ofstream OutFile(SGI.Path);
   if (!OutFile) {
-    throw std::runtime_error("SaveGame: Failed to open file: " + Path.string());
+    throw std::runtime_error("SaveGame: Failed to open file: " +
+                             SGI.Path.string());
   }
 
-  if (JSON) {
+  if (SGI.JSON) {
     cereal::JSONOutputArchive Ar(OutFile);
     Ar(*this);
   } else {

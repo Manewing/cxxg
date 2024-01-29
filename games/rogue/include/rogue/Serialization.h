@@ -6,6 +6,7 @@
 #include <rogue/Components/Items.h>
 #include <rogue/Components/Level.h>
 #include <rogue/Components/Player.h>
+#include <rogue/SaveGame.h>
 
 namespace rogue {
 class Level;
@@ -53,20 +54,15 @@ struct PlayerInfo {
   template <class Archive> void serialize(Archive &Ar) { Ar(KnownRecipes); }
 };
 
-class SaveGame {
+class SaveGameSerializer {
 public:
-  static constexpr const char *JsonExt = ".sg.rogue.json";
-  static constexpr const char *BinExt = ".sg.rogue.bin";
+  static SaveGameSerializer loadFromFile(const SaveGameInfo &SGI);
 
-public:
-  static SaveGame loadFromFile(const std::filesystem::path &SaveGamePath,
-                               bool JSON = false);
-  static SaveGame create(Level &Lvl);
+  static SaveGameSerializer create(Level &Lvl);
 
 public:
   void apply(Level &Lvl);
-  void saveToFile(const std::filesystem::path &SaveGamePath,
-                  bool JSON = false) const;
+  void saveToFile(const SaveGameInfo &SGI) const;
 
   template <class Archive> void load(Archive &Ar) {
     Ar(Doors, EquipmentInfos, InventoryInfos, PlayerInfos);
