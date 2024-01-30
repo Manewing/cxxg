@@ -26,7 +26,6 @@ SaveGameInfo SaveGameInfo::fromPath(const std::filesystem::path &Path,
 }
 
 SaveGameInfo SaveGameInfo::fromSlot(unsigned Slot, bool JSON) {
-  SaveGameInfo SGI;
   return fromPath(getSaveGamePath("slot_" + std::to_string(Slot), JSON), JSON);
 }
 

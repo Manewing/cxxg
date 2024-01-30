@@ -29,6 +29,9 @@ public:
   /// Path to the save game
   std::filesystem::path Path;
 
+  /// Name of the save game
+  std::string Name;
+
   /// True if the save game is a JSON file
   bool JSON = false;
 

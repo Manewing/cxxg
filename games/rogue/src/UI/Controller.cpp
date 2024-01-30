@@ -115,10 +115,27 @@ void Controller::closeMenuUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<MenuController>());
 }
 
-void Controller::tooltip(std::string Text, std::string Header) {
+void Controller::tooltip(std::string Text, std::string Header,
+                         bool CloseOtherWindows) {
+  if (CloseOtherWindows) {
+    closeAll();
+  }
   const auto TooltipSize = cxxg::types::Size{40, 7};
   auto &Wdw = WdwContainer.addWindow<Tooltip>(cxxg::types::Position{0, 2},
                                               TooltipSize, Text, Header);
+  WdwContainer.centerWindow(Wdw);
+}
+
+void Controller::createYesNoDialog(std::string Text,
+                                   const std::function<void(bool)> &Cb,
+                                   bool CloseOtherWindows) {
+  if (CloseOtherWindows) {
+    closeAll();
+  }
+
+  const auto DialogSize = cxxg::types::Size{40, 7};
+  auto &Wdw = WdwContainer.addWindow<YesNoDialog>(
+      cxxg::types::Position{0, 2}, DialogSize, Text, Cb);
   WdwContainer.centerWindow(Wdw);
 }
 

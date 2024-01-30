@@ -72,11 +72,16 @@ public:
     return WdwContainer.getWindowOfType<T>();
   }
 
-  void setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb, const SaveGameCbTy &SaveGameCb);
+  void setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb,
+                 const SaveGameCbTy &SaveGameCb);
   bool hasMenuUI() const;
   void closeMenuUI();
 
-  void tooltip(std::string Text, std::string Header = "");
+  void tooltip(std::string Text, std::string Header = "",
+               bool CloseOtherWindows = false);
+
+  void createYesNoDialog(std::string Text, const std::function<void(bool)> &Cb,
+                         bool CloseOtherWindows = false);
 
   void setCommandLineUI(Level &Lvl);
   bool hasCommandLineUI() const;

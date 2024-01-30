@@ -152,6 +152,7 @@ std::shared_ptr<Widget> makeSlotsWindow(
     SlotStr[5] = '1' + SlotIdx;
 
     auto SGI = SaveGameInfo::fromSlot(SlotIdx, StoreAsJSON);
+    SGI.Name = SlotStr;
     SgMap[SlotStr] = SGI;
 
     std::string Label = "Empty";
@@ -179,6 +180,22 @@ std::shared_ptr<Widget> makeSlotsWindow(
   return Wdw;
 }
 
+void handleLoadGame(Controller &Ctrl, const SaveGameInfo &SGI,
+                    const MenuController::LoadGameCbTy &LoadGameCb) {
+  try {
+    LoadGameCb(SGI);
+    // This kills all other UI including this one, so we can't do anything
+    // after
+    Ctrl.tooltip("Loaded game", "Info", /*CloseOtherWindows=*/true);
+  } catch (const std::exception &E) {
+    // This kills all other UI including this one, so we can't do anything
+    // after
+    Ctrl.tooltip("Failed to load game from " + SGI.Path.string() + ":\n" +
+                     E.what(),
+                 "Error", /*CloseOtherWindows=*/true);
+  }
+}
+
 std::shared_ptr<Widget>
 makeLoadSlotWindow(Controller &Ctrl, MenuController::LoadGameCbTy LoadGameCb,
                    bool StoreAsJSON) {
@@ -187,15 +204,34 @@ makeLoadSlotWindow(Controller &Ctrl, MenuController::LoadGameCbTy LoadGameCb,
         if (!SGI.exists()) {
           return;
         }
-        try {
-          LoadGameCb(SGI);
-          Ctrl.tooltip("Loaded game", "Info");
-        } catch (const std::exception &E) {
-          Ctrl.tooltip("Failed to load game from " + SGI.Path.string() + ":\n" +
-                           E.what(),
-                       "Error");
-        }
+        std::stringstream SS;
+        SS << "Load game from " << SGI.Name
+           << "? This will overwrite the current game.\n\n"
+           << "Save Game Info:\n"
+           << SGI.getDateStr() << "\n"
+           << SGI.Path.string();
+        Ctrl.createYesNoDialog(SS.str(), [LoadGameCb, &Ctrl, SGI](bool Yes) {
+          if (Yes) {
+            handleLoadGame(Ctrl, SGI, LoadGameCb);
+          }
+        });
       });
+}
+
+void handleSaveGame(Controller &Ctrl, const SaveGameInfo &SGI,
+                    const MenuController::SaveGameCbTy &SaveGameCb) {
+  try {
+    SaveGameCb(SGI);
+    // This kills all other UI including this one, so we can't do anything
+    // after
+    Ctrl.tooltip("Saved game", "Info", /*CloseOtherWindows=*/true);
+  } catch (const std::exception &E) {
+    // This kills all other UI including this one, so we can't do anything
+    // after
+    Ctrl.tooltip("Failed to save game to" + SGI.Path.string() + ":\n" +
+                     E.what(),
+                 "Error", /*CloseOtherWindows=*/true);
+  }
 }
 
 std::shared_ptr<Widget>
@@ -203,14 +239,21 @@ makeSaveSlotWindow(Controller &Ctrl, MenuController::SaveGameCbTy SaveGameCb,
                    bool StoreAsJSON) {
   return makeSlotsWindow(
       "Save Game", StoreAsJSON, [SaveGameCb, &Ctrl](const auto SGI) mutable {
-        try {
-          SaveGameCb(SGI);
-          Ctrl.tooltip("Saved game", "Info");
-        } catch (const std::exception &E) {
-          Ctrl.tooltip("Failed to save game to" + SGI.Path.string() + ":\n" +
-                           E.what(),
-                       "Error");
+        std::stringstream SS;
+        SS << "Save game to " << SGI.Name << "?";
+        if (SGI.exists()) {
+          SS << " This will overwrite the existing save game.";
         }
+        SS << "\n\nSave Game Info:\n";
+        if (SGI.exists()) {
+          SS << SGI.getDateStr() << "\n";
+        }
+        SS << SGI.Path.string();
+        Ctrl.createYesNoDialog(SS.str(), [SaveGameCb, &Ctrl, SGI](bool Yes) {
+          if (Yes) {
+            handleSaveGame(Ctrl, SGI, SaveGameCb);
+          }
+        });
       });
 }
 
