@@ -15,14 +15,23 @@ TEST(WordWrapTest, SingleWord) {
   rogue::ui::WordWrap WW("Hello", 10);
   EXPECT_EQ(WW.getNumLines(), 1);
   EXPECT_EQ(WW.getLineWidth(), 10);
-  EXPECT_EQ(WW.getLine(0), "Hello ");
+  EXPECT_EQ(WW.getLine(0), "Hello");
+}
+
+TEST(WordWrapTest, SingleWordExactlyMatchingLineWidth) {
+  std::string Text = "123456789";
+  rogue::ui::WordWrap WW(Text, Text.size());
+  // FIXME this should be a single line
+  EXPECT_EQ(WW.getNumLines(), 2);
+  EXPECT_EQ(WW.getLine(0), "");
+  EXPECT_EQ(WW.getLine(1), "123456789");
 }
 
 TEST(WordWrapTest, SingleReallyLongWord) {
   rogue::ui::WordWrap WW("Hellooooooooooooooooooooooooooooo", 10);
   EXPECT_EQ(WW.getNumLines(), 2);
   EXPECT_EQ(WW.getLine(0), "");
-  EXPECT_EQ(WW.getLine(1), "Hellooooooooooooooooooooooooooooo ");
+  EXPECT_EQ(WW.getLine(1), "Hellooooooooooooooooooooooooooooo");
 }
 
 TEST(WordWrapTest, MultipleWords) {
@@ -30,7 +39,7 @@ TEST(WordWrapTest, MultipleWords) {
   EXPECT_EQ(WW.getNumLines(), 3);
   EXPECT_EQ(WW.getLine(0), "Hello to ");
   EXPECT_EQ(WW.getLine(1), "this ");
-  EXPECT_EQ(WW.getLine(2), "World ");
+  EXPECT_EQ(WW.getLine(2), "World");
 }
 
 TEST(WordWrapTest, MultipleWordsOneReallyLong) {
@@ -40,7 +49,7 @@ TEST(WordWrapTest, MultipleWordsOneReallyLong) {
   EXPECT_EQ(WW.getLine(0), "Hello ");
   EXPECT_EQ(WW.getLine(1), "toooooooooooooooooooooooooooooooo ");
   EXPECT_EQ(WW.getLine(2), "this ");
-  EXPECT_EQ(WW.getLine(3), "World ");
+  EXPECT_EQ(WW.getLine(3), "World");
 }
 
 TEST(WordWrapTest, MultipleWordsWithNewLine) {
@@ -48,7 +57,7 @@ TEST(WordWrapTest, MultipleWordsWithNewLine) {
   EXPECT_EQ(WW.getNumLines(), 3);
   EXPECT_EQ(WW.getLine(0), "Hello ");
   EXPECT_EQ(WW.getLine(1), "to this ");
-  EXPECT_EQ(WW.getLine(2), "World ");
+  EXPECT_EQ(WW.getLine(2), "World");
 }
 
 TEST(WordWrapTest, NewLineExactlyAtEndOfLine) {
@@ -72,7 +81,7 @@ TEST(WordWrapTest, NewLineBeforeEndOfLine) {
   EXPECT_EQ(WW.getNumLines(), 3);
   EXPECT_EQ(WW.getLine(0), " ");
   EXPECT_EQ(WW.getLine(1), "");
-  EXPECT_EQ(WW.getLine(2), "0123456789 ");
+  EXPECT_EQ(WW.getLine(2), "0123456789");
 }
 
 } // namespace

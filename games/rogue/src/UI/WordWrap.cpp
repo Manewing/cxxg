@@ -51,9 +51,14 @@ WordWrap::WordWrap(const std::string &Text, std::size_t LineWidth)
     CurrentLineSize = 0;
   }
 
+  // Create an interval for the last line, if the last line is empty, add a
+  // whitespace so we do not have an empty string
   CurrentLineSize += CurrentWordSize;
-  LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize + 1});
-  StrBuffer.push_back(' ');
+  if (CurrentLineSize == 0) {
+    StrBuffer.push_back(' ');
+    CurrentLineSize++;
+  }
+  LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize});
 }
 
 } // namespace rogue::ui
