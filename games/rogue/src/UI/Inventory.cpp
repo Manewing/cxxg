@@ -136,7 +136,13 @@ bool InventoryController::handleInput(int Char) {
     InvHandler.tryDropItem(ItemIdx);
   } break;
   case Controls::Dismantle.Char: {
-    InvHandler.tryDismantleItem(ItemIdx);
+    Ctrl.createYesNoDialog("Dismantle " +
+                               Inv.getItem(ItemIdx).getQualifierName(),
+                           [this, ItemIdx](bool Yes) {
+                             if (Yes) {
+                               InvHandler.tryDismantleItem(ItemIdx);
+                             }
+                           });
   } break;
   case Controls::StoreOne.Char:
     if (auto *LUI = Ctrl.getWindowOfType<LootController>()) {
