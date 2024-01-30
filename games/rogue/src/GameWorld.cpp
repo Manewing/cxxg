@@ -141,6 +141,9 @@ void DungeonSweeper::loadSaveGame(const SaveGameInfo &SGI) {
 }
 
 void DungeonSweeper::storeSaveGame(const SaveGameInfo &SGI) {
+  if (CurrSubWorld) {
+    throw std::runtime_error("Can not save game in a dungeon");
+  }
   auto &CurrLvl = getCurrentLevelOrFail();
 
   serialize::SaveGameSerializer::create(CurrLvl).saveToFile(SGI);
