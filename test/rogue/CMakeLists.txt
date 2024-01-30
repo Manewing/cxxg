@@ -20,6 +20,7 @@ set(SOURCES
   Systems/DeathSystemTest.cpp
   Systems/LOSSystemTest.cpp
   Systems/StatsSystemTest.cpp
+  UI/WordWrapTest.cpp
 )
 
 add_cxxg_unittest(
