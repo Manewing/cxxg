@@ -116,11 +116,7 @@ void Controller::closeMenuUI() {
 }
 
 void Controller::tooltip(std::string Text, std::string Header) {
-  auto TooltipSize = cxxg::types::Size{30, 7};
-  if (TooltipSize.X > Text.size() + 6) {
-    TooltipSize.X = Text.size() + 6;
-    TooltipSize.Y = 4;
-  }
+  const auto TooltipSize = cxxg::types::Size{40, 7};
   auto &Wdw = WdwContainer.addWindow<Tooltip>(cxxg::types::Position{0, 2},
                                               TooltipSize, Text, Header);
   WdwContainer.centerWindow(Wdw);

@@ -173,7 +173,7 @@ void SaveGameSerializer::apply(Level &Lvl) {
       [this, &ItemDb, &Lvl](auto Entity, const auto &IdC, auto &EC) {
         auto It = EquipmentInfos.find(IdC.Id);
         if (It == EquipmentInfos.end()) {
-          throw std::runtime_error("SaveGame: Equipment not found: Id=" +
+          throw std::runtime_error("SaveGame: Equipment not found in save for Id=" +
                                    std::to_string(IdC.Id));
         }
         It->second.applyTo(ItemDb, EC, Entity, Lvl.Reg);
@@ -183,7 +183,7 @@ void SaveGameSerializer::apply(Level &Lvl) {
       [this, &ItemDb](auto &IdC, auto &IC) {
         auto It = InventoryInfos.find(IdC.Id);
         if (It == InventoryInfos.end()) {
-          throw std::runtime_error("SaveGame: Inventory not found: Id=" +
+          throw std::runtime_error("SaveGame: Inventory not found in save for Id=" +
                                    std::to_string(IdC.Id));
         }
         It->second.applyTo(ItemDb, IC);
@@ -192,7 +192,7 @@ void SaveGameSerializer::apply(Level &Lvl) {
   Lvl.Reg.view<const IdComp, PlayerComp>().each([this](auto &IdC, auto &PC) {
     auto It = PlayerInfos.find(IdC.Id);
     if (It == PlayerInfos.end()) {
-      throw std::runtime_error("SaveGame: Player not found: Id=" +
+      throw std::runtime_error("SaveGame: Player not found for Id=" +
                                std::to_string(IdC.Id));
     }
     PC.KnownRecipes = It->second.KnownRecipes;
