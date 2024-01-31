@@ -82,6 +82,14 @@ void InventoryControllerBase::updateElements() const {
   }
   auto PrevIdx = List->getSelectedElement();
   List->setElements(Elements);
+
+  if (PrevIdx >= Inv.getItems().size()) {
+    if (Inv.getItems().empty()) {
+      List->selectElement(0);
+      return;
+    }
+    PrevIdx = Inv.getItems().size() - 1;
+  }
   List->selectElement(PrevIdx);
 }
 
@@ -166,7 +174,12 @@ std::string InventoryController::getInteractMsg() const {
     return "";
   }
 
-  const auto &SelectedItem = Inv.getItem(List->getSelectedElement());
+  auto SelectIdx = List->getSelectedElement();
+  if (SelectIdx >= Inv.getItems().size()) {
+    SelectIdx = Inv.getItems().size() - 1;
+    List->selectElement(SelectIdx);
+  }
+  const auto &SelectedItem = Inv.getItem(SelectIdx);
   std::vector<KeyOption> Options = {Controls::Info, Controls::Drop};
   // FIXME this should all be based on capability flags, not item type
   if (SelectedItem.getType() & ItemType::EquipmentMask) {
