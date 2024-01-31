@@ -61,9 +61,6 @@
             "search_ai": {
               "$ref": "#/defs/assembler_types/on_off"
             },
-            "line_of_sight": {
-              "$ref": "#/defs/assembler_types/on_off"
-            },
             "equipment": {
               "$ref": "#/defs/assembler_types/on_off"
             },
@@ -111,6 +108,17 @@
               "anyOf": [
                 {
                   "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/race_kind"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "line_of_sight": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/line_of_sight"
                 },
                 {
                   "type": "boolean",
@@ -252,6 +260,18 @@
           },
           "open_tile": {
             "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "additionalProperties": false
+      },
+      "line_of_sight": {
+        "type": "object",
+        "required": ["range"],
+        "properties": {
+          "range": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Line of sight range of the entity"
           }
         },
         "additionalProperties": false

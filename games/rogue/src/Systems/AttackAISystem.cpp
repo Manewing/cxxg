@@ -96,7 +96,7 @@ void handleRangedAndMeleeAutoAttacks(Level &L) {
   auto TargetView =
       L.Reg.view<const PositionComp, HealthComp, const FactionComp>();
   View.each([&TargetView, &L](const auto &Entity, const auto &Pos,
-                              const auto &Ag, const auto &Fac) {
+                              auto &Ag, const auto &Fac) {
     if (L.Reg.any_of<CombatActionComp>(Entity)) {
       if (L.Reg.any_of<MovementComp>(Entity)) {
         L.Reg.erase<MovementComp>(Entity);
@@ -115,6 +115,11 @@ void handleRangedAndMeleeAutoAttacks(Level &L) {
       if (L.Reg.any_of<MovementComp>(Entity)) {
         L.Reg.erase<MovementComp>(Entity);
       }
+    }
+
+    // If there is no combat or movement still consume ap
+    if (!L.Reg.any_of<CombatActionComp, MovementComp>(Entity)) {
+      Ag.trySpendAP(MovementComp::MoveAPCost);
     }
   });
 }

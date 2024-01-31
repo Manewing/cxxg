@@ -53,6 +53,15 @@ private:
   RaceKind R;
 };
 
+class LineOfSightCompAssembler : public EntityAssembler {
+public:
+  explicit LineOfSightCompAssembler(unsigned Range);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  unsigned Range;
+};
+
 class InventoryCompAssembler : public EntityAssembler {
 public:
   InventoryCompAssembler(const ItemDatabase &ItemDb,
@@ -205,8 +214,6 @@ using VisibleCompAssembler = DefaultConstructEntityAssembler<VisibleComp>;
 using WanderAICompAssembler = DefaultConstructEntityAssembler<WanderAIComp>;
 
 // TODO make configurable
-using LineOfSightCompAssembler =
-    DefaultConstructEntityAssembler<LineOfSightComp>;
 using AgilityCompAssembler = DefaultConstructEntityAssembler<AgilityComp>;
 
 } // namespace rogue

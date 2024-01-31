@@ -104,7 +104,9 @@
         "attack_ai": true,
         "collision": true,
         "health": true,
-        "line_of_sight": true,
+        "line_of_sight": {
+          "range": 14
+        },
         "position": true,
         "search_ai": true,
         "visible": true,
@@ -117,7 +119,9 @@
         "agility": true,
         "collision": true,
         "health": true,
-        "line_of_sight": true,
+        "line_of_sight": {
+          "range": 14
+        },
         "position": true,
         "visible": true,
         "wander_ai": true
@@ -969,6 +973,62 @@
       "display_name": "Skeletal Remains",
       "from_template": "base_chest",
       "name": "common_skeletal_remains"
+    },
+    {
+      "assemblers": {
+        "drop_equipment": false,
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_thorn_blossom"
+        },
+        "line_of_sight": {
+          "range": 7
+        },
+        "race": "creature",
+        "search_ai": false,
+        "stats": {
+          "dex": 5,
+          "int": 0,
+          "str": 0,
+          "vit": 3
+        },
+        "tile": {
+          "bg_color": "#5d2721",
+          "char": "&",
+          "color": "#819f00"
+        },
+        "wander_ai": false
+      },
+      "description": "Hostile flower in that shoots sharp thorns at intruders when disturbed",
+      "display_name": "Thorn Blossom",
+      "from_template": "base_enemy",
+      "name": "thorn_blossom"
+    },
+    {
+      "assemblers": {
+        "auto_equip": true,
+        "drop_equipment": false,
+        "equipment": true,
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_changeling"
+        },
+        "race": "creature",
+        "stats": {
+          "dex": 9,
+          "int": 3,
+          "str": 2,
+          "vit": 3
+        },
+        "tile": {
+          "char": "c",
+          "color": "#7b5ad2"
+        }
+      },
+      "description": "The Changeling is a creature known for its shape-shifting abilities, often taking the form of a human baby. In folklore, it replaces human infants, leading unsuspecting parents to raise what they believe to be their child, while the true human child is taken to the fairy realm.",
+      "display_name": "Changeling",
+      "from_template": "hostile_creature",
+      "name": "changeling"
     }
   ]
 }

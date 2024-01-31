@@ -35,6 +35,14 @@ void RaceCompAssembler::assemble(entt::registry &Reg,
   Reg.emplace<RaceComp>(Entity, R);
 }
 
+LineOfSightCompAssembler::LineOfSightCompAssembler(unsigned Range)
+    : Range(Range) {}
+
+void LineOfSightCompAssembler::assemble(entt::registry &Reg,
+                                        entt::entity Entity) const {
+  Reg.emplace<LineOfSightComp>(Entity, Range, Range);
+}
+
 InventoryCompAssembler::InventoryCompAssembler(const ItemDatabase &ItemDb,
                                                const std::string &LootTable,
                                                unsigned MaxStackSize)

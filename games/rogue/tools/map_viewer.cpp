@@ -47,6 +47,8 @@ int main(int Argc, char *Argv[]) {
   cxxg::Screen Scr(cxxg::Screen::getTerminalSize());
   cxxg::utils::registerSigintHandler([]() { exit(0); });
 
+  rogue::GeneratedMapLevelGenerator::DebugRooms = true;
+
   rogue::EventHub Hub;
   rogue::RenderEventCollector RenderCollector;
   RenderCollector.setEventHub(&Hub);

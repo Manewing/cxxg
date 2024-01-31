@@ -26,8 +26,8 @@ TargetInfo::TargetInfo(Controller &C, entt::entity TEt, Level &L)
   std::string Hdr = NC ? NC->Name : "Unknown";
   std::string Desc = NC ? NC->Description : "";
 
-  auto Offset = WW.getNumLines() + 3;
   WW = WordWrap(Desc, getSize().X - 4);
+  auto Offset = WW.getNumLines() + 3;
   Rect.setSize(getSize() + cxxg::types::Size{0, Offset});
 
   auto ItSel = std::make_shared<ItemSelect>(Pos);

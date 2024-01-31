@@ -165,9 +165,15 @@
       "phys_damage": 0,
       "type": "melee_attack_comp"
     },
+    "magic_melee_2": {
+      "ap_cost": 10,
+      "magic_damage": 2.0,
+      "phys_damage": 0,
+      "type": "melee_attack_comp"
+    },
     "magic_melee_5": {
       "ap_cost": 10,
-      "magic_damage": 10,
+      "magic_damage": 5.0,
       "phys_damage": 0,
       "type": "melee_attack_comp"
     },
@@ -360,6 +366,12 @@
       "phys_damage": 0.0,
       "radius": 4,
       "type": "disc_area_hit_effect"
+    },
+    "slow_ranged_2": {
+      "ap_cost": 25,
+      "magic_damage": 0.0,
+      "phys_damage": 2.0,
+      "type": "ranged_attack_comp"
     },
     "smite_i": {
       "damage_percent": 250.0,
@@ -1938,6 +1950,34 @@
       "types": [
         "consumable"
       ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "slow_ranged_2",
+          "type": "equipment"
+        }
+      ],
+      "description": "Head of a Thorn Blossom",
+      "max_stack_size": 1,
+      "name": "Thorn Blossom Head",
+      "types": [
+        "ranged"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "magic_melee_2",
+          "type": "equipment"
+        }
+      ],
+      "description": "Magic claws dealing magic damage",
+      "max_stack_size": 1,
+      "name": "Magic Claws",
+      "types": [
+        "weapon"
+      ]
     }
   ],
   "item_specializations": {
@@ -2828,6 +2868,54 @@
         }
       ]
     },
+    "ltb_changeling": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 30
+        },
+        {
+          "type": "null",
+          "weight": 20
+        },
+        {
+          "max_count": 2,
+          "min_count": 1,
+          "name": "Bone",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 2,
+          "min_count": 1,
+          "name": "Ash",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Cursed Blood",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 3,
+          "min_count": 2,
+          "name": "Cursed Blood",
+          "type": "item",
+          "weight": 1
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Magic Claws",
+          "type": "item",
+          "weight": -1
+        }
+      ]
+    },
     "ltb_fairy": {
       "rolls": 1,
       "slots": [
@@ -2912,6 +3000,18 @@
           "name": "Arcane Liquid",
           "type": "item",
           "weight": 30
+        }
+      ]
+    },
+    "ltb_thorn_blossom": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Thorn Blossom Head",
+          "type": "item",
+          "weight": -1
         }
       ]
     },

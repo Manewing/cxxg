@@ -101,7 +101,6 @@ EntityAssemblerCache getDefaultEntityAssemblerCache() {
   Cache.add<WanderAICompAssembler>("wander_ai");
 
   // TODO make configurable
-  Cache.add<LineOfSightCompAssembler>("line_of_sight");
   Cache.add<AgilityCompAssembler>("agility");
   Cache.add<HealerInteractableCompAssembler>("healer");
   Cache.add<ShopAssembler>("shop");
@@ -238,6 +237,13 @@ makeStatsCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   return std::make_shared<StatsCompAssembler>(SP);
 }
 
+std::shared_ptr<LineOfSightCompAssembler>
+makeLineOfSightCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  unsigned Range = JsonObj["range"].GetUint();
+  return std::make_shared<LineOfSightCompAssembler>(Range);
+}
+
 DamageComp parseDamageComp(const rapidjson::Value &Json) {
   DamageComp DC;
   const auto &JsonObj = Json.GetObject();
@@ -269,6 +275,7 @@ const auto &getEntityAssemblerFactories() {
       {"inventory", makeInventoryCompAssembler},
       {"race", makeRaceCompAssembler},
       {"stats", makeStatsCompAssembler},
+      {"line_of_sight", makeLineOfSightCompAssembler},
       {"damage", makeDamageCompAssembler},
       {"tile", makeTileCompAssembler},
       {"world_entry", makeWorldEntryAssembler},
