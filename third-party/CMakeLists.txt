@@ -2,6 +2,7 @@ message(STATUS "cxxg: Adding entt")
 add_subdirectory(entt EXCLUDE_FROM_ALL)
 
 message(STATUS "cxxg: Adding cereal")
+option(SKIP_PERFORMANCE_COMPARISON "" ON)
 add_subdirectory(cereal EXCLUDE_FROM_ALL)
 
 if (BUILD_TESTS)
