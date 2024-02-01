@@ -46,8 +46,9 @@ StatsController::StatsController(Controller &Ctrl, StatsComp &Stats,
 
   // Str, Dex, Int, Vit
   for (const auto &SI : StatsInfos) {
-    ItSel->addSelect<LabeledSelect>(SI.Short, SI.DefaultValue, Pos + SI.Offset,
-                                    (DefaultSize.X - 6) / 2);
+    ItSel->addSelect<LabeledSelect>(
+        SI.Short, SI.DefaultValue, Pos + SI.Offset,
+        static_cast<unsigned>((DefaultSize.X - 6) / 2));
   }
 
   Comp = std::make_shared<Frame>(ItSel, Pos, DefaultSize, "Stats");
