@@ -165,7 +165,8 @@ std::shared_ptr<Widget> makeSlotsWindow(
     auto SlotPos = Pos;
     SlotPos.Y += SlotIdx * 2;
     SlotSelect->addSelect<LabeledSelect>(
-        SlotStr, Label, SlotPos, SlotWdwSize.X - 2, LabelColor, LabelColor);
+        SlotStr, Label, SlotPos, static_cast<unsigned>(SlotWdwSize.X - 2),
+        LabelColor, LabelColor);
   }
 
   SlotSelect->registerOnSelectCallback([SgMap, SlotSelectCb](const Select &S) {

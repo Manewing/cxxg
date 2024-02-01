@@ -26,7 +26,7 @@ struct DoorComp {
   Tile OpenTile;
   Tile ClosedTile;
   std::optional<int> KeyId;
-  std::size_t ActionIdx = -1;
+  std::size_t ActionIdx = -1UL;
 
   bool hasLock() const { return KeyId.has_value(); }
   bool isLocked() const { return hasLock() && !IsOpen; }
