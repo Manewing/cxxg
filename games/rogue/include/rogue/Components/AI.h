@@ -3,6 +3,7 @@
 
 #include <iosfwd>
 #include <optional>
+#include <random>
 #include <rogue/EffectInfo.h>
 #include <rogue/Tile.h>
 #include <ymir/Types.hpp>
