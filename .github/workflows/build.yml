@@ -47,6 +47,24 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Cache Boost
+        id: cache-boost
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/boost-1.83.0
+          key: ${{ matrix.os }}-boost-1.83.0
+
+      - if: |
+          matrix.os == 'ubuntu-latest'
+          && steps.cache-boost.outputs.cache-hit =! 'true'
+        name: Install boost
+        uses: MarkusJx/install-boost@v2.4.4
+        id: install-boost
+        with:
+            boost_version: 1.83.0
+            platform_version: 22.04
+            boost_install_dir: /home/runner/boost-1.83.0
+
       - name: Set reusable strings
         id: strings
         shell: bash
