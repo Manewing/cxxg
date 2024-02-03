@@ -272,6 +272,130 @@ std::size_t CompositeMultiLevelGenerator::getMaxLevelIdx() const {
   return Generators.back().LevelEndIdx + 1;
 }
 
+TiledMapLevelGenerator::TiledMapLevelGenerator(const GameContext &Ctx,
+                                               const Config &Cfg)
+    : LevelGenerator(Ctx), Cfg(Cfg) {}
+
+std::shared_ptr<Level>
+TiledMapLevelGenerator::generateLevel(int LevelId) const {
+  auto NewLevel = createNewLevel(LevelId);
+  NewLevel->Reg.ctx().emplace<GameContext>(Ctx);
+  NewLevel->Reg.ctx().emplace<Level *>(NewLevel.get());
+  return NewLevel;
+}
+
+namespace {
+
+ymir::LayeredMap<int, int> loadTiledMap(const std::filesystem::path &MapFile) {
+  auto [DocStr, Doc] = loadJSON(MapFile, nullptr);
+  auto TiledJson = Doc.GetObject();
+
+  auto Width = TiledJson["width"].GetInt();
+  auto Height = TiledJson["height"].GetInt();
+
+  auto Layers = TiledJson["layers"].GetArray();
+
+  std::vector<std::string> LayerNames;
+  for (const auto &Layer : Layers) {
+    auto LayerName = std::string(Layer["name"].GetString());
+    LayerNames.push_back(LayerName);
+  }
+
+  ymir::LayeredMap<int, int> Map(LayerNames, ymir::Size2d<int>{Width, Height});
+
+  for (const auto &Layer : Layers) {
+    auto LayerName = std::string(Layer["name"].GetString());
+    auto Data = Layer["data"].GetArray();
+    auto &M = Map.get(LayerName);
+
+    auto It = M.begin();
+    for (auto &Elem : Data) {
+      *It = Elem.GetInt();
+      ++It;
+    }
+  }
+
+  return Map;
+}
+
+struct TileInfos {
+  std::map<int, std::string> Entities;
+  std::map<int, Tile> Tiles;
+};
+
+TileInfos loadTileInfos(const std::filesystem::path &TileInfoMap) {
+  auto [DocStr, Doc] = loadJSON(TileInfoMap, nullptr);
+  auto TileInfosJson = Doc.GetArray();
+
+  TileInfos Infos;
+  unsigned TileIdx = 1;
+  for (auto &JsonInfo : TileInfosJson) {
+    auto Key = std::string(JsonInfo["key"].GetString());
+    auto TileType = std::string(JsonInfo["tile_type"].GetString());
+    if (TileType == "entity") {
+      Infos.Entities[TileIdx] = Key;
+    } else {
+      Infos.Tiles[TileIdx] = parseTile(JsonInfo["tile"]);
+    }
+    TileIdx++;
+  }
+
+  Infos.Tiles[0] = Level::EmptyTile;
+  Infos.Entities[0] = "";
+
+  return Infos;
+}
+
+} // namespace
+
+std::shared_ptr<Level>
+TiledMapLevelGenerator::createNewLevel(int LevelId) const {
+  auto TiledMap = loadTiledMap(Cfg.TiledMapFile);
+  auto TileInfos = loadTileInfos(Cfg.TiledIdMapFile);
+
+  auto NewLevel = std::make_shared<Level>(LevelId, TiledMap.getSize());
+
+  static const std::array<std::size_t, 4> LayerIndices = {
+      Level::LayerGroundIdx, Level::LayerGroundDecoIdx, Level::LayerWallsIdx,
+      Level::LayerWallsDecoIdx};
+  for (const auto &Idx : LayerIndices) {
+    const auto &Name = Level::LayerNames.at(Idx);
+    auto &LvlM = NewLevel->Map.get(Name);
+    auto &TiledM = TiledMap.get(Name);
+
+    LvlM.forEach([&TiledM, &TileInfos](auto Pos, auto &Tile) {
+      auto TileId = TiledM.getTile(Pos);
+      auto It = TileInfos.Tiles.find(TileId);
+      if (It == TileInfos.Tiles.end()) {
+        throw std::out_of_range("Could not find tile for tile Id: " +
+                                std::to_string(TileId));
+      }
+      Tile = TileInfos.Tiles.at(TiledM.getTile(Pos));
+    });
+  }
+
+  auto &TiledEntitiesMap =
+      TiledMap.get(Level::LayerNames.at(Level::LayerEntitiesIdx));
+
+  EntityFactory Factory(NewLevel->Reg, Ctx.EntityDb);
+  TiledEntitiesMap.forEach(
+      [this, &TileInfos, &Factory, &NewLevel](auto Pos, auto TileId) {
+        auto It = TileInfos.Entities.find(TileId);
+        if (It == TileInfos.Entities.end()) {
+          throw std::out_of_range("Could not find entity for tile Id: " +
+                                  std::to_string(TileId));
+        }
+        if (It->second.empty()) {
+          return;
+        }
+        spawnAndPlaceEntity(Factory, Pos,
+                            Ctx.EntityDb.getEntityTemplateId(It->second),
+                            NewLevel->getLevelId());
+      });
+
+  return NewLevel;
+}
+
 namespace {
 
 DesignedMapLevelGenerator::Config::CharInfo
@@ -353,6 +477,17 @@ loadCompositeMultiLevelGeneratorConfig(const std::filesystem::path &BasePath,
   return MapCfg;
 }
 
+TiledMapLevelGenerator::Config
+loadTiledMapGeneratorConfig(const std::filesystem::path &BasePath,
+                            const rapidjson::Value &Doc) {
+  TiledMapLevelGenerator::Config MapCfg;
+  auto MapJson = Doc["map"].GetObject();
+  std::cerr << "ehere" << std::endl;
+  MapCfg.TiledMapFile = BasePath / MapJson["tiled_map_file"].GetString();
+  MapCfg.TiledIdMapFile = BasePath / MapJson["tiled_id_map_file"].GetString();
+  return MapCfg;
+}
+
 } // namespace
 
 LevelGeneratorLoader::LevelGeneratorLoader(const GameContext &Ctx) : Ctx(Ctx) {}
@@ -383,6 +518,9 @@ LevelGeneratorLoader::loadCfg(unsigned Seed,
   if (MapCfgType == "composite") {
     return loadCompositeMultiLevelGeneratorConfig(BasePath, Doc);
   }
+  if (MapCfgType == "tiled") {
+    return loadTiledMapGeneratorConfig(BasePath, Doc);
+  }
 
   throw std::out_of_range("Invalid map type: " + MapCfgType);
 }
@@ -406,6 +544,9 @@ LevelGeneratorLoader::create(unsigned Seed, const LevelConfig &Cfg) {
       LevelGenSeed++;
     }
     return CompGen;
+  }
+  if (auto *TiledCfg = std::get_if<TiledMapLevelGenerator::Config>(&Cfg)) {
+    return std::make_shared<TiledMapLevelGenerator>(Ctx, *TiledCfg);
   }
   throw std::out_of_range("Invalid map type");
 }

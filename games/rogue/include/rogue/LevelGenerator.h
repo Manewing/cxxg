@@ -80,6 +80,26 @@ private:
   Config Cfg;
 };
 
+/// Level generator that loads a level from Tiled JSON file
+class TiledMapLevelGenerator : public LevelGenerator {
+public:
+  struct Config {
+    std::filesystem::path TiledMapFile;
+    std::filesystem::path TiledIdMapFile;
+  };
+
+public:
+  TiledMapLevelGenerator(const GameContext &Ctx, const Config &Cfg);
+
+  std::shared_ptr<Level> generateLevel(int LevelId) const final;
+
+protected:
+  std::shared_ptr<Level> createNewLevel(int LevelId) const;
+
+private:
+  Config Cfg;
+};
+
 /// Level generator that generates a level from a procedurally generated map
 class GeneratedMapLevelGenerator : public LevelGenerator {
 public:
@@ -143,7 +163,8 @@ class LevelGeneratorLoader {
 public:
   using LevelConfig = std::variant<
       EmptyLevelGenerator::Config, DesignedMapLevelGenerator::Config,
-      GeneratedMapLevelGenerator::Config, CompositeMultiLevelGenerator::Config>;
+      GeneratedMapLevelGenerator::Config, CompositeMultiLevelGenerator::Config,
+      TiledMapLevelGenerator::Config>;
 
 public:
   static LevelConfig loadCfg(unsigned Seed,

@@ -1,0 +1,163 @@
+[
+    {
+        "key": "arachnoth_broodguard",
+        "tile_type": "entity"
+    },
+    {
+        "key": "arachnoth_burrower",
+        "tile_type": "entity"
+    },
+    {
+        "key": "arachnoth_hatchling",
+        "tile_type": "entity"
+    },
+    {
+        "key": "base_world_entry",
+        "tile_type": "entity"
+    },
+    {
+        "key": "blob",
+        "tile_type": "entity"
+    },
+    {
+        "key": "blood_fairy",
+        "tile_type": "entity"
+    },
+    {
+        "key": "changeling",
+        "tile_type": "entity"
+    },
+    {
+        "key": "fairy",
+        "tile_type": "entity"
+    },
+    {
+        "key": "fat_rat",
+        "tile_type": "entity"
+    },
+    {
+        "key": "ghost",
+        "tile_type": "entity"
+    },
+    {
+        "key": "grove_guardian",
+        "tile_type": "entity"
+    },
+    {
+        "key": "healer",
+        "tile_type": "entity"
+    },
+    {
+        "key": "iron_pine_tree",
+        "tile_type": "entity"
+    },
+    {
+        "key": "large_silk_cocoon",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_1",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_2",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_3",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_entry",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_exit",
+        "tile_type": "entity"
+    },
+    {
+        "key": "oak_tree",
+        "tile_type": "entity"
+    },
+    {
+        "key": "pine_tree",
+        "tile_type": "entity"
+    },
+    {
+        "key": "sewer_rat",
+        "tile_type": "entity"
+    },
+    {
+        "key": "shop",
+        "tile_type": "entity"
+    },
+    {
+        "key": "silk_cocoon",
+        "tile_type": "entity"
+    },
+    {
+        "key": "skeleton",
+        "tile_type": "entity"
+    },
+    {
+        "key": "thorn_blossom",
+        "tile_type": "entity"
+    },
+    {
+        "key": "toxic_rat",
+        "tile_type": "entity"
+    },
+    {
+        "key": "troll",
+        "tile_type": "entity"
+    },
+    {
+        "key": "troll_berserker",
+        "tile_type": "entity"
+    },
+    {
+        "key": "young_blood_fairy",
+        "tile_type": "entity"
+    },
+    {
+        "key": "1",
+        "tile": {
+            "char": "1",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "2",
+        "tile": {
+            "char": "2",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground",
+        "tile": {
+            "bg_color": "#222222",
+            "char": " ",
+            "color": "#222222"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "torch",
+        "tile": {
+            "char": "'",
+            "color": "#ed3424"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "wall",
+        "tile": {
+            "char": "#",
+            "color": "#737373"
+        },
+        "tile_type": "tile"
+    }
+]
