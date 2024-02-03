@@ -1,5 +1,5 @@
 {
-  "$id": "https://rogue-todo.com/entity-db-schema",
+  "$id": "https://rogue-todo.com/entity-db-schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "JSON Schema for the entity database",
   "type": "object",
@@ -43,6 +43,9 @@
             "health": {
               "$ref": "#/defs/assembler_types/on_off"
             },
+            "mana": {
+              "$ref": "#/defs/assembler_types/on_off"
+            },
             "block_los": {
               "$ref": "#/defs/assembler_types/on_off"
             },
@@ -55,7 +58,7 @@
             "wander_ai": {
               "$ref": "#/defs/assembler_types/on_off"
             },
-            "line_of_sight": {
+            "search_ai": {
               "$ref": "#/defs/assembler_types/on_off"
             },
             "equipment": {
@@ -105,6 +108,17 @@
               "anyOf": [
                 {
                   "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/race_kind"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "line_of_sight": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/line_of_sight"
                 },
                 {
                   "type": "boolean",
@@ -178,10 +192,43 @@
                 }
               ]
             },
+            "spawn_entity_post_interaction": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/spawn_entity_post_interaction"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
             "damage": {
               "anyOf": [
                 {
                   "$ref": "#/defs/assembler_types/damage"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "serialization_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/serialization_id"
+                },
+                {
+                  "type": "boolean",
+                  "const": false
+                }
+              ]
+            },
+            "effect_executor": {
+              "anyOf": [
+                {
+                  "$ref": "#/defs/assembler_types/effect_executor"
                 },
                 {
                   "type": "boolean",
@@ -213,6 +260,18 @@
           },
           "open_tile": {
             "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "additionalProperties": false
+      },
+      "line_of_sight": {
+        "type": "object",
+        "required": ["range"],
+        "properties": {
+          "range": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Line of sight range of the entity"
           }
         },
         "additionalProperties": false
@@ -294,6 +353,28 @@
         },
         "additionalProperties": false
       },
+      "spawn_entity_post_interaction": {
+        "type": "object",
+        "required": ["entity_name"],
+        "properties": {
+          "entity_name": {
+            "type": "string",
+            "description": "Name of the entity to spawn"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Chance of spawning the entity"
+          },
+          "uses": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of times the entity can be spawned from the interaction, 0 means infinite"
+          }
+        },
+        "additionalProperties": false
+      },
       "damage": {
         "type": "object",
         "required": ["phys_damage", "magic_damage"],
@@ -314,6 +395,49 @@
           "ticks": {
             "type": "integer",
             "description": "Number of ticks before the entity is destroyed, default -1 (never)"
+          }
+        },
+        "additionalProperties": false
+      },
+      "serialization_id": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id to use for serialization",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "effect_executor": {
+        "type": "object",
+        "required": ["effects"],
+        "properties": {
+          "effects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["effect_name", "min_delay", "max_delay"],
+              "properties": {
+                "effect_name": {
+                  "type": "string",
+                  "description": "Name of the effect to execute"
+                },
+                "min_delay": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Minimum delay before executing the effect"
+                },
+                "max_delay": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Maximum delay before executing the effect"
+                }
+              },
+              "additionalProperties": false
+            }
           }
         },
         "additionalProperties": false

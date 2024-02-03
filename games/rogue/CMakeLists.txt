@@ -8,19 +8,20 @@ set(HEADER_FILES
   include/rogue/Components/Level.h
   include/rogue/Components/Player.h
   include/rogue/Components/RaceFaction.h
+  include/rogue/Components/Serialization.h
   include/rogue/Components/Stats.h
   include/rogue/Components/Transform.h
   include/rogue/Components/Visual.h
   include/rogue/Context.h
   include/rogue/CraftingDatabase.h
   include/rogue/CraftingHandler.h
+  include/rogue/EffectInfo.h
   include/rogue/EntityAssemblers.h
   include/rogue/EntityDatabase.h
   include/rogue/Equipment.h
   include/rogue/Event.h
   include/rogue/EventHub.h
   include/rogue/Game.h
-  include/rogue/EffectInfo.h
   include/rogue/GameWorld.h
   include/rogue/History.h
   include/rogue/Inventory.h
@@ -38,6 +39,8 @@ set(HEADER_FILES
   include/rogue/LevelDatabase.h
   include/rogue/LevelGenerator.h
   include/rogue/LootTable.h
+  include/rogue/SaveGame.h
+  include/rogue/Serialization.h
   include/rogue/Parser.h
   include/rogue/RenderEventCollector.h
   include/rogue/Renderer.h
@@ -49,12 +52,14 @@ set(HEADER_FILES
   include/rogue/Systems/NPCSystem.h
   include/rogue/Systems/PlayerSystem.h
   include/rogue/Systems/RegenSystem.h
+  include/rogue/Systems/SearchAISystem.h
   include/rogue/Systems/StatsSystem.h
   include/rogue/Systems/System.h
   include/rogue/Systems/WanderAISystem.h
   include/rogue/Types.h
   include/rogue/UI/Buffs.h
   include/rogue/UI/CommandLine.h
+  include/rogue/UI/CompHelpers.h
   include/rogue/UI/Controller.h
   include/rogue/UI/Controls.h
   include/rogue/UI/Crafting.h
@@ -83,6 +88,7 @@ set(SOURCE_FILES
   src/Components/Buffs.cpp
   src/Components/Combat.cpp
   src/Components/Entity.cpp
+  src/Components/Level.cpp
   src/Components/Player.cpp
   src/Components/RaceFaction.cpp
   src/Components/Stats.cpp
@@ -113,6 +119,8 @@ set(SOURCE_FILES
   src/LevelDatabase.cpp
   src/LevelGenerator.cpp
   src/LootTable.cpp
+  src/SaveGame.cpp
+  src/Serialization.cpp
   src/Parser.cpp
   src/RenderEventCollector.cpp
   src/Renderer.cpp
@@ -125,10 +133,12 @@ set(SOURCE_FILES
   src/Systems/NPCSystem.cpp
   src/Systems/PlayerSystem.cpp
   src/Systems/RegenSystem.cpp
+  src/Systems/SearchAISystem.cpp
   src/Systems/StatsSystem.cpp
   src/Systems/WanderAISystem.cpp
   src/UI/Buffs.cpp
   src/UI/CommandLine.cpp
+  src/UI/CompHelpers.cpp
   src/UI/Controller.cpp
   src/UI/Controls.cpp
   src/UI/Crafting.cpp
@@ -162,7 +172,7 @@ add_library(
 target_include_directories(lib${TARGET} PUBLIC include)
 
 target_link_libraries(lib${TARGET}
-  cxxg ymir EnTT::EnTT
+  cxxg ymir EnTT::EnTT cereal::cereal
 )
 
 target_include_directories(lib${TARGET}
@@ -190,12 +200,27 @@ target_link_libraries(map_viewer
   lib${TARGET}
 )
 
+add_executable(loot_info
+  tools/loot_info.cpp
+)
+
+target_link_libraries(loot_info
+  lib${TARGET}
+)
+
 add_subdirectory(test)
 
 add_custom_target(
   rogue_create_data_dir
   ALL
   DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/data/
+)
+
+list(APPEND PYTHONPATH ${CMAKE_CURRENT_SOURCE_DIR}/python)
+set(RUN_PYTHON
+  ${CMAKE_COMMAND} -E env
+  "PYTHONPATH=${PYTHONPATH}"
+  ${PYTHON_EXECUTABLE}
 )
 
 file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json ${CMAKE_CURRENT_SOURCE_DIR}/data/*.yaml)
@@ -210,7 +235,7 @@ add_custom_command(
 
   # Post-process all JSON schemas
   COMMAND
-    ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
+    ${RUN_PYTHON} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
     --schema-files
         ${SCHEMA_FILES}
     --output-dir
@@ -218,14 +243,14 @@ add_custom_command(
 
   # Post-process all YAML data files
   COMMAND
-    ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/yaml_json.py
+    ${RUN_PYTHON} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/yaml_json.py
       ${CMAKE_CURRENT_SOURCE_DIR}/data/crafting_db.yaml
       ${CMAKE_CURRENT_BINARY_DIR}/data/crafting_db.json
 
 
   # Post-process JSON configurations
   COMMAND
-   ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/entity_db_post_process.py
+   ${RUN_PYTHON} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/entity_db_post_process.py
     --entity-db
       ${CMAKE_CURRENT_SOURCE_DIR}/data/entity_db.json
     --output
@@ -257,3 +282,5 @@ install(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/
   DESTINATION shared/data
 )
+
+add_subdirectory(python)

@@ -1,4 +1,5 @@
 #include <rogue/Components/Items.h>
+#include <rogue/Context.h>
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 #include <sstream>
@@ -28,7 +29,7 @@ std::string HealItemEffect::getName() const { return "Heal"; }
 
 std::string HealItemEffect::getDescription() const {
   std::stringstream SS;
-  SS << "Heals for " << Amount;
+  SS << "Heals for " << Amount << "HP";
   return SS.str();
 }
 
@@ -99,9 +100,8 @@ void DamageItemEffect::applyTo(const entt::entity &SrcEt,
   markCombat(SrcEt, DstEt, Reg);
 }
 
-DismantleEffect::DismantleEffect(const ItemDatabase &DB,
-                                 std::vector<DismantleResult> Results)
-    : ItemDb(DB), Results(std::move(Results)) {}
+DismantleEffect::DismantleEffect(std::vector<DismantleResult> Results)
+    : Results(std::move(Results)) {}
 
 std::shared_ptr<ItemEffect> DismantleEffect::clone() const {
   return std::make_shared<DismantleEffect>(*this);
@@ -113,8 +113,7 @@ std::string DismantleEffect::getDescription() const {
   std::stringstream SS;
   SS << "Dismantles into:\n";
   for (const auto &Result : Results) {
-    SS << "  " << Result.Amount << "x "
-       << ItemDb.getItemProto(Result.ItemId).Name << "\n";
+    SS << "  " << Result.Amount << "x " << Result.Name << "\n";
   }
   return SS.str();
 }
@@ -144,6 +143,7 @@ bool DismantleEffect::canApplyTo(const entt::entity &,
 
 void DismantleEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
                               entt::registry &Reg) const {
+  auto &ItemDb = Reg.ctx().get<GameContext>().ItemDb;
   auto &Inv = Reg.get<InventoryComp>(DstEt);
   for (const auto &Result : Results) {
     Inv.Inv.addItem(ItemDb.createItem(Result.ItemId, Result.Amount));

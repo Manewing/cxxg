@@ -40,6 +40,10 @@ bool BuffApplyEffectEvent::isPlayerAffected() const {
   return isValidAndPlayer(Registry, Entity);
 }
 
+bool RestoreHealthEvent::isPlayerAffected() const {
+  return isValidAndPlayer(Registry, Entity);
+}
+
 bool BuffExpiredEvent::isPlayerAffected() const {
   return isValidAndPlayer(Registry, Entity);
 }

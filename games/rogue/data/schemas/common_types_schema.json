@@ -72,10 +72,12 @@
         },
         "color": {
           "type": "string",
+          "pattern": "#[0-9a-fA-F]{6}",
           "description": "The color of the character"
         },
         "bg_color": {
           "type": "string",
+          "pattern": "#[0-9a-fA-F]{6}",
           "description": "The background color of the character"
         },
         "z_index": {

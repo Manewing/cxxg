@@ -1,13 +1,13 @@
 {
-  "map": {
-    "type": "generated",
-    "config": "skeleton_dungeon.cfg"
-  },
   "entities": {
-    "s": "skeleton",
+    "%": "common_skeletal_remains",
     "<": "level_entry",
+    "C": "rare_chest",
     "H": "level_exit",
-    "C": "rare_chest"
+    "s": "skeleton"
+  },
+  "map": {
+    "config": "skeleton_dungeon.cfg",
+    "type": "generated"
   }
 }
-

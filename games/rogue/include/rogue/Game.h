@@ -27,6 +27,7 @@ struct SwitchLevelEvent;
 struct SwitchGameWorldEvent;
 struct LootEvent;
 struct CraftEvent;
+struct SaveGameInfo;
 } // namespace rogue
 
 namespace rogue {
@@ -54,6 +55,9 @@ public:
 
   void movePlayer(ymir::Dir2d Dir);
   bool tryInteract();
+
+  void loadSaveGame(const SaveGameInfo &SGI);
+  void storeSaveGame(const SaveGameInfo &SGI);
 
 private:
   entt::registry &getLvlReg();

@@ -8,6 +8,7 @@
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
 #include <rogue/Level.h>
+#include <rogue/UI/CompHelpers.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
@@ -16,29 +17,40 @@
 
 namespace rogue::ui {
 
+bool TargetInfo::DebugTargets = false;
+
 TargetInfo::TargetInfo(Controller &C, entt::entity TEt, Level &L)
-    : BaseRectDecorator({2, 2}, {25, 10}, nullptr), Ctrl(C), TargetEt(TEt),
-      Lvl(L) {
+    : BaseRectDecorator({2, 2}, {40, 10}, nullptr), Ctrl(C), TargetEt(TEt),
+      Lvl(L), WW("", getSize().X - 2) {
   auto *NC = Lvl.Reg.try_get<NameComp>(TargetEt);
   std::string Hdr = NC ? NC->Name : "Unknown";
+  std::string Desc = NC ? NC->Description : "";
+
+  WW = WordWrap(Desc, getSize().X - 4);
+  auto Offset = WW.getNumLines() + 3;
+  Rect.setSize(getSize() + cxxg::types::Size{0, Offset});
 
   auto ItSel = std::make_shared<ItemSelect>(Pos);
-  int Count = 2;
-  if (Lvl.Reg.try_get<EquipmentComp>(TargetEt)) {
-    ItSel->addSelect<Select>(
-        "Equip", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
+  int Count = Offset;
+
+  if (DebugTargets) {
+    if (Lvl.Reg.try_get<EquipmentComp>(TargetEt)) {
+      ItSel->addSelect<Select>(
+          "Equip", cxxg::types::Position{Pos.X, Pos.Y + ++Count}, 12);
+    }
+    if (Lvl.Reg.try_get<InventoryComp>(TargetEt)) {
+      ItSel->addSelect<Select>(
+          "Inventory", cxxg::types::Position{Pos.X, Pos.Y + ++Count}, 12);
+    }
   }
-  if (Lvl.Reg.try_get<InventoryComp>(TargetEt)) {
-    ItSel->addSelect<Select>(
-        "Inventory", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
-  }
+
   if (Lvl.Reg.try_get<StatsComp>(TargetEt)) {
-    ItSel->addSelect<Select>(
-        "Stats", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 12);
+    ItSel->addSelect<Select>("Stats",
+                             cxxg::types::Position{Pos.X, Pos.Y + ++Count}, 12);
   }
   if (BuffTypeList::anyOf(Lvl.Reg, TargetEt)) {
-    ItSel->addSelect<Select>(
-        "Buffs", cxxg::types::Position{Pos.X + 1, Pos.Y + ++Count}, 25);
+    ItSel->addSelect<Select>("Buffs",
+                             cxxg::types::Position{Pos.X, Pos.Y + ++Count}, 25);
   }
 
   ItSel->registerOnSelectCallback([this](const auto &Sel) {
@@ -63,22 +75,17 @@ TargetInfo::TargetInfo(Controller &C, entt::entity TEt, Level &L)
 void TargetInfo::draw(cxxg::Screen &Scr) const {
   BaseRectDecorator::draw(Scr);
 
-  cxxg::types::Position DrawPos = Pos + cxxg::types::Position{2, 1};
+  for (std::size_t Y = 0; Y < WW.getNumLines(); ++Y) {
+    Scr[Pos.Y + Y + 1][Pos.X + 2] << WW.getLine(Y);
+  }
 
-  // FIXME move this to general stats?
-  if (auto *HC = Lvl.Reg.try_get<HealthComp>(TargetEt)) {
-    Scr[DrawPos.Y][DrawPos.X + 1] << "Health: " << HC->Value << "/"
-                                  << HC->MaxValue;
-    DrawPos += cxxg::types::Position{0, 1};
-  }
-  if (auto *AG = Lvl.Reg.try_get<AgilityComp>(TargetEt)) {
-    Scr[DrawPos.Y][DrawPos.X + 1] << "AP: " << AG->AP << " AG: " << AG->Agility;
-    DrawPos += cxxg::types::Position{0, 1};
-  }
-  if (auto *AI = Lvl.Reg.try_get<WanderAIComp>(TargetEt)) {
-    Scr[DrawPos.Y][DrawPos.X + 1] << "AI: " << getWanderAIStateStr(AI->State);
-    DrawPos += cxxg::types::Position{0, 1};
-  }
+  auto Offset = WW.getNumLines() + 2;
+  auto DP = Pos + cxxg::types::Position{2, static_cast<int>(Offset)};
+  addHealthInfo(Scr, DP, Lvl.Reg, TargetEt);
+  DP.Y++;
+  addManaInfo(Scr, DP, Lvl.Reg, TargetEt);
+  DP.Y++;
+  addAgilityInfo(Scr, DP, Lvl.Reg, TargetEt);
 }
 
 TargetUI::TargetUI(Controller &Ctrl, ymir::Point2d<int> StartPos,

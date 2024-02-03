@@ -1,6 +1,7 @@
 #include <random>
 #include <rogue/Components/Buffs.h>
 #include <rogue/Components/Combat.h>
+#include <rogue/Components/Entity.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
@@ -29,17 +30,40 @@ void applyCombatComps(entt::registry &Reg, entt::entity Attacker,
 
 template <typename ChanceOnHitBuffType>
 void tryApplyChanceOnHitBuff(entt::registry &Reg, entt::entity Target,
-                             entt::entity Source) {
-  if (auto *COHB = Reg.try_get<ChanceOnHitBuffType>(Source)) {
+                             entt::entity Source, entt::entity StorageEt) {
+  if (auto *COHB = Reg.try_get<ChanceOnHitBuffType>(StorageEt)) {
     if (COHB->canApplyTo(Source, Target, Reg)) {
       COHB->applyTo(Source, Target, Reg);
     }
   }
 }
 
+void applyLifeSteal(entt::registry &Reg, entt::entity Source,
+                    const DamageComp &AppliedDC, EventHubConnector &EHC) {
+  auto *LSBC = Reg.try_get<LifeStealBuffComp>(Source);
+  if (!LSBC) {
+    return;
+  }
+  auto LifeStealValue = LSBC->getEffectiveLifeSteal(AppliedDC.total());
+  if (LifeStealValue == 0) {
+    return;
+  }
+  auto *HC = Reg.try_get<HealthComp>(Source);
+  if (!HC) {
+    return;
+  }
+  HC->restore(LifeStealValue);
+  EHC.publish(RestoreHealthEvent{
+      {}, Source, &Reg, static_cast<unsigned>(LifeStealValue), "Life steal"});
+}
+
+/// Applies the damage defined by a damage component to the given target
+/// \return Returns the damage value that was applied or nullptr if the damage
+/// was blocked
 std::optional<unsigned> applyDamage(entt::registry &Reg,
                                     const entt::entity Target,
-                                    HealthComp &THealth, const DamageComp &DC) {
+                                    HealthComp &THealth, const DamageComp &DC,
+                                    EventHubConnector &EHC, entt::entity DCEt) {
   if (auto *BC = Reg.try_get<BlockBuffComp>(Target)) {
     // Increase the block chance if the attacker is blinded
     StatValue MaxChance =
@@ -55,16 +79,28 @@ std::optional<unsigned> applyDamage(entt::registry &Reg,
   if (auto *ABC = Reg.try_get<ArmorBuffComp>(Target)) {
     auto *SC = Reg.try_get<StatsComp>(Target);
     NewDC.PhysDamage = ABC->getPhysEffectiveDamage(NewDC.PhysDamage, SC);
-    NewDC.PhysDamage = ABC->getMagicEffectiveDamage(NewDC.PhysDamage, SC);
+    NewDC.MagicDamage = ABC->getMagicEffectiveDamage(NewDC.MagicDamage, SC);
   }
 
-  tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source);
-  tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source);
-  tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source);
+  tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source,
+                                                       DC.Source);
+  tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source,
+                                                      DC.Source);
+  tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source,
+                                                     DC.Source);
+  if (DCEt != entt::null) {
+    tryApplyChanceOnHitBuff<CoHTargetBleedingDebuffComp>(Reg, Target, DC.Source,
+                                                         DCEt);
+    tryApplyChanceOnHitBuff<CoHTargetBlindedDebuffComp>(Reg, Target, DC.Source,
+                                                        DCEt);
+    tryApplyChanceOnHitBuff<CoHTargetPoisonDebuffComp>(Reg, Target, DC.Source,
+                                                       DCEt);
+  }
+  applyLifeSteal(Reg, DC.Source, NewDC, EHC);
 
-  THealth.reduce(NewDC.PhysDamage);
-  THealth.reduce(NewDC.MagicDamage);
-  return static_cast<unsigned>(NewDC.total());
+  auto DamageValue = NewDC.total();
+  THealth.reduce(DamageValue);
+  return static_cast<unsigned>(DamageValue);
 }
 
 bool performMeleeAttack(entt::registry &Reg, entt::entity Attacker,
@@ -140,15 +176,14 @@ bool performRangedAttack(entt::registry &Reg, entt::entity Attacker,
   }
 
   // Compute the effective damage and apply it
+  auto EffRAC = RAC->getEffective(Reg.try_get<StatsComp>(Attacker));
   DamageComp DC;
   DC.Source = Attacker;
-  if (auto *SC = Reg.try_get<StatsComp>(Attacker)) {
-    auto SP = SC->effective();
-    DC.PhysDamage = RAC->getPhysEffectiveDamage(&SP);
-    DC.MagicDamage = RAC->getMagicEffectiveDamage(&SP);
-  } else {
-    DC.PhysDamage = RAC->getPhysEffectiveDamage();
-    DC.MagicDamage = RAC->getMagicEffectiveDamage();
+  DC.MagicDamage = EffRAC.MagicDamage;
+  DC.PhysDamage = EffRAC.PhysDamage;
+  DC.CanHurtSource = false;
+  if (auto *FC = Reg.try_get<FactionComp>(Attacker)) {
+    DC.Faction = FC->Faction;
   }
 
   // Create projectile in the move direction
@@ -170,23 +205,31 @@ void performAttack(entt::registry &Reg, entt::entity Attacker,
     CanRemove = performMeleeAttack(Reg, Attacker, CC.Target, EHC);
   }
   if (CanRemove) {
-    Reg.erase<CombatActionComp>(Attacker);
     applyCombatComps(Reg, Attacker, CC.Target);
+    Reg.erase<CombatActionComp>(Attacker);
   }
 }
 
-void applyDamageComp(entt::registry &Reg, DamageComp &DC,
-                 const PositionComp &PC, EventHubConnector &EHC) {
+void applyDamageComp(entt::registry &Reg, DamageComp &DC, entt::entity DcEt,
+                     const PositionComp &PC, EventHubConnector &EHC) {
   Reg.view<PositionComp, HealthComp>().each(
-      [&Reg, &PC, &DC, &EHC](const auto &TEt, auto &TPC, auto &THC) {
+      [&Reg, &PC, &DC, &DcEt, &EHC](const auto &TEt, auto &TPC, auto &THC) {
         auto *TMC = Reg.try_get<MovementComp>(TEt);
         if (PC.Pos != TPC.Pos && (!TMC || (TPC.Pos + TMC->Dir) != PC.Pos)) {
           return;
         }
+        if (!DC.CanHurtSource && TEt == DC.Source) {
+          return;
+        }
+        if (auto *TFC = Reg.try_get<FactionComp>(TEt)) {
+          if (DC.Faction == TFC->Faction) {
+            return;
+          }
+        }
         if (DC.Hits-- == 0) {
           return;
         }
-        auto Damage = applyDamage(Reg, TEt, THC, DC);
+        auto Damage = applyDamage(Reg, TEt, THC, DC, EHC, DcEt);
 
         // Applying damage may cause update attack/target components
         applyCombatComps(Reg, DC.Source, TEt);
@@ -223,19 +266,14 @@ void CombatSystem::handleMeleeAttack(entt::registry &Reg, entt::entity Attacker,
   }
 
   // Compute the effective damage and apply it
+  auto EffMA = MA.getEffective(Reg.try_get<StatsComp>(Attacker));
   DamageComp DC;
   DC.Source = Attacker;
-  if (auto *SC = Reg.try_get<StatsComp>(Attacker)) {
-    auto SP = SC->effective();
-    DC.PhysDamage = MA.getPhysEffectiveDamage(&SP);
-    DC.MagicDamage = MA.getMagicEffectiveDamage(&SP);
-  } else {
-    DC.PhysDamage = MA.getPhysEffectiveDamage();
-    DC.MagicDamage = MA.getMagicEffectiveDamage();
-  }
+  DC.MagicDamage = EffMA.MagicDamage;
+  DC.PhysDamage = EffMA.PhysDamage;
   DC.PhysDamage *= DamageFactor;
   DC.MagicDamage *= DamageFactor;
-  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC);
+  auto TotalDamage = applyDamage(Reg, Target, *THealth, DC, EHC, entt::null);
 
   // Check for on hit buffs and apply stacks
   if (auto *SBPH = Reg.try_get<StatsBuffPerHitComp>(Attacker);
@@ -267,8 +305,8 @@ void CombatSystem::update(UpdateType Type) {
 
   // Deal with damages, removing damage entities is handled by the death system
   Reg.view<DamageComp, PositionComp>().each(
-      [this](const auto &, auto &DC, auto &PC) {
-        applyDamageComp(Reg, DC, PC, *this);
+      [this](const auto &DcEt, auto &DC, auto &PC) {
+        applyDamageComp(Reg, DC, DcEt, PC, *this);
       });
 }
 

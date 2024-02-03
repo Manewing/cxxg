@@ -46,7 +46,8 @@ Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
 }
 
 void Renderer::renderShadow(unsigned char Darkness) {
-  const cxxg::types::RgbColor ShadowColor{Darkness, Darkness, Darkness};
+  const cxxg::types::RgbColor ShadowColor{Darkness, Darkness, Darkness, true,
+                                          0,        0,        0};
   VisibleMap.forEach(
       [ShadowColor](auto, auto &Tile) { Tile.Color = ShadowColor; });
   IsVisibleMap.fill(false);

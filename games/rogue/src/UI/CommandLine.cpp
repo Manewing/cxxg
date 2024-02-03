@@ -6,6 +6,7 @@
 #include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
+#include <rogue/UI/TargetUI.h>
 
 namespace rogue::ui {
 
@@ -107,12 +108,20 @@ bool CommandLineController::handleCommandLine(const std::string &Cmd) {
             << "Switching to level: " + std::to_string(Lvl.getLevelId() + 1));
     publish(SwitchLevelEvent{
         {}, Lvl.getLevelId() + 1, true, entt::null, entt::null});
+  } else if (Cmd == "debug_targets") {
+    TargetInfo::DebugTargets = !TargetInfo::DebugTargets;
+    publish(DebugMessageEvent()
+            << "Debug targets: " + std::to_string(TargetInfo::DebugTargets));
   } else if (Cmd == "debug_rooms") {
     GeneratedMapLevelGenerator::DebugRooms =
         !GeneratedMapLevelGenerator::DebugRooms;
     publish(DebugMessageEvent()
             << "Debug rooms: " +
                    std::to_string(GeneratedMapLevelGenerator::DebugRooms));
+  } else if (Cmd == "delay_ticks") {
+    Ctrl.DelayTicks = !Ctrl.DelayTicks;
+    publish(DebugMessageEvent()
+              << "Delaying ticks: " + std::to_string(Ctrl.DelayTicks));
   } else {
     publish(DebugMessageEvent() << "Unknown command: " + Cmd);
   }

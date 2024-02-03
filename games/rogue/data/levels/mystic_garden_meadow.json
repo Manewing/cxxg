@@ -1,14 +1,14 @@
 {
-  "map": {
-    "type": "generated",
-    "config": "mystic_garden_meadow.cfg"
-  },
   "entities": {
-    "f": "fairy",
-    "A": "pine_tree",
-    "O": "oak_tree",
-    "H": "level_entry",
     "<": "level_exit",
-    "B": "berry_bush"
+    "A": "pine_tree",
+    "B": "berry_bush",
+    "H": "level_entry",
+    "O": "oak_tree",
+    "f": "fairy"
+  },
+  "map": {
+    "config": "mystic_garden_meadow.cfg",
+    "type": "generated"
   }
 }

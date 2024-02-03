@@ -1,19 +1,19 @@
 {
-  "map": {
-    "type": "generated",
-    "config": "mystic_grove.cfg"
-  },
   "entities": {
+    "<": "level_exit",
+    "A": "pine_tree",
+    "B": "berry_bush",
+    "C": "rare_chest",
+    "G": "grove_guardian",
+    "H": "level_entry",
+    "I": "iron_pine_tree",
+    "O": "oak_tree",
     "b": "blood_fairy",
     "f": "fairy",
-    "A": "pine_tree",
-    "O": "oak_tree",
-    "I": "iron_pine_tree",
-    "G": "grove_guardian",
-    "C": "rare_chest",
-    "H": "level_entry",
-    "<": "level_exit",
-    "B": "berry_bush",
     "m": "blinding_mushroom"
+  },
+  "map": {
+    "config": "mystic_grove.cfg",
+    "type": "generated"
   }
 }

@@ -26,12 +26,16 @@ if (NOT PYTHON_EXECUTABLE)
 endif()
 message(STATUS "Python executable: ${PYTHON_EXECUTABLE}")
 
-add_subdirectory(games)
-add_subdirectory(lib)
 add_subdirectory(third-party)
 
 option(BUILD_TESTS "If to build unit tests (need google-test)" OFF)
 if (BUILD_TESTS)
   enable_testing()
+endif()
+
+add_subdirectory(games)
+add_subdirectory(lib)
+
+if (BUILD_TESTS)
   add_subdirectory(test)
 endif()

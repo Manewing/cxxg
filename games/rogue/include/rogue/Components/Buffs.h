@@ -1,6 +1,7 @@
 #ifndef ROGUE_COMPONENTS_BUFFS_H
 #define ROGUE_COMPONENTS_BUFFS_H
 
+#include <cereal/types/base_class.hpp>
 #include <entt/entt.hpp>
 #include <optional>
 #include <rogue/Components/Helpers.h>
@@ -28,6 +29,8 @@ struct AdditiveBuff {
   unsigned SourceCount = 1;
   void add(const AdditiveBuff &Other);
   bool remove(const AdditiveBuff &Other);
+
+  template <class Archive> void serialize(Archive &Ar) { Ar(SourceCount); }
 };
 
 struct TimedBuff {
@@ -43,6 +46,10 @@ struct TimedBuff {
   unsigned totalTicksLeft() const;
 
   bool remove(const TimedBuff &) { return false; }
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(TicksLeft, TickPeriod, TickPeriodsLeft);
+  }
 };
 
 struct DiminishingReturnsValueGenBuff : public TimedBuff {
@@ -59,6 +66,10 @@ public:
   StatValue total() const;
 
   virtual std::string getApplyDesc() const = 0;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<TimedBuff>(this), TickAmount, RealDuration);
+  }
 
 protected:
   std::string getParamApplyDesc(std::string_view Prologue,
@@ -84,6 +95,10 @@ public:
   void add(const StatsBuffComp &Other);
   bool remove(const StatsBuffComp &Other);
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), Bonus);
+  }
+
 public:
   StatPoints Bonus;
 };
@@ -91,7 +106,17 @@ public:
 struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
   std::string getName() const override;
   std::string getDescription() const override;
+
+  /// Will increase the buff but the duration will be minimum of the two
   void add(const StatsTimedBuffComp &Other);
+
+  /// Removes an added buff, returns true if component can be removed
+  bool remove(const StatsTimedBuffComp &Other);
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<StatsBuffComp>(this),
+       cereal::base_class<TimedBuff>(this));
+  }
 };
 
 // TODO:
@@ -100,7 +125,6 @@ struct StatsTimedBuffComp : public StatsBuffComp, public TimedBuff {
 //  Debuffs:
 //      - Burning
 //      - Slow
-//      - Blinded
 
 struct PoisonDebuffComp : public DiminishingReturnsValueGenBuff,
                           public BuffBase {
@@ -151,6 +175,10 @@ public:
   std::string getDescription() const override;
   void add(const MindVisionBuffComp &Other);
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<TimedBuff>(this), Range);
+  }
+
 public:
   unsigned Range = 100;
 };
@@ -183,6 +211,10 @@ struct ArmorBuffComp : public AdditiveBuff, public BuffBase {
 
   // Magic armor reduces damage by 1/x where x is armor * 0.5
   StatValue getMagicEffectiveDamage(StatValue Damage, StatsComp *DstSC) const;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), PhysArmor, MagicArmor);
+  }
 };
 
 struct BlockBuffComp : public AdditiveBuff, public BuffBase {
@@ -194,6 +226,10 @@ struct BlockBuffComp : public AdditiveBuff, public BuffBase {
 
   void add(const BlockBuffComp &Other);
   bool remove(const BlockBuffComp &Other);
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), BlockChance);
+  }
 };
 
 class BuffApplyHelperBase {
@@ -275,12 +311,18 @@ struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
   BuffType Buff;
 
   std::string getName() const override {
-    return std::to_string(int(Chance)) + "% chance to apply " + Buff.getName();
+    if (Chance != 100) {
+      return std::to_string(int(Chance)) + "% chance on hit " + Buff.getName();
+    }
+    return std::to_string(int(Chance)) + "On hit " + Buff.getName();
   }
 
   std::string getDescription() const override {
-    return std::to_string(int(Chance)) + "% chance to apply " +
-           Buff.getDescription();
+    if (Chance != 100) {
+      return std::to_string(int(Chance)) +
+             "% chance on hit to apply: " + Buff.getDescription();
+    }
+    return "On hit apply " + Buff.getDescription();
   }
 
   void add(const ChanceToApplyBuffComp &Other) {
@@ -290,9 +332,10 @@ struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
 
   bool remove(const ChanceToApplyBuffComp &Other) {
     if (!AdditiveBuff::remove(Other)) {
+      Buff.remove(Other.Buff);
       return false;
     }
-    return Buff.remove(Other.Buff);
+    return true;
   }
 
   bool canApplyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
@@ -306,6 +349,10 @@ struct ChanceToApplyBuffComp : public AdditiveBuff, public BuffBase {
       return;
     }
     Helper::applyTo(Buff, SrcEt, DstEt, Reg);
+  }
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), Chance, Buff);
   }
 };
 
@@ -330,6 +377,27 @@ struct StatsBuffPerHitComp : public TimedBuff, public BuffBase {
 
   StatsBuffComp *Applied = nullptr;
   std::optional<StatPoint> AppliedStack = std::nullopt;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<TimedBuff>(this), Stacks, MaxStacks, SBC);
+  }
+};
+
+struct LifeStealBuffComp : public AdditiveBuff, public BuffBase {
+  std::string getName() const override;
+  std::string getDescription() const override;
+
+  void add(const LifeStealBuffComp &Other);
+  bool remove(const LifeStealBuffComp &Other);
+
+  StatValue getEffectiveLifeSteal(StatValue Damage) const;
+
+  StatValue Percent = 0.0;
+  StatValue BonusHP = 0.0;
+
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(cereal::base_class<AdditiveBuff>(this), Percent, BonusHP);
+  }
 };
 
 // Chance to apply on hit to target
@@ -340,12 +408,27 @@ using CoHTargetBleedingDebuffComp =
 using CoHTargetBlindedDebuffComp =
     ChanceToApplyBuffComp<BlindedDebuffComp, LineOfSightComp>;
 
+// clang-format off
+// Keep this list sorted alphabetically
 using BuffTypeList = ComponentList<
-    StatsBuffComp, StatsTimedBuffComp, PoisonDebuffComp,
-    CoHTargetPoisonDebuffComp, BleedingDebuffComp, CoHTargetBleedingDebuffComp,
-    HealthRegenBuffComp, ManaRegenBuffComp, BlindedDebuffComp,
-    CoHTargetBlindedDebuffComp, MindVisionBuffComp, InvisibilityBuffComp,
-    ArmorBuffComp, BlockBuffComp, StatsBuffPerHitComp>;
+ ArmorBuffComp,
+ BleedingDebuffComp,
+ BlindedDebuffComp,
+ BlockBuffComp,
+ CoHTargetBleedingDebuffComp,
+ CoHTargetBlindedDebuffComp,
+ CoHTargetPoisonDebuffComp,
+ HealthRegenBuffComp,
+ InvisibilityBuffComp,
+ LifeStealBuffComp,
+ ManaRegenBuffComp,
+ MindVisionBuffComp,
+ PoisonDebuffComp,
+ StatsBuffComp,
+ StatsBuffPerHitComp,
+ StatsTimedBuffComp
+>;
+// clang-format on
 
 void copyBuffs(entt::entity EntityFrom, entt::registry &RegFrom,
                entt::entity EntityTo, entt::registry &RegTo);

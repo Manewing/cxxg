@@ -2,6 +2,7 @@
 #define ROGUE_UI_CONTROLLER_H
 
 #include <entt/entt.hpp>
+#include <filesystem>
 #include <memory>
 #include <rogue/EventHub.h>
 #include <rogue/UI/TargetUI.h>
@@ -22,18 +23,26 @@ struct StatsComp;
 class Level;
 class CraftingDatabase;
 class CraftingHandler;
+struct SaveGameInfo;
 } // namespace rogue
 
 namespace rogue::ui {
 
 class Controller : public EventHubConnector {
 public:
+  struct SkillInfo {
+    std::string Key;
+    std::string Name;
+    cxxg::types::TermColor NameColor;
+  };
+
   struct PlayerInfo {
     int Health;
     int MaxHealth;
     int Mana;
     int MaxMana;
     std::string InteractStr;
+    std::vector<SkillInfo> Skills;
   };
 
   struct TargetInfo {
@@ -41,6 +50,9 @@ public:
     int Health;
     int MaxHealth;
   };
+
+  using LoadGameCbTy = std::function<void(const SaveGameInfo &)>;
+  using SaveGameCbTy = std::function<void(const SaveGameInfo &)>;
 
 public:
   Controller(cxxg::Screen &Scr);
@@ -60,9 +72,16 @@ public:
     return WdwContainer.getWindowOfType<T>();
   }
 
-  void setMenuUI(Level &Lvl);
+  void setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb,
+                 const SaveGameCbTy &SaveGameCb);
   bool hasMenuUI() const;
   void closeMenuUI();
+
+  void tooltip(std::string Text, std::string Header = "",
+               bool CloseOtherWindows = false);
+
+  void createYesNoDialog(std::string Text, const std::function<void(bool)> &Cb,
+                         bool CloseOtherWindows = false);
 
   void setCommandLineUI(Level &Lvl);
   bool hasCommandLineUI() const;
@@ -126,6 +145,9 @@ public:
   void closeAll();
 
   void handleResize(cxxg::types::Size Size);
+
+public:
+  bool DelayTicks = false;
 
 private:
   cxxg::Screen &Scr;

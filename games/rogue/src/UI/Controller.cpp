@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <rogue/UI/Buffs.h>
 #include <rogue/UI/CommandLine.h>
+#include <rogue/UI/CompHelpers.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Crafting.h>
 #include <rogue/UI/Equipment.h>
@@ -12,6 +13,7 @@
 #include <rogue/UI/Menu.h>
 #include <rogue/UI/Stats.h>
 #include <rogue/UI/TargetUI.h>
+#include <rogue/UI/Tooltip.h>
 
 // FIXME get rid of dep
 #include <rogue/Components/Items.h>
@@ -20,38 +22,6 @@
 namespace rogue::ui {
 
 namespace {
-
-/// Returns color for health bar, based on current health and max health. From
-/// red to green (full life).
-cxxg::types::RgbColor getHealthColor(int Health, int MaxHealth) {
-  if (Health <= 0) {
-    return {145, 10, 10};
-  }
-  int Percent = (Health * 100) / MaxHealth;
-  if (Percent >= 66) {
-    return {135, 250, 10};
-  }
-  if (Percent >= 33) {
-    return {225, 140, 10};
-  }
-  return {245, 30, 30};
-}
-
-/// Returns color for mana bar, based on current mana and max mana. From grey to
-/// blue (full mana).
-cxxg::types::RgbColor getManaColor(int Mana, int MaxMana) {
-  if (Mana <= 0) {
-    return {145, 145, 145};
-  }
-  int Percent = (Mana * 100) / MaxMana;
-  if (Percent >= 66) {
-    return {10, 140, 250};
-  }
-  if (Percent >= 33) {
-    return {80, 150, 200};
-  }
-  return {145, 145, 200};
-}
 
 cxxg::types::Size getWindowContainerSize(const cxxg::types::Size &Size) {
   return {Size.X - 1, Size.Y - 2};
@@ -97,6 +67,17 @@ void Controller::draw(int LevelIdx, const PlayerInfo &PI,
   Acc << " | " << InterColor.underline() << InteractStr;
   Acc.flushBuffer();
 
+  auto SecondAcc = Scr[1][0];
+  SecondAcc << HasInterColor.underline() << "[Skills]:";
+  for (const auto &SI : PI.Skills) {
+    SecondAcc << HasInterColor << " [" << SI.Key << "] " << SI.NameColor
+              << SI.Name;
+  }
+  if (PI.Skills.empty()) {
+    SecondAcc << NoInterColor.underline() << " Nothing";
+  }
+  SecondAcc.flushBuffer();
+
   WdwContainer.draw(Scr);
 }
 
@@ -120,8 +101,9 @@ void Controller::addWindow(std::shared_ptr<Widget> Wdw, bool AutoLayoutWindows,
   }
 }
 
-void Controller::setMenuUI(Level &Lvl) {
-  WdwContainer.addWindow<MenuController>(*this, Lvl);
+void Controller::setMenuUI(Level &Lvl, const LoadGameCbTy &LoadGameCb,
+                           const SaveGameCbTy &SaveGameCb) {
+  WdwContainer.addWindow<MenuController>(*this, Lvl, LoadGameCb, SaveGameCb);
   WdwContainer.centerSingleWindow();
 }
 
@@ -131,6 +113,30 @@ bool Controller::hasMenuUI() const {
 
 void Controller::closeMenuUI() {
   WdwContainer.closeWindow(WdwContainer.getWindowOfType<MenuController>());
+}
+
+void Controller::tooltip(std::string Text, std::string Header,
+                         bool CloseOtherWindows) {
+  if (CloseOtherWindows) {
+    closeAll();
+  }
+  const auto TooltipSize = cxxg::types::Size{40, 7};
+  auto &Wdw = WdwContainer.addWindow<Tooltip>(cxxg::types::Position{0, 2},
+                                              TooltipSize, Text, Header);
+  WdwContainer.centerWindow(Wdw);
+}
+
+void Controller::createYesNoDialog(std::string Text,
+                                   const std::function<void(bool)> &Cb,
+                                   bool CloseOtherWindows) {
+  if (CloseOtherWindows) {
+    closeAll();
+  }
+
+  const auto DialogSize = cxxg::types::Size{40, 7};
+  auto &Wdw = WdwContainer.addWindow<YesNoDialog>(
+      cxxg::types::Position{0, 2}, DialogSize, Text, Cb);
+  WdwContainer.centerWindow(Wdw);
 }
 
 void Controller::setCommandLineUI(Level &Lvl) {

@@ -26,22 +26,53 @@ void BuffsInfo::draw(cxxg::Screen &Scr) const {
       SS << "-> " << BB->getDescription() << "\n";
     }
   });
+  auto *SC = Reg.try_get<StatsComp>(Entity);
 
+  const char *Pred = "-> ";
   if (const auto *MA = Reg.try_get<MeleeAttackComp>(Entity)) {
+    const auto EffMA = MA->getEffective(SC);
     if (MA->PhysDamage > 0) {
-      SS << MA->PhysDamage << " melee phys. dmg.\n";
+      SS << Pred << MA->PhysDamage << " melee phys. dmg. (eff. "
+         << static_cast<int>(EffMA.PhysDamage) << ")";
+      Pred = ", ";
     }
     if (MA->MagicDamage > 0) {
-      SS << MA->MagicDamage << " melee magic dmg.\n";
+      SS << Pred << MA->MagicDamage << " melee magic dmg. (eff. "
+         << static_cast<int>(EffMA.MagicDamage) << ")";
+      Pred = ", ";
     }
+    if (EffMA.APCost > 0) {
+      SS << Pred << EffMA.APCost << "AP";
+      Pred = ", ";
+    }
+    if (EffMA.ManaCost > 0) {
+      SS << Pred << EffMA.ManaCost << "MP";
+      Pred = ", ";
+    }
+    SS << "\n";
   }
+  Pred = "-> ";
   if (const auto *RA = Reg.try_get<RangedAttackComp>(Entity)) {
+    const auto EffRA = RA->getEffective(SC);
     if (RA->PhysDamage > 0) {
-      SS << RA->PhysDamage << " ranged phys. dmg.\n";
+      SS << Pred << RA->PhysDamage << " ranged phys. dmg. (eff. "
+         << EffRA.PhysDamage << ")";
+      Pred = ", ";
     }
     if (RA->MagicDamage > 0) {
-      SS << RA->MagicDamage << " ranged magic dmg.\n";
+      SS << Pred << RA->MagicDamage << " ranged magic dmg. (eff. "
+         << EffRA.MagicDamage << ")";
+      Pred = ", ";
     }
+    if (EffRA.APCost > 0) {
+      SS << Pred << EffRA.APCost << "AP";
+      Pred = ", ";
+    }
+    if (EffRA.ManaCost > 0) {
+      SS << Pred << EffRA.ManaCost << "MP";
+      Pred = ", ";
+    }
+    SS << "\n";
   }
 
   auto Text = SS.str();

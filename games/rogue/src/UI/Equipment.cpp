@@ -157,9 +157,9 @@ void EquipmentController::addSelect(const EquipmentSlot &ES,
                                     cxxg::types::Position AtPos) {
   constexpr const auto NoColor = cxxg::types::Color::NONE;
   int Idx = AtPos.Y - Pos.Y + 1;
-  ItSel->addSelect<LabeledSelect>(ES.BaseTypeFilter.str(),
-                                  getSelectValue(ES, Idx), AtPos,
-                                  getSize().X - 2, NoColor, NoColor);
+  ItSel->addSelect<LabeledSelect>(
+      ES.BaseTypeFilter.str(), getSelectValue(ES, Idx), AtPos,
+      static_cast<unsigned>(getSize().X - 4), NoColor, NoColor);
 }
 
 void EquipmentController::updateSelectValues() const {

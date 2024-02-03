@@ -1,35 +1,35 @@
 {
+  "entities": {
+    "<": "level_exit",
+    "C": "common_chest",
+    "H": "level_entry",
+    "s": "skeleton"
+  },
   "map": {
-    "type": "designed",
-    "map_file": "chest_room.map",
-    "default_char": {
-      "tile": {
-        "char": " ",
-        "color": "#222222"
-      },
-      "layer": "ground"
-    },
     "char_info": {
       " ": {
+        "layer": "ground",
         "tile": {
           "char": " ",
           "color": "#222222"
-        },
-        "layer": "ground"
+        }
       },
       "#": {
+        "layer": "walls",
         "tile": {
           "char": "#",
           "color": "#737373"
-        },
-        "layer": "walls"
+        }
       }
-    }
-  },
-  "entities": {
-    "s": "skeleton",
-    "H": "level_entry",
-    "<": "level_exit",
-    "C": "common_chest"
+    },
+    "default_char": {
+      "layer": "ground",
+      "tile": {
+        "char": " ",
+        "color": "#222222"
+      }
+    },
+    "map_file": "chest_room.map",
+    "type": "designed"
   }
 }

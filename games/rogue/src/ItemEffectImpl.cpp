@@ -1,14 +1,20 @@
+#include <random>
+#include <rogue/Components/Entity.h>
 #include <rogue/Components/Player.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Context.h>
 #include <rogue/CraftingDatabase.h>
+#include <rogue/EntityDatabase.h>
 #include <rogue/Event.h>
 #include <rogue/EventHub.h>
 #include <rogue/ItemEffectImpl.h>
+#include <rogue/Level.h>
 #include <rogue/Systems/CombatSystem.h>
 #include <sstream>
 
 namespace rogue {
+
+static std::random_device RandomEngine;
 
 std::shared_ptr<ItemEffect> SetMeleeCompEffect::clone() const {
   return std::make_shared<SetMeleeCompEffect>(*this);
@@ -63,29 +69,46 @@ std::string SetRangedCompEffect::getDescription() const {
                            Comp.ManaCost, "ranged");
 }
 
-std::shared_ptr<ItemEffect> RemovePoisonEffect::clone() const {
-  return std::make_shared<RemovePoisonEffect>(*this);
-}
+#define ROGUE_REMOVE_EFFECT_IMPL(CLASS_NAME, NAME, DESC)                       \
+  std::shared_ptr<ItemEffect> CLASS_NAME::clone() const {                      \
+    return std::make_shared<CLASS_NAME>(*this);                                \
+  }                                                                            \
+  std::string CLASS_NAME::getName() const { return NAME; }                     \
+  std::string CLASS_NAME::getDescription() const { return DESC; }
 
-std::string RemovePoisonEffect::getName() const {
-  return "Remove poison effect";
-}
+ROGUE_REMOVE_EFFECT_IMPL(RemovePoisonEffect, "Remove poison effect",
+                         "Removes poison effect")
+ROGUE_REMOVE_EFFECT_IMPL(RemoveBleedingEffect, "Remove bleeding effect",
+                         "Removes bleeding effect")
+ROGUE_REMOVE_EFFECT_IMPL(RemoveBlindedEffect, "Remove blinded effect",
+                         "Removes blinded effect")
+ROGUE_REMOVE_EFFECT_IMPL(RemoveHealthRegenEffect, "Remove health regen effect",
+                         "Removes health regen effect")
+ROGUE_REMOVE_EFFECT_IMPL(RemoveManaRegenEffect, "Remove mana regen effect",
+                         "Removes mana regen effect")
 
-std::string RemovePoisonEffect::getDescription() const {
-  return "Removes poison effect";
-}
+#define ROGUE_REMOVE_BUFF_EFFECT_IMPL(CLASS_NAME, NAME, DESC)                  \
+  std::shared_ptr<ItemEffect> CLASS_NAME::clone() const {                      \
+    return std::make_shared<CLASS_NAME>(*this);                                \
+  }                                                                            \
+  std::string CLASS_NAME::getName() const { return NAME; }                     \
+  std::string CLASS_NAME::getDescription() const { return DESC; }
 
-std::shared_ptr<ItemEffect> RemovePoisonDebuffEffect::clone() const {
-  return std::make_shared<RemovePoisonDebuffEffect>(*this);
-}
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemovePoisonDebuffEffect, "Remove poison debuff",
+                              "Removes poison debuff")
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemoveBleedingDebuffEffect,
+                              "Remove bleeding debuff",
+                              "Removes bleeding debuff")
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemoveBlindedDebuffEffect,
+                              "Remove blinded debuff", "Removes blinded debuff")
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemoveHealthRegenBuffEffect,
+                              "Remove health regen buff",
+                              "Removes health regen buff")
+ROGUE_REMOVE_BUFF_EFFECT_IMPL(RemoveManaRegenBuffEffect,
+                              "Remove mana regen buff",
+                              "Removes mana regen buff")
 
-std::string RemovePoisonDebuffEffect::getName() const {
-  return "Remove poison debuff";
-}
-
-std::string RemovePoisonDebuffEffect::getDescription() const {
-  return "Removes poison debuff";
-}
+#undef ROGUE_REMOVE_BUFF_EFFECT_IMPL
 
 ManaItemEffect::ManaItemEffect(StatValue Amount) : Amount(Amount) {}
 
@@ -116,10 +139,19 @@ std::shared_ptr<ItemEffect> SweepingStrikeEffect::clone() const {
   return std::make_shared<SweepingStrikeEffect>(*this);
 }
 
-std::string SweepingStrikeEffect::getName() const { return "Sweeping Strike"; }
+SweepingStrikeEffect::SweepingStrikeEffect(std::string Name,
+                                           double DamagePercent,
+                                           Tile EffectTile)
+    : Name(std::move(Name)), DamagePercent(DamagePercent),
+      EffectTile(EffectTile) {}
+
+std::string SweepingStrikeEffect::getName() const { return Name; }
 
 std::string SweepingStrikeEffect::getDescription() const {
-  return "Hits all surrounding enemies.";
+  std::stringstream SS;
+  SS << "Hits all surrounding enemies with "
+     << static_cast<unsigned>(DamagePercent) << "% melee damage.";
+  return SS.str();
 }
 
 bool SweepingStrikeEffect::canApplyTo(const entt::entity &SrcEt,
@@ -142,19 +174,14 @@ void SweepingStrikeEffect::applyTo(const entt::entity &SrcEt,
     MA = *AMA;
   }
 
+  auto EffMA = MA.getEffective(Reg.try_get<StatsComp>(SrcEt));
   DamageComp DC;
   DC.Source = SrcEt;
-  if (auto *SC = Reg.try_get<StatsComp>(SrcEt)) {
-    auto SP = SC->effective();
-    DC.PhysDamage = MA.getPhysEffectiveDamage(&SP);
-    DC.MagicDamage = MA.getMagicEffectiveDamage(&SP);
-  } else {
-    DC.PhysDamage = MA.getPhysEffectiveDamage();
-    DC.MagicDamage = MA.getMagicEffectiveDamage();
-  }
+  DC.MagicDamage = EffMA.MagicDamage * DamagePercent / 100.0;
+  DC.PhysDamage = EffMA.PhysDamage * DamagePercent / 100.0;
 
   for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
-    createTempDamage(Reg, DC, PC.Pos + Dir);
+    createTempDamage(Reg, DC, PC.Pos + Dir, EffectTile, 1);
   }
 
   // Make sure effect will be rendered
@@ -165,10 +192,16 @@ std::shared_ptr<ItemEffect> SmiteEffect::clone() const {
   return std::make_shared<SmiteEffect>(*this);
 }
 
-std::string SmiteEffect::getName() const { return "Smite"; }
+SmiteEffect::SmiteEffect(std::string Name, double DamagePercent)
+    : Name(std::move(Name)), DamagePercent(DamagePercent) {}
+
+std::string SmiteEffect::getName() const { return Name; }
 
 std::string SmiteEffect::getDescription() const {
-  return "Smite a single target with 250% melee damage.";
+  std::stringstream SS;
+  SS << "Smite a single target with " << static_cast<unsigned>(DamagePercent)
+     << "% melee damage.";
+  return SS.str();
 }
 
 bool SmiteEffect::canApplyTo(const entt::entity &SrcEt,
@@ -181,7 +214,161 @@ void SmiteEffect::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                           entt::registry &Reg) const {
   EventHubConnector EHC;
   EHC.setEventHub(&Reg.ctx().get<GameContext>().EvHub);
-  CombatSystem::handleMeleeAttack(Reg, SrcEt, DstEt, EHC, 2.5);
+  CombatSystem::handleMeleeAttack(Reg, SrcEt, DstEt, EHC,
+                                  DamagePercent / 100.0);
+}
+
+DiscAreaHitEffect::DiscAreaHitEffect(
+    std::string Name, unsigned Radius, StatValue PhysDamage,
+    StatValue MagicDamage,
+    std::optional<CoHTargetBleedingDebuffComp> BleedingDebuff,
+    std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
+    std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff, Tile EffectTile,
+    double DecreasePercent, unsigned MinTicks, unsigned MaxTicks,
+    bool CanHurtSource, bool CanHurtFaction)
+    : Name(std::move(Name)), Radius(Radius), PhysDamage(PhysDamage),
+      MagicDamage(MagicDamage), BleedingDebuff(BleedingDebuff),
+      PoisonDebuff(PoisonDebuff), BlindedDebuff(BlindedDebuff),
+      EffectTile(EffectTile), DecreasePercent(DecreasePercent),
+      MinTicks(MinTicks), MaxTicks(MaxTicks), CanHurtSource(CanHurtSource),
+      CanHurtFaction(CanHurtFaction) {
+  MaxTicks = std::max(MaxTicks, 1U);
+  MinTicks = std::min(MinTicks, MaxTicks);
+}
+
+std::shared_ptr<ItemEffect> DiscAreaHitEffect::clone() const {
+  return std::make_shared<DiscAreaHitEffect>(*this);
+}
+
+std::string DiscAreaHitEffect::getName() const { return Name; }
+
+std::string DiscAreaHitEffect::getDescription() const {
+  std::stringstream SS;
+  SS << "Hits all enemies in a " << static_cast<unsigned>(Radius)
+     << " tile radius";
+  const char *Pred = " for ";
+  if (MagicDamage > 0) {
+    SS << Pred << static_cast<unsigned>(MagicDamage) << " magic";
+    Pred = " and ";
+  }
+  if (PhysDamage > 0) {
+    SS << Pred << static_cast<unsigned>(PhysDamage) << " phys.";
+    Pred = " and ";
+  }
+  if (MagicDamage > 0 || PhysDamage > 0) {
+    SS << " damage";
+  }
+  if (MinTicks > 0) {
+    SS << " lasting " << MinTicks << "-" << MaxTicks << " ticks";
+  }
+  SS << ".";
+
+  if (DecreasePercent > 0) {
+    SS << " Damage decreases by " << static_cast<unsigned>(DecreasePercent)
+       << "% per tile.";
+  }
+
+  Pred = " ";
+  if (BleedingDebuff) {
+    SS << Pred << BleedingDebuff->getDescription();
+    Pred = " and ";
+  }
+  if (PoisonDebuff) {
+    SS << Pred << PoisonDebuff->getDescription();
+    Pred = " and ";
+  }
+  if (BlindedDebuff) {
+    SS << Pred << BlindedDebuff->getDescription();
+    Pred = " and ";
+  }
+
+  return SS.str();
+}
+
+bool DiscAreaHitEffect::canApplyTo(const entt::entity &SrcEt,
+                                   const entt::entity &,
+                                   entt::registry &Reg) const {
+  return Reg.all_of<PositionComp>(SrcEt);
+}
+
+namespace {
+
+template <typename HandlerFunc>
+void doForEachTileInCircleAt(ymir::Point2d<int> AtPos, int Radius,
+                             const HandlerFunc &Handler) {
+  // Visit all tiles in radius exactly once
+  int X = -Radius, Y = 0, Error = 2 - 2 * Radius; /* II. Quadrant */
+  do {
+    Handler(AtPos + ymir::Point2d<int>{-X, +Y}); /*   I. Quadrant */
+    Handler(AtPos + ymir::Point2d<int>{-Y, -X}); /*  II. Quadrant */
+    Handler(AtPos + ymir::Point2d<int>{+X, -Y}); /* III. Quadrant */
+    Handler(AtPos + ymir::Point2d<int>{+Y, +X}); /*  IV. Quadrant */
+    Radius = Error;
+    if (Radius <= Y)
+      Error += ++Y * 2 + 1; /* e_xy+e_y < 0 */
+    if (Radius > X || Error > Y)
+      Error += ++X * 2 + 1; /* e_xy+e_x > 0 or no 2nd y-step */
+  } while (X < 0);
+}
+
+} // namespace
+
+void DiscAreaHitEffect::applyTo(const entt::entity &SrcEt, const entt::entity &,
+                                entt::registry &Reg) const {
+  auto &PC = Reg.get<PositionComp>(SrcEt);
+
+  // Special case for radius 1-2
+  if (Radius >= 1) {
+    for (const auto &Dir : ymir::EightTileDirections<int>::get()) {
+      createDamageEt(Reg, SrcEt, PC.Pos + Dir, 1.0);
+    }
+  }
+
+  // Visit all tiles in radius exactly once
+  static const auto DecreaseFactor = (1 - DecreasePercent / 100.0);
+  auto Factor = 1.0;
+  for (unsigned X = 2; X < Radius; ++X) {
+    Factor *= DecreaseFactor;
+    doForEachTileInCircleAt(PC.Pos, X,
+                            [this, &Reg, SrcEt, Factor](ymir::Point2d<int> P) {
+                              createDamageEt(Reg, SrcEt, P, Factor);
+                            });
+  }
+
+  // Make sure effect will be rendered
+  Reg.ctx().get<GameContext>().EvHub.publish(EffectDelayEvent{});
+}
+
+void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
+                                       const entt::entity &SrcEt,
+                                       ymir::Point2d<int> Pos,
+                                       double DecreaseFactor) const {
+  if (Reg.ctx().get<Level *>()->isWallBlocked(Pos)) {
+    return;
+  }
+  DamageComp DC;
+  DC.Source = SrcEt;
+  DC.CanHurtSource = CanHurtSource;
+  DC.PhysDamage = PhysDamage * DecreaseFactor;
+  DC.MagicDamage = MagicDamage * DecreaseFactor;
+  if (!CanHurtFaction && Reg.all_of<FactionComp>(SrcEt)) {
+    DC.Faction = Reg.get<FactionComp>(SrcEt).Faction;
+  }
+
+  unsigned Ticks = std::rand() % (MaxTicks - MinTicks + 1) + MinTicks;
+  auto Et = createTempDamage(Reg, DC, Pos, EffectTile, Ticks);
+
+  if (BleedingDebuff) {
+    Reg.emplace<CoHTargetBleedingDebuffComp>(Et, *BleedingDebuff);
+  }
+
+  if (PoisonDebuff) {
+    Reg.emplace<CoHTargetPoisonDebuffComp>(Et, *PoisonDebuff);
+  }
+
+  if (BlindedDebuff) {
+    Reg.emplace<CoHTargetBlindedDebuffComp>(Et, *BlindedDebuff);
+  }
 }
 
 std::shared_ptr<ItemEffect> LearnRecipeEffect::clone() const {
@@ -231,6 +418,65 @@ void LearnRecipeEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
   PC->KnownRecipes.insert(RecipeId);
   EvHub.publish(PlayerInfoMessageEvent()
                 << "You learned: " << Recipes.at(RecipeId).getName());
+}
+
+SpawnEntityEffect::SpawnEntityEffect(std::string EntityName, double Chance)
+    : EntityName(std::move(EntityName)), Chance(Chance) {}
+
+std::shared_ptr<ItemEffect> SpawnEntityEffect::clone() const {
+  return std::make_shared<SpawnEntityEffect>(*this);
+}
+
+std::string SpawnEntityEffect::getName() const { return "Spawn " + EntityName; }
+
+std::string SpawnEntityEffect::getDescription() const {
+  std::stringstream SS;
+  SS << "Spawns " << EntityName;
+  if (Chance != 0) {
+    SS << " with " << Chance * 100 << "% chance.";
+  }
+  return SS.str();
+}
+
+bool SpawnEntityEffect::canApplyTo(const entt::entity &,
+                                   const entt::entity &DstEt,
+                                   entt::registry &Reg) const {
+  return Reg.all_of<PositionComp>(DstEt);
+}
+
+void SpawnEntityEffect::applyTo(const entt::entity &, const entt::entity &DstEt,
+                                entt::registry &Reg) const {
+  auto *Lvl = Reg.ctx().get<Level *>();
+  assert(Lvl && "No level set in registry");
+
+  if (Chance != 0) {
+    std::uniform_real_distribution<double> Dist(0, 1);
+    if (Dist(RandomEngine) > Chance) {
+      return;
+    }
+  }
+
+  auto &Pos = Reg.get<PositionComp>(DstEt).Pos;
+  auto &EvHub = Reg.ctx().get<GameContext>().EvHub;
+
+  const auto &EntityDb = Reg.ctx().get<GameContext>().EntityDb;
+  EntityFactory EF(Reg, EntityDb);
+
+  auto EtTmplId = EntityDb.getEntityTemplateId(EntityName);
+  auto NewEntity = EF.createEntity(EtTmplId);
+
+  if (auto *PC = Reg.try_get<PositionComp>(NewEntity)) {
+    auto NewPosOrNone = Lvl->getNonBodyBlockedPosNextTo(Pos);
+    if (!NewPosOrNone) {
+      EvHub.publish(PlayerInfoMessageEvent()
+                    << "Could not spawn " << EntityName << " at " << Pos
+                    << " because there is no free space.");
+      return;
+    }
+    PC->Pos = *NewPosOrNone;
+  }
+
+  EvHub.publish(SpawnEntityEvent{{}, NewEntity, &Reg});
 }
 
 } // namespace rogue

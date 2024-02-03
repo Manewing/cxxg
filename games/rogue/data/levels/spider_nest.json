@@ -1,13 +1,13 @@
 {
-  "map": {
-    "type": "generated",
-    "config": "spider_nest.cfg"
-  },
   "entities": {
+    "0": "silk_cocoon",
     "<": "level_entry",
     "H": "level_exit",
-    "0": "silk_cocoon",
-    "h": "arachnoth_hatchling",
-    "b": "arachnoth_burrower"
+    "b": "arachnoth_burrower",
+    "h": "arachnoth_hatchling"
+  },
+  "map": {
+    "config": "spider_nest.cfg",
+    "type": "generated"
   }
 }

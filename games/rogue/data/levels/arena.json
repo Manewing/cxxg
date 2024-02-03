@@ -1,34 +1,43 @@
 {
+  "entities": {
+    "0": "troll",
+    "1": "toxic_rat",
+    "2": "toxic_rat",
+    "3": "toxic_rat",
+    "4": "toxic_rat",
+    "5": "toxic_rat",
+    "6": "troll",
+    "7": "troll",
+    "8": "troll",
+    "9": "troll",
+    "<": "level_exit",
+    "H": "level_entry"
+  },
   "map": {
-    "type": "designed",
-    "map_file": "arena.map",
-    "default_char": {
-      "tile": {
-        "char": " ",
-        "color": "#222222"
-      },
-      "layer": "ground"
-    },
     "char_info": {
       " ": {
+        "layer": "ground",
         "tile": {
           "char": " ",
           "color": "#222222"
-        },
-        "layer": "ground"
+        }
       },
       "#": {
+        "layer": "walls",
         "tile": {
           "char": "#",
           "color": "#737373"
-        },
-        "layer": "walls"
+        }
       }
-    }
-  },
-  "entities": {
-    "t": "troll",
-    "H": "level_entry",
-    "<": "level_exit"
+    },
+    "default_char": {
+      "layer": "ground",
+      "tile": {
+        "char": " ",
+        "color": "#222222"
+      }
+    },
+    "map_file": "arena.map",
+    "type": "designed"
   }
 }

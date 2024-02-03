@@ -35,6 +35,10 @@ ItemType ItemType::fromString(const std::string &Type) {
   throw std::out_of_range("Unknown ItemType: " + Type);
 }
 
+bool ItemType::is(ItemType Other) const {
+  return (Value & Other.Value) == Other.Value;
+}
+
 std::string ItemType::str() const {
   std::stringstream Label;
   const char *Pred = "";
@@ -119,9 +123,6 @@ CapabilityFlags::parseString(const std::string &Str) {
   if (Str == "dismantle") {
     return CapabilityFlags::Dismantle;
   }
-  if (Str == "ranged") {
-    return CapabilityFlags::Ranged;
-  }
   if (Str == "ranged_use") {
     return CapabilityFlags::Ranged | CapabilityFlags::UseOn;
   }
@@ -193,9 +194,55 @@ const char *CapabilityFlags::str() const {
   return "<unimp. CapabilityFlags>";
 }
 
+std::string CapabilityFlags::flagString() const {
+  std::stringstream Flags;
+  const char *Pred = "";
+  if (Value & CapabilityFlags::UseOn) {
+    Flags << Pred << "Use";
+    Pred = " | ";
+  }
+  if (Value & CapabilityFlags::EquipOn) {
+    Flags << Pred << "Equip";
+    Pred = " | ";
+  }
+  if (Value & CapabilityFlags::UnequipFrom) {
+    Flags << Pred << "Unequip";
+    Pred = " | ";
+  }
+  if (Value & CapabilityFlags::Dismantle) {
+    Flags << Pred << "Dismantle";
+    Pred = " | ";
+  }
+  if (Value & CapabilityFlags::Ranged) {
+    Flags << Pred << "Ranged";
+    Pred = " | ";
+  }
+  if (Value & CapabilityFlags::Adjacent) {
+    Flags << Pred << "Adjacent";
+    Pred = " | ";
+  }
+  if (Value & CapabilityFlags::Self) {
+    Flags << Pred << "Self";
+    Pred = " | ";
+  }
+  if (Value & CapabilityFlags::Skill) {
+    Flags << Pred << "Skill";
+    Pred = " | ";
+  }
+  auto FlagsStr = Flags.str();
+  if (FlagsStr.empty()) {
+    return "<unimp. CapabilityFlags>";
+  }
+  return FlagsStr;
+}
+
 CapabilityFlags::operator bool() const {
   // Filter out capability flags that are not valid on their own
   return (Value & ~(Self | Ranged | Adjacent)) != None;
+}
+
+bool CapabilityFlags::is(CapabilityFlags Other) const {
+  return (Value & Other) == Other;
 }
 
 bool CapabilityFlags::isAdjacent(CapabilityFlags Other) const {

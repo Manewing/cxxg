@@ -1,13 +1,15 @@
 {
-  "map": {
-    "type": "generated",
-    "config": "sewers.cfg"
-  },
   "entities": {
-    "r": "sewer_rat",
-    "R": "toxic_rat",
+    "%": "common_skeletal_remains",
     "<": "level_entry",
     "H": "level_exit",
-    "v": "common_vase"
+    "R": "toxic_rat",
+    "r": "sewer_rat",
+    "v": "common_vase",
+    "w": "common_arcane_workshop"
+  },
+  "map": {
+    "config": "sewers.cfg",
+    "type": "generated"
   }
 }

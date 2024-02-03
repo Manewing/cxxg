@@ -17,9 +17,10 @@ namespace rogue {
 
 class Item {
 public:
-  explicit Item(const ItemPrototype &Proto, int StackSize = 1,
-                const std::shared_ptr<ItemPrototype> &Specialization = nullptr,
-                bool SpecOverrides = false);
+  explicit Item(
+      const ItemPrototype &Proto, int StackSize = 1,
+      const std::shared_ptr<const ItemPrototype> &Specialization = nullptr,
+      bool SpecOverrides = false);
   virtual ~Item() = default;
 
   int getId() const;
@@ -49,6 +50,9 @@ public:
                   entt::registry &Reg, CapabilityFlags Flags) const;
 
   const ItemPrototype &getProto() const;
+  const std::shared_ptr<const ItemPrototype> &getSpecialization() const;
+
+  bool doesSpecOverride() const { return SpecOverrides; }
 
 public:
   int StackSize = 1;

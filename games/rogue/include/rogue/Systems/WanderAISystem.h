@@ -9,9 +9,6 @@ namespace rogue {
 class Level;
 struct PositionComp;
 struct WanderAIComp;
-struct AgilityComp;
-struct LineOfSightComp;
-struct FactionComp;
 } // namespace rogue
 
 namespace rogue {
@@ -26,22 +23,9 @@ public:
 private:
   void updateEntity(entt::entity Entity, PositionComp &Pos, WanderAIComp &AI);
 
-  std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
-  checkForTarget(entt::entity Entity, PositionComp &PC, WanderAIComp &AI);
-
-  std::tuple<entt::entity, const LineOfSightComp *, const FactionComp *>
-  findTarget(entt::entity Entity, const ymir::Point2d<int> &AtPos);
-
-  ymir::Point2d<int> wander(const ymir::Point2d<int> AtPos);
-
-  std::optional<ymir::Point2d<int>>
-  findPathToPoint(const ymir::Point2d<int> ToPos,
-                  const ymir::Point2d<int> FutureToPos,
-                  const ymir::Point2d<int> AtPos, const unsigned LOSRange);
-
-  std::optional<ymir::Point2d<int>> chaseTarget(entt::entity TargetEt,
-                                                const ymir::Point2d<int> AtPos,
-                                                const LineOfSightComp &LOS);
+  /// Searches the level for a non-blocked position next to \p AtPos
+  ymir::Point2d<int>
+  findRandomNonBlockedPosNextTo(ymir::Point2d<int> AtPos) const;
 
 private:
   Level &L;
@@ -49,4 +33,4 @@ private:
 
 } // namespace rogue
 
-#endif // #ifndef ROGUE_SYSTEMS_AGILITY_SYSTEM_H
+#endif // #ifndef ROGUE_SYSTEMS_WANDER_AI_SYSTEM_H

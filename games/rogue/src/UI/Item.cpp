@@ -63,6 +63,10 @@ cxxg::types::TermColor getColorForItem(const Item &It) {
     return getColorForItemEffects(AllEffects, CapabilityFlags::Equipment |
                                                   CapabilityFlags::Skill);
   }
+  if (It.getType().is(ItemType::CraftingBase | ItemType::Consumable) &&
+      AllEffects.size() > 1) {
+    return getColorForItemEffects(AllEffects, CapabilityFlags::UseOn);
+  }
   return getColorForItemType(It.getType());
 }
 
@@ -115,6 +119,7 @@ std::string getCapabilityDescription(const ItemType &ItType,
   if (!ItemPrototype::canApply(ItType, Flag)) {
     return "Crafting only: " + SS.str();
   }
+  SS << "\n";
   return SS.str();
 }
 

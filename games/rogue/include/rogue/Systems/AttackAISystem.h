@@ -4,11 +4,18 @@
 #include <rogue/Systems/System.h>
 
 namespace rogue {
+class Level;
+}
+
+namespace rogue {
 
 class AttackAISystem : public System {
 public:
-  using System::System;
+  explicit AttackAISystem(Level &L);
   void update(UpdateType Type) override;
+
+private:
+  Level &L;
 };
 
 } // namespace rogue

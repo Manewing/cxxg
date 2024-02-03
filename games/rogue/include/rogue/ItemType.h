@@ -63,7 +63,12 @@ public:
   bool operator==(ValueType Other) const { return Value == Other; }
   bool operator!=(ValueType Other) const { return Value != Other; }
 
+  /// Returns true if all flags set in other are also set in this
+  bool is(ItemType Other) const;
+
   std::string str() const;
+
+  template <class Archive> void serialize(Archive &Ar) { Ar(Value); }
 
 private:
   ValueType Value = None;
@@ -124,6 +129,9 @@ public:
     return Value != Other.Value;
   }
 
+  /// Returns true if all flags set in other are also set in this
+  bool is(CapabilityFlags Other) const;
+
   /// Checks if both adjacent and \p Other flags are set
   bool isAdjacent(CapabilityFlags Other) const;
 
@@ -134,6 +142,9 @@ public:
   bool operator!=(ValueType Other) const { return Value != Other; }
 
   const char *str() const;
+  std::string flagString() const;
+
+  template <class Archive> void serialize(Archive &Ar) { Ar(Value); }
 
 private:
   ValueType Value = None;

@@ -1,5 +1,7 @@
 #include <array>
 #include <cxxg/Screen.h>
+#include <rogue/Level.h>
+#include <rogue/Serialization.h>
 #include <rogue/UI/Controller.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Frame.h>
@@ -15,13 +17,15 @@ struct MenuItemInfo {
   const char *Text = "<unimp. text>";
   bool Debug = false;
 };
-static constexpr std::array<MenuItemInfo, 6> MenuItemInfos = {{
+static constexpr std::array<MenuItemInfo, 8> MenuItemInfos = {{
     {{(DefaultSize.X - 6) / 2, 2}, "Resume", false},
     {{(DefaultSize.X - 8) / 2, 4}, "Controls", false},
     {{(DefaultSize.X - 4) / 2, 6}, "Help", false},
     {{(DefaultSize.X - 11) / 2, 8}, "Help Combat", false},
     {{(DefaultSize.X - 13) / 2, 10}, "Help Crafting", false},
-    {{(DefaultSize.X - 12) / 2, 12}, "Command Line", true},
+    {{(DefaultSize.X - 9) / 2, 12}, "Save Game", false},
+    {{(DefaultSize.X - 9) / 2, 14}, "Load Game", false},
+    {{(DefaultSize.X - 12) / 2, 16}, "Command Line", true},
 }};
 
 static constexpr std::array<const rogue::ui::KeyOption *, 6> GameCtrlInfos = {
@@ -132,10 +136,134 @@ std::shared_ptr<Widget> makeHelpCraftingWindow() {
   return makeHelpWindow("Help Crafting", SS.str(), DefaultPos, DefaultSize);
 }
 
+std::shared_ptr<Widget> makeSlotsWindow(
+    const std::string &Title, bool StoreAsJSON,
+    const std::function<void(const SaveGameInfo &SGI)> &SlotSelectCb) {
+  cxxg::types::Position Pos = {2, 2};
+  static constexpr auto SlotWdwPos = cxxg::types::Position{2, 2};
+  static constexpr auto SlotWdwSize = cxxg::types::Size{30, 12};
+
+  std::shared_ptr<ItemSelect> SlotSelect = std::make_shared<ItemSelect>(Pos);
+
+  std::string SlotStr = "Slot 0";
+
+  std::map<std::string, SaveGameInfo> SgMap;
+  for (unsigned SlotIdx = 0; SlotIdx < 5; SlotIdx++) {
+    SlotStr[5] = '1' + SlotIdx;
+
+    auto SGI = SaveGameInfo::fromSlot(SlotIdx, StoreAsJSON);
+    SGI.Name = SlotStr;
+    SgMap[SlotStr] = SGI;
+
+    std::string Label = "Empty";
+    cxxg::types::TermColor LabelColor = cxxg::types::Color::GREY;
+    if (SGI.exists()) {
+      Label = SGI.getDateStr();
+      LabelColor = cxxg::types::Color::GREEN;
+    }
+
+    auto SlotPos = Pos;
+    SlotPos.Y += SlotIdx * 2;
+    SlotSelect->addSelect<LabeledSelect>(
+        SlotStr, Label, SlotPos, static_cast<unsigned>(SlotWdwSize.X - 2),
+        LabelColor, LabelColor);
+  }
+
+  SlotSelect->registerOnSelectCallback([SgMap, SlotSelectCb](const Select &S) {
+    auto &LS = static_cast<const LabeledSelect &>(S);
+    SlotSelectCb(SgMap.at(LS.getLabel()));
+  });
+
+  std::shared_ptr<Widget> Wdw =
+      std::make_shared<BaseRectDecorator>(SlotWdwPos, SlotWdwSize, SlotSelect);
+  Wdw = std::make_shared<Frame>(Wdw, SlotWdwPos, SlotWdwSize, Title);
+
+  return Wdw;
+}
+
+void handleLoadGame(Controller &Ctrl, const SaveGameInfo &SGI,
+                    const MenuController::LoadGameCbTy &LoadGameCb) {
+  try {
+    LoadGameCb(SGI);
+    // This kills all other UI including this one, so we can't do anything
+    // after
+    Ctrl.tooltip("Loaded game", "Info", /*CloseOtherWindows=*/true);
+  } catch (const std::exception &E) {
+    // This kills all other UI including this one, so we can't do anything
+    // after
+    Ctrl.tooltip("Failed to load game from " + SGI.Path.string() + ":\n" +
+                     E.what(),
+                 "Error", /*CloseOtherWindows=*/true);
+  }
+}
+
+std::shared_ptr<Widget>
+makeLoadSlotWindow(Controller &Ctrl, MenuController::LoadGameCbTy LoadGameCb,
+                   bool StoreAsJSON) {
+  return makeSlotsWindow(
+      "Load Game", StoreAsJSON, [LoadGameCb, &Ctrl](const auto SGI) mutable {
+        if (!SGI.exists()) {
+          return;
+        }
+        std::stringstream SS;
+        SS << "Load game from " << SGI.Name
+           << "? This will overwrite the current game.\n\n"
+           << "Save Game Info:\n"
+           << SGI.getDateStr() << "\n"
+           << SGI.Path.string();
+        Ctrl.createYesNoDialog(SS.str(), [LoadGameCb, &Ctrl, SGI](bool Yes) {
+          if (Yes) {
+            handleLoadGame(Ctrl, SGI, LoadGameCb);
+          }
+        });
+      });
+}
+
+void handleSaveGame(Controller &Ctrl, const SaveGameInfo &SGI,
+                    const MenuController::SaveGameCbTy &SaveGameCb) {
+  try {
+    SaveGameCb(SGI);
+    // This kills all other UI including this one, so we can't do anything
+    // after
+    Ctrl.tooltip("Saved game", "Info", /*CloseOtherWindows=*/true);
+  } catch (const std::exception &E) {
+    // This kills all other UI including this one, so we can't do anything
+    // after
+    Ctrl.tooltip("Failed to save game to" + SGI.Path.string() + ":\n" +
+                     E.what(),
+                 "Error", /*CloseOtherWindows=*/true);
+  }
+}
+
+std::shared_ptr<Widget>
+makeSaveSlotWindow(Controller &Ctrl, MenuController::SaveGameCbTy SaveGameCb,
+                   bool StoreAsJSON) {
+  return makeSlotsWindow(
+      "Save Game", StoreAsJSON, [SaveGameCb, &Ctrl](const auto SGI) mutable {
+        std::stringstream SS;
+        SS << "Save game to " << SGI.Name << "?";
+        if (SGI.exists()) {
+          SS << " This will overwrite the existing save game.";
+        }
+        SS << "\n\nSave Game Info:\n";
+        if (SGI.exists()) {
+          SS << SGI.getDateStr() << "\n";
+        }
+        SS << SGI.Path.string();
+        Ctrl.createYesNoDialog(SS.str(), [SaveGameCb, &Ctrl, SGI](bool Yes) {
+          if (Yes) {
+            handleSaveGame(Ctrl, SGI, SaveGameCb);
+          }
+        });
+      });
+}
+
 } // namespace
 
-MenuController::MenuController(Controller &C, Level &L)
-    : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Ctrl(C), Lvl(L) {
+MenuController::MenuController(Controller &C, Level &L, LoadGameCbTy Ld,
+                               SaveGameCbTy Sv)
+    : BaseRectDecorator(DefaultPos, DefaultSize, nullptr), Ctrl(C), Lvl(L),
+      LoadGameCb(std::move(Ld)), SaveGameCb(std::move(Sv)) {
   MenuItSel = std::make_shared<ItemSelect>(Pos);
 
   const bool Debug = getenv("ROGUE_DEBUG") != nullptr;
@@ -161,6 +289,8 @@ MenuController::MenuController(Controller &C, Level &L)
 
   Comp = std::make_shared<Frame>(MenuItSel, Pos, DefaultSize, "Menu");
 
+  static const bool StoreAsJSON = true;
+
   MenuItSel->registerOnSelectCallback([this](const Select &S) {
     if (S.getValue() == "Resume") {
       Ctrl.closeMenuUI();
@@ -175,6 +305,14 @@ MenuController::MenuController(Controller &C, Level &L)
       Ctrl.closeMenuUI();
     } else if (S.getValue() == "Help Crafting") {
       Ctrl.addWindow(makeHelpCraftingWindow(), false, true);
+      Ctrl.closeMenuUI();
+    } else if (S.getValue() == "Load Game") {
+      Ctrl.addWindow(makeLoadSlotWindow(Ctrl, LoadGameCb, StoreAsJSON), false,
+                     true);
+      Ctrl.closeMenuUI();
+    } else if (S.getValue() == "Save Game") {
+      Ctrl.addWindow(makeSaveSlotWindow(Ctrl, SaveGameCb, StoreAsJSON), false,
+                     true);
       Ctrl.closeMenuUI();
     } else if (S.getValue() == "Command Line") {
       Ctrl.setCommandLineUI(Lvl);

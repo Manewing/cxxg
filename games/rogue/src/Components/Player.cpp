@@ -9,6 +9,7 @@
 #include <rogue/Components/Stats.h>
 #include <rogue/Components/Transform.h>
 #include <rogue/Components/Visual.h>
+#include <rogue/Components/Serialization.h>
 
 namespace rogue {
 namespace {
@@ -17,7 +18,7 @@ using PlayerCompList =
     ComponentList<TileComp, FactionComp, PlayerComp, PositionComp, StatsComp,
                   HealthComp, ManaComp, NameComp, LineOfSightComp,
                   VisibleLOSComp, VisibleComp, AgilityComp, InventoryComp,
-                  EquipmentComp, CollisionComp>;
+                  EquipmentComp, CollisionComp, serialize::IdComp>;
 using PlayerCompListOpt = ComponentList<MeleeAttackComp, RangedAttackComp>;
 
 entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
@@ -33,6 +34,8 @@ entt::entity createPlayer(entt::registry &Reg, const PlayerComp &PC,
   // Fixed values
   Reg.emplace<TileComp>(Entity, PlayerTile);
   Reg.emplace<FactionComp>(Entity, FactionKind::Player);
+
+  Reg.emplace<serialize::IdComp>(Entity, serialize::IdComp{9999});
 
   // Copy values
   Reg.emplace<PlayerComp>(Entity, PC);
@@ -61,7 +64,7 @@ entt::entity PlayerComp::createPlayer(entt::registry &Reg,
                                       ymir::Point2d<int> Pos) {
   return ::rogue::createPlayer(Reg, PlayerComp{}, PositionComp{Pos},
                                StatsComp{StatPoints{4, 4, 4, 4}, {}},
-                               HealthComp{}, ManaComp{}, NameComp{Name},
+                               HealthComp{}, ManaComp{}, NameComp{Name, Name},
                                LineOfSightComp{18}, AgilityComp{},
                                InventoryComp{}, EquipmentComp{});
 }

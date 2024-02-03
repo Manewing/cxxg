@@ -1,16 +1,16 @@
 {
+  "entities": {},
   "map": {
-    "type": "composite",
     "levels": [
       {
-        "end": 1,
-        "config": "sewers.json"
+        "config": "sewers.json",
+        "end": 1
       },
       {
-        "end": 2,
-        "config": "fat_rat.json"
+        "config": "fat_rat.json",
+        "end": 2
       }
-    ]
-  },
-  "entities": {}
+    ],
+    "type": "composite"
+  }
 }

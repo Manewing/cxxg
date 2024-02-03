@@ -96,11 +96,11 @@ EntityAssemblerCache getDefaultEntityAssemblerCache() {
   Cache.add<ManaCompAssembler>("mana");
   Cache.add<PlayerCompAssembler>("player");
   Cache.add<PositionCompAssembler>("position");
+  Cache.add<SearchAICompAssembler>("search_ai");
   Cache.add<VisibleCompAssembler>("visible");
   Cache.add<WanderAICompAssembler>("wander_ai");
 
   // TODO make configurable
-  Cache.add<LineOfSightCompAssembler>("line_of_sight");
   Cache.add<AgilityCompAssembler>("agility");
   Cache.add<HealerInteractableCompAssembler>("healer");
   Cache.add<ShopAssembler>("shop");
@@ -192,10 +192,56 @@ makeLevelEntryExitAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   return std::make_shared<LevelEntryExitAssembler>(IsExit, LevelId);
 }
 
+std::shared_ptr<SpawnEntityPostInteractionAssembler>
+makeSpawnEntityPostInteraction(ItemDatabase &, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  std::string EntityName = JsonObj["entity_name"].GetString();
+  double Chance = 0;
+  if (JsonObj.HasMember("chance")) {
+    Chance = JsonObj["chance"].GetDouble();
+  }
+  unsigned Uses = 1;
+  if (JsonObj.HasMember("uses")) {
+    Uses = JsonObj["uses"].GetUint();
+  }
+  return std::make_shared<SpawnEntityPostInteractionAssembler>(EntityName,
+                                                               Chance, Uses);
+}
+
+std::shared_ptr<SerializationIdCompAssembler>
+makeSerializationIdCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  std::size_t Id = JsonObj["id"].GetUint64();
+  return std::make_shared<SerializationIdCompAssembler>(Id);
+}
+
+std::shared_ptr<EffectExecutorCompAssembler>
+makeEffectExecutorCompAssembler(ItemDatabase &ItemDb, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  EffectExecutorComp Comp;
+  for (const auto &EffectJson : JsonObj["effects"].GetArray()) {
+    unsigned MinDelay = EffectJson["min_delay"].GetUint();
+    unsigned MaxDelay = EffectJson["max_delay"].GetUint();
+
+    EffectExecutorComp::Info Info;
+    Info.Effect = ItemDb.getItemEffect(EffectJson["effect_name"].GetString());
+    Info.DelayDist = std::uniform_int_distribution<unsigned>(MinDelay, MaxDelay);
+    Comp.Effects.emplace_back(std::move(Info));
+  }
+  return std::make_shared<EffectExecutorCompAssembler>(std::move(Comp));
+}
+
 std::shared_ptr<StatsCompAssembler>
 makeStatsCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
   auto SP = parseStatPoints(Json);
   return std::make_shared<StatsCompAssembler>(SP);
+}
+
+std::shared_ptr<LineOfSightCompAssembler>
+makeLineOfSightCompAssembler(ItemDatabase &, const rapidjson::Value &Json) {
+  const auto &JsonObj = Json.GetObject();
+  unsigned Range = JsonObj["range"].GetUint();
+  return std::make_shared<LineOfSightCompAssembler>(Range);
 }
 
 DamageComp parseDamageComp(const rapidjson::Value &Json) {
@@ -229,10 +275,14 @@ const auto &getEntityAssemblerFactories() {
       {"inventory", makeInventoryCompAssembler},
       {"race", makeRaceCompAssembler},
       {"stats", makeStatsCompAssembler},
+      {"line_of_sight", makeLineOfSightCompAssembler},
       {"damage", makeDamageCompAssembler},
       {"tile", makeTileCompAssembler},
       {"world_entry", makeWorldEntryAssembler},
       {"level_entry_exit", makeLevelEntryExitAssembler},
+      {"spawn_entity_post_interaction", makeSpawnEntityPostInteraction},
+      {"serialization_id", makeSerializationIdCompAssembler},
+      {"effect_executor", makeEffectExecutorCompAssembler},
       {"loot_interact", makeLootInteractCompAssembler}};
   return Factories;
 }
@@ -374,7 +424,8 @@ entt::entity EntityFactory::createEntity(EntityTemplateId Id) const {
   auto Entity = Reg.create();
   auto &EtTmpl = EntityDb.getEntityTemplate(Id);
 
-  Reg.emplace<NameComp>(Entity, EtTmpl.getDisplayName());
+  Reg.emplace<NameComp>(Entity, EtTmpl.getDisplayName(),
+                        EtTmpl.getDescription());
 
   // Assemble entity
   try {

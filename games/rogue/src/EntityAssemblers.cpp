@@ -1,9 +1,11 @@
+#include <rogue/Components/Serialization.h>
 #include <rogue/Context.h>
 #include <rogue/CraftingHandler.h>
 #include <rogue/EntityAssemblers.h>
 #include <rogue/Event.h>
 #include <rogue/InventoryHandler.h>
 #include <rogue/ItemDatabase.h>
+#include <rogue/ItemEffectImpl.h>
 
 namespace rogue {
 
@@ -31,6 +33,14 @@ RaceCompAssembler::RaceCompAssembler(RaceKind R) : R(R) {}
 void RaceCompAssembler::assemble(entt::registry &Reg,
                                  entt::entity Entity) const {
   Reg.emplace<RaceComp>(Entity, R);
+}
+
+LineOfSightCompAssembler::LineOfSightCompAssembler(unsigned Range)
+    : Range(Range) {}
+
+void LineOfSightCompAssembler::assemble(entt::registry &Reg,
+                                        entt::entity Entity) const {
+  Reg.emplace<LineOfSightComp>(Entity, Range, Range);
 }
 
 InventoryCompAssembler::InventoryCompAssembler(const ItemDatabase &ItemDb,
@@ -76,61 +86,6 @@ DoorCompAssembler::DoorCompAssembler(bool IsOpen, Tile OpenTile,
     : IsOpen(IsOpen), OpenTile(OpenTile), ClosedTile(ClosedTile), KeyId(KeyId) {
 }
 
-namespace {
-
-bool unlockDoor(entt::registry &Reg, const entt::entity &DoorEt,
-                const entt::entity &ActEt, std::size_t ActionIdx) {
-  auto *IC = Reg.try_get<InventoryComp>(ActEt);
-  if (!IC) {
-    return false;
-  }
-
-  auto &DC = Reg.get<DoorComp>(DoorEt);
-  if (!DC.hasLock()) {
-    return false;
-  }
-
-  auto KeyIdx = IC->Inv.getItemIndexForId(DC.KeyId.value());
-  if (!KeyIdx) {
-    return false;
-  }
-  (void)IC->Inv.takeItem(KeyIdx.value());
-  DC.KeyId = {};
-
-  Reg.get<InteractableComp>(DoorEt).Actions.at(ActionIdx).Msg = "Open door";
-
-  return true;
-}
-
-void openDoor(entt::registry &Reg, const entt::entity &Entity,
-              std::size_t ActionIdx) {
-  auto &DC = Reg.get<DoorComp>(Entity);
-  DC.IsOpen = true;
-  Reg.erase<CollisionComp>(Entity);
-  Reg.erase<BlocksLOS>(Entity);
-
-  Reg.get<InteractableComp>(Entity).Actions.at(ActionIdx).Msg = "Close door";
-
-  auto &T = Reg.get<TileComp>(Entity);
-  T.ZIndex = -2;
-  T.T = DC.OpenTile;
-}
-
-void closeDoor(entt::registry &Reg, const entt::entity &Entity,
-               std::size_t ActionIdx) {
-  auto &DC = Reg.get<DoorComp>(Entity);
-  DC.IsOpen = false;
-  Reg.emplace<CollisionComp>(Entity);
-  Reg.emplace<BlocksLOS>(Entity);
-  Reg.get<InteractableComp>(Entity).Actions.at(ActionIdx).Msg = "Open door";
-
-  auto &T = Reg.get<TileComp>(Entity);
-  T.ZIndex = 0;
-  T.T = DC.ClosedTile;
-}
-
-} // namespace
-
 void DoorCompAssembler::assemble(entt::registry &Reg,
                                  entt::entity Entity) const {
   auto &DC = Reg.emplace<DoorComp>(Entity);
@@ -143,22 +98,22 @@ void DoorCompAssembler::assemble(entt::registry &Reg,
       DC.isLocked() ? "Unlock door" : (IsOpen ? "Close door" : "Open door");
 
   auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
-  const auto InteractIdx = ITC.Actions.size();
+  DC.ActionIdx = ITC.Actions.size();
   ITC.Actions.push_back(
-      {InteractMsg, [Entity, InteractIdx](auto &EHC, auto Et, auto &Reg) {
+      {InteractMsg, [Entity](auto &EHC, auto Et, auto &Reg) {
          auto &DC = Reg.template get<DoorComp>(Entity);
          if (DC.isLocked()) {
-           if (unlockDoor(Reg, Entity, Et, InteractIdx)) {
+           if (DoorComp::unlockDoor(Reg, Entity, Et)) {
              EHC.publish(PlayerInfoMessageEvent() << "You unlock the door.");
            } else {
              EHC.publish(PlayerInfoMessageEvent()
                          << "You fail to unlock the door.");
            }
          } else if (DC.IsOpen) {
-           closeDoor(Reg, Entity, InteractIdx);
+           DoorComp::closeDoor(Reg, Entity);
            EHC.publish(PlayerInfoMessageEvent() << "You open the door.");
          } else {
-           openDoor(Reg, Entity, InteractIdx);
+           DoorComp::openDoor(Reg, Entity);
            EHC.publish(PlayerInfoMessageEvent() << "You close the door.");
          }
          (void)Et;
@@ -207,8 +162,10 @@ void LootedInteractCompAssembler::assemble(entt::registry &Reg,
   auto &TC = Reg.get_or_emplace<TileComp>(Entity);
   if (IsLooted) {
     TC.T = LootedTile;
+    TC.ZIndex = LootedTile.ZIndex;
   } else {
     TC.T = DefaultTile;
+    TC.ZIndex = DefaultTile.ZIndex;
   }
 }
 
@@ -292,6 +249,32 @@ void WorkbenchAssembler::assemble(entt::registry &Reg,
                          }});
 }
 
+SpawnEntityPostInteractionAssembler::SpawnEntityPostInteractionAssembler(
+    const std::string &EntityName, double Chance, unsigned Uses)
+    : EntityName(EntityName), Chance(Chance), Uses(Uses) {}
+
+void SpawnEntityPostInteractionAssembler::assemble(entt::registry &Reg,
+                                                   entt::entity Entity) const {
+  auto &ITC = Reg.get_or_emplace<InteractableComp>(Entity);
+  if (Uses == 0) {
+    ITC.PreActionExecuteFns.push_back(
+        [this](auto &, auto SrcEt, auto &Reg) mutable {
+          SpawnEntityEffect SEE(EntityName, Chance);
+          SEE.applyTo(SrcEt, SrcEt, Reg);
+        });
+    return;
+  }
+  ITC.PreActionExecuteFns.push_back(
+      [this, Uses = Uses](auto &, auto SrcEt, auto &Reg) mutable {
+        if (Uses == 0) {
+          return;
+        }
+        Uses--;
+        SpawnEntityEffect SEE(EntityName, Chance);
+        SEE.applyTo(SrcEt, SrcEt, Reg);
+      });
+}
+
 bool WorkbenchAssembler::isPostProcess() const { return true; }
 
 StatsCompAssembler::StatsCompAssembler(StatPoints Stats) : Stats(Stats) {}
@@ -308,6 +291,23 @@ void DamageCompAssembler::assemble(entt::registry &Reg,
   auto NewDC = DC;
   NewDC.Source = Entity;
   Reg.emplace<DamageComp>(Entity, NewDC);
+}
+
+EffectExecutorCompAssembler::EffectExecutorCompAssembler(
+    EffectExecutorComp Executer)
+    : Executer(std::move(Executer)) {}
+
+void EffectExecutorCompAssembler::assemble(entt::registry &Reg,
+                                           entt::entity Entity) const {
+  Reg.emplace<EffectExecutorComp>(Entity, Executer);
+}
+
+SerializationIdCompAssembler::SerializationIdCompAssembler(std::size_t Id)
+    : Id(Id) {}
+
+void SerializationIdCompAssembler::assemble(entt::registry &Reg,
+                                            entt::entity Entity) const {
+  Reg.get_or_emplace<serialize::IdComp>(Entity).Id = Id;
 }
 
 } // namespace rogue

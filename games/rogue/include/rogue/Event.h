@@ -75,12 +75,25 @@ struct BuffApplyEffectEvent : public BaseEvent {
   bool isPlayerAffected() const;
 };
 
+struct RestoreHealthEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
+  entt::registry *Registry = nullptr;
+  unsigned Amount = 0;
+  std::string RestoreSource;
+  bool isPlayerAffected() const;
+};
+
 struct BuffExpiredEvent : public BaseEvent {
   entt::entity Entity = entt::null;
   entt::registry *Registry = nullptr;
   const BuffBase *Buff = nullptr;
 
   bool isPlayerAffected() const;
+};
+
+struct SpawnEntityEvent : public BaseEvent {
+  entt::entity Entity = entt::null;
+  entt::registry *Registry = nullptr;
 };
 
 struct SwitchLevelEvent : public BaseEvent {

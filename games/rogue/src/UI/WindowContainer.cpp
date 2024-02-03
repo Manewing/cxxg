@@ -14,7 +14,7 @@ std::optional<WindowContainer::WindowInfo>
 WindowContainer::WindowInfo::getWindowInfo(Widget *const Wdw) {
   Widget *NextWdw = Wdw;
   while (auto *Next = dynamic_cast<Decorator *>(NextWdw)) {
-    if (auto *BrWdw = dynamic_cast<BaseRectDecorator *>(Wdw)) {
+    if (auto *BrWdw = dynamic_cast<BaseRectDecorator *>(Next)) {
       auto Size = BrWdw->getSize();
       return WindowInfo{BrWdw->getPos(), BrWdw->getSize(), Size.X * Size.Y,
                         Wdw};
@@ -132,9 +132,10 @@ bool WindowContainer::closeWindow(Widget *Wdw) {
 
 bool WindowContainer::closeActiveWindow() { return closeWindow(FocusIdx); }
 
-void WindowContainer::addWindow(std::shared_ptr<Widget> Window) {
+Widget &WindowContainer::addWindow(std::shared_ptr<Widget> Window) {
   Windows.emplace_back(std::move(Window));
   selectWindow(Windows.size() - 1);
+  return *Windows.back();
 }
 
 namespace {
@@ -155,7 +156,7 @@ Frame *getFrameFromWidget(Widget *W) {
 void changeWindowHighlight(Widget &W, bool Highlight) {
   if (auto *F = getFrameFromWidget(&W)) {
     if (Highlight) {
-      F->setFrameColor(cxxg::types::RgbColor{255, 255, 200}.bold());
+      F->setFrameColor(cxxg::types::RgbColor{255, 255, 170}.bold());
     } else {
       F->setFrameColor(cxxg::types::Color::NONE);
     }

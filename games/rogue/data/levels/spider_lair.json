@@ -1,14 +1,15 @@
 {
-  "map": {
-    "type": "generated",
-    "config": "spider_lair.cfg"
-  },
   "entities": {
-    "<": "level_entry",
-    "H": "level_exit",
+    "%": "common_skeletal_remains",
     "0": "large_silk_cocoon",
-    "h": "arachnoth_hatchling",
+    "<": "level_entry",
+    "B": "arachnoth_broodguard",
+    "H": "level_exit",
     "b": "arachnoth_burrower",
-    "B": "arachnoth_broodguard"
+    "h": "arachnoth_hatchling"
+  },
+  "map": {
+    "config": "spider_lair.cfg",
+    "type": "generated"
   }
 }

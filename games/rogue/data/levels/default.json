@@ -1,53 +1,53 @@
 {
-  "map": {
-    "type": "designed",
-    "map_file": "default.map",
-    "default_char": {
-      "tile": {
-        "char": " ",
-        "color": "#222222"
-      },
-      "layer": "ground"
-    },
-    "char_info": {
-      " ": {
-        "tile": {
-          "char": " ",
-          "color": "#222222"
-        },
-        "layer": "ground"
-      },
-      "'": {
-        "tile": {
-          "char": "'",
-          "color": "#ed3424"
-        },
-        "layer": "walls_deco"
-      },
-      "#": {
-        "tile": {
-          "char": "#",
-          "color": "#737373"
-        },
-        "layer": "walls"
-      }
-    }
-  },
   "entities": {
-    "H": "level_exit",
-    "<": "level_entry",
-    "C": "stash",
-    "w": "work_bench",
-    "S": "shop",
-    "h": "healer",
+    "+": "closed_door",
+    "/": "open_door",
     "1": "level_1",
     "2": "level_2",
     "3": "level_3",
-    "+": "closed_door",
-    "/": "open_door",
+    "<": "level_entry",
+    "C": "stash",
+    "H": "level_exit",
+    "S": "shop",
+    "h": "healer",
+    "u": "final_locked_door",
+    "w": "work_bench",
     "x": "l1_locked_door",
     "y": "l2_locked_door",
-    "z": "l3_locked_door",
-    "u": "final_locked_door"
+    "z": "l3_locked_door"
+  },
+  "map": {
+    "char_info": {
+      " ": {
+        "layer": "ground",
+        "tile": {
+          "char": " ",
+          "color": "#222222"
+        }
+      },
+      "#": {
+        "layer": "walls",
+        "tile": {
+          "char": "#",
+          "color": "#737373"
+        }
+      },
+      "'": {
+        "layer": "walls_deco",
+        "tile": {
+          "char": "'",
+          "color": "#ed3424"
+        }
+      }
+    },
+    "default_char": {
+      "layer": "ground",
+      "tile": {
+        "char": " ",
+        "color": "#222222"
+      }
+    },
+    "map_file": "default.map",
+    "type": "designed"
   }
 }

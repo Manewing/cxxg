@@ -6,7 +6,7 @@
 namespace rogue {
 
 Item::Item(const ItemPrototype &Proto, int StackSize,
-           const std::shared_ptr<ItemPrototype> &Spec, bool SpecOverrides)
+           const std::shared_ptr<const ItemPrototype> &Spec, bool SpecOverrides)
     : StackSize(StackSize), Proto(&Proto), Specialization(Spec),
       SpecOverrides(SpecOverrides) {}
 
@@ -26,13 +26,15 @@ std::string getQualifierNameForHash(std::size_t Hash) {
   return Name;
 }
 
-std::string getQualifierNameForItem(const Item &It) {
+std::string getQualifierNameForItem(const Item &It, CapabilityFlags Flags) {
   // Check for stats buff effect and return name based strongest
   // stat point boost
   std::size_t Hash = 0;
   for (const auto &ItEff : It.getAllEffects()) {
-    if (!(ItEff.Attributes.Flags &
-          (CapabilityFlags::Equipment | CapabilityFlags::Skill))) {
+    if (!(ItEff.Attributes.Flags.is(Flags))) {
+      continue;
+    }
+    if (dynamic_cast<const NullEffect *>(ItEff.Effect.get())) {
       continue;
     }
     Hash ^= std::hash<std::string>{}(ItEff.Effect->getDescription());
@@ -47,28 +49,51 @@ std::string getQualifierNameForItem(const Item &It) {
 
 int Item::getId() const { return getProto().ItemId; }
 
-const std::string &Item::getName() const { return getProto().Name; }
+const std::string &Item::getName() const {
+  if (!Specialization || !SpecOverrides) {
+    return getProto().Name;
+  } else {
+    return Specialization->Name;
+  }
+}
 
 std::string Item::getQualifierName() const {
-  if (getType() & ItemType::EquipmentMask) {
-    return getQualifierNameForItem(*this) + getProto().Name;
+  auto Name = getProto().Name;
+  if (Specialization && SpecOverrides) {
+    Name = Specialization->Name;
   }
-  return getProto().Name;
+  if (getType() & ItemType::EquipmentMask) {
+    return getQualifierNameForItem(*this, CapabilityFlags::Equipment) + Name;
+  }
+  if (getType().is(ItemType::CraftingBase | ItemType::Consumable)) {
+    return getQualifierNameForItem(*this, CapabilityFlags::UseOn) + Name;
+  }
+  return Name;
 }
 
 std::string Item::getDescription() const {
-  // TODO make description depend on quality etc
+  if (Specialization && SpecOverrides) {
+    return Specialization->Description;
+  }
   return getProto().Description;
 }
 
 ItemType Item::getType() const {
   if (Specialization) {
+    if (SpecOverrides) {
+      return Specialization->Type;
+    }
     return getProto().Type | Specialization->Type;
   }
   return getProto().Type;
 }
 
-int Item::getMaxStackSize() const { return getProto().MaxStackSize; }
+int Item::getMaxStackSize() const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->MaxStackSize;
+  }
+  return getProto().MaxStackSize;
+}
 
 std::vector<EffectInfo> Item::getAllEffects() const {
   if (Specialization && SpecOverrides) {
@@ -103,6 +128,10 @@ bool Item::hasEffect(CapabilityFlags Flags, bool AllowNull,
 }
 
 CapabilityFlags Item::getCapabilityFlags() const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->getCapabilityFlags();
+  }
+
   auto Flags = getProto().getCapabilityFlags();
   if (Specialization) {
     Flags = Flags | Specialization->getCapabilityFlags();
@@ -175,5 +204,9 @@ void Item::removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
 }
 
 const ItemPrototype &Item::getProto() const { return *Proto; }
+
+const std::shared_ptr<const ItemPrototype> &Item::getSpecialization() const {
+  return Specialization;
+}
 
 } // namespace rogue

@@ -59,10 +59,10 @@ public:
   bool closeWindow(Widget *Wdw);
   bool closeActiveWindow();
 
-  void addWindow(std::shared_ptr<Widget> Window);
+  Widget &addWindow(std::shared_ptr<Widget> Window);
 
-  template <typename T, typename... Args> void addWindow(Args &&...Arg) {
-    addWindow(std::make_shared<T>(Arg...));
+  template <typename T, typename... Args> Widget &addWindow(Args &&...Arg) {
+    return addWindow(std::make_shared<T>(Arg...));
   }
 
   void selectWindow(std::size_t Idx);

@@ -1,5 +1,5 @@
 {
-  "$id": "https://rogue-todo.com/item-db-schema",
+  "$id": "https://rogue-todo.com/item-db-schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "description": "JSON Schema the item database",
   "type": "object",
@@ -63,11 +63,11 @@
               "additionalProperties": false
             }
           },
-          "specialization": {
+          "specializations": {
             "type": "array",
             "items": {
               "type": "object",
-              "required": ["type", "effect"],
+              "required": ["type", "specialization"],
               "properties": {
                 "type": {
                   "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/capability_flags"
@@ -98,9 +98,9 @@
           "enhancements": {
             "type": "string",
             "description": "Optional loot table referencing optional enhancements to be crafted onto the item"
-          },
-          "additionalProperties": false
-        }
+          }
+        },
+        "additionalProperties": false
       }
     },
     "item_effects": {

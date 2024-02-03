@@ -34,6 +34,9 @@
             "$ref": "#/defs/effect/stats_buff_per_hit_comp"
           },
           {
+            "$ref": "#/defs/effect/stats_timed_buff_comp"
+          },
+          {
             "$ref": "#/defs/effect/armor_buff_comp"
           },
           {
@@ -58,13 +61,28 @@
             "$ref": "#/defs/effect/chance_on_hit_to_apply_poison"
           },
           {
-            "$ref": "#/defs/effect/chance_on_hit_to_bleeding"
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_bleeding"
           },
           {
             "$ref": "#/defs/effect/chance_on_hit_to_apply_blinded"
           },
           {
+            "$ref": "#/defs/effect/life_steal"
+          },
+          {
+            "$ref": "#/defs/effect/smite_effect"
+          },
+          {
+            "$ref": "#/defs/effect/sweeping_strike_effect"
+          },
+          {
+            "$ref": "#/defs/effect/disc_area_hit_effect"
+          },
+          {
             "$ref": "#/defs/effect/dismantle"
+          },
+          {
+            "$ref": "#/defs/effect/spawn_entity_effect"
           }
         ]
       },
@@ -194,6 +212,23 @@
           }
         },
         "required": ["stats", "max_stacks", "ticks", "type"],
+        "additionalProperties": false
+      },
+      "stats_timed_buff_comp": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "stats_timed_buff_comp"
+          },
+          "stats": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/stat_points"
+          },
+          "ticks": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["stats", "ticks", "type"],
         "additionalProperties": false
       },
       "armor_buff_comp": {
@@ -344,7 +379,7 @@
         "required": ["buff", "type", "chance"],
         "additionalProperties": false
       },
-      "chance_on_hit_to_bleeding": {
+      "chance_on_hit_to_apply_bleeding": {
         "type": "object",
         "properties": {
           "type": {
@@ -380,6 +415,133 @@
         "required": ["buff", "type", "chance"],
         "additionalProperties": false
       },
+      "life_steal": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "life_steal"
+          },
+          "percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "bonus_hp": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": ["percent", "bonus_hp", "type"],
+        "additionalProperties": false
+      },
+      "sweeping_strike_effect": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "sweeping_strike_effect"
+          },
+          "damage_percent": {
+            "type": "number",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          },
+          "effect_tile": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "required": ["type", "name", "damage_percent", "effect_tile"],
+        "additionalProperties": false
+      },
+      "smite_effect": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "smite_effect"
+          },
+          "damage_percent": {
+            "type": "number",
+            "minimum": 0
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["type", "name", "damage_percent"],
+        "additionalProperties": false
+      },
+      "disc_area_hit_effect": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "disc_area_hit_effect"
+          },
+          "radius": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "phys_damage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "magic_damage": {
+            "type": "number",
+            "minimum": 0
+          },
+          "bleeding": {
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_bleeding"
+          },
+          "poison": {
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_poison"
+          },
+          "blinded": {
+            "$ref": "#/defs/effect/chance_on_hit_to_apply_blinded"
+          },
+          "min_ticks": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Minimum ticks the damage component persists after the effect is applied"
+          },
+          "max_ticks": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Maximum ticks the damage component persists after the effect is applied"
+          },
+          "can_hurt_source": {
+            "type": "boolean",
+            "default": true,
+            "description": "If the damage component created can hurt the source entity of the effect"
+          },
+          "can_hurt_faction": {
+            "type": "boolean",
+            "default": true,
+            "description": "If the damage component created can hurt any other entity of the faction of the entity"
+          },
+          "decrease_percent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Damage decrease percent per tile distance"
+          },
+          "name": {
+            "type": "string"
+          },
+          "effect_tile": {
+            "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
+          }
+        },
+        "required": [
+          "type",
+          "name",
+          "phys_damage",
+          "magic_damage",
+          "decrease_percent",
+          "radius",
+          "effect_tile"
+        ],
+        "additionalProperties": false
+      },
       "dismantle": {
         "type": "object",
         "properties": {
@@ -405,6 +567,26 @@
           }
         },
         "required": ["items", "type"],
+        "additionalProperties": false
+      },
+      "spawn_entity_effect": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "spawn_entity_effect"
+          },
+          "entity_name": {
+            "type": "string",
+            "description": "Name of the entity in the entity database to spawn"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Chance to spawn the entity"
+          }
+        },
+        "required": ["entity_name", "chance", "type"],
         "additionalProperties": false
       }
     },

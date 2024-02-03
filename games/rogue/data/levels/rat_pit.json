@@ -1,35 +1,35 @@
 {
+  "entities": {
+    "<": "level_entry",
+    "H": "level_exit",
+    "r": "sewer_rat",
+    "v": "common_chest"
+  },
   "map": {
-    "type": "designed",
-    "map_file": "rat_pit.map",
-    "default_char": {
-      "tile": {
-        "char": " ",
-        "color": "#222222"
-      },
-      "layer": "ground"
-    },
     "char_info": {
       " ": {
+        "layer": "ground",
         "tile": {
           "char": " ",
           "color": "#222222"
-        },
-        "layer": "ground"
+        }
       },
       "#": {
+        "layer": "walls",
         "tile": {
           "char": "#",
           "color": "#737373"
-        },
-        "layer": "walls"
+        }
       }
-    }
-  },
-  "entities": {
-    "r": "sewer_rat",
-    "<": "level_entry",
-    "H": "level_exit",
-    "v": "common_chest"
+    },
+    "default_char": {
+      "layer": "ground",
+      "tile": {
+        "char": " ",
+        "color": "#222222"
+      }
+    },
+    "map_file": "rat_pit.map",
+    "type": "designed"
   }
 }

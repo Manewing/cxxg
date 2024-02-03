@@ -53,6 +53,15 @@ private:
   RaceKind R;
 };
 
+class LineOfSightCompAssembler : public EntityAssembler {
+public:
+  explicit LineOfSightCompAssembler(unsigned Range);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  unsigned Range;
+};
+
 class InventoryCompAssembler : public EntityAssembler {
 public:
   InventoryCompAssembler(const ItemDatabase &ItemDb,
@@ -136,6 +145,22 @@ public:
   bool isPostProcess() const override;
 };
 
+class SpawnEntityPostInteractionAssembler : public EntityAssembler {
+public:
+  /// @brief Spawn an entity after interacting with this entity
+  /// @param EntityName Name of the entity to spawn
+  /// @param Chance Chance to spawn the entity, 0 means always spawn
+  /// @param Uses Number of times the action can be performed, 0 means infinite
+  SpawnEntityPostInteractionAssembler(const std::string &EntityName,
+                                      double Chance, unsigned Uses);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  std::string EntityName;
+  double Chance;
+  unsigned Uses;
+};
+
 class StatsCompAssembler : public EntityAssembler {
 public:
   explicit StatsCompAssembler(StatPoints Stats);
@@ -156,6 +181,24 @@ private:
   DamageComp DC;
 };
 
+class EffectExecutorCompAssembler : public EntityAssembler {
+public:
+  explicit EffectExecutorCompAssembler(EffectExecutorComp Executer);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  EffectExecutorComp Executer;
+};
+
+class SerializationIdCompAssembler : public EntityAssembler {
+public:
+  explicit SerializationIdCompAssembler(std::size_t Id);
+  void assemble(entt::registry &Reg, entt::entity Entity) const override;
+
+private:
+  std::size_t Id;
+};
+
 // Keep sorted
 using AttackAICompAssembler = DefaultConstructEntityAssembler<AttackAIComp>;
 using BlockLOSCompAssembler = DefaultConstructEntityAssembler<BlocksLOS>;
@@ -166,12 +209,11 @@ using HealthCompAssembler = DefaultConstructEntityAssembler<HealthComp>;
 using ManaCompAssembler = DefaultConstructEntityAssembler<ManaComp>;
 using PlayerCompAssembler = DefaultConstructEntityAssembler<PlayerComp>;
 using PositionCompAssembler = DefaultConstructEntityAssembler<PositionComp>;
+using SearchAICompAssembler = DefaultConstructEntityAssembler<SearchAIComp>;
 using VisibleCompAssembler = DefaultConstructEntityAssembler<VisibleComp>;
 using WanderAICompAssembler = DefaultConstructEntityAssembler<WanderAIComp>;
 
 // TODO make configurable
-using LineOfSightCompAssembler =
-    DefaultConstructEntityAssembler<LineOfSightComp>;
 using AgilityCompAssembler = DefaultConstructEntityAssembler<AgilityComp>;
 
 } // namespace rogue

@@ -14,6 +14,7 @@
 #include <rogue/Systems/RegenSystem.h>
 #include <rogue/Systems/StatsSystem.h>
 #include <rogue/Systems/WanderAISystem.h>
+#include <rogue/Systems/SearchAISystem.h>
 #include <sstream>
 #include <ymir/Algorithm/Dijkstra.hpp>
 #include <ymir/Algorithm/LineOfSight.hpp>
@@ -33,7 +34,8 @@ Level::Level(int LevelId, ymir::Size2d<int> Size)
       std::make_shared<PlayerSystem>(*this),
       std::make_shared<NPCSystem>(*this),
       std::make_shared<WanderAISystem>(*this),
-      std::make_shared<AttackAISystem>(Reg),
+      std::make_shared<SearchAISystem>(*this),
+      std::make_shared<AttackAISystem>(*this),
       std::make_shared<CombatSystem>(Reg),
       std::make_shared<MovementSystem>(*this),
       std::make_shared<DeathSystem>(Reg),

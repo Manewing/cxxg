@@ -167,11 +167,19 @@ public:
   static const std::shared_ptr<ItemEffect> PoisonEffect;
   static const std::shared_ptr<ItemEffect> CleansePoisonEffect;
 
+  static const std::shared_ptr<ItemEffect> SetComp1Effect;
+  static const std::shared_ptr<ItemEffect> SetComp2Effect;
+  static const std::shared_ptr<ItemEffect> SetComp3Effect;
+
   ItemPrototype HelmetA;
   ItemPrototype HelmetB;
+  ItemPrototype SwordSkillSelf;
+  ItemPrototype SwordSkillAdjacent;
+  ItemPrototype SwordSkillAll;
   ItemPrototype Ring;
   ItemPrototype CursedRing;
   ItemPrototype HealConsumable;
+  ItemPrototype HealThrowConsumable;
   ItemPrototype PoisonConsumable;
   ItemPrototype Potion;
   ItemPrototype PlateCrafting;

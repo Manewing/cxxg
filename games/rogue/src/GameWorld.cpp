@@ -3,6 +3,7 @@
 #include <rogue/Level.h>
 #include <rogue/LevelDatabase.h>
 #include <rogue/LevelGenerator.h>
+#include <rogue/Serialization.h>
 
 namespace rogue {
 
@@ -50,6 +51,14 @@ void MultiLevelDungeon::switchWorld(unsigned, const std::string &LevelName,
                                     entt::entity) {
   throw std::runtime_error("MultiLevelDungeon: switchWorld not implemented: " +
                            std::string(LevelName));
+}
+
+void MultiLevelDungeon::loadSaveGame(const SaveGameInfo &) {
+  throw std::runtime_error("MultiLevelDungeon: loadSaveGame not implemented");
+}
+
+void MultiLevelDungeon::storeSaveGame(const SaveGameInfo &) {
+  throw std::runtime_error("MultiLevelDungeon: storeSaveGame not implemented");
 }
 
 std::size_t MultiLevelDungeon::getCurrentLevelIdx() const {
@@ -117,6 +126,27 @@ Level &DungeonSweeper::switchLevel(std::size_t LevelIdx, bool ToEntry) {
 
   // We did not switch levels so no need to move player
   return *Lvl;
+}
+
+void DungeonSweeper::loadSaveGame(const SaveGameInfo &SGI) {
+  CurrSubWorld = nullptr;
+  Lvl = nullptr;
+  switchLevel(0, true);
+
+  auto &CurrLvl = getCurrentLevelOrFail();
+  CurrLvl.createPlayer();
+
+  auto SaveGame = serialize::SaveGameSerializer::loadFromFile(SGI);
+  SaveGame.apply(CurrLvl);
+}
+
+void DungeonSweeper::storeSaveGame(const SaveGameInfo &SGI) {
+  if (CurrSubWorld) {
+    throw std::runtime_error("Can not save game in a dungeon");
+  }
+  auto &CurrLvl = getCurrentLevelOrFail();
+
+  serialize::SaveGameSerializer::create(CurrLvl).saveToFile(SGI);
 }
 
 void DungeonSweeper::switchWorld(unsigned Seed, const std::string &LevelName,

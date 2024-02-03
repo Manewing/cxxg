@@ -17,6 +17,7 @@
 #include <rogue/UI/CommandLine.h>
 #include <rogue/UI/Controls.h>
 #include <rogue/UI/Equipment.h>
+#include <rogue/UI/Item.h>
 #include <rogue/UI/TargetUI.h>
 
 namespace rogue {
@@ -82,7 +83,10 @@ void Game::initialize(bool BufferedInput, unsigned TickDelayUs) {
   // We could update the level here, but we want to draw the initial state.
   handleUpdates(/*IsTick=*/false);
 
-  UICtrl.setMenuUI(World->getCurrentLevelOrFail());
+  UICtrl.setMenuUI(
+      World->getCurrentLevelOrFail(),
+      [this](const SaveGameInfo &SGI) { loadSaveGame(SGI); },
+      [this](const SaveGameInfo &SGI) { storeSaveGame(SGI); });
 
   handleDraw();
 }
@@ -165,17 +169,19 @@ bool Game::handleInput(int Char) {
       const auto &PC = getLvlReg().get<PositionComp>(getPlayer());
       // No range, allow investigate entire level
       UICtrl.setTargetUI(PC, {}, Lvl, [&Lvl, SrcEt](auto TgEt, auto TPos) {
-        CombatActionComp CC;
-        CC.Target = TgEt;
-        CC.RangedPos = TPos;
-        Lvl.Reg.template emplace<CombatActionComp>(SrcEt, CC);
+        auto &CAC = Lvl.Reg.template get_or_emplace<CombatActionComp>(SrcEt);
+        CAC.Target = TgEt;
+        CAC.RangedPos = TPos;
       });
     }
     return true;
   }
   case ui::Controls::CloseWindow.Char: {
     if (!UICtrl.isUIActive()) {
-      UICtrl.setMenuUI(World->getCurrentLevelOrFail());
+      UICtrl.setMenuUI(
+          World->getCurrentLevelOrFail(),
+          [this](const SaveGameInfo &SGI) { loadSaveGame(SGI); },
+          [this](const SaveGameInfo &SGI) { storeSaveGame(SGI); });
       return true;
     } else if (UICtrl.hasMenuUI()) {
       UICtrl.closeMenuUI();
@@ -270,7 +276,7 @@ bool Game::handleUpdates(bool IsTick) {
 
     auto SleepAfterDraw = REC.hasEvents();
     handleDrawLevel(true);
-    if (SleepAfterDraw) {
+    if (UICtrl.DelayTicks || SleepAfterDraw) {
       cxxg::utils::sleep(200000);
     }
 
@@ -325,6 +331,10 @@ bool Game::tryInteract() {
       auto &PC = getLvlReg().get<PlayerComp>(Player);
       PC.CurrentInteraction = Interactable.Actions.front();
 
+      for (auto &PostFn : Interactable.PreActionExecuteFns) {
+        PostFn(World->getCurrentLevelOrFail(), Player, getLvlReg());
+      }
+
       // This may switch level so needs to be last thing that is done
       Interactable.Actions.front().Execute(World->getCurrentLevelOrFail(),
                                            Player, getLvlReg());
@@ -338,6 +348,19 @@ bool Game::tryInteract() {
                        World->getCurrentLevelOrFail());
 
   return true;
+}
+
+void Game::loadSaveGame(const SaveGameInfo &SGI) {
+  REC.clear();
+
+  World->loadSaveGame(SGI);
+
+  // We could update the level here, but we want to draw the initial state.
+  handleUpdates(/*IsTick=*/false);
+}
+
+void Game::storeSaveGame(const SaveGameInfo &SGI) {
+  World->storeSaveGame(SGI);
 }
 
 entt::registry &Game::getLvlReg() { return World->getCurrentLevelOrFail().Reg; }
@@ -428,22 +451,69 @@ ui::Controller::PlayerInfo getUIPlayerInfo(entt::entity Player,
     PI.InteractStr = "[e] " + Interact->Msg;
   }
 
+  const auto &Equip = Reg.get<EquipmentComp>(Player).Equip;
+  for (std::size_t Idx = 0; Idx < Equip.all().size(); ++Idx) {
+    auto *Slot = Equip.all().at(Idx);
+    if (!Slot->It) {
+      continue;
+    }
+    if (!Slot->It->hasEffect(CapabilityFlags::Skill)) {
+      continue;
+    }
+    ui::Controller::SkillInfo SI;
+    SI.Key = std::to_string(Idx + 1);
+    SI.Name = Slot->It->getName();
+    SI.NameColor = ui::getColorForItem(*Slot->It);
+    PI.Skills.push_back(SI);
+  }
+
   return PI;
 }
 
-std::optional<ui::Controller::TargetInfo> getUITargetInfo(entt::entity Player,
-                                                          entt::registry &Reg) {
-  const auto *CC = Reg.try_get<CombatAttackComp>(Player);
-  if (!CC || CC->Target == entt::null || !Reg.valid(CC->Target)) {
-    return {};
+std::optional<ui::Controller::TargetInfo>
+getUITargetInfoForTarget(entt::entity Target, const entt::registry &Reg) {
+  if (!Reg.valid(Target)) {
+    return ui::Controller::TargetInfo{"<InvalidEntity>", 0, 0};
   }
   ui::Controller::TargetInfo TI;
-  auto *TNC = Reg.try_get<NameComp>(CC->Target);
-  auto *THC = Reg.try_get<HealthComp>(CC->Target);
+  auto *TNC = Reg.try_get<NameComp>(Target);
+  auto *THC = Reg.try_get<HealthComp>(Target);
   TI.Name = TNC ? TNC->Name : "<NameCompMissing>";
   TI.Health = THC ? THC->Value : 0;
   TI.MaxHealth = THC ? THC->MaxValue : 0;
   return TI;
+}
+
+std::optional<ui::Controller::TargetInfo>
+getUITargetInfoFromPlayer(entt::entity Player, const entt::registry &Reg) {
+  const auto *CC = Reg.try_get<CombatAttackComp>(Player);
+  if (!CC || CC->Target == entt::null || !Reg.valid(CC->Target)) {
+    return {};
+  }
+  return getUITargetInfoForTarget(CC->Target, Reg);
+}
+
+std::optional<ui::Controller::TargetInfo>
+getUITargetInfoFromTargetUI(const ui::Controller &UICtrl,
+                            const entt::registry &Reg) {
+  const auto *TUI = UICtrl.getWindowOfType<ui::TargetUI>();
+  if (!TUI || TUI->getTarget() == entt::null) {
+    return {};
+  }
+  return getUITargetInfoForTarget(TUI->getTarget(), Reg);
+}
+
+std::optional<ui::Controller::TargetInfo>
+getUITargetInfo(entt::entity Player, const ui::Controller &UICtrl,
+                const entt::registry &Reg) {
+  auto TI = getUITargetInfoFromTargetUI(UICtrl, Reg);
+  if (TI || UICtrl.hasTargetUI()) {
+    return TI;
+  }
+  if (auto TI = getUITargetInfoFromPlayer(Player, Reg)) {
+    return TI;
+  }
+  return {};
 }
 
 } // namespace
@@ -475,7 +545,7 @@ void Game::handleDrawLevel(bool UpdateScreen) {
 
   // Draw UI overlay
   auto PI = getUIPlayerInfo(Player, getLvlReg(), getAvailableInteraction());
-  auto TI = getUITargetInfo(Player, getLvlReg());
+  auto TI = getUITargetInfo(Player, UICtrl, getLvlReg());
   UICtrl.draw(World->getCurrentLevelIdx(), PI, TI);
 
   if (UpdateScreen) {

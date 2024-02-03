@@ -1,751 +1,784 @@
 {
   "entity_templates": [
     {
-      "name": "closed_door",
-      "display_name": "Door",
-      "description": "A door",
       "assemblers": {
-        "position": true,
-        "collision": true,
         "block_los": true,
-        "visible": true,
+        "collision": true,
         "door": {
+          "closed_tile": {
+            "char": "+",
+            "color": "#737373"
+          },
           "is_open": false,
           "open_tile": {
             "char": "/",
             "color": "#737373"
-          },
-          "closed_tile": {
-            "char": "+",
-            "color": "#737373"
           }
-        }
-      }
+        },
+        "position": true,
+        "visible": true
+      },
+      "description": "A door",
+      "display_name": "Door",
+      "name": "closed_door"
     },
     {
-      "name": "open_door",
-      "from_template": "closed_door",
       "assemblers": {
         "block_los": false,
         "collision": false,
         "door": {
           "is_open": true
         }
-      }
+      },
+      "from_template": "closed_door",
+      "name": "open_door"
     },
     {
-      "name": "l1_locked_door",
-      "from_template": "closed_door",
       "assemblers": {
         "door": {
           "key": "L1 Key"
+        },
+        "serialization_id": {
+          "id": 10001
         }
-      }
+      },
+      "from_template": "closed_door",
+      "name": "l1_locked_door"
     },
     {
-      "name": "l2_locked_door",
-      "from_template": "closed_door",
       "assemblers": {
         "door": {
           "key": "L2 Key"
+        },
+        "serialization_id": {
+          "id": 10002
         }
-      }
+      },
+      "from_template": "closed_door",
+      "name": "l2_locked_door"
     },
     {
-      "name": "l3_locked_door",
-      "from_template": "closed_door",
       "assemblers": {
         "door": {
           "key": "L3 Key"
+        },
+        "serialization_id": {
+          "id": 10003
         }
-      }
+      },
+      "from_template": "closed_door",
+      "name": "l3_locked_door"
     },
     {
-      "name": "final_locked_door",
-      "from_template": "closed_door",
       "assemblers": {
         "door": {
           "key": "Final Key"
         }
-      }
+      },
+      "from_template": "closed_door",
+      "name": "final_locked_door"
     },
     {
-      "name": "dummy_creature",
       "assemblers": {
         "collision": true,
         "health": true,
         "position": true,
         "visible": true
-      }
+      },
+      "name": "dummy_creature"
     },
     {
-      "name": "base_trap",
       "assemblers": {
-        "position": true,
-        "visible": true,
         "damage": {
-          "phys_damage": 0,
-          "magic_damage": 0
-        }
-      }
+          "magic_damage": 0,
+          "phys_damage": 0
+        },
+        "position": true,
+        "visible": true
+      },
+      "name": "base_trap"
     },
     {
-      "name": "hostile_creature",
       "assemblers": {
+        "agility": true,
         "attack_ai": true,
         "collision": true,
         "health": true,
+        "line_of_sight": {
+          "range": 14
+        },
         "position": true,
+        "search_ai": true,
         "visible": true,
-        "agility": true,
-        "line_of_sight": true,
         "wander_ai": true
-      }
+      },
+      "name": "hostile_creature"
     },
     {
-      "name": "neutral_creature",
       "assemblers": {
+        "agility": true,
         "collision": true,
         "health": true,
+        "line_of_sight": {
+          "range": 14
+        },
         "position": true,
         "visible": true,
-        "agility": true,
-        "line_of_sight": true,
         "wander_ai": true
-      }
+      },
+      "name": "neutral_creature"
     },
     {
-      "name": "base_enemy",
-      "from_template": "hostile_creature",
       "assemblers": {
-        "equipment": true,
+        "auto_equip": true,
         "drop_equipment": true,
-        "auto_equip": true
-      }
+        "equipment": true,
+        "mana": true
+      },
+      "from_template": "hostile_creature",
+      "name": "base_enemy"
     },
     {
-      "name": "base_interact",
       "assemblers": {
-        "position": true,
         "collision": true,
+        "position": true,
         "visible": true
-      }
+      },
+      "name": "base_interact"
     },
     {
-      "name": "base_chest",
-      "from_template": "base_interact",
       "assemblers": {
         "inventory": {
           "loot_table": "<not defined from base_chest>"
         },
         "loot_interact": {
-          "is_looted": false,
-          "is_persistent": true,
-          "loot_name": "Chest",
-          "interact_text": "Open Chest",
           "default_tile": {
             "char": "C",
             "color": "#ff0000"
           },
+          "interact_text": "Open Chest",
+          "is_looted": false,
+          "is_persistent": true,
+          "loot_name": "Chest",
           "looted_tile": {
             "char": "c",
             "color": "#00ff00"
           }
         }
-      }
+      },
+      "from_template": "base_interact",
+      "name": "base_chest"
     },
     {
-      "name": "base_rat",
-      "from_template": "hostile_creature",
       "assemblers": {
         "faction": "nature",
-        "race": "creature",
         "inventory": {
           "loot_table": "common_rat"
-        }
-      }
+        },
+        "race": "creature"
+      },
+      "from_template": "hostile_creature",
+      "name": "base_rat"
     },
     {
-      "name": "sewer_rat",
-      "from_template": "base_rat",
-      "display_name": "Sewer Rat",
-      "description": "A rat TODO",
       "assemblers": {
-        "tile": {
-          "color": "#5C5F55",
-          "char": "r"
-        },
         "stats": {
-          "str": 2,
           "dex": 6,
           "int": 0,
+          "str": 2,
           "vit": 3
+        },
+        "tile": {
+          "char": "r",
+          "color": "#5C5F55"
         }
-      }
+      },
+      "description": "A rat TODO",
+      "display_name": "Sewer Rat",
+      "from_template": "base_rat",
+      "name": "sewer_rat"
     },
     {
-      "name": "toxic_rat",
-      "from_template": "base_rat",
-      "display_name": "Toxic Rat",
-      "description": "A toxic rat TODO",
       "assemblers": {
+        "auto_equip": true,
+        "equipment": true,
         "inventory": {
           "loot_table": "ltb_toxic_rat"
         },
-        "equipment": true,
-        "auto_equip": true,
-        "tile": {
-          "color": "#475D35",
-          "char": "R"
-        },
         "stats": {
-          "str": 2,
           "dex": 6,
           "int": 0,
+          "str": 2,
           "vit": 3
+        },
+        "tile": {
+          "char": "R",
+          "color": "#475D35"
         }
-      }
+      },
+      "description": "A toxic rat TODO",
+      "display_name": "Toxic Rat",
+      "from_template": "base_rat",
+      "name": "toxic_rat"
     },
     {
-      "name": "fat_rat",
-      "from_template": "base_rat",
-      "display_name": "Fat Rat",
-      "description": "A giant fat rat with a vicious appetite.",
       "assemblers": {
+        "auto_equip": true,
+        "effect_executor": {
+          "effects": [
+            {
+              "effect_name": "null",
+              "max_delay": 100,
+              "min_delay": 80
+            },
+            {
+              "effect_name": "major_health_regen_effect",
+              "max_delay": 90,
+              "min_delay": 80
+            }
+          ]
+        },
+        "equipment": true,
         "inventory": {
           "loot_table": "ltb_fat_rat"
         },
-        "equipment": true,
-        "auto_equip": true,
-        "tile": {
-          "color": "#c8c8b4",
-          "char": "R"
-        },
         "stats": {
-          "str": 6,
           "dex": 2,
           "int": 0,
+          "str": 6,
           "vit": 10
+        },
+        "tile": {
+          "char": "R",
+          "color": "#c8c8b4"
         }
-      }
+      },
+      "description": "A giant fat rat with a vicious appetite.",
+      "display_name": "Fat Rat",
+      "from_template": "base_rat",
+      "name": "fat_rat"
     },
     {
-      "name": "silk_cocoon",
-      "from_template": "dummy_creature",
-      "display_name": "Silk Cocoon",
-      "description": "Suspended cocoon containing captured prey.",
       "assemblers": {
-        "tile": {
-          "color": "#e0e0e0",
-          "char": "0"
-        },
-        "stats": {
-          "str": 0,
-          "dex": 0,
-          "int": 0,
-          "vit": 1
-        },
         "faction": "nature",
         "inventory": {
           "loot_table": "common_silk_cocoon"
         },
-        "race": "dummy"
-      }
-    },
-    {
-      "name": "large_silk_cocoon",
-      "from_template": "silk_cocoon",
-      "display_name": "Large Silk Cocoon",
-      "assemblers": {
-        "tile": {
-          "color": "#e0e0a0",
-          "char": "O"
-        },
+        "race": "dummy",
         "stats": {
-          "str": 0,
           "dex": 0,
           "int": 0,
-          "vit": 3
+          "str": 0,
+          "vit": 1
+        },
+        "tile": {
+          "char": "0",
+          "color": "#e0e0e0"
+        }
+      },
+      "description": "Suspended cocoon containing captured prey.",
+      "display_name": "Silk Cocoon",
+      "from_template": "dummy_creature",
+      "name": "silk_cocoon"
+    },
+    {
+      "assemblers": {
+        "effect_executor": {
+          "effects": [
+            {
+              "effect_name": "spawn_hatchling",
+              "max_delay": 60,
+              "min_delay": 40
+            }
+          ]
         },
         "inventory": {
           "loot_table": "rare_silk_cocoon"
+        },
+        "stats": {
+          "vit": 3
+        },
+        "tile": {
+          "char": "O",
+          "color": "#e0e0a0"
         }
-      }
+      },
+      "display_name": "Large Silk Cocoon",
+      "from_template": "silk_cocoon",
+      "name": "large_silk_cocoon"
     },
     {
-      "name": "base_spider",
-      "from_template": "hostile_creature",
       "assemblers": {
         "faction": "nature",
-        "race": "creature",
         "inventory": {
           "loot_table": "common_spider"
-        }
-      }
+        },
+        "race": "creature"
+      },
+      "from_template": "hostile_creature",
+      "name": "base_spider"
     },
     {
-      "name": "arachnoth_hatchling",
-      "from_template": "base_spider",
-      "display_name": "Arachnoth Hatchling",
-      "description": "Agile spiderlings that scuttle around the lair.",
       "assemblers": {
-        "tile": {
-          "color": "#418778",
-          "char": "h"
-        },
         "stats": {
-          "str": 1,
           "dex": 10,
           "int": 0,
+          "str": 1,
           "vit": 1
+        },
+        "tile": {
+          "char": "h",
+          "color": "#418778"
         }
-      }
+      },
+      "description": "Agile spiderlings that scuttle around the lair.",
+      "display_name": "Arachnoth Hatchling",
+      "from_template": "base_spider",
+      "name": "arachnoth_hatchling"
     },
     {
-      "name": "arachnoth_burrower",
-      "from_template": "base_spider",
-      "display_name": "Arachnoth Burrower",
-      "description": "Spider with razor-sharp claws that emerges from hidden tunnels to ambush intruders.",
       "assemblers": {
-        "tile": {
-          "color": "#2e2d22",
-          "char": "b"
-        },
         "stats": {
-          "str": 1,
           "dex": 20,
           "int": 0,
+          "str": 1,
           "vit": 2
+        },
+        "tile": {
+          "char": "b",
+          "color": "#2e2d22"
         }
-      }
+      },
+      "description": "Spider with razor-sharp claws that emerges from hidden tunnels to ambush intruders.",
+      "display_name": "Arachnoth Burrower",
+      "from_template": "base_spider",
+      "name": "arachnoth_burrower"
     },
     {
-      "name": "arachnoth_broodguard",
-      "from_template": "base_spider",
-      "display_name": "Arachnoth Broodguard",
-      "description": "Large more aggressive spider that protects key areas of the lair.",
       "assemblers": {
-        "tile": {
-          "color": "#72de54",
-          "char": "B"
-        },
         "stats": {
-          "str": 4,
           "dex": 10,
           "int": 0,
+          "str": 4,
           "vit": 3
+        },
+        "tile": {
+          "char": "B",
+          "color": "#72de54"
         }
-      }
+      },
+      "description": "Large more aggressive spider that protects key areas of the lair.",
+      "display_name": "Arachnoth Broodguard",
+      "from_template": "base_spider",
+      "name": "arachnoth_broodguard"
     },
     {
-      "name": "base_blob",
-      "from_template": "hostile_creature",
       "assemblers": {
         "faction": "nature",
-        "race": "creature",
         "inventory": {
           "loot_table": "common_blob"
-        }
-      }
+        },
+        "race": "creature"
+      },
+      "from_template": "hostile_creature",
+      "name": "base_blob"
     },
     {
-      "name": "blob",
-      "from_template": "base_blob",
-      "display_name": "Blob",
-      "description": "A blob TODO",
       "assemblers": {
-        "tile": {
-          "color": "#2aa310",
-          "char": "b"
-        },
         "stats": {
-          "str": 7,
           "dex": 1,
           "int": 0,
+          "str": 7,
           "vit": 7
+        },
+        "tile": {
+          "char": "b",
+          "color": "#2aa310"
         }
-      }
+      },
+      "description": "A blob TODO",
+      "display_name": "Blob",
+      "from_template": "base_blob",
+      "name": "blob"
     },
     {
-      "name": "skeleton",
-      "from_template": "base_enemy",
-      "display_name": "Skeleton",
-      "description": "A skeleton TODO",
       "assemblers": {
-        "tile": {
-          "color": "#b8ad74",
-          "char": "s"
-        },
-        "stats": {
-          "str": 2,
-          "dex": 30,
-          "int": 0,
-          "vit": 2
-        },
+        "faction": "enemy",
         "inventory": {
           "loot_table": "common_enemy"
         },
-        "faction": "enemy",
-        "race": "undead"
-      }
+        "race": "undead",
+        "stats": {
+          "dex": 30,
+          "int": 0,
+          "str": 2,
+          "vit": 2
+        },
+        "tile": {
+          "char": "s",
+          "color": "#b8ad74"
+        }
+      },
+      "description": "A skeleton TODO",
+      "display_name": "Skeleton",
+      "from_template": "base_enemy",
+      "name": "skeleton"
     },
     {
-      "name": "troll_base",
-      "from_template": "base_enemy",
       "assemblers": {
         "faction": "enemy",
-        "race": "troll",
         "inventory": {
           "loot_table": "rare_enemy"
-        }
-      }
+        },
+        "race": "troll"
+      },
+      "from_template": "base_enemy",
+      "name": "troll_base"
     },
     {
-      "name": "troll",
-      "from_template": "troll_base",
-      "display_name": "Troll",
-      "description": "A troll TODO",
       "assemblers": {
-        "tile": {
-          "color": "#236e36",
-          "char": "t"
-        },
         "stats": {
-          "str": 4,
           "dex": 5,
           "int": 0,
+          "str": 4,
           "vit": 7
+        },
+        "tile": {
+          "char": "t",
+          "color": "#236e36"
         }
-      }
+      },
+      "description": "A troll TODO",
+      "display_name": "Troll",
+      "from_template": "troll_base",
+      "name": "troll"
     },
     {
-      "name": "troll_berserker",
-      "from_template": "troll_base",
-      "display_name": "Troll Berserker",
-      "description": "A troll berserker TODO",
       "assemblers": {
-        "tile": {
-          "color": "#236e36",
-          "char": "T"
-        },
         "stats": {
-          "str": 25,
           "dex": 8,
           "int": 0,
+          "str": 25,
           "vit": 30
+        },
+        "tile": {
+          "char": "T",
+          "color": "#236e36"
         }
-      }
+      },
+      "description": "A troll berserker TODO",
+      "display_name": "Troll Berserker",
+      "from_template": "troll_base",
+      "name": "troll_berserker"
     },
     {
-      "name": "fairy",
-      "from_template": "neutral_creature",
-      "display_name": "Fairy",
-      "description": "A delicate creature, it dances amidst the moonlit meadows, radiating an otherworldly glow.",
       "assemblers": {
-        "tile": {
-          "color": "#64e6e6",
-          "char": "f"
-        },
+        "healer": true,
         "race": "creature",
         "stats": {
+          "dex": 10,
+          "int": 5,
           "str": 0,
-          "dex": 10,
-          "int": 5,
           "vit": 1
         },
-        "healer": true
-      }
+        "tile": {
+          "char": "f",
+          "color": "#64e6e6"
+        }
+      },
+      "description": "A delicate creature, it dances amidst the moonlit meadows, radiating an otherworldly glow.",
+      "display_name": "Fairy",
+      "from_template": "neutral_creature",
+      "name": "fairy"
     },
     {
-      "name": "blood_fairy",
-      "from_template": "hostile_creature",
-      "display_name": "Blood Fairy",
-      "description": "A corrupted fairy that consumes the blood of its victims.",
       "assemblers": {
-        "tile": {
-          "color": "#c81e1e",
-          "char": "f"
-        },
-        "race": "creature",
-        "faction": "nature",
-        "stats": {
-          "str": 1,
-          "dex": 10,
-          "int": 5,
-          "vit": 1
-        },
-        "equipment": true,
         "auto_equip": true,
         "drop_equipment": false,
+        "equipment": true,
+        "faction": "nature",
         "inventory": {
           "loot_table": "ltb_blood_fairy"
+        },
+        "race": "creature",
+        "stats": {
+          "dex": 10,
+          "int": 5,
+          "str": 1,
+          "vit": 1
+        },
+        "tile": {
+          "char": "f",
+          "color": "#c81e1e"
         }
-      }
+      },
+      "description": "A corrupted fairy that consumes the blood of its victims.",
+      "display_name": "Blood Fairy",
+      "from_template": "hostile_creature",
+      "name": "blood_fairy"
     },
     {
-      "name": "young_blood_fairy",
-      "from_template": "blood_fairy",
-      "display_name": "Young Blood Fairy",
-      "description": "A corrupted fairy that consumes the blood of its victims.",
       "assemblers": {
-        "tile": {
-          "color": "#c86464"
-        },
         "stats": {
-          "str": 0,
           "dex": 5,
           "int": 2,
-          "vit": 1
+          "str": 0
+        },
+        "tile": {
+          "color": "#c86464"
         }
-      }
+      },
+      "description": "A corrupted fairy that consumes the blood of its victims.",
+      "display_name": "Young Blood Fairy",
+      "from_template": "blood_fairy",
+      "name": "young_blood_fairy"
     },
     {
-      "name": "blinding_mushroom",
-      "display_name": "Blinding Mushroom",
-      "description": "A mushroom that emits toxic blinding spores when disturbed.",
-      "from_template": "base_trap",
       "assemblers": {
-        "equipment": true,
         "auto_equip": true,
         "drop_equipment": false,
+        "equipment": true,
+        "inventory": {
+          "loot_table": "ltb_blinding_mushroom"
+        },
         "loot_interact": {
+          "default_tile": {
+            "char": "m",
+            "color": "#ff0000"
+          },
+          "interact_text": "Harvest Mushroom",
           "is_looted": false,
           "is_persistent": false,
           "loot_name": "Blinding Mushroom",
-          "interact_text": "Harvest Mushroom",
-          "default_tile": {
-            "color": "#ff0000",
-            "char": "m"
-          },
           "looted_tile": {
-            "color": "#0a0a0a",
-            "char": "m"
+            "char": "m",
+            "color": "#0a0a0a"
           }
-        },
-        "inventory": {
-          "loot_table": "ltb_blinding_mushroom"
         }
-      }
+      },
+      "description": "A mushroom that emits toxic blinding spores when disturbed.",
+      "display_name": "Blinding Mushroom",
+      "from_template": "base_trap",
+      "name": "blinding_mushroom"
     },
     {
-      "name": "base_tree",
-      "from_template": "dummy_creature",
       "assemblers": {
-        "equipment": true,
-        "drop_equipment": false,
         "auto_equip": true,
-        "race": "creature",
+        "drop_equipment": false,
+        "equipment": true,
         "faction": "nature",
         "inventory": {
           "loot_table": "ltb_base_tree"
-        }
-      }
+        },
+        "race": "creature"
+      },
+      "from_template": "dummy_creature",
+      "name": "base_tree"
     },
     {
-      "name": "pine_tree",
-      "from_template": "base_tree",
-      "display_name": "Pine Tree",
+      "assemblers": {
+        "stats": {
+          "dex": 0,
+          "int": 0,
+          "str": 0,
+          "vit": 10
+        },
+        "tile": {
+          "char": "A",
+          "color": "#288232"
+        }
+      },
       "description": "A pine tree",
-      "assemblers": {
-        "tile": {
-          "color": "#288232",
-          "char": "A"
-        },
-        "stats": {
-          "str": 0,
-          "dex": 0,
-          "int": 0,
-          "vit": 10
-        }
-      }
-    },
-    {
-      "name": "oak_tree",
+      "display_name": "Pine Tree",
       "from_template": "base_tree",
-      "display_name": "Oak Tree",
-      "description": "An oak tree",
-      "assemblers": {
-        "tile": {
-          "color": "#82b45a",
-          "char": "A"
-        },
-        "stats": {
-          "str": 0,
-          "dex": 0,
-          "int": 0,
-          "vit": 10
-        }
-      }
+      "name": "pine_tree"
     },
     {
-      "name": "iron_pine_tree",
-      "from_template": "pine_tree",
-      "display_name": "Iron Pine Tree",
-      "description": "A runic pine tree made of iron",
       "assemblers": {
-        "tile": {
-          "color": "#5a5a5a",
-          "char": "A"
+        "stats": {
+          "dex": 0,
+          "int": 0,
+          "str": 0,
+          "vit": 10
         },
+        "tile": {
+          "char": "A",
+          "color": "#82b45a"
+        }
+      },
+      "description": "An oak tree",
+      "display_name": "Oak Tree",
+      "from_template": "base_tree",
+      "name": "oak_tree"
+    },
+    {
+      "assemblers": {
         "inventory": {
           "loot_table": "ltb_iron_pine_tree"
         },
         "stats": {
-          "str": 0,
-          "dex": 0,
-          "int": 0,
           "vit": 40
+        },
+        "tile": {
+          "color": "#5a5a5a"
         }
-      }
+      },
+      "description": "A runic pine tree made of iron",
+      "display_name": "Iron Pine Tree",
+      "from_template": "pine_tree",
+      "name": "iron_pine_tree"
     },
     {
-      "name": "grove_guardian",
-      "from_template": "base_enemy",
-      "display_name": "Grove Guardian",
-      "description": "A Massive tree-like being that serves as the protector of the forest.",
       "assemblers": {
-        "race": "creature",
+        "drop_equipment": false,
         "faction": "nature",
-        "tile": {
-          "color": "#a0c8a0",
-          "char": "A"
+        "inventory": {
+          "loot_table": "ltb_iron_pine_tree"
         },
+        "race": "creature",
         "stats": {
-          "str": 10,
           "dex": 1,
           "int": 0,
+          "str": 10,
           "vit": 20
         },
-        "inventory": {
-          "loot_table": "ltb_iron_pine_tree"
-        },
-        "drop_equipment": false
-      }
+        "tile": {
+          "char": "A",
+          "color": "#a0c8a0"
+        }
+      },
+      "description": "A Massive tree-like being that serves as the protector of the forest.",
+      "display_name": "Grove Guardian",
+      "from_template": "base_enemy",
+      "name": "grove_guardian"
     },
     {
-      "name": "berry_bush",
-      "from_template": "base_chest",
-      "display_name": "Berry Bush",
-      "description": "A bush full of berries",
       "assemblers": {
         "inventory": {
           "loot_table": "common_fruits"
         },
         "loot_interact": {
-          "loot_name": "Berry Bush",
-          "interact_text": "Harvest Berries",
           "default_tile": {
             "char": "B",
             "color": "#8c0a32"
           },
+          "interact_text": "Harvest Berries",
+          "loot_name": "Berry Bush",
           "looted_tile": {
             "char": "B",
             "color": "#051e05"
           }
         }
-      }
+      },
+      "description": "A bush full of berries",
+      "display_name": "Berry Bush",
+      "from_template": "base_chest",
+      "name": "berry_bush"
     },
     {
-      "name": "healer",
-      "from_template": "base_interact",
-      "display_name": "Healer",
+      "assemblers": {
+        "healer": true,
+        "tile": {
+          "char": "h",
+          "color": "#278716"
+        }
+      },
       "description": "A healer TODO",
-      "assemblers": {
-        "tile": {
-          "color": "#278716",
-          "char": "h"
-        },
-        "healer": true
-      }
+      "display_name": "Healer",
+      "from_template": "base_interact",
+      "name": "healer"
     },
     {
-      "name": "shop",
-      "from_template": "base_interact",
-      "display_name": "Shop",
+      "assemblers": {
+        "shop": true,
+        "tile": {
+          "char": "S",
+          "color": "#a68733"
+        }
+      },
       "description": "A shop TODO",
-      "assemblers": {
-        "tile": {
-          "color": "#a68733",
-          "char": "S"
-        },
-        "shop": true
-      }
+      "display_name": "Shop",
+      "from_template": "base_interact",
+      "name": "shop"
     },
     {
-      "name": "level_entry",
-      "from_template": "base_interact",
-      "display_name": "Level Entry",
-      "description": "A level entry TODO",
       "assemblers": {
-        "tile": {
-          "color": "#489dcf",
-          "char": "<"
-        },
         "level_entry_exit": {
           "is_exit": false,
           "level_id": 0
+        },
+        "tile": {
+          "char": "<",
+          "color": "#489dcf"
         }
-      }
+      },
+      "description": "A level entry TODO",
+      "display_name": "Level Entry",
+      "from_template": "base_interact",
+      "name": "level_entry"
     },
     {
-      "name": "level_exit",
-      "from_template": "level_entry",
-      "display_name": "Level Exit",
-      "description": "A level exit TODO",
       "assemblers": {
-        "tile": {
-          "char": "H"
-        },
         "level_entry_exit": {
           "is_exit": true
+        },
+        "tile": {
+          "char": "H"
         }
-      }
+      },
+      "description": "A level exit TODO",
+      "display_name": "Level Exit",
+      "from_template": "level_entry",
+      "name": "level_exit"
     },
     {
-      "name": "stash",
-      "from_template": "base_chest",
       "assemblers": {
         "inventory": {
           "loot_table": "l1_key"
         },
         "loot_interact": {
-          "loot_name": "Stash",
-          "interact_text": "Open Stash",
           "default_tile": {
             "char": "C",
             "color": "#fac43c"
           },
+          "interact_text": "Open Stash",
+          "loot_name": "Stash",
           "looted_tile": {
             "char": "C",
             "color": "#fac43c"
           }
+        },
+        "serialization_id": {
+          "id": 20001
         }
-      }
+      },
+      "description": "A stash where you can store items",
+      "display_name": "Stash",
+      "from_template": "base_chest",
+      "name": "stash"
     },
     {
-      "name": "common_vase",
-      "from_template": "base_chest",
       "assemblers": {
         "inventory": {
           "loot_table": "common_chest"
         },
         "loot_interact": {
-          "loot_name": "Vase",
-          "interact_text": "Look into Vase",
           "default_tile": {
             "char": "V",
             "color": "#77412c"
           },
+          "interact_text": "Look into Vase",
+          "loot_name": "Vase",
           "looted_tile": {
             "char": "v",
             "color": "#77412c"
           }
         }
-      }
+      },
+      "from_template": "base_chest",
+      "name": "common_vase"
     },
     {
-      "name": "common_chest",
-      "from_template": "base_chest",
       "assemblers": {
         "inventory": {
           "loot_table": "common_chest"
@@ -760,11 +793,11 @@
             "color": "#c49a31"
           }
         }
-      }
+      },
+      "from_template": "base_chest",
+      "name": "common_chest"
     },
     {
-      "name": "rare_chest",
-      "from_template": "base_chest",
       "assemblers": {
         "inventory": {
           "loot_table": "rare_chest"
@@ -779,78 +812,223 @@
             "color": "#a65c2d"
           }
         }
-      }
+      },
+      "from_template": "base_chest",
+      "name": "rare_chest"
     },
     {
-      "name": "base_world_entry",
-      "from_template": "base_interact",
       "assemblers": {
-        "world_entry": {
-          "level_name": "<not defined from base_world_entry>"
-        },
         "tile": {
           "char": "<",
           "color": "#ff0000"
+        },
+        "world_entry": {
+          "level_name": "<not defined from base_world_entry>"
         }
-      }
+      },
+      "from_template": "base_interact",
+      "name": "base_world_entry"
     },
     {
-      "name": "work_bench",
-      "from_template": "base_chest",
-      "display_name": "Work Bench",
-      "description": "A work bench TODO",
       "assemblers": {
         "inventory": {
           "loot_table": "null",
           "max_stack_size": 1
         },
         "loot_interact": {
-          "loot_name": "Work Bench",
-          "interact_text": "Use Work Bench",
           "default_tile": {
-            "color": "#735740",
-            "char": "W"
+            "char": "W",
+            "color": "#735740"
           },
+          "interact_text": "Use Work Bench",
+          "loot_name": "Work Bench",
           "looted_tile": {
-            "color": "#735740",
-            "char": "W"
+            "char": "W",
+            "color": "#735740"
           }
         },
+        "serialization_id": {
+          "id": 20002
+        },
         "work_bench": true
-      }
+      },
+      "description": "A work bench TODO",
+      "display_name": "Work Bench",
+      "from_template": "base_chest",
+      "name": "work_bench"
     },
     {
-      "name": "level_1",
-      "from_template": "base_world_entry",
-      "display_name": "Level 1",
-      "description": "Level 1 TODO",
       "assemblers": {
         "world_entry": {
           "level_name": "level_1"
         }
-      }
+      },
+      "description": "Level 1 TODO",
+      "display_name": "Level 1",
+      "from_template": "base_world_entry",
+      "name": "level_1"
     },
     {
-      "name": "level_2",
-      "from_template": "base_world_entry",
-      "display_name": "Level 2",
-      "description": "Level 2 TODO",
       "assemblers": {
         "world_entry": {
           "level_name": "level_2"
         }
-      }
+      },
+      "description": "Level 2 TODO",
+      "display_name": "Level 2",
+      "from_template": "base_world_entry",
+      "name": "level_2"
     },
     {
-      "name": "level_3",
-      "from_template": "base_world_entry",
-      "display_name": "Level 3",
-      "description": "Level 3 TODO",
       "assemblers": {
         "world_entry": {
           "level_name": "level_3"
         }
-      }
+      },
+      "description": "Level 3 TODO",
+      "display_name": "Level 3",
+      "from_template": "base_world_entry",
+      "name": "level_3"
+    },
+    {
+      "assemblers": {
+        "inventory": {
+          "loot_table": "common_arcane_workshop"
+        },
+        "loot_interact": {
+          "default_tile": {
+            "char": "W",
+            "color": "#45c5b0"
+          },
+          "interact_text": "Search Workshop",
+          "loot_name": "Workshop",
+          "looted_tile": {
+            "char": "w",
+            "color": "#329c8c"
+          }
+        }
+      },
+      "description": "An abandond arcane workshop",
+      "display_name": "Arcane Workshop",
+      "from_template": "base_chest",
+      "name": "common_arcane_workshop"
+    },
+    {
+      "assemblers": {
+        "inventory": {
+          "loot_table": "null"
+        }
+      },
+      "name": "null"
+    },
+    {
+      "assemblers": {
+        "drop_equipment": false,
+        "faction": "enemy",
+        "inventory": {
+          "loot_table": "ltb_ghost"
+        },
+        "race": "undead",
+        "stats": {
+          "dex": 8,
+          "int": 4,
+          "str": 0,
+          "vit": 3
+        },
+        "tile": {
+          "char": "g",
+          "color": "#bcdbeb"
+        }
+      },
+      "description": "A woken spirit that haunts the surroundings",
+      "display_name": "Ghost",
+      "from_template": "base_enemy",
+      "name": "ghost"
+    },
+    {
+      "assemblers": {
+        "collision": false,
+        "inventory": {
+          "loot_table": "rare_chest"
+        },
+        "loot_interact": {
+          "default_tile": {
+            "char": "%",
+            "color": "#d9c4b3",
+            "z_index": -2
+          },
+          "interact_text": "Search bones",
+          "loot_name": "Bones",
+          "looted_tile": {
+            "char": "%",
+            "color": "#867b80",
+            "z_index": -2
+          }
+        },
+        "spawn_entity_post_interaction": {
+          "entity_name": "ghost"
+        }
+      },
+      "description": "Remains of a dead humanoid, better not to disrupt the grave",
+      "display_name": "Skeletal Remains",
+      "from_template": "base_chest",
+      "name": "common_skeletal_remains"
+    },
+    {
+      "assemblers": {
+        "drop_equipment": false,
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_thorn_blossom"
+        },
+        "line_of_sight": {
+          "range": 7
+        },
+        "race": "creature",
+        "search_ai": false,
+        "stats": {
+          "dex": 5,
+          "int": 0,
+          "str": 0,
+          "vit": 3
+        },
+        "tile": {
+          "bg_color": "#5d2721",
+          "char": "&",
+          "color": "#819f00"
+        },
+        "wander_ai": false
+      },
+      "description": "Hostile flower in that shoots sharp thorns at intruders when disturbed",
+      "display_name": "Thorn Blossom",
+      "from_template": "base_enemy",
+      "name": "thorn_blossom"
+    },
+    {
+      "assemblers": {
+        "auto_equip": true,
+        "drop_equipment": false,
+        "equipment": true,
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_changeling"
+        },
+        "race": "creature",
+        "stats": {
+          "dex": 9,
+          "int": 3,
+          "str": 2,
+          "vit": 3
+        },
+        "tile": {
+          "char": "c",
+          "color": "#7b5ad2"
+        }
+      },
+      "description": "The Changeling is a creature known for its shape-shifting abilities, often taking the form of a human baby. In folklore, it replaces human infants, leading unsuspecting parents to raise what they believe to be their child, while the true human child is taken to the fairy realm.",
+      "display_name": "Changeling",
+      "from_template": "hostile_creature",
+      "name": "changeling"
     }
   ]
 }

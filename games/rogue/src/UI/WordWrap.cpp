@@ -12,30 +12,63 @@ WordWrap::WordWrap(const std::string &Text, std::size_t LineWidth)
   std::size_t CurrentWordSize = 0;
   std::size_t CurrentLineSize = 0;
   std::size_t LastLineEnd = 0;
+
+  auto checkAndAddLine = [&]() {
+    // current line size with last word 'CurrentWordSize' and
+    // whitespace greater than line size?
+    if (CurrentLineSize + CurrentWordSize > LineWidth) {
+      // add interval
+      LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize});
+
+      // set end of last line and reset current line size
+      LastLineEnd += CurrentLineSize;
+      CurrentLineSize = 0;
+    }
+  };
+
+  auto checkAndCutWord = [&]() {
+    // check if the word fits at all into a line
+    if (CurrentWordSize > LineWidth) {
+      // word is longer than a line -> cut it, since we anyways cut it add as
+      // much as possible to the current line, then add as many lines as
+      // needed
+      // add as much as possible to current line
+      auto LineLeft = static_cast<int>(LineWidth - CurrentLineSize);
+      if (LineLeft > 0) {
+        LineIntvs.push_back(Interval{LastLineEnd, LineWidth});
+        LastLineEnd += LineWidth;
+        CurrentLineSize = 0;
+        CurrentWordSize -= LineLeft;
+      }
+
+      // add as many lines as needed
+      while (CurrentWordSize > LineWidth) {
+        LineIntvs.push_back(Interval{LastLineEnd, LineWidth});
+        LastLineEnd += LineWidth;
+        CurrentWordSize -= LineWidth;
+      }
+    }
+  };
+
   while (CurrentReadPos < Text.size()) {
     // not a whitespace character?
     if (Text[CurrentReadPos] != ' ' && Text[CurrentReadPos] != '\n') {
       // yes, increase current word size
       CurrentWordSize += 1;
     } else {
-      // current line size with last word 'CurrentWordSize' and
-      // whitespace greater than line size?
-      if (CurrentLineSize + CurrentWordSize + 1 > LineWidth) {
-        // add interval
-        LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize});
+      // handle cutting the word if it is to large
+      checkAndCutWord();
 
-        // set end of last line and reset current line size
-        LastLineEnd += CurrentLineSize;
-        CurrentLineSize = 0;
-      }
+      // handle adding a new line to wrap the word if needed
+      checkAndAddLine();
 
       // add started word to current line
-      CurrentLineSize += ++CurrentWordSize;
+      CurrentLineSize += CurrentWordSize + 1;
       CurrentWordSize = 0;
 
       if (Text[CurrentReadPos] == '\n') {
-        // got new line -> forced cut
-        LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize});
+        // got new line character -> forced new line
+        LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize - 1});
         StrBuffer[LastLineEnd + CurrentLineSize - 1] = ' ';
         LastLineEnd += CurrentLineSize;
         CurrentLineSize = 0;
@@ -45,15 +78,20 @@ WordWrap::WordWrap(const std::string &Text, std::size_t LineWidth)
     CurrentReadPos++;
   }
 
-  if (CurrentLineSize + CurrentWordSize + 1 > LineWidth) {
-    LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize});
-    LastLineEnd += CurrentLineSize;
-    CurrentLineSize = 0;
-  }
+  // handle cutting the word if it is to large
+  checkAndCutWord();
 
+  // handle adding a new line to wrap the word if needed
+  checkAndAddLine();
+
+  // Create an interval for the last line, if the last line is empty, add a
+  // whitespace so we do not have an empty string
   CurrentLineSize += CurrentWordSize;
-  LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize + 1});
-  StrBuffer.push_back(' ');
+  if (CurrentLineSize == 0) {
+    StrBuffer.push_back(' ');
+    CurrentLineSize++;
+  }
+  LineIntvs.push_back(Interval{LastLineEnd, CurrentLineSize});
 }
 
 } // namespace rogue::ui

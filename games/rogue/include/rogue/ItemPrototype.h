@@ -15,6 +15,8 @@ public:
   static bool canApply(ItemType Type, CapabilityFlags Flags);
 
 public:
+  ItemPrototype() = default;
+
   /// Creates an item prototype with the given attributes
   /// \param ItemId Unique identifier for the item
   /// \param Name Name of the item
@@ -44,8 +46,12 @@ public:
   void removeFrom(const entt::entity &SrcEt, const entt::entity &DstEt,
                   entt::registry &Reg, CapabilityFlags Flags) const;
 
+  template <class Archive> void serialize(Archive &Ar) {
+    Ar(ItemId, Name, Description, Type, MaxStackSize, Effects);
+  }
+
 public:
-  int ItemId;
+  int ItemId = -1;
   std::string Name;
   std::string Description;
   ItemType Type = ItemType::None;

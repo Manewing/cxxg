@@ -82,6 +82,14 @@ void InventoryControllerBase::updateElements() const {
   }
   auto PrevIdx = List->getSelectedElement();
   List->setElements(Elements);
+
+  if (PrevIdx >= Inv.getItems().size()) {
+    if (Inv.getItems().empty()) {
+      List->selectElement(0);
+      return;
+    }
+    PrevIdx = Inv.getItems().size() - 1;
+  }
   List->selectElement(PrevIdx);
 }
 
@@ -136,7 +144,13 @@ bool InventoryController::handleInput(int Char) {
     InvHandler.tryDropItem(ItemIdx);
   } break;
   case Controls::Dismantle.Char: {
-    InvHandler.tryDismantleItem(ItemIdx);
+    Ctrl.createYesNoDialog("Dismantle " +
+                               Inv.getItem(ItemIdx).getQualifierName(),
+                           [this, ItemIdx](bool Yes) {
+                             if (Yes) {
+                               InvHandler.tryDismantleItem(ItemIdx);
+                             }
+                           });
   } break;
   case Controls::StoreOne.Char:
     if (auto *LUI = Ctrl.getWindowOfType<LootController>()) {
@@ -160,7 +174,12 @@ std::string InventoryController::getInteractMsg() const {
     return "";
   }
 
-  const auto &SelectedItem = Inv.getItem(List->getSelectedElement());
+  auto SelectIdx = List->getSelectedElement();
+  if (SelectIdx >= Inv.getItems().size()) {
+    SelectIdx = Inv.getItems().size() - 1;
+    List->selectElement(SelectIdx);
+  }
+  const auto &SelectedItem = Inv.getItem(SelectIdx);
   std::vector<KeyOption> Options = {Controls::Info, Controls::Drop};
   // FIXME this should all be based on capability flags, not item type
   if (SelectedItem.getType() & ItemType::EquipmentMask) {

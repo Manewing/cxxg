@@ -22,7 +22,13 @@ void resetStats(entt::registry &Reg) {
 }
 
 void updateStatsTimedBuffComp(entt::entity Entity, entt::registry &Reg,
-                              StatsComp &S, StatsTimedBuffComp &STB) {
+                              StatsComp &S, StatsTimedBuffComp &STB,
+                              bool IsTick) {
+  if (!IsTick) {
+    S.add(STB.Bonus);
+    return;
+  }
+
   auto St = STB.tick();
   if (St == TimedBuff::State::Expired) {
     Reg.erase<StatsTimedBuffComp>(Entity);
@@ -68,11 +74,11 @@ void applyStatsBuffPerHitComp(entt::registry &Reg, bool Tick) {
   });
 }
 
-void applyTimedStatsAndBuffs(entt::registry &Reg) {
+void applyTimedStatsAndBuffs(entt::registry &Reg, bool IsTick) {
   // Apply timed stats buff
   Reg.view<StatsComp, StatsTimedBuffComp>().each(
-      [&Reg](auto Entity, auto &S, auto &STB) {
-        updateStatsTimedBuffComp(Entity, Reg, S, STB);
+      [&Reg, IsTick](auto Entity, auto &S, auto &STB) {
+        updateStatsTimedBuffComp(Entity, Reg, S, STB, IsTick);
       });
 }
 
@@ -126,9 +132,8 @@ void StatsSystem::update(UpdateType Type) {
   // Update stats buff per hit comp
   applyStatsBuffPerHitComp(Reg, UpdateType::Tick == Type);
 
-  if (Type == UpdateType::Tick) {
-    applyTimedStatsAndBuffs(Reg);
-  }
+  // Update timed stats
+  applyTimedStatsAndBuffs(Reg, Type == UpdateType::Tick);
 
   applyStaticStatBuffs(Reg);
   applyStatEffects(Reg);
