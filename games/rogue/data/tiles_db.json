@@ -4,20 +4,114 @@
     "color": "#222222",
     "bg_color": "#222222"
   },
+  "ground_mod_0": {
+    "char": "\\",
+    "color": "#1d1d1d",
+    "bg_color": "#222222"
+  },
+  "ground_mod_1": {
+    "char": "_",
+    "color": "#111111",
+    "bg_color": "#222222"
+  },
+  "ground_mod_2": {
+    "char": " ",
+    "color": "#222222",
+    "bg_color": "#222233"
+  },
+  "ground_planks_1": {
+    "char": "=",
+    "color": "#533116",
+    "bg_color": "#382626"
+  },
+  "black": {
+    "char": " ",
+    "color": "#000000",
+    "bg_color": "#000000"
+  },
   "wall": {
     "char": "#",
     "color": "#737373"
   },
-	"1": {
-		"char": "1",
-		"color": "#333333"
-	},
-	"2": {
-		"char": "2",
-		"color": "#333333"
-	},
+  "mossy_wall": {
+    "char": "#",
+    "color": "#5a8551"
+  },
+  "wall_planks": {
+    "char": "#",
+    "color": "#382626",
+    "bg_color": "#533116"
+  },
+  "mossy_foliage": {
+    "char": "\"",
+    "color": "#5a8551"
+  },
+  "water_0": {
+    "char": "~",
+    "color": "#126265"
+  },
+  "water_1": {
+    "char": "~",
+    "color": "#144C71"
+  },
+  "1": {
+    "char": "1",
+    "color": "#333333"
+  },
+  "2": {
+    "char": "2",
+    "color": "#333333"
+  },
+  "3": {
+    "char": "3",
+    "color": "#333333"
+  },
+  "4": {
+    "char": "4",
+    "color": "#333333"
+  },
+  "5": {
+    "char": "5",
+    "color": "#333333"
+  },
+  "6": {
+    "char": "6",
+    "color": "#333333"
+  },
+  "7": {
+    "char": "7",
+    "color": "#333333"
+  },
+  "8": {
+    "char": "8",
+    "color": "#333333"
+  },
+  "9": {
+    "char": "9",
+    "color": "#333333"
+  },
+  "0": {
+    "char": "0",
+    "color": "#333333"
+  },
+  "spider_lair_wall": {
+    "char": "#",
+    "color": "#062e29"
+  },
+  "spider_lair_wall_second": {
+    "char": "#",
+    "color": "#0c544b"
+  },
+  "spider_lair_web_0": {
+    "char": "x",
+    "color": "#939696"
+  },
+  "spider_lair_web_1": {
+    "char": "*",
+    "color": "#4a5957"
+  },
   "torch": {
     "char": "'",
     "color": "#ed3424"
-	}
+  }
 }

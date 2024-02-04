@@ -267,6 +267,7 @@ add_custom_command(
       ${DATA_FILES}
       ${LEVEL_FILES}
       ${TILED_FILES}
+      ${CMAKE_CURRENT_SOURCE_DIR}/data/tiled_maps/tiled_id_map.json
       ${CMAKE_CURRENT_SOURCE_DIR}/scripts/schema_processor.py
 )
 

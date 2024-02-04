@@ -48,8 +48,14 @@ Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
 void Renderer::renderShadow(unsigned char Darkness) {
   const cxxg::types::RgbColor ShadowColor{Darkness, Darkness, Darkness, true,
                                           0,        0,        0};
-  VisibleMap.forEach(
-      [ShadowColor](auto, auto &Tile) { Tile.Color = ShadowColor; });
+  auto &WallsMap = L.Map.get(Level::LayerWallsIdx);
+  VisibleMap.forEach([ShadowColor, &WallsMap, this](auto Pos, auto &Tile) {
+    Tile.Color = ShadowColor;
+    if (WallsMap.contains(Pos - Offset) &&
+        WallsMap.getTile(Pos - Offset) == Level::EmptyTile) {
+      Tile.Char = '.';
+    }
+  });
   IsVisibleMap.fill(false);
 }
 

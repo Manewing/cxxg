@@ -159,5 +159,251 @@
     {
         "key": "level_3",
         "tile_type": "entity"
+    },
+    {
+        "key": "0",
+        "tile": {
+            "char": "0",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "3",
+        "tile": {
+            "char": "3",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "4",
+        "tile": {
+            "char": "4",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "5",
+        "tile": {
+            "char": "5",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "6",
+        "tile": {
+            "char": "6",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "7",
+        "tile": {
+            "char": "7",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "8",
+        "tile": {
+            "char": "8",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "9",
+        "tile": {
+            "char": "9",
+            "color": "#333333"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "mossy_wall",
+        "tile": {
+            "char": "#",
+            "color": "#5a8551"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "spider_lair_wall",
+        "tile": {
+            "char": "#",
+            "color": "#062e29"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "spider_lair_web_0",
+        "tile": {
+            "char": "x",
+            "color": "#939696"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "spider_lair_web_1",
+        "tile": {
+            "char": "*",
+            "color": "#4a5957"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "spider_lair_wall_second",
+        "tile": {
+            "char": "#",
+            "color": "#0c544b"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "black",
+        "tile": {
+            "bg_color": "#000000",
+            "char": " ",
+            "color": "#000000"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "base_chest",
+        "tile_type": "entity"
+    },
+    {
+        "key": "berry_bush",
+        "tile_type": "entity"
+    },
+    {
+        "key": "blinding_mushroom",
+        "tile_type": "entity"
+    },
+    {
+        "key": "closed_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "common_arcane_workshop",
+        "tile_type": "entity"
+    },
+    {
+        "key": "common_chest",
+        "tile_type": "entity"
+    },
+    {
+        "key": "common_skeletal_remains",
+        "tile_type": "entity"
+    },
+    {
+        "key": "common_vase",
+        "tile_type": "entity"
+    },
+    {
+        "key": "final_locked_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "l1_locked_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "l2_locked_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "l3_locked_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "open_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "rare_chest",
+        "tile_type": "entity"
+    },
+    {
+        "key": "stash",
+        "tile_type": "entity"
+    },
+    {
+        "key": "work_bench",
+        "tile_type": "entity"
+    },
+    {
+        "key": "ground_mod_0",
+        "tile": {
+            "bg_color": "#222222",
+            "char": "\\",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_mod_1",
+        "tile": {
+            "bg_color": "#222222",
+            "char": "_",
+            "color": "#111111"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_planks_1",
+        "tile": {
+            "bg_color": "#382626",
+            "char": "=",
+            "color": "#533116"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "wall_planks",
+        "tile": {
+            "bg_color": "#533116",
+            "char": "#",
+            "color": "#382626"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "mossy_foliage",
+        "tile": {
+            "char": "\"",
+            "color": "#5a8551"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "water_0",
+        "tile": {
+            "char": "~",
+            "color": "#126265"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "water_1",
+        "tile": {
+            "char": "~",
+            "color": "#144C71"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_mod_2",
+        "tile": {
+            "bg_color": "#222233",
+            "char": " ",
+            "color": "#222222"
+        },
+        "tile_type": "tile"
     }
 ]

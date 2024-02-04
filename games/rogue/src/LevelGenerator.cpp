@@ -367,8 +367,13 @@ TiledMapLevelGenerator::createNewLevel(int LevelId) const {
       auto TileId = TiledM.getTile(Pos);
       auto It = TileInfos.Tiles.find(TileId);
       if (It == TileInfos.Tiles.end()) {
-        throw std::out_of_range("Could not find tile for tile Id: " +
-                                std::to_string(TileId));
+        std::stringstream SS;
+        SS << "Could not find tile for tile Id: " << TileId << " at " << Pos;
+        if (auto EtIt = TileInfos.Entities.find(TileId);
+            EtIt != TileInfos.Entities.end()) {
+          SS << "\nYou are referencing an entity: " << EtIt->second << "";
+        }
+        throw std::out_of_range(SS.str());
       }
       Tile = TileInfos.Tiles.at(TiledM.getTile(Pos));
     });
@@ -382,8 +387,13 @@ TiledMapLevelGenerator::createNewLevel(int LevelId) const {
       [this, &TileInfos, &Factory, &NewLevel](auto Pos, auto TileId) {
         auto It = TileInfos.Entities.find(TileId);
         if (It == TileInfos.Entities.end()) {
-          throw std::out_of_range("Could not find entity for tile Id: " +
-                                  std::to_string(TileId));
+          std::stringstream SS;
+          SS << "Could not find entity for tile Id: " << TileId << " at " << Pos;
+          if (auto TIt = TileInfos.Tiles.find(TileId);
+              TIt != TileInfos.Tiles.end()) {
+            SS << "\nYou are referencing a tile: " << TIt->second.kind();
+          }
+          throw std::out_of_range(SS.str());
         }
         if (It->second.empty()) {
           return;
@@ -482,7 +492,6 @@ loadTiledMapGeneratorConfig(const std::filesystem::path &BasePath,
                             const rapidjson::Value &Doc) {
   TiledMapLevelGenerator::Config MapCfg;
   auto MapJson = Doc["map"].GetObject();
-  std::cerr << "ehere" << std::endl;
   MapCfg.TiledMapFile = BasePath / MapJson["tiled_map_file"].GetString();
   MapCfg.TiledIdMapFile = BasePath / MapJson["tiled_id_map_file"].GetString();
   return MapCfg;

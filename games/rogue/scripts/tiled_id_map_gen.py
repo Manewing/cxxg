@@ -19,6 +19,18 @@ def get_entity_tiles(entity_db: EntityDb) -> Dict[str, dict]:
         assemblers = fully_defined_template.get("assemblers", {})
         if "tile" in assemblers:
             entity_tiles[name] = assemblers["tile"]
+        elif "door" in assemblers:
+            door = assemblers["door"]
+            if door["is_open"]:
+                entity_tiles[name] = door["open_tile"]
+            else:
+                entity_tiles[name] = door["closed_tile"]
+        elif "loot_interact" in assemblers:
+            loot_interact = assemblers["loot_interact"]
+            if loot_interact["is_looted"]:
+                entity_tiles[name] = loot_interact["looted_tile"]
+            else:
+                entity_tiles[name] = loot_interact["default_tile"]
     return entity_tiles
 
 

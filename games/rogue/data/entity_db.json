@@ -7,12 +7,12 @@
         "door": {
           "closed_tile": {
             "char": "+",
-            "color": "#737373"
+            "color": "#5e4028"
           },
           "is_open": false,
           "open_tile": {
             "char": "/",
-            "color": "#737373"
+            "color": "#5e4028"
           }
         },
         "position": true,
