@@ -47,6 +47,18 @@ TEST(InventoryTest, AddItem) {
   EXPECT_EQ(Inv.getItemIndexForId(1), 0);
 }
 
+TEST(InventoryTest, AddItemWithExcessStackSize) {
+  rogue::Inventory Inv;
+  rogue::Item It(DummyConsumable, 10);
+  Inv.addItem(It);
+  ASSERT_EQ(Inv.size(), 2) << Inv;
+  EXPECT_EQ(Inv.getItem(0).StackSize, 5);
+  EXPECT_EQ(Inv.getItem(0).getName(), "consumable");
+  EXPECT_EQ(Inv.getItem(1).StackSize, 5);
+  EXPECT_EQ(Inv.getItem(1).getName(), "consumable");
+  EXPECT_EQ(Inv.getItemIndexForId(1), 0);
+}
+
 TEST(InventoryTest, AddItemInvMaxStack) {
   rogue::Inventory Inv(/*MaxStackSize=*/1);
   rogue::Item It(DummyConsumable, 2);
