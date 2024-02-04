@@ -59,7 +59,7 @@ int main(int Argc, char *Argv[]) {
   rogue::CraftingHandler Crafter(ItemDb);
   rogue::GameContext Ctx{Hub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter};
 
-  rogue::LevelGeneratorLoader LvlGenLoader(Ctx);
+  rogue::LevelGeneratorLoader LvlGenLoader(Ctx, Cfg.LevelDbConfig.parent_path());
   auto LG = LvlGenLoader.load(Cfg.Seed, Argv[2]);
   auto Level = LG->generateLevel(0);
   Level->setEventHub(&Hub);

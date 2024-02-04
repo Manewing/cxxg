@@ -72,7 +72,8 @@ int main(int Argc, char *Argv[]) {
   rogue::CraftingHandler Crafter(ItemDb);
   rogue::GameContext Ctx{Hub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter};
 
-  LevelGeneratorLoader LvlGenLoader(Ctx);
+  LevelGeneratorLoader LvlGenLoader(
+      Ctx, std::filesystem::path(Argv[1]).parent_path());
   auto LG = LvlGenLoader.load(0, Argv[1]);
   auto Level = LG->generateLevel(0);
   auto NPCEntity =

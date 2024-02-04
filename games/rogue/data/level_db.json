@@ -4,19 +4,19 @@
       "slots": [
         {
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/l1_sewers.json",
+          "level_config": "levels/sewers/l1.json",
           "type": "level",
           "weight": 5
         },
         {
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/l1_mystic_gardens.json",
+          "level_config": "levels/mystic_grove/l1.json",
           "type": "level",
           "weight": 5
         },
         {
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/l1_spiders.json",
+          "level_config": "levels/arachnoth/l1.json",
           "type": "level",
           "weight": 5
         }
@@ -26,19 +26,19 @@
       "slots": [
         {
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/rat_pit.json",
+          "level_config": "levels/sewers/rat_pit.json",
           "type": "level",
           "weight": 5
         },
         {
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/l2_mystic_grove.json",
+          "level_config": "levels/mystic_grove/l2.json",
           "type": "level",
           "weight": 10
         },
         {
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/spider_lair.json",
+          "level_config": "levels/arachnoth/l2.json",
           "type": "level",
           "weight": 10
         }
@@ -48,13 +48,13 @@
       "slots": [
         {
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/troll_dungeon.json",
+          "level_config": "levels/troll_dungeon/troll_dungeon.json",
           "type": "level",
           "weight": 5
         },
         {
           "game_world": "multi_level_dungeon",
-          "level_config": "levels/blob_cave.json",
+          "level_config": "levels/blobs/blob_cave.json",
           "type": "level",
           "weight": 5
         }

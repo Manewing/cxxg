@@ -225,7 +225,7 @@ set(RUN_PYTHON
 
 file(GLOB DATA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/*.json ${CMAKE_CURRENT_SOURCE_DIR}/data/*.yaml)
 file(GLOB SCHEMA_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/schemas/*.json)
-file(GLOB LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/levels/*.json)
+file(GLOB_RECURSE LEVEL_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/levels/*.json)
 file(GLOB TILED_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/levels/*.tmj)
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/data/

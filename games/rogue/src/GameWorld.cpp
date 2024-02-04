@@ -178,7 +178,8 @@ void DungeonSweeper::switchWorld(unsigned Seed, std::string_view Type,
   Seed ^= Seed << 12 ^ SwitchPos.X ^ SwitchPos.Y << 8;
   Seed ^= SwitchedWorldCount++;
 
-  CurrSubLvlGen = LevelGeneratorLoader(LevelGen.getCtx()).load(Seed, Config);
+  CurrSubLvlGen = LevelGeneratorLoader(LevelGen.getCtx(), LevelGen.getDataDir())
+                      .load(Seed, Config);
   CurrSubWorld = GameWorld::create(LevelDb, *CurrSubLvlGen, Type);
   CurrSubWorld->setEventHub(Hub);
   CurrMaxLevel = 1;

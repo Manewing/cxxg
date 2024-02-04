@@ -31,7 +31,7 @@ public:
 };
 
 TEST_F(GameWorldTest, MultiLevelDungeonEmpty) {
-  rogue::EmptyLevelGenerator LvlGen(Ctx, {{1, 1}});
+  rogue::EmptyLevelGenerator LvlGen(Ctx, "", {{1, 1}});
   rogue::MultiLevelDungeon MLD(LvlGen);
 
   EXPECT_EQ(MLD.getCurrentLevelIdx(), 0);
@@ -44,7 +44,7 @@ TEST_F(GameWorldTest, MultiLevelDungeonEmpty) {
 }
 
 TEST_F(GameWorldTest, MultiLevelDungeonSwitchLevel) {
-  rogue::EmptyLevelGenerator LvlGen(Ctx, {{1, 1}});
+  rogue::EmptyLevelGenerator LvlGen(Ctx, "", {{1, 1}});
   rogue::MultiLevelDungeon MLD(LvlGen);
 
   EXPECT_EQ(MLD.getCurrentLevel(), nullptr);

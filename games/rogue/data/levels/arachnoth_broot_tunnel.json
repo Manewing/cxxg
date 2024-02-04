@@ -1,8 +1,0 @@
-{
-  "map": {
-    "type": "tiled",
-    "tiled_map_file": "arachnoth_broot_tunnel.tmj",
-    "tiled_id_map_file": "../tiled_maps/tiled_id_map.json"
-  },
-	"entities": {}
-}
