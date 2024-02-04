@@ -1907,6 +1907,7 @@
         }
       ],
       "description": "Gain extra vitality for a period of time",
+      "max_stack_size": 99,
       "name": "Herb of Vitality",
       "types": [
         "consumable"
@@ -1920,6 +1921,7 @@
         }
       ],
       "description": "Gain extra strength for a period of time",
+      "max_stack_size": 99,
       "name": "Herb of Strength",
       "types": [
         "consumable"
@@ -1933,6 +1935,7 @@
         }
       ],
       "description": "Gain extra intelligence for a period of time",
+      "max_stack_size": 99,
       "name": "Herb of Intelligence",
       "types": [
         "consumable"
@@ -1946,6 +1949,7 @@
         }
       ],
       "description": "Gain extra dexterity for a period of time",
+      "max_stack_size": 99,
       "name": "Herb of Dexterity",
       "types": [
         "consumable"

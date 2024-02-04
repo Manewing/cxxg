@@ -11,7 +11,7 @@
       "items": {
         "description": "An item prototype",
         "type": "object",
-        "required": ["name", "description", "types", "capabilities"],
+        "required": ["name", "description", "types", "capabilities", "max_stack_size"],
         "properties": {
           "name": {
             "type": "string",
