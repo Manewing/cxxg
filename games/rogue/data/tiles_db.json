@@ -11,7 +11,7 @@
   },
   "ground_mod_1": {
     "char": "_",
-    "color": "#111111",
+    "color": "#1d1d1d",
     "bg_color": "#222222"
   },
   "ground_mod_2": {
@@ -56,43 +56,43 @@
   },
   "1": {
     "char": "1",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "2": {
     "char": "2",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "3": {
     "char": "3",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "4": {
     "char": "4",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "5": {
     "char": "5",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "6": {
     "char": "6",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "7": {
     "char": "7",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "8": {
     "char": "8",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "9": {
     "char": "9",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "0": {
     "char": "0",
-    "color": "#333333"
+    "color": "#1d1d1d"
   },
   "spider_lair_wall": {
     "char": "#",
