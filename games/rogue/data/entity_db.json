@@ -320,6 +320,9 @@
     },
     {
       "assemblers": {
+        "inventory": {
+          "loot_table": "ltb_hatchling"
+        },
         "stats": {
           "dex": 10,
           "int": 0,

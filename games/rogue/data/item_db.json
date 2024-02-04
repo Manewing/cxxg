@@ -447,6 +447,10 @@
       "ticks": 20,
       "type": "stats_buff_per_hit_comp"
     },
+    "suicide_effect": {
+      "damage_value": 999999.0,
+      "type": "damage_item_effect"
+    },
     "sweeping_strike_i": {
       "damage_percent": 70.0,
       "effect_tile": {
@@ -1982,6 +1986,25 @@
       "types": [
         "weapon"
       ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "major_poison_effect",
+          "type": "use_on"
+        },
+        {
+          "effect": "suicide_effect",
+          "type": "use_on"
+        }
+      ],
+      "description": "Kills the consumer",
+      "max_stack_size": 99,
+      "name": "Suicide Capsule",
+      "types": [
+        "crafting",
+        "consumable"
+      ]
     }
   ],
   "item_specializations": {
@@ -2631,17 +2654,32 @@
       ]
     },
     "common_silk_cocoon": {
-      "rolls": 2,
+      "rolls": 3,
       "slots": [
+        {
+          "type": "null",
+          "weight": 40
+        },
+        {
+          "type": "null",
+          "weight": 40
+        },
+        {
+          "max_count": 3,
+          "min_count": 2,
+          "name": "Silk Thread",
+          "type": "item",
+          "weight": 40
+        },
         {
           "ref": "common_spider",
           "type": "table",
-          "weight": -1
+          "weight": 40
         },
         {
           "ref": "common_chest",
           "type": "table",
-          "weight": -1
+          "weight": 10
         }
       ]
     },
@@ -2962,6 +3000,40 @@
           "name": "Arcane Shardblade",
           "type": "item",
           "weight": -1
+        }
+      ]
+    },
+    "ltb_hatchling": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 100
+        },
+        {
+          "type": "null",
+          "weight": 70
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Silk Thread",
+          "type": "item",
+          "weight": 8
+        },
+        {
+          "max_count": 4,
+          "min_count": 3,
+          "name": "Silk Thread",
+          "type": "item",
+          "weight": 3
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Arachnid Chitin Shard",
+          "type": "item",
+          "weight": 3
         }
       ]
     },
@@ -3316,17 +3388,32 @@
       ]
     },
     "rare_silk_cocoon": {
-      "rolls": 2,
+      "rolls": 3,
       "slots": [
+        {
+          "type": "null",
+          "weight": 40
+        },
+        {
+          "type": "null",
+          "weight": 40
+        },
+        {
+          "max_count": 4,
+          "min_count": 3,
+          "name": "Silk Thread",
+          "type": "item",
+          "weight": 40
+        },
         {
           "ref": "common_spider",
           "type": "table",
-          "weight": -1
+          "weight": 40
         },
         {
           "ref": "mixed_chest",
           "type": "table",
-          "weight": -1
+          "weight": 10
         }
       ]
     }
