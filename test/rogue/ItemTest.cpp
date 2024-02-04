@@ -4,6 +4,8 @@
 
 namespace {
 
+using PId = rogue::ItemProtoId;
+
 auto DummyEffComp0 =
     rogue::test::DummyComponentEffect<rogue::test::DummyComp<0>>::get();
 auto DummyEffComp1 =
@@ -28,7 +30,7 @@ public:
 };
 
 TEST_F(ItemTest, Properties) {
-  rogue::ItemPrototype Proto(1, "Test Item", "Test Description",
+  rogue::ItemPrototype Proto(PId(1), "Test Item", "Test Description",
                              rogue::ItemType::Ring, 1, {});
   rogue::Item Item(Proto);
 
@@ -44,7 +46,7 @@ TEST_F(ItemTest, Properties) {
 
 TEST_F(ItemTest, HasEffect) {
   auto Proto = rogue::ItemPrototype(
-      1, "Test Item", "Test Description",
+      PId(1), "Test Item", "Test Description",
       rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::Skill | rogue::CapabilityFlags::Self},
         DummyEffComp0}});
@@ -57,7 +59,7 @@ TEST_F(ItemTest, HasEffect) {
                               rogue::CapabilityFlags::Adjacent));
 
   Proto = rogue::ItemPrototype(
-      1, "Test Item", "Test Description",
+      PId(1), "Test Item", "Test Description",
       rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::Skill | rogue::CapabilityFlags::Self},
         DummyEffComp0},
@@ -76,10 +78,11 @@ TEST_F(ItemTest, HasEffect) {
 
 TEST_F(ItemTest, Specialization) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(1), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
-  rogue::ItemPrototype SpecProto(2, "Test Spec Item", "Test Spec Description",
-                                 rogue::ItemType::Ring, 1,
+  rogue::ItemPrototype SpecProto(PId(2), "Test Spec Item",
+                                 "Test Spec Description", rogue::ItemType::Ring,
+                                 1,
                                  {{{rogue::CapabilityFlags::Equipment},
                                    rogue::test::DummyItems::NullEffect}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
@@ -99,9 +102,10 @@ TEST_F(ItemTest, Specialization) {
 
 TEST_F(ItemTest, SpecializationOverrides) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(1), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
-  rogue::ItemPrototype SpecProto(2, "Test Spec Item", "Test Spec Description",
+  rogue::ItemPrototype SpecProto(PId(2), "Test Spec Item",
+                                 "Test Spec Description",
                                  rogue::ItemType::Weapon, 99,
                                  {{{rogue::CapabilityFlags::Equipment},
                                    rogue::test::DummyItems::NullEffect}});
@@ -121,11 +125,11 @@ TEST_F(ItemTest, SpecializationOverrides) {
 
 TEST_F(ItemTest, CanApplyTo) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description",
+      PId(1), "Test Item", "Test Description",
       rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, DummyEffCompReq0}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffCompReq1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
@@ -168,14 +172,14 @@ TEST_F(ItemTest, CanApplyTo) {
 
 TEST_F(ItemTest, CanApplyToWithCost) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description",
+      PId(1), "Test Item", "Test Description",
       rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn, 10, 0, 0},
         rogue::test::DummyItems::NullEffect},
        {{rogue::CapabilityFlags::Equipment, 0, 0, 10},
         rogue::test::DummyItems::NullEffect}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment, 0, 0, 10},
         rogue::test::DummyItems::NullEffect}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
@@ -208,10 +212,10 @@ TEST_F(ItemTest, CanApplyToWithCost) {
 
 TEST_F(ItemTest, ApplyToWithSpecialization) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(1), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
@@ -227,10 +231,10 @@ TEST_F(ItemTest, ApplyToWithSpecialization) {
 
 TEST_F(ItemTest, ApplyToWithSpecializationOverride) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(1), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
@@ -245,10 +249,10 @@ TEST_F(ItemTest, ApplyToWithSpecializationOverride) {
 
 TEST_F(ItemTest, ApplyToWithSpecMutuallyExclusiveFlags) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(1), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Consumable, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
@@ -272,11 +276,11 @@ TEST_F(ItemTest, ApplyToWithSpecMutuallyExclusiveFlags) {
 
 TEST_F(ItemTest, CanRemoveFrom) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description",
+      PId(1), "Test Item", "Test Description",
       rogue::ItemType::Ring | rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, DummyEffCompReq0}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffCompReq1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
@@ -322,10 +326,10 @@ TEST_F(ItemTest, CanRemoveFrom) {
 
 TEST_F(ItemTest, RemoveFromWithSpecialization) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(1), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
@@ -341,10 +345,10 @@ TEST_F(ItemTest, RemoveFromWithSpecialization) {
 
 TEST_F(ItemTest, RemoveFromWithSpecializationOverride) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(1), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 
@@ -363,10 +367,10 @@ TEST_F(ItemTest, RemoveFromWithSpecializationOverride) {
 
 TEST_F(ItemTest, RemoveFromWithSpecMutuallyExclusive) {
   rogue::ItemPrototype Proto(
-      1, "Test Item", "Test Description", rogue::ItemType::Ring, 1,
+      PId(1), "Test Item", "Test Description", rogue::ItemType::Ring, 1,
       {{{rogue::CapabilityFlags::Equipment}, DummyEffComp0}});
   rogue::ItemPrototype SpecProto(
-      2, "Test Item", "Test Description", rogue::ItemType::Consumable, 1,
+      PId(2), "Test Item", "Test Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, DummyEffComp1}});
   auto Specialization = std::make_shared<rogue::ItemPrototype>(SpecProto);
 

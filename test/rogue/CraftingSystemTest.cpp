@@ -5,105 +5,10 @@
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 
-namespace rogue {
-
-// After cleanup add this as documentation!
-//
-// Avoid hard coding specific item types, items are created by the effects
-// via composition.
-//
-//
-// How to deal with corner cases such as:
-//     Small Sword + Blueberry -> ??
-//
-//     -> based on capability flags only items with a specific
-//         flag already set can be modified with further extensions
-//         to that flag
-//
-//     -> start item determines what elements can be added
-//
-//     -> utilize item type to avoid allowing items with equip modifier
-//         to be equipped if they are not equipment
-//
-// Arcane Liquid + Glas Vial -> Potion
-//
-// Rune Dust + Modifier -> Rune
-//     Bone -> Strong against undead
-//
-// Potion + Essence -> Specialized Potion
-// -> apply to using entity
-//
-// Rune + Equipment -> Specialized Equipment
-// -> apply to equipping entity
-//
-// Bomb + Essence -> Specialized Bomb
-// -> apply to hit entity
-//
-// Consumables for:
-// -> increased armor (iron skin)
-// -> health increase
-// -> health generation
-// -> special damage (poison, bleeding, frost, etc.)
-// -> increased movement speed
-// -> block chance
-// -> removing debuffs
-// -> mana increase
-// -> mana generation
-//
-// Small Sword
-// Bone
-// Blueberry
-// Potion Base
-// Sewer Meat
-// Charcoal
-// Green Goo
-// Spider Silk
-// Venomous Fang
-// Spiderling Venom Sac
-//
-//
-// Crafting tree for recipes
-// -> avoid linear lookup of items
-// -> map with key tuple (item_id, count)
-//
-//
-// Ideas:
-//
-// Charcoal: Modifier, Crafting
-// - Use: Remove poison debuff
-//
-// Sewer meat: Modifier, Consumable, Crafting
-// - Use: Poison debuff
-// - Use: Heals 5HP
-//
-// Blueberry: Modifier, Consumable, Crafting
-// - Use: Health generation increased
-//
-// Potion Base:  Crafting, PType
-// - <emtpy>
-//
-// Glas vial: Crafting
-// - <empt>
-//
-// Arcane liquid: Crafting
-// - <empty>
-//
-// A valid recipe would be:
-// [Glas vial, Arcane liquid]
-// It would yield the "Potion Base" item
-//
-// A valid modifier recipe could be:
-// [PType, Sewer meat, Charcoal, Blueberry], "%s Potion"
-//
-// And would yield for example the following item "Nature Healing Potion":
-//
-// Nature healing potion:
-// - Use: Heals 5 HP
-// - Use: Health generation increased
-
-} // namespace rogue
-
 namespace {
+
+using CId = rogue::CraftingRecipeId;
+using PId = rogue::ItemProtoId;
 
 class CraftingSystemTest : public ::testing::Test {
 public:
@@ -124,7 +29,7 @@ TEST_F(CraftingSystemTest, Empty) {
 
 TEST_F(CraftingSystemTest, SingleItem) {
   rogue::CraftingHandler System(Db);
-  auto Result = System.tryCraft({Db.createItem(1)});
+  auto Result = System.tryCraft({Db.createItem(PId(1))});
   EXPECT_FALSE(Result.has_value());
 }
 
@@ -266,7 +171,7 @@ TEST_F(CraftingSystemTest, SimpleRecipe) {
   rogue::CraftingRecipe Recipe(
       "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
       {DummyItems.CraftingC.ItemId});
-  System.addRecipe(0, Recipe);
+  System.addRecipe(CId(0), Recipe);
 
   auto A = Db.createItem(DummyItems.CraftingA.ItemId);
   auto B = Db.createItem(DummyItems.CraftingB.ItemId);
@@ -291,7 +196,7 @@ TEST_F(CraftingSystemTest, RecipeOverrides) {
   rogue::CraftingRecipe Recipe(
       "dummy", {DummyItems.Potion.ItemId, DummyItems.HealConsumable.ItemId},
       {DummyItems.CraftingA.ItemId});
-  System.addRecipe(0, Recipe);
+  System.addRecipe(CId(0), Recipe);
 
   ResultVec = System.tryCraft({Potion, Heal});
   ASSERT_TRUE(ResultVec.has_value());
@@ -312,9 +217,9 @@ TEST_F(CraftingSystemTest, MultipleRecipes) {
   rogue::CraftingRecipe RecipeAC(
       "dummy_ac", {DummyItems.CraftingA.ItemId, DummyItems.CraftingC.ItemId},
       {DummyItems.Potion.ItemId});
-  System.addRecipe(0, RecipeAB);
-  System.addRecipe(1, RecipeABC);
-  System.addRecipe(2, RecipeAC);
+  System.addRecipe(CId(0), RecipeAB);
+  System.addRecipe(CId(1), RecipeABC);
+  System.addRecipe(CId(2), RecipeAC);
 
   auto A = Db.createItem(DummyItems.CraftingA.ItemId);
   auto B = Db.createItem(DummyItems.CraftingB.ItemId);

@@ -12,8 +12,9 @@
 
 namespace rogue {
 
-static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
-  std::map<std::string, int> ItemIdsByName;
+static std::map<std::string, ItemProtoId>
+getItemIdsByName(const rapidjson::Value &V) {
+  std::map<std::string, ItemProtoId> ItemIdsByName;
 
   int ItemId = 0;
   for (const auto &ItemProtoJson : V.GetArray()) {
@@ -21,7 +22,7 @@ static std::map<std::string, int> getItemIdsByName(const rapidjson::Value &V) {
     if (ItemIdsByName.count(Name) != 0) {
       throw std::runtime_error("Duplicate item name: " + Name);
     }
-    ItemIdsByName.emplace(Name, ItemId++);
+    ItemIdsByName.emplace(Name, ItemProtoId(ItemId++));
   }
 
   return ItemIdsByName;
@@ -197,13 +198,12 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              LSBC.BonusHP = V["bonus_hp"].GetDouble();
              return std::make_shared<LifeStealBuffEffect>(LSBC);
            }},
-           {"spawn_entity_effect",
+          {"spawn_entity_effect",
            [](const auto &, const auto &V) {
-            auto EntityName = std::string(V["entity_name"].GetString());
-            double Chance = V["chance"].GetDouble();
-            return std::make_shared<SpawnEntityEffect>(EntityName, Chance);
-           }
-           },
+             auto EntityName = std::string(V["entity_name"].GetString());
+             double Chance = V["chance"].GetDouble();
+             return std::make_shared<SpawnEntityEffect>(EntityName, Chance);
+           }},
           {"disc_area_hit_effect",
            [](const auto &, const auto &V) {
              auto Name = std::string(V["name"].GetString());
@@ -234,15 +234,15 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
                CanHurtSource = V["can_hurt_source"].GetBool();
              }
              bool CanHurtFaction = true;
-              if (V.HasMember("can_hurt_faction")) {
-                CanHurtFaction = V["can_hurt_faction"].GetBool();
-              }
+             if (V.HasMember("can_hurt_faction")) {
+               CanHurtFaction = V["can_hurt_faction"].GetBool();
+             }
              auto DecreasePercent = V["decrease_percent"].GetDouble();
              auto T = parseTile(V["effect_tile"]);
              return std::make_shared<DiscAreaHitEffect>(
                  Name, Radius, PhysDamage, MagicDamage, Bleeding, Poison,
-                 Blinded, T, DecreasePercent, MinTicks, MaxTicks,
-                 CanHurtSource, CanHurtFaction);
+                 Blinded, T, DecreasePercent, MinTicks, MaxTicks, CanHurtSource,
+                 CanHurtFaction);
            }},
           {"smite_effect",
            [](const auto &, const auto &V) {
@@ -504,9 +504,9 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig,
   return DB;
 }
 
-int ItemDatabase::getNewItemId() { return MaxItemId++; }
+ItemProtoId ItemDatabase::getNewItemId() { return ItemProtoId(MaxItemId++); }
 
-int ItemDatabase::getItemId(const std::string &ItemName) const {
+ItemProtoId ItemDatabase::getItemId(const std::string &ItemName) const {
   const auto It = ItemIdsByName.find(ItemName);
   if (It == ItemIdsByName.end()) {
     throw std::out_of_range("Unknown item name: " + ItemName);
@@ -514,11 +514,12 @@ int ItemDatabase::getItemId(const std::string &ItemName) const {
   return It->second;
 }
 
-const std::map<int, ItemPrototype> &ItemDatabase::getItemProtos() const {
+const std::map<ItemProtoId, ItemPrototype> &
+ItemDatabase::getItemProtos() const {
   return ItemProtos;
 }
 
-const ItemPrototype &ItemDatabase::getItemProto(int ItemId) const {
+const ItemPrototype &ItemDatabase::getItemProto(ItemProtoId ItemId) const {
   const auto It = ItemProtos.find(ItemId);
   if (It == ItemProtos.end()) {
     throw std::out_of_range("Unknown item id: " + std::to_string(ItemId));
@@ -526,7 +527,7 @@ const ItemPrototype &ItemDatabase::getItemProto(int ItemId) const {
   return It->second;
 }
 
-const ItemSpecializations *ItemDatabase::getItemSpec(int ItemId) const {
+const ItemSpecializations *ItemDatabase::getItemSpec(ItemProtoId ItemId) const {
   const auto It = ItemSpecs.find(ItemId);
   if (It == ItemSpecs.end()) {
     return nullptr;
@@ -548,7 +549,7 @@ void ItemDatabase::addItemProto(
   }
 }
 
-Item ItemDatabase::createItem(int ItemId, int StackSize,
+Item ItemDatabase::createItem(ItemProtoId ItemId, int StackSize,
                               bool AllowEnchanting) const {
   auto It = ItemProtos.find(ItemId);
   if (It == ItemProtos.end()) {
@@ -592,7 +593,7 @@ Item ItemDatabase::createItem(int ItemId, int StackSize,
   return NewItem;
 }
 
-int ItemDatabase::getRandomItemId() const {
+ItemProtoId ItemDatabase::getRandomItemId() const {
   if (ItemProtos.empty()) {
     throw std::out_of_range("No item prototypes");
   }

@@ -5,8 +5,10 @@
 
 namespace {
 
+using PId = rogue::ItemProtoId;
+
 const rogue::ItemPrototype DummyConsumable(
-    1, "consumable", "desc", rogue::ItemType::Consumable, 5,
+    PId(1), "consumable", "desc", rogue::ItemType::Consumable, 5,
     {{{rogue::CapabilityFlags::UseOn}, std::make_shared<rogue::NullEffect>()}});
 
 TEST(InventoryTest, Empty) {

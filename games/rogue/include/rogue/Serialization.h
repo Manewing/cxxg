@@ -19,7 +19,7 @@ struct ItemInfo {
   static ItemInfo createFrom(const Item &It);
   Item create(const ItemDatabase &ItemDb) const;
 
-  int Id = 0;
+  ItemProtoId Id = ItemProtoId(-1);
   int StackSize = 1;
   std::shared_ptr<const ItemPrototype> Specialization = nullptr;
   bool SpecOverrides = false;

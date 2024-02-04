@@ -16,11 +16,15 @@ bool ItemPrototype::canApply(ItemType Type, CapabilityFlags Flags) {
       || ((Flags & CapabilityFlags::Dismantle));
 }
 
-ItemPrototype::ItemPrototype(int ItemId, std::string N, std::string D,
+ItemPrototype::ItemPrototype(ItemProtoId ItemId, std::string N, std::string D,
                              ItemType Type, int MaxStatckSize,
                              std::vector<EffectInfo> Eff)
     : ItemId(ItemId), Name(std::move(N)), Description(std::move(D)), Type(Type),
-      MaxStackSize(MaxStatckSize), Effects(std::move(Eff)) {}
+      MaxStackSize(MaxStatckSize), Effects(std::move(Eff)) {
+  if (MaxStackSize <= 0) {
+    throw std::invalid_argument("Max stack size must be greater than 0");
+  }
+}
 
 EffectAttributes ItemPrototype::getAttributes() const {
   EffectAttributes Attrs;

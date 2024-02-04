@@ -214,7 +214,7 @@ Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) const {
   // specialization effects). The item specialization will not be copied (the
   // first item is already specialized).
   auto Special = std::make_shared<ItemPrototype>(
-      -1, First.getName(), First.getDescription(), First.getType(),
+      ItemProtoId(-1), First.getName(), First.getDescription(), First.getType(),
       First.getMaxStackSize(), std::vector<EffectInfo>{});
 
   // Combine effects from all other items

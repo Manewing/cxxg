@@ -23,7 +23,7 @@ public:
       bool SpecOverrides = false);
   virtual ~Item() = default;
 
-  int getId() const;
+  ItemProtoId getId() const;
   const std::string &getName() const;
   std::string getQualifierName() const;
   std::string getDescription() const;

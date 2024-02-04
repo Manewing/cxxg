@@ -47,7 +47,7 @@ std::string getQualifierNameForItem(const Item &It, CapabilityFlags Flags) {
 
 } // namespace
 
-int Item::getId() const { return getProto().ItemId; }
+ItemProtoId Item::getId() const { return getProto().ItemId; }
 
 const std::string &Item::getName() const {
   if (!Specialization || !SpecOverrides) {

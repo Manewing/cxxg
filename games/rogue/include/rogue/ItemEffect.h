@@ -146,7 +146,7 @@ private:
 class DismantleEffect : public ItemEffect {
 public:
   struct DismantleResult {
-    int ItemId = -1;
+    ItemProtoId ItemId = ItemProtoId(-1);
     unsigned Amount = 0;
     std::string Name;
 

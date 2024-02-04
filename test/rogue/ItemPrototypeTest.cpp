@@ -4,6 +4,8 @@
 
 namespace {
 
+using PId = rogue::ItemProtoId;
+
 class ItemPrototypeTest : public ::testing::Test {
 public:
   void SetUp() override {
@@ -16,8 +18,8 @@ public:
 };
 
 TEST_F(ItemPrototypeTest, Properties) {
-  rogue::ItemPrototype Proto(1, "Name", "Description", rogue::ItemType::None, 1,
-                             {});
+  rogue::ItemPrototype Proto(PId(1), "Name", "Description",
+                             rogue::ItemType::None, 1, {});
   EXPECT_EQ(Proto.ItemId, 1);
   EXPECT_EQ(Proto.Name, "Name");
   EXPECT_EQ(Proto.Description, "Description");
@@ -31,7 +33,7 @@ TEST_F(ItemPrototypeTest, Properties) {
 
 TEST_F(ItemPrototypeTest, GetCapabilityFlags) {
   rogue::ItemPrototype Proto(
-      1, "Name", "Description", rogue::ItemType::Consumable, 1,
+      PId(1), "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_EQ(Proto.getCapabilityFlags(), rogue::CapabilityFlags::UseOn);
   EXPECT_EQ(Proto.getAttributes(),
@@ -39,15 +41,15 @@ TEST_F(ItemPrototypeTest, GetCapabilityFlags) {
   EXPECT_FALSE(Proto.hasEffect(rogue::CapabilityFlags::UseOn));
   EXPECT_TRUE(Proto.hasEffect(rogue::CapabilityFlags::UseOn, true));
 
-  rogue::ItemPrototype Proto2(1, "Name", "Description", rogue::ItemType::Ring,
-                              1,
+  rogue::ItemPrototype Proto2(PId(1), "Name", "Description",
+                              rogue::ItemType::Ring, 1,
                               {{{rogue::CapabilityFlags::Equipment},
                                 rogue::test::DummyItems::NullEffect}});
   EXPECT_EQ(Proto2.getCapabilityFlags(), rogue::CapabilityFlags::Equipment);
   EXPECT_EQ(Proto2.getAttributes(),
             rogue::EffectAttributes{rogue::CapabilityFlags::Equipment});
 
-  rogue::ItemPrototype Proto3(1, "Name", "Description",
+  rogue::ItemPrototype Proto3(PId(1), "Name", "Description",
                               rogue::ItemType::Crafting, 1, {});
   EXPECT_EQ(Proto3.getCapabilityFlags(), rogue::CapabilityFlags::None);
   EXPECT_EQ(Proto3.getAttributes(),
@@ -56,7 +58,7 @@ TEST_F(ItemPrototypeTest, GetCapabilityFlags) {
 
 TEST_F(ItemPrototypeTest, CanApply) {
   rogue::ItemPrototype Proto(
-      1, "Name", "Description", rogue::ItemType::Consumable, 1,
+      PId(1), "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_FALSE(
       Proto.canApplyTo(Entity, Entity, Reg, rogue::CapabilityFlags::None))
@@ -70,7 +72,7 @@ TEST_F(ItemPrototypeTest, CanApply) {
 }
 
 TEST_F(ItemPrototypeTest, CanApplyCostHP) {
-  rogue::ItemPrototype Proto(1, "Name", "Description",
+  rogue::ItemPrototype Proto(PId(1), "Name", "Description",
                              rogue::ItemType::Consumable, 1,
                              {{{rogue::CapabilityFlags::UseOn, 0, 0, 10},
                                rogue::test::DummyItems::NullEffect}});
@@ -90,7 +92,7 @@ TEST_F(ItemPrototypeTest, CanApplyCostHP) {
 }
 
 TEST_F(ItemPrototypeTest, CanApplyCostAP) {
-  rogue::ItemPrototype Proto(1, "Name", "Description",
+  rogue::ItemPrototype Proto(PId(1), "Name", "Description",
                              rogue::ItemType::Consumable, 1,
                              {{{rogue::CapabilityFlags::UseOn, 10, 0, 0},
                                rogue::test::DummyItems::NullEffect}});
@@ -113,7 +115,7 @@ TEST_F(ItemPrototypeTest, CanApplyCostAP) {
 
 TEST_F(ItemPrototypeTest, Apply) {
   rogue::ItemPrototype Proto(
-      1, "Name", "Description", rogue::ItemType::Consumable, 1,
+      PId(1), "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_THROW(Proto.applyTo(Entity, Entity, Reg, rogue::CapabilityFlags::None),
                std::runtime_error)
@@ -134,7 +136,7 @@ TEST_F(ItemPrototypeTest, Apply) {
 }
 
 TEST_F(ItemPrototypeTest, ApplyCost) {
-  rogue::ItemPrototype Proto(1, "Name", "Description",
+  rogue::ItemPrototype Proto(PId(1), "Name", "Description",
                              rogue::ItemType::Consumable, 1,
                              {{{rogue::CapabilityFlags::UseOn, 10, 10, 10},
                                rogue::test::DummyItems::NullEffect}});
@@ -155,7 +157,7 @@ TEST_F(ItemPrototypeTest, ApplyCost) {
 
 TEST_F(ItemPrototypeTest, CanRemove) {
   rogue::ItemPrototype Proto(
-      1, "Name", "Description", rogue::ItemType::Consumable, 1,
+      PId(1), "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_FALSE(
       Proto.canRemoveFrom(Entity, Entity, Reg, rogue::CapabilityFlags::None))
@@ -170,7 +172,7 @@ TEST_F(ItemPrototypeTest, CanRemove) {
 
 TEST_F(ItemPrototypeTest, Remove) {
   rogue::ItemPrototype Proto(
-      1, "Name", "Description", rogue::ItemType::Consumable, 1,
+      PId(1), "Name", "Description", rogue::ItemType::Consumable, 1,
       {{{rogue::CapabilityFlags::UseOn}, rogue::test::DummyItems::NullEffect}});
   EXPECT_THROW(
       Proto.removeFrom(Entity, Entity, Reg, rogue::CapabilityFlags::None),

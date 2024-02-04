@@ -16,22 +16,22 @@ public:
                            const std::filesystem::path *SchemaPath = nullptr);
 
 public:
-  int getNewItemId();
-  int getItemId(const std::string &ItemName) const;
+  ItemProtoId getNewItemId();
+  ItemProtoId getItemId(const std::string &ItemName) const;
 
-  const std::map<int, ItemPrototype> &getItemProtos() const;
+  const std::map<ItemProtoId, ItemPrototype> &getItemProtos() const;
 
-  const ItemPrototype &getItemProto(int ItemId) const;
-  const ItemSpecializations *getItemSpec(int ItemId) const;
+  const ItemPrototype &getItemProto(ItemProtoId ItemId) const;
+  const ItemSpecializations *getItemSpec(ItemProtoId ItemId) const;
 
   void addItemProto(const ItemPrototype &ItemProto,
                     const ItemSpecializations *ItemSpec = nullptr,
                     const std::shared_ptr<LootTable> &Enhancements = nullptr);
 
-  Item createItem(int ItemId, int StackSize = 1,
+  Item createItem(ItemProtoId ItemId, int StackSize = 1,
                   bool AllowEnchanting = true) const;
 
-  int getRandomItemId() const;
+  ItemProtoId getRandomItemId() const;
 
   LootTable &addLootTable(const std::string &Name);
   const std::shared_ptr<LootTable> &getLootTable(const std::string &Name) const;
@@ -42,12 +42,12 @@ public:
 
 private:
   int MaxItemId = 0;
-  std::map<std::string, int> ItemIdsByName;
+  std::map<std::string, ItemProtoId> ItemIdsByName;
 
   // FIXME make this a vector Id is index
-  std::map<int, ItemPrototype> ItemProtos;
-  std::map<int, ItemSpecializations> ItemSpecs;
-  std::map<int, std::shared_ptr<LootTable>> ItemEnhancements;
+  std::map<ItemProtoId, ItemPrototype> ItemProtos;
+  std::map<ItemProtoId, ItemSpecializations> ItemSpecs;
+  std::map<ItemProtoId, std::shared_ptr<LootTable>> ItemEnhancements;
 
   /// Map of loot table name to loot table
   std::map<std::string, std::shared_ptr<LootTable>> LootTables;

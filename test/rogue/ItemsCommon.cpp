@@ -4,6 +4,7 @@ namespace rogue::test {
 
 using CF = rogue::CapabilityFlags;
 using IT = rogue::ItemType;
+using Id = rogue::ItemProtoId;
 
 rogue::ArmorBuffComp makeArmorBuffComp(rogue::StatValue MagicArmor,
                                        rogue::StatValue PhysArmor) {
@@ -21,44 +22,44 @@ rogue::PoisonDebuffComp makePoisonDebuffComp(rogue::StatValue TA,
 }
 
 DummyItems::DummyItems()
-    : HelmetA(0, "helmet_a", "desc", IT::Helmet, 1,
+    : HelmetA(Id(0), "helmet_a", "desc", IT::Helmet, 1,
               {{{CF::Equipment}, ArmorEffect}, {{CF::Dismantle}, NullEffect}}),
-      HelmetB(0, "helmet_b", "desc", IT::Helmet, 1,
+      HelmetB(Id(0), "helmet_b", "desc", IT::Helmet, 1,
               {{{CF::Equipment}, ArmorEffect}}),
-      SwordSkillSelf(0, "sword_self", "desc", IT::Weapon, 1,
+      SwordSkillSelf(Id(0), "sword_self", "desc", IT::Weapon, 1,
                      {{{CF::Equipment}, DamageEffect},
                       {{CF::Skill | CF::Self}, SetComp1Effect}}),
-      SwordSkillAdjacent(0, "sword_adj", "desc", IT::Weapon, 1,
+      SwordSkillAdjacent(Id(0), "sword_adj", "desc", IT::Weapon, 1,
                          {{{CF::Equipment}, DamageEffect},
                           {{CF::Skill | CF::Adjacent}, SetComp2Effect}}),
-      SwordSkillAll(0, "sword_all", "desc", IT::Weapon, 1,
+      SwordSkillAll(Id(0), "sword_all", "desc", IT::Weapon, 1,
                     {{{CF::Equipment}, DamageEffect},
                      {{CF::Skill | CF::Self}, SetComp1Effect},
                      {{CF::Skill | CF::Adjacent}, SetComp2Effect},
                      {{CF::Skill | CF::Ranged}, SetComp3Effect}}),
-      Ring(0, "ring", "desc", IT::Ring, 1, {{{CF::Equipment}, NullEffect}}),
+      Ring(Id(0), "ring", "desc", IT::Ring, 1, {{{CF::Equipment}, NullEffect}}),
       // Cursed ring can not be unequipped
-      CursedRing(0, "cursed_ring", "desc", IT::Ring, 1,
+      CursedRing(Id(0), "cursed_ring", "desc", IT::Ring, 1,
                  {{{CF::EquipOn}, NullEffect}}),
-      HealConsumable(0, "dummy_heal", "desc", IT::Consumable | IT::Crafting, 0,
-                     {{{CF::UseOn | CF::Self}, HealEffect}}),
-      HealThrowConsumable(0, "dummy_heal_throw", "desc",
-                          IT::Consumable | IT::Crafting, 0,
+      HealConsumable(Id(0), "dummy_heal", "desc", IT::Consumable | IT::Crafting,
+                     5, {{{CF::UseOn | CF::Self}, HealEffect}}),
+      HealThrowConsumable(Id(0), "dummy_heal_throw", "desc",
+                          IT::Consumable | IT::Crafting, 5,
                           {{{CF::UseOn | CF::Ranged}, HealEffect}}),
-      PoisonConsumable(0, "poison_liquid", "desc",
+      PoisonConsumable(Id(0), "poison_liquid", "desc",
                        IT::Consumable | IT::Crafting, 5,
                        {{{CF::UseOn | CF::Self}, HealEffect},
                         {{CF::UseOn | CF::Self}, PoisonEffect}}),
-      Potion(0, "potion", "desc", IT::Consumable | IT::CraftingBase, 5,
+      Potion(Id(0), "potion", "desc", IT::Consumable | IT::CraftingBase, 5,
              {{{CF::UseOn | CF::Self}, NullEffect}}),
-      PlateCrafting(0, "plate", "desc", IT::Crafting, 5,
+      PlateCrafting(Id(0), "plate", "desc", IT::Crafting, 5,
                     {{{CF::Equipment}, ArmorEffect}}),
-      CharcoalCrafting(0, "charcoal", "desc", IT::Crafting, 5,
+      CharcoalCrafting(Id(0), "charcoal", "desc", IT::Crafting, 5,
                        {{{CF::UseOn | CF::Self}, CleansePoisonEffect}}),
-      CraftingA(0, "crafting_a", "desc", IT::Crafting, 5, {{}}),
-      CraftingB(0, "crafting_b", "desc", IT::Crafting, 5, {{}}),
-      CraftingC(0, "crafting_c", "desc", IT::Crafting, 5, {{}}),
-      CraftingD(0, "crafting_d", "desc", IT::Crafting, 5, {{}}) {}
+      CraftingA(Id(0), "crafting_a", "desc", IT::Crafting, 5, {{}}),
+      CraftingB(Id(0), "crafting_b", "desc", IT::Crafting, 5, {{}}),
+      CraftingC(Id(0), "crafting_c", "desc", IT::Crafting, 5, {{}}),
+      CraftingD(Id(0), "crafting_d", "desc", IT::Crafting, 5, {{}}) {}
 
 ItemDatabase DummyItems::createItemDatabase() {
   ItemDatabase DB;

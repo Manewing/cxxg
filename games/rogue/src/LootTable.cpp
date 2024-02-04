@@ -12,12 +12,12 @@ std::vector<LootContainer::LootReward> LootContainer::generateLoot() const {
   return Loot;
 }
 
-LootItem::LootItem(ItemId ItId, unsigned MinCount, unsigned MaxCount)
+LootItem::LootItem(ItemProtoId ItId, unsigned MinCount, unsigned MaxCount)
     : ItId(ItId), MinCount(MinCount), MaxCount(MaxCount) {
   assert(MinCount <= MaxCount && MinCount > 0);
 }
 
-LootContainer::ItemId LootItem::getItemId() const { return ItId; }
+ItemProtoId LootItem::getItemId() const { return ItId; }
 
 void LootItem::fillLoot(std::vector<LootReward> &Loot) const {
   auto Count = MinCount + std::rand() % (MaxCount - MinCount + 1);
