@@ -1019,8 +1019,14 @@ class JSONFileManagerInterface(BaseInterface):
                     key=self.k.load,
                     expand_x=True,
                 ),
+                sg.Button(
+                    "Load From",
+                    key=self.k.load_from,
+                    expand_x=True,
+                ),
             ]
             self.register_event(self.k.load)
+            self.register_event(self.k.load_from)
 
         if self._on_save is not None:
             toolbar += [
@@ -1075,7 +1081,13 @@ class JSONFileManagerInterface(BaseInterface):
             return
         self._save()
 
-    def _handle_load(self) -> None:
+    def _load(self) -> None:
+        if not self._on_load:
+            raise ValueError("Load callback not set")
+        self._on_load(self._file_path)
+        sg.popup(f"Loaded {self._title} from: {self._file_path}")
+
+    def _handle_load_from(self) -> None:
         if not self._on_load:
             raise ValueError("Load callback not set")
         filename = sg.popup_get_file(
@@ -1086,8 +1098,13 @@ class JSONFileManagerInterface(BaseInterface):
         )
         if filename:
             self._set_file_path(filename)
-            self._on_load(filename)
-            sg.popup(f"Loaded {self._title} from: {filename}")
+            self._load()
+
+    def _handle_load(self) -> None:
+        if not self._file_path:
+            self._handle_load_from()
+            return
+        self._load()
 
     def handle_event(self, event: str, values: dict) -> bool:
         if super().handle_event(event, values):
@@ -1100,6 +1117,9 @@ class JSONFileManagerInterface(BaseInterface):
             return True
         if event == self.k.load:
             self._handle_load()
+            return True
+        if event == self.k.load_from:
+            self._handle_load_from()
             return True
         return False
 
