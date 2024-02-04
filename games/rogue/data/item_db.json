@@ -112,6 +112,15 @@
       ],
       "type": "dismantle"
     },
+    "dismantle_rune": {
+      "items": [
+        {
+          "amount": 1,
+          "name": "Rune Stone"
+        }
+      ],
+      "type": "dismantle"
+    },
     "health_effect": {
       "health_value": 10,
       "type": "health_item_effect"
@@ -627,6 +636,10 @@
     {
       "capabilities": [
         {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
           "effect": "str_5",
           "type": "equipment"
         }
@@ -635,11 +648,16 @@
       "max_stack_size": 1,
       "name": "Orb of Strength",
       "types": [
+        "quest",
         "crafting"
       ]
     },
     {
       "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
         {
           "effect": "dex_5",
           "type": "equipment"
@@ -649,11 +667,16 @@
       "max_stack_size": 1,
       "name": "Orb of Dexterity",
       "types": [
+        "quest",
         "crafting"
       ]
     },
     {
       "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
         {
           "effect": "int_5",
           "type": "equipment"
@@ -663,11 +686,16 @@
       "max_stack_size": 1,
       "name": "Orb of Intelligence",
       "types": [
+        "quest",
         "crafting"
       ]
     },
     {
       "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
         {
           "effect": "vit_5",
           "type": "equipment"
@@ -677,11 +705,17 @@
       "max_stack_size": 1,
       "name": "Orb of Vitality",
       "types": [
+        "quest",
         "crafting"
       ]
     },
     {
-      "capabilities": [],
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        }
+      ],
       "description": "An orb that can be used to upgrade equipment",
       "max_stack_size": 1,
       "name": "Orb of Upgrade",
@@ -692,11 +726,17 @@
         }
       ],
       "types": [
+        "quest",
         "crafting"
       ]
     },
     {
-      "capabilities": [],
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        }
+      ],
       "description": "An orb that can be used to upgrade equipment",
       "max_stack_size": 1,
       "name": "Great Orb of Upgrade",
@@ -707,6 +747,7 @@
         }
       ],
       "types": [
+        "quest",
         "crafting"
       ]
     },
@@ -891,9 +932,8 @@
     {
       "capabilities": [
         {
-          "effect": "sweeping_strike_i",
-          "mana_cost": 10,
-          "type": "use_on"
+          "effect": "dismantle_rune",
+          "type": "dismantle"
         },
         {
           "ap_cost": 12,
@@ -902,20 +942,19 @@
           "type": "skill"
         }
       ],
-      "description": "Strikes targets in the surrounding area",
+      "description": "Rune spell that strikes targets in the surrounding area",
       "max_stack_size": 1,
-      "name": "Scroll of striking",
+      "name": "Striking I",
       "types": [
-        "consumable",
+        "quest",
         "crafting"
       ]
     },
     {
       "capabilities": [
         {
-          "effect": "smite_i",
-          "mana_cost": 10,
-          "type": "adjacent_use"
+          "effect": "dismantle_rune",
+          "type": "dismantle"
         },
         {
           "ap_cost": 15,
@@ -924,11 +963,11 @@
           "type": "skill_adjacent"
         }
       ],
-      "description": "Smite the target with enormous power",
+      "description": "A rune spell that smites the target with enormous power",
       "max_stack_size": 1,
-      "name": "Scroll of smiting",
+      "name": "Smiting I",
       "types": [
-        "consumable",
+        "quest",
         "crafting"
       ]
     },
@@ -2005,6 +2044,90 @@
         "crafting",
         "consumable"
       ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
+          "ap_cost": 15,
+          "effect": "acid_splash_i",
+          "mana_cost": 10,
+          "type": "skill"
+        }
+      ],
+      "description": "Rune spell that causes an acidic explosion",
+      "max_stack_size": 1,
+      "name": "Acidic Explosion I",
+      "types": [
+        "quest",
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
+          "ap_cost": 20.0,
+          "effect": "spikes_i",
+          "mana_cost": 5.0,
+          "type": "skill"
+        }
+      ],
+      "description": "Rune spell that causes an explosion of spikes",
+      "max_stack_size": 1,
+      "name": "Spikes I",
+      "types": [
+        "quest",
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
+          "ap_cost": 10.0,
+          "effect": "stomp_i",
+          "mana_cost": 8.0,
+          "type": "skill"
+        }
+      ],
+      "description": "A stone enchanted with rune magic",
+      "max_stack_size": 1,
+      "name": "Stomp I",
+      "types": [
+        "quest",
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
+          "ap_cost": 10.0,
+          "effect": "shield_flare_i",
+          "mana_cost": 12.0,
+          "type": "skill"
+        }
+      ],
+      "description": "Rune spell that causes an explosion of light blinding enemies",
+      "max_stack_size": 1,
+      "name": "Shield Flare I",
+      "types": [
+        "quest",
+        "crafting"
+      ]
     }
   ],
   "item_specializations": {
@@ -2049,7 +2172,11 @@
       "slots": [
         {
           "type": "null",
-          "weight": 50
+          "weight": 250
+        },
+        {
+          "type": "null",
+          "weight": 150
         },
         {
           "max_count": 1,
@@ -2099,8 +2226,25 @@
           "weight": 5
         },
         {
-          "type": "null",
-          "weight": 1
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Acidic Explosion I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Stomp I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Shield Flare I",
+          "type": "item",
+          "weight": 5
         }
       ]
     },
@@ -2406,6 +2550,10 @@
       "slots": [
         {
           "type": "null",
+          "weight": 150
+        },
+        {
+          "type": "null",
           "weight": 50
         },
         {
@@ -2426,10 +2574,6 @@
           "name": "Spider Venom Oil",
           "type": "item",
           "weight": 5
-        },
-        {
-          "type": "null",
-          "weight": 1
         }
       ]
     },
@@ -2438,7 +2582,11 @@
       "slots": [
         {
           "type": "null",
-          "weight": 50
+          "weight": 150
+        },
+        {
+          "type": "null",
+          "weight": 100
         },
         {
           "max_count": 1,
@@ -2462,20 +2610,23 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of striking",
+          "name": "Striking I",
           "type": "item",
           "weight": 5
         },
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of smiting",
+          "name": "Smiting I",
           "type": "item",
           "weight": 5
         },
         {
-          "type": "null",
-          "weight": 1
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Spikes I",
+          "type": "item",
+          "weight": 5
         }
       ]
     },
@@ -2577,7 +2728,7 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of striking",
+          "name": "Striking I",
           "type": "item",
           "weight": 5
         },
@@ -2612,7 +2763,7 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of smiting",
+          "name": "Smiting I",
           "type": "item",
           "weight": 5
         },
@@ -2648,6 +2799,34 @@
           "max_count": 1,
           "min_count": 1,
           "name": "Scroll of mind vision",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Spikes I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Acidic Explosion I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Stomp I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Shield Flare I",
           "type": "item",
           "weight": 5
         }
@@ -3370,14 +3549,14 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of striking",
+          "name": "Striking I",
           "type": "item",
           "weight": 5
         },
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of smiting",
+          "name": "Smiting I",
           "type": "item",
           "weight": 5
         },
