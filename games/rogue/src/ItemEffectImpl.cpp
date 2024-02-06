@@ -355,7 +355,10 @@ void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
     DC.Faction = Reg.get<FactionComp>(SrcEt).Faction;
   }
 
-  unsigned Ticks = std::rand() % (MaxTicks - MinTicks + 1) + MinTicks;
+  unsigned Ticks = -1U;
+  if (MinTicks > 0) {
+    Ticks = std::rand() % (MaxTicks - MinTicks + 1) + MinTicks;
+  }
   auto Et = createTempDamage(Reg, DC, Pos, EffectTile, Ticks);
 
   if (BleedingDebuff) {

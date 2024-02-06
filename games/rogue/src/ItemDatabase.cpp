@@ -222,7 +222,7 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              if (V.HasMember("blinded")) {
                Blinded = parseCoHTargetBlindedDebuffComp(V["blinded"]);
              }
-             unsigned MinTicks = 1, MaxTicks = 1;
+             unsigned MinTicks = 0, MaxTicks = 0;
              if (V.HasMember("min_ticks")) {
                MinTicks = V["min_ticks"].GetUint();
              }
