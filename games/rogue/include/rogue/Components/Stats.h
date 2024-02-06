@@ -85,7 +85,7 @@ struct StatsComp {
 };
 
 struct ValueRegenCompBase {
-  StatValue Value = 100;
+  StatValue Value = std::numeric_limits<StatValue>::max();
   StatValue MaxValue = 100;
 
   unsigned TickPeriod = 4;
