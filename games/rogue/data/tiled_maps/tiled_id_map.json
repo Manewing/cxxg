@@ -405,5 +405,60 @@
             "color": "#222222"
         },
         "tile_type": "tile"
+    },
+    {
+        "key": "ground_sewers_0",
+        "tile": {
+            "bg_color": "#0a0a0a",
+            "char": " ",
+            "color": "#222222"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_sewers_water_0",
+        "tile": {
+            "char": "~",
+            "color": "#126265"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_sewers_water_1",
+        "tile": {
+            "char": "~",
+            "color": "#144c71"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_sewers_water_bg_0",
+        "tile": {
+            "bg_color": "#0f0f20",
+            "char": " ",
+            "color": "#222222"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_sewers_water_bg_1",
+        "tile": {
+            "bg_color": "#121230",
+            "char": " ",
+            "color": "#222222"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "wall_sewers",
+        "tile": {
+            "char": "#",
+            "color": "#534f3c"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "rubble",
+        "tile_type": "entity"
     }
 ]

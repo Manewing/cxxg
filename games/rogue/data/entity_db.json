@@ -228,13 +228,13 @@
           "effects": [
             {
               "effect_name": "null",
-              "max_delay": 100,
-              "min_delay": 80
+              "max_delay": 30,
+              "min_delay": 10
             },
             {
               "effect_name": "major_health_regen_effect",
-              "max_delay": 90,
-              "min_delay": 80
+              "max_delay": 40,
+              "min_delay": 10
             }
           ]
         },
@@ -245,8 +245,8 @@
         "stats": {
           "dex": 2,
           "int": 0,
-          "str": 6,
-          "vit": 10
+          "str": 4,
+          "vit": 20
         },
         "tile": {
           "char": "R",
@@ -580,6 +580,7 @@
     },
     {
       "assemblers": {
+        "block_los": true,
         "stats": {
           "dex": 0,
           "int": 0,
@@ -657,6 +658,8 @@
     },
     {
       "assemblers": {
+        "faction": "nature",
+        "health": true,
         "inventory": {
           "loot_table": "common_fruits"
         },
@@ -1032,6 +1035,32 @@
       "display_name": "Changeling",
       "from_template": "hostile_creature",
       "name": "changeling"
+    },
+    {
+      "assemblers": {
+        "auto_equip": true,
+        "block_los": true,
+        "drop_equipment": false,
+        "equipment": true,
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_rubble"
+        },
+        "stats": {
+          "dex": 0,
+          "int": 0,
+          "str": 0,
+          "vit": 10
+        },
+        "tile": {
+          "char": "#",
+          "color": "#646161"
+        }
+      },
+      "description": "A large pile of rubble enough force might remove it",
+      "display_name": "Rubble",
+      "from_template": "dummy_creature",
+      "name": "rubble"
     }
   ]
 }

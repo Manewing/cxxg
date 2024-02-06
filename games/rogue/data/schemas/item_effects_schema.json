@@ -500,12 +500,12 @@
           },
           "min_ticks": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 0,
             "description": "Minimum ticks the damage component persists after the effect is applied"
           },
           "max_ticks": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 0,
             "description": "Maximum ticks the damage component persists after the effect is applied"
           },
           "can_hurt_source": {

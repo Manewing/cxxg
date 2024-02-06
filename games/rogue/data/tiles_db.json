@@ -24,6 +24,29 @@
     "color": "#533116",
     "bg_color": "#382626"
   },
+  "ground_sewers_0": {
+    "char": " ",
+    "color": "#222222",
+    "bg_color": "#0a0a0a"
+  },
+  "ground_sewers_water_bg_0": {
+    "char": " ",
+    "color": "#222222",
+    "bg_color": "#0f0f20"
+  },
+  "ground_sewers_water_bg_1": {
+    "char": " ",
+    "color": "#222222",
+    "bg_color": "#121230"
+  },
+  "ground_sewers_water_0": {
+    "char": "~",
+    "color": "#126265"
+  },
+  "ground_sewers_water_1": {
+    "char": "~",
+    "color": "#144c71"
+  },
   "black": {
     "char": " ",
     "color": "#000000",
@@ -41,6 +64,10 @@
     "char": "#",
     "color": "#382626",
     "bg_color": "#533116"
+  },
+  "wall_sewers": {
+    "char": "#",
+    "color": "#534f3c"
   },
   "mossy_foliage": {
     "char": "\"",
