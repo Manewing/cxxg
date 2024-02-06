@@ -6,6 +6,7 @@
 #include <rogue/Tile.h>
 #include <ymir/Map.hpp>
 #include <ymir/Types.hpp>
+#include <entt/entt.hpp>
 
 namespace rogue {
 class Level;
@@ -33,7 +34,7 @@ public:
   const ymir::Map<cxxg::types::ColoredChar> &get() const { return VisibleMap; }
 
 protected:
-  void renderVisibleEntity(const PositionComp &PC, const TileComp &T,
+  void renderVisibleEntity(entt::entity Entity, const PositionComp &PC, const TileComp &T,
                            const VisibleComp &VC);
 
 private:

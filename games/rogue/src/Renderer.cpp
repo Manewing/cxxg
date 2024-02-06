@@ -34,7 +34,7 @@ Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
   });
 
   VisibleMap.fill(Level::WallTile.T);
-  IsVisibleMap.fill(true);
+  IsVisibleMap.fill(false);
 
   VisibleMap.forEach([this](auto Pos, auto &Tile) {
     Pos -= Offset;
@@ -48,15 +48,11 @@ Renderer::Renderer(ymir::Size2d<int> Size, Level &L, ymir::Point2d<int> Center)
 void Renderer::renderShadow(unsigned char Darkness) {
   const cxxg::types::RgbColor ShadowColor{Darkness, Darkness, Darkness, true,
                                           0,        0,        0};
-  auto &WallsMap = L.Map.get(Level::LayerWallsIdx);
-  VisibleMap.forEach([ShadowColor, &WallsMap, this](auto Pos, auto &Tile) {
-    Tile.Color = ShadowColor;
-    if (WallsMap.contains(Pos - Offset) &&
-        WallsMap.getTile(Pos - Offset) == Level::EmptyTile) {
-      Tile.Char = '.';
+  VisibleMap.forEach([ShadowColor, this](auto Pos, auto &Tile) {
+    if (IsVisibleMap.contains(Pos) && !IsVisibleMap.getTile(Pos)) {
+      Tile.Color = ShadowColor;
     }
   });
-  IsVisibleMap.fill(false);
 }
 
 void Renderer::renderFogOfWar(const ymir::Map<bool, int> &SeenMap) {
@@ -108,9 +104,6 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
 
 bool Renderer::renderVisibleChar(const cxxg::types::ColoredChar &EffC,
                                  ymir::Point2d<int> AtPos) {
-  if (!VisibleMap.contains(AtPos + Offset) || !IsVisibleMap.getTile(AtPos + Offset)) {
-    return false;
-  }
   VisibleMap.getTile(AtPos + Offset).Char = EffC.Char;
   if (auto *RgbColor = std::get_if<cxxg::types::RgbColor>(&EffC.Color)) {
     if (RgbColor->HasBackground) {
@@ -129,6 +122,10 @@ bool Renderer::renderVisibleChar(const cxxg::types::ColoredChar &EffC,
 
 bool Renderer::renderEffect(cxxg::types::ColoredChar EffC,
                             ymir::Point2d<int> AtPos) {
+  if (!VisibleMap.contains(AtPos + Offset) ||
+      !IsVisibleMap.getTile(AtPos + Offset)) {
+    return false;
+  }
   return renderVisibleChar(EffC, AtPos);
 }
 
@@ -138,18 +135,19 @@ void Renderer::renderEntities() {
   L.Reg.sort<PositionComp, TileComp>();
   auto View =
       L.Reg.view<const PositionComp, const TileComp, const VisibleComp>();
-  View.each([this](const auto &PC, const auto &T, const auto &VC) {
-    renderVisibleEntity(PC, T, VC);
+  View.each([this](auto Entity, const auto &PC, const auto &T, const auto &VC) {
+    renderVisibleEntity(Entity, PC, T, VC);
   });
 }
 
-void Renderer::renderVisibleEntity(const PositionComp &PC, const TileComp &T,
-                                   const VisibleComp &VC) {
+void Renderer::renderVisibleEntity(entt::entity Entity, const PositionComp &PC,
+                                   const TileComp &T, const VisibleComp &VC) {
   if (!VC.IsVisible && !VC.Partially) {
     return;
   }
+  const bool Blocks = L.Reg.any_of<BlocksLOS>(Entity);
   if (!IsVisibleMap.contains(PC.Pos + Offset) ||
-      !IsVisibleMap.getTile(PC.Pos + Offset)) {
+      (!IsVisibleMap.getTile(PC.Pos + Offset) && !Blocks)) {
     return;
   }
   if (!VC.IsVisible && VC.Partially) {

@@ -533,10 +533,10 @@ void Game::handleDrawLevel(bool UpdateScreen) {
 
   auto &CurrentLevel = World->getCurrentLevelOrFail();
   Renderer Render(RenderSize, CurrentLevel, CenterPos);
-  Render.renderShadow(/*Darkness=*/30);
-  Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
   Render.renderAllLineOfSight();
   Render.renderEntities();
+  Render.renderShadow(/*Darkness=*/30);
+  Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
   REC.apply(Render);
 
   // Draw map
