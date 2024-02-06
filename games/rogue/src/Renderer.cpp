@@ -106,10 +106,10 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
   }
 }
 
-void Renderer::renderVisibleChar(const cxxg::types::ColoredChar &EffC,
+bool Renderer::renderVisibleChar(const cxxg::types::ColoredChar &EffC,
                                  ymir::Point2d<int> AtPos) {
-  if (!VisibleMap.contains(AtPos + Offset)) {
-    return;
+  if (!VisibleMap.contains(AtPos + Offset) || !IsVisibleMap.getTile(AtPos + Offset)) {
+    return false;
   }
   VisibleMap.getTile(AtPos + Offset).Char = EffC.Char;
   if (auto *RgbColor = std::get_if<cxxg::types::RgbColor>(&EffC.Color)) {
@@ -124,11 +124,12 @@ void Renderer::renderVisibleChar(const cxxg::types::ColoredChar &EffC,
   } else {
     VisibleMap.getTile(AtPos + Offset).Color = EffC.Color;
   }
+  return true;
 }
 
-void Renderer::renderEffect(cxxg::types::ColoredChar EffC,
+bool Renderer::renderEffect(cxxg::types::ColoredChar EffC,
                             ymir::Point2d<int> AtPos) {
-  renderVisibleChar(EffC, AtPos);
+  return renderVisibleChar(EffC, AtPos);
 }
 
 void Renderer::renderEntities() {

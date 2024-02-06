@@ -275,11 +275,11 @@ bool Game::handleUpdates(bool IsTick) {
       break;
     }
 
-    auto SleepAfterDraw = REC.hasEvents();
     handleDrawLevel(true);
-    if (UICtrl.DelayTicks || SleepAfterDraw) {
-      cxxg::utils::sleep(200000);
+    if (UICtrl.DelayTicks || REC.hasEvents()) {
+      cxxg::utils::sleep(150000);
     }
+    REC.clear();
 
     // Clear stdin buffer
     cxxg::utils::getChar(false);
@@ -296,6 +296,7 @@ bool Game::handleUpdates(bool IsTick) {
 void Game::handleDraw() {
   if (GameRunning) {
     handleDrawLevel(false);
+    REC.clear();
   } else {
     handleDrawGameOver();
   }
@@ -537,7 +538,6 @@ void Game::handleDrawLevel(bool UpdateScreen) {
   Render.renderAllLineOfSight();
   Render.renderEntities();
   REC.apply(Render);
-  REC.clear();
 
   // Draw map
   Scr << Render.get();
