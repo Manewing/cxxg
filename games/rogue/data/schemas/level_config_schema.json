@@ -15,6 +15,9 @@
         },
         {
           "$ref": "#/def/composite_map"
+        },
+        {
+          "$ref": "#/def/tiled_map"
         }
       ]
     },
@@ -91,6 +94,24 @@
           "additionalProperties": {
             "$ref": "#/def/char_info"
           }
+        }
+      },
+      "additionalProperties": false
+    },
+    "tiled_map": {
+      "type": "object",
+      "required": ["type", "tiled_map_file", "tiled_id_map_file"],
+      "properties": {
+        "type": {
+          "const": "tiled"
+        },
+        "tiled_map_file": {
+          "type": "string",
+          "description": "Relative path to the Tiled map file"
+        },
+        "tiled_id_map_file": {
+          "type": "string",
+          "description": "Relative path to the tile info map file"
         }
       },
       "additionalProperties": false

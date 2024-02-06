@@ -1,0 +1,409 @@
+[
+    {
+        "key": "arachnoth_broodguard",
+        "tile_type": "entity"
+    },
+    {
+        "key": "arachnoth_burrower",
+        "tile_type": "entity"
+    },
+    {
+        "key": "arachnoth_hatchling",
+        "tile_type": "entity"
+    },
+    {
+        "key": "base_world_entry",
+        "tile_type": "entity"
+    },
+    {
+        "key": "blob",
+        "tile_type": "entity"
+    },
+    {
+        "key": "blood_fairy",
+        "tile_type": "entity"
+    },
+    {
+        "key": "changeling",
+        "tile_type": "entity"
+    },
+    {
+        "key": "fairy",
+        "tile_type": "entity"
+    },
+    {
+        "key": "fat_rat",
+        "tile_type": "entity"
+    },
+    {
+        "key": "ghost",
+        "tile_type": "entity"
+    },
+    {
+        "key": "grove_guardian",
+        "tile_type": "entity"
+    },
+    {
+        "key": "healer",
+        "tile_type": "entity"
+    },
+    {
+        "key": "iron_pine_tree",
+        "tile_type": "entity"
+    },
+    {
+        "key": "large_silk_cocoon",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_entry",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_exit",
+        "tile_type": "entity"
+    },
+    {
+        "key": "oak_tree",
+        "tile_type": "entity"
+    },
+    {
+        "key": "pine_tree",
+        "tile_type": "entity"
+    },
+    {
+        "key": "sewer_rat",
+        "tile_type": "entity"
+    },
+    {
+        "key": "shop",
+        "tile_type": "entity"
+    },
+    {
+        "key": "silk_cocoon",
+        "tile_type": "entity"
+    },
+    {
+        "key": "skeleton",
+        "tile_type": "entity"
+    },
+    {
+        "key": "thorn_blossom",
+        "tile_type": "entity"
+    },
+    {
+        "key": "toxic_rat",
+        "tile_type": "entity"
+    },
+    {
+        "key": "troll",
+        "tile_type": "entity"
+    },
+    {
+        "key": "troll_berserker",
+        "tile_type": "entity"
+    },
+    {
+        "key": "young_blood_fairy",
+        "tile_type": "entity"
+    },
+    {
+        "key": "ground",
+        "tile": {
+            "bg_color": "#222222",
+            "char": " ",
+            "color": "#222222"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "torch",
+        "tile": {
+            "char": "'",
+            "color": "#ed3424"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "wall",
+        "tile": {
+            "char": "#",
+            "color": "#737373"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "1",
+        "tile": {
+            "char": "1",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "2",
+        "tile": {
+            "char": "2",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "level_1",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_2",
+        "tile_type": "entity"
+    },
+    {
+        "key": "level_3",
+        "tile_type": "entity"
+    },
+    {
+        "key": "0",
+        "tile": {
+            "char": "0",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "3",
+        "tile": {
+            "char": "3",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "4",
+        "tile": {
+            "char": "4",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "5",
+        "tile": {
+            "char": "5",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "6",
+        "tile": {
+            "char": "6",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "7",
+        "tile": {
+            "char": "7",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "8",
+        "tile": {
+            "char": "8",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "9",
+        "tile": {
+            "char": "9",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "mossy_wall",
+        "tile": {
+            "char": "#",
+            "color": "#5a8551"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "spider_lair_wall",
+        "tile": {
+            "char": "#",
+            "color": "#062e29"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "spider_lair_web_0",
+        "tile": {
+            "char": "x",
+            "color": "#939696"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "spider_lair_web_1",
+        "tile": {
+            "char": "*",
+            "color": "#4a5957"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "spider_lair_wall_second",
+        "tile": {
+            "char": "#",
+            "color": "#0c544b"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "black",
+        "tile": {
+            "bg_color": "#000000",
+            "char": " ",
+            "color": "#000000"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "base_chest",
+        "tile_type": "entity"
+    },
+    {
+        "key": "berry_bush",
+        "tile_type": "entity"
+    },
+    {
+        "key": "blinding_mushroom",
+        "tile_type": "entity"
+    },
+    {
+        "key": "closed_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "common_arcane_workshop",
+        "tile_type": "entity"
+    },
+    {
+        "key": "common_chest",
+        "tile_type": "entity"
+    },
+    {
+        "key": "common_skeletal_remains",
+        "tile_type": "entity"
+    },
+    {
+        "key": "common_vase",
+        "tile_type": "entity"
+    },
+    {
+        "key": "final_locked_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "l1_locked_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "l2_locked_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "l3_locked_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "open_door",
+        "tile_type": "entity"
+    },
+    {
+        "key": "rare_chest",
+        "tile_type": "entity"
+    },
+    {
+        "key": "stash",
+        "tile_type": "entity"
+    },
+    {
+        "key": "work_bench",
+        "tile_type": "entity"
+    },
+    {
+        "key": "ground_mod_0",
+        "tile": {
+            "bg_color": "#222222",
+            "char": "\\",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_mod_1",
+        "tile": {
+            "bg_color": "#222222",
+            "char": "_",
+            "color": "#1d1d1d"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_planks_1",
+        "tile": {
+            "bg_color": "#382626",
+            "char": "=",
+            "color": "#533116"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "wall_planks",
+        "tile": {
+            "bg_color": "#533116",
+            "char": "#",
+            "color": "#382626"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "mossy_foliage",
+        "tile": {
+            "char": "\"",
+            "color": "#5a8551"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "water_0",
+        "tile": {
+            "char": "~",
+            "color": "#126265"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "water_1",
+        "tile": {
+            "char": "~",
+            "color": "#144C71"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "ground_mod_2",
+        "tile": {
+            "bg_color": "#222233",
+            "char": " ",
+            "color": "#222222"
+        },
+        "tile_type": "tile"
+    }
+]

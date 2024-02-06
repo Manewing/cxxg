@@ -22,9 +22,11 @@ struct LevelEntityConfig {
 /// Base class for all level generators
 class LevelGenerator {
 public:
-  explicit LevelGenerator(const GameContext &Ctx);
+  explicit LevelGenerator(const GameContext &Ctx,
+                          const std::filesystem::path &DataDir);
 
   const GameContext &getCtx() const { return Ctx; }
+  const std::filesystem::path &getDataDir() const { return DataDir; }
 
   virtual ~LevelGenerator() = default;
   virtual std::shared_ptr<Level> generateLevel(int LevelId) const = 0;
@@ -36,6 +38,7 @@ protected:
 
 protected:
   const GameContext &Ctx;
+  std::filesystem::path DataDir;
 };
 
 /// Level generator that generates an empty level with the given size
@@ -46,7 +49,8 @@ public:
   };
 
 public:
-  EmptyLevelGenerator(const GameContext &Ctx, const Config &Cfg);
+  EmptyLevelGenerator(const GameContext &Ctx,
+                          const std::filesystem::path &DataDir, const Config &Cfg);
   std::shared_ptr<Level> generateLevel(int LevelId) const final;
 
 private:
@@ -69,7 +73,29 @@ public:
   };
 
 public:
-  DesignedMapLevelGenerator(const GameContext &Ctx, const Config &Cfg);
+  DesignedMapLevelGenerator(const GameContext &Ctx,
+                          const std::filesystem::path &DataDir, const Config &Cfg);
+
+  std::shared_ptr<Level> generateLevel(int LevelId) const final;
+
+protected:
+  std::shared_ptr<Level> createNewLevel(int LevelId) const;
+
+private:
+  Config Cfg;
+};
+
+/// Level generator that loads a level from Tiled JSON file
+class TiledMapLevelGenerator : public LevelGenerator {
+public:
+  struct Config {
+    std::filesystem::path TiledMapFile;
+    std::filesystem::path TiledIdMapFile;
+  };
+
+public:
+  TiledMapLevelGenerator(const GameContext &Ctx,
+                          const std::filesystem::path &DataDir, const Config &Cfg);
 
   std::shared_ptr<Level> generateLevel(int LevelId) const final;
 
@@ -93,7 +119,8 @@ public:
   };
 
 public:
-  GeneratedMapLevelGenerator(const GameContext &Ctx, const Config &Cfg);
+  GeneratedMapLevelGenerator(const GameContext &Ctx,
+                          const std::filesystem::path &DataDir, const Config &Cfg);
 
   std::shared_ptr<Level> generateLevel(int LevelId) const final;
 
@@ -122,7 +149,8 @@ public:
   };
 
 public:
-  CompositeMultiLevelGenerator(const GameContext &Ctx);
+  CompositeMultiLevelGenerator(const GameContext &Ctx,
+                          const std::filesystem::path &DataDir);
 
   const LevelGenerator &getGeneratorForLevel(std::size_t LevelIdx) const;
 
@@ -143,14 +171,17 @@ class LevelGeneratorLoader {
 public:
   using LevelConfig = std::variant<
       EmptyLevelGenerator::Config, DesignedMapLevelGenerator::Config,
-      GeneratedMapLevelGenerator::Config, CompositeMultiLevelGenerator::Config>;
+      GeneratedMapLevelGenerator::Config, CompositeMultiLevelGenerator::Config,
+      TiledMapLevelGenerator::Config>;
 
 public:
   static LevelConfig loadCfg(unsigned Seed,
-                             const std::filesystem::path &CfgFile);
+                             const std::filesystem::path &CfgFile,
+                             const std::filesystem::path &DataDir);
 
 public:
-  explicit LevelGeneratorLoader(const GameContext &Ctx);
+  explicit LevelGeneratorLoader(const GameContext &Ctx,
+                                const std::filesystem::path &DataDir);
 
   std::shared_ptr<LevelGenerator> create(unsigned Seed, const LevelConfig &Cfg);
   std::shared_ptr<LevelGenerator> load(unsigned Seed,
@@ -158,6 +189,7 @@ public:
 
 private:
   const GameContext &Ctx;
+  std::filesystem::path DataDir;
 };
 
 } // namespace rogue

@@ -1,0 +1,16 @@
+{
+  "entities": {},
+  "map": {
+    "levels": [
+      {
+        "config": "spider_lair.json",
+        "end": 1
+      },
+      {
+        "config": "brood_tunnel.json",
+        "end": 2
+      }
+    ],
+    "type": "composite"
+  }
+}
