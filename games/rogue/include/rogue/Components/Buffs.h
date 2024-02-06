@@ -86,6 +86,9 @@ public:
   /// Real total amount of regeneration/reduction kept to avoid integer rounding
   /// errors
   StatValue RealDuration = 0.0;
+
+  /// Coefficient to reduce the amount of regeneration/reduction
+  StatValue Coeff = 2.0;
 };
 
 struct StatsBuffComp : public AdditiveBuff, public BuffBase {

@@ -95,11 +95,11 @@ void DiminishingReturnsValueGenBuff::add(
 
   // Compute diminishing returns for reduction amount per tick period
   TickAmount = computeDiminishingReturns(TickAmount, Other.TickAmount,
-                                         /*Coefficient=*/40.0f);
+                                         /*Coefficient=*/Coeff);
 
   // Compute diminishing returns for total amount of reduction
   RealDuration = computeDiminishingReturns(RealDuration, Other.RealDuration,
-                                           /*Coefficient=*/20.0f);
+                                           /*Coefficient=*/Coeff);
 
   // Compute new tick periods left, tick period is kept from existing buff
   TickPeriodsLeft = RealDuration / TickPeriod;
