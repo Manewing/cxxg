@@ -26,7 +26,9 @@
 
 namespace rogue {
 
-LevelGenerator::LevelGenerator(const GameContext &Ctx) : Ctx(Ctx) {}
+LevelGenerator::LevelGenerator(const GameContext &Ctx,
+                               const std::filesystem::path &DataDir)
+    : Ctx(Ctx), DataDir(DataDir) {}
 
 void LevelGenerator::spawnEntities(const LevelEntityConfig &Cfg,
                                    Level &L) const {
@@ -76,8 +78,9 @@ void LevelGenerator::spawnEntity(char Char, const LevelEntityConfig &Cfg,
 }
 
 EmptyLevelGenerator::EmptyLevelGenerator(const GameContext &Ctx,
+                                         const std::filesystem::path &DataDir,
                                          const Config &Cfg)
-    : LevelGenerator(Ctx), Cfg(Cfg) {}
+    : LevelGenerator(Ctx, DataDir), Cfg(Cfg) {}
 
 std::shared_ptr<Level> EmptyLevelGenerator::generateLevel(int LevelId) const {
   auto NewLevel = std::make_shared<Level>(LevelId, Cfg.Size);
@@ -88,9 +91,10 @@ std::shared_ptr<Level> EmptyLevelGenerator::generateLevel(int LevelId) const {
   return NewLevel;
 }
 
-DesignedMapLevelGenerator::DesignedMapLevelGenerator(const GameContext &Ctx,
-                                                     const Config &Cfg)
-    : LevelGenerator(Ctx), Cfg(Cfg) {}
+DesignedMapLevelGenerator::DesignedMapLevelGenerator(
+    const GameContext &Ctx, const std::filesystem::path &DataDir,
+    const Config &Cfg)
+    : LevelGenerator(Ctx, DataDir), Cfg(Cfg) {}
 
 std::shared_ptr<Level>
 DesignedMapLevelGenerator::generateLevel(int LevelId) const {
@@ -131,9 +135,10 @@ DesignedMapLevelGenerator::createNewLevel(int LevelId) const {
 
 bool GeneratedMapLevelGenerator::DebugRooms = false;
 
-GeneratedMapLevelGenerator::GeneratedMapLevelGenerator(const GameContext &Ctx,
-                                                       const Config &Cfg)
-    : LevelGenerator(Ctx), Cfg(Cfg) {}
+GeneratedMapLevelGenerator::GeneratedMapLevelGenerator(
+    const GameContext &Ctx, const std::filesystem::path &DataDir,
+    const Config &Cfg)
+    : LevelGenerator(Ctx, DataDir), Cfg(Cfg) {}
 
 std::shared_ptr<Level>
 GeneratedMapLevelGenerator::generateLevel(int LevelId) const {
@@ -237,8 +242,8 @@ GeneratedMapLevelGenerator::createNewLevel(int LevelId) const {
 }
 
 CompositeMultiLevelGenerator::CompositeMultiLevelGenerator(
-    const GameContext &Ctx)
-    : LevelGenerator(Ctx) {}
+    const GameContext &Ctx, const std::filesystem::path &DataDir)
+    : LevelGenerator(Ctx, DataDir) {}
 
 const LevelGenerator &
 CompositeMultiLevelGenerator::getGeneratorForLevel(std::size_t LevelIdx) const {
@@ -270,6 +275,141 @@ std::size_t CompositeMultiLevelGenerator::getMaxLevelIdx() const {
     return 0;
   }
   return Generators.back().LevelEndIdx + 1;
+}
+
+TiledMapLevelGenerator::TiledMapLevelGenerator(
+    const GameContext &Ctx, const std::filesystem::path &DataDir,
+    const Config &Cfg)
+    : LevelGenerator(Ctx, DataDir), Cfg(Cfg) {}
+
+std::shared_ptr<Level>
+TiledMapLevelGenerator::generateLevel(int LevelId) const {
+  auto NewLevel = createNewLevel(LevelId);
+  NewLevel->Reg.ctx().emplace<GameContext>(Ctx);
+  NewLevel->Reg.ctx().emplace<Level *>(NewLevel.get());
+  return NewLevel;
+}
+
+namespace {
+
+ymir::LayeredMap<int, int> loadTiledMap(const std::filesystem::path &MapFile) {
+  auto [DocStr, Doc] = loadJSON(MapFile, nullptr);
+  auto TiledJson = Doc.GetObject();
+
+  auto Width = TiledJson["width"].GetInt();
+  auto Height = TiledJson["height"].GetInt();
+
+  auto Layers = TiledJson["layers"].GetArray();
+
+  std::vector<std::string> LayerNames;
+  for (const auto &Layer : Layers) {
+    auto LayerName = std::string(Layer["name"].GetString());
+    LayerNames.push_back(LayerName);
+  }
+
+  ymir::LayeredMap<int, int> Map(LayerNames, ymir::Size2d<int>{Width, Height});
+
+  for (const auto &Layer : Layers) {
+    auto LayerName = std::string(Layer["name"].GetString());
+    auto Data = Layer["data"].GetArray();
+    auto &M = Map.get(LayerName);
+
+    auto It = M.begin();
+    for (auto &Elem : Data) {
+      *It = Elem.GetInt();
+      ++It;
+    }
+  }
+
+  return Map;
+}
+
+struct TileInfos {
+  std::map<int, std::string> Entities;
+  std::map<int, Tile> Tiles;
+};
+
+TileInfos loadTileInfos(const std::filesystem::path &TileInfoMap) {
+  auto [DocStr, Doc] = loadJSON(TileInfoMap, nullptr);
+  auto TileInfosJson = Doc.GetArray();
+
+  TileInfos Infos;
+  unsigned TileIdx = 1;
+  for (auto &JsonInfo : TileInfosJson) {
+    auto Key = std::string(JsonInfo["key"].GetString());
+    auto TileType = std::string(JsonInfo["tile_type"].GetString());
+    if (TileType == "entity") {
+      Infos.Entities[TileIdx] = Key;
+    } else {
+      Infos.Tiles[TileIdx] = parseTile(JsonInfo["tile"]);
+    }
+    TileIdx++;
+  }
+
+  Infos.Tiles[0] = Level::EmptyTile;
+  Infos.Entities[0] = "";
+
+  return Infos;
+}
+
+} // namespace
+
+std::shared_ptr<Level>
+TiledMapLevelGenerator::createNewLevel(int LevelId) const {
+  auto TiledMap = loadTiledMap(Cfg.TiledMapFile);
+  auto TileInfos = loadTileInfos(Cfg.TiledIdMapFile);
+
+  auto NewLevel = std::make_shared<Level>(LevelId, TiledMap.getSize());
+
+  static const std::array<std::size_t, 4> LayerIndices = {
+      Level::LayerGroundIdx, Level::LayerGroundDecoIdx, Level::LayerWallsIdx,
+      Level::LayerWallsDecoIdx};
+  for (const auto &Idx : LayerIndices) {
+    const auto &Name = Level::LayerNames.at(Idx);
+    auto &LvlM = NewLevel->Map.get(Name);
+    auto &TiledM = TiledMap.get(Name);
+
+    LvlM.forEach([&TiledM, &TileInfos](auto Pos, auto &Tile) {
+      auto TileId = TiledM.getTile(Pos);
+      auto It = TileInfos.Tiles.find(TileId);
+      if (It == TileInfos.Tiles.end()) {
+        std::stringstream SS;
+        SS << "Could not find tile for tile Id: " << TileId << " at " << Pos;
+        if (auto EtIt = TileInfos.Entities.find(TileId);
+            EtIt != TileInfos.Entities.end()) {
+          SS << "\nYou are referencing an entity: " << EtIt->second << "";
+        }
+        throw std::out_of_range(SS.str());
+      }
+      Tile = TileInfos.Tiles.at(TiledM.getTile(Pos));
+    });
+  }
+
+  auto &TiledEntitiesMap =
+      TiledMap.get(Level::LayerNames.at(Level::LayerEntitiesIdx));
+
+  EntityFactory Factory(NewLevel->Reg, Ctx.EntityDb);
+  TiledEntitiesMap.forEach([this, &TileInfos, &Factory,
+                            &NewLevel](auto Pos, auto TileId) {
+    auto It = TileInfos.Entities.find(TileId);
+    if (It == TileInfos.Entities.end()) {
+      std::stringstream SS;
+      SS << "Could not find entity for tile Id: " << TileId << " at " << Pos;
+      if (auto TIt = TileInfos.Tiles.find(TileId);
+          TIt != TileInfos.Tiles.end()) {
+        SS << "\nYou are referencing a tile: " << TIt->second.kind();
+      }
+      throw std::out_of_range(SS.str());
+    }
+    if (It->second.empty()) {
+      return;
+    }
+    spawnAndPlaceEntity(Factory, Pos,
+                        Ctx.EntityDb.getEntityTemplateId(It->second),
+                        NewLevel->getLevelId());
+  });
+
+  return NewLevel;
 }
 
 namespace {
@@ -353,18 +493,31 @@ loadCompositeMultiLevelGeneratorConfig(const std::filesystem::path &BasePath,
   return MapCfg;
 }
 
+TiledMapLevelGenerator::Config
+loadTiledMapGeneratorConfig(const std::filesystem::path &BasePath,
+                            const rapidjson::Value &Doc) {
+  TiledMapLevelGenerator::Config MapCfg;
+  auto MapJson = Doc["map"].GetObject();
+  MapCfg.TiledMapFile = BasePath / MapJson["tiled_map_file"].GetString();
+  MapCfg.TiledIdMapFile = BasePath / MapJson["tiled_id_map_file"].GetString();
+  return MapCfg;
+}
+
 } // namespace
 
-LevelGeneratorLoader::LevelGeneratorLoader(const GameContext &Ctx) : Ctx(Ctx) {}
+LevelGeneratorLoader::LevelGeneratorLoader(const GameContext &Ctx,
+                                           const std::filesystem::path &DataDir)
+    : Ctx(Ctx), DataDir(DataDir) {}
 
 LevelGeneratorLoader::LevelConfig
 LevelGeneratorLoader::loadCfg(unsigned Seed,
-                              const std::filesystem::path &CfgFile) {
+                              const std::filesystem::path &CfgFile,
+                              const std::filesystem::path &DataDir) {
   LevelConfig LvlCfg;
 
   const auto BasePath = CfgFile.parent_path();
-  const auto SchemaFile =
-      BasePath.parent_path() / "schemas" / "level_config_schema.json";
+  const auto SchemaDir = DataDir / "schemas";
+  const auto SchemaFile = SchemaDir / "level_config_schema.json";
   auto [DocStr, Doc] = loadJSON(CfgFile, &SchemaFile);
 
   auto MapCfg = Doc["map"].GetObject();
@@ -383,6 +536,9 @@ LevelGeneratorLoader::loadCfg(unsigned Seed,
   if (MapCfgType == "composite") {
     return loadCompositeMultiLevelGeneratorConfig(BasePath, Doc);
   }
+  if (MapCfgType == "tiled") {
+    return loadTiledMapGeneratorConfig(BasePath, Doc);
+  }
 
   throw std::out_of_range("Invalid map type: " + MapCfgType);
 }
@@ -390,16 +546,16 @@ LevelGeneratorLoader::loadCfg(unsigned Seed,
 std::shared_ptr<LevelGenerator>
 LevelGeneratorLoader::create(unsigned Seed, const LevelConfig &Cfg) {
   if (auto *GenCfg = std::get_if<GeneratedMapLevelGenerator::Config>(&Cfg)) {
-    return std::make_shared<GeneratedMapLevelGenerator>(Ctx, *GenCfg);
+    return std::make_shared<GeneratedMapLevelGenerator>(Ctx, DataDir, *GenCfg);
   }
   if (auto *DesCfg = std::get_if<DesignedMapLevelGenerator::Config>(&Cfg)) {
-    return std::make_shared<DesignedMapLevelGenerator>(Ctx, *DesCfg);
+    return std::make_shared<DesignedMapLevelGenerator>(Ctx, DataDir, *DesCfg);
   }
   if (auto *EmptyCfg = std::get_if<EmptyLevelGenerator::Config>(&Cfg)) {
-    return std::make_shared<EmptyLevelGenerator>(Ctx, *EmptyCfg);
+    return std::make_shared<EmptyLevelGenerator>(Ctx, DataDir, *EmptyCfg);
   }
   if (auto *CompCfg = std::get_if<CompositeMultiLevelGenerator::Config>(&Cfg)) {
-    auto CompGen = std::make_shared<CompositeMultiLevelGenerator>(Ctx);
+    auto CompGen = std::make_shared<CompositeMultiLevelGenerator>(Ctx, DataDir);
     unsigned LevelGenSeed = Seed;
     for (const auto &[LevelEndIdx, LevelCfg] : CompCfg->Levels) {
       CompGen->addGenerator(load(LevelGenSeed, LevelCfg), LevelEndIdx);
@@ -407,13 +563,16 @@ LevelGeneratorLoader::create(unsigned Seed, const LevelConfig &Cfg) {
     }
     return CompGen;
   }
+  if (auto *TiledCfg = std::get_if<TiledMapLevelGenerator::Config>(&Cfg)) {
+    return std::make_shared<TiledMapLevelGenerator>(Ctx, DataDir, *TiledCfg);
+  }
   throw std::out_of_range("Invalid map type");
 }
 
 std::shared_ptr<LevelGenerator>
 LevelGeneratorLoader::load(unsigned Seed,
                            const std::filesystem::path &CfgFile) {
-  auto Cfg = loadCfg(Seed, CfgFile);
+  auto Cfg = loadCfg(Seed, CfgFile, DataDir);
   return create(Seed, Cfg);
 }
 

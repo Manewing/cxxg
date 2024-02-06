@@ -49,7 +49,7 @@ public:
 };
 
 TEST_F(LevelGeneratorTest, EmptyLevelGenerator) {
-  rogue::EmptyLevelGenerator ELG(Ctx, {ymir::Size2d<int>(1, 1)});
+  rogue::EmptyLevelGenerator ELG(Ctx, "", {ymir::Size2d<int>(1, 1)});
   auto Lvl = ELG.generateLevel(0);
   EXPECT_EQ(Lvl->getLevelId(), 0);
   EXPECT_EQ(Lvl->Map.getSize(), ymir::Size2d<int>(1, 1));
@@ -69,7 +69,7 @@ TEST_F(LevelGeneratorTest, DesignedMapLevelGeneratorSimpleMap) {
   Cfg.CharInfoMap['#'].Layer = "walls";
   Cfg.CharInfoMap[' '] = Cfg.DefaultChar;
 
-  rogue::DesignedMapLevelGenerator DMLG(Ctx, Cfg);
+  rogue::DesignedMapLevelGenerator DMLG(Ctx, "", Cfg);
 
   auto Lvl = DMLG.generateLevel(0);
   EXPECT_EQ(Lvl->getLevelId(), 0);
@@ -116,7 +116,7 @@ TEST_F(LevelGeneratorTest, DesignedMapLevelGeneratorSimpleMapWithEntities) {
   ETI.Name = "dummy_c";
   EntityDb.addEntityTemplate(ETI);
 
-  rogue::DesignedMapLevelGenerator DMLG(Ctx, Cfg);
+  rogue::DesignedMapLevelGenerator DMLG(Ctx, "", Cfg);
 
   auto Lvl = DMLG.generateLevel(0);
   EXPECT_EQ(Lvl->getLevelId(), 0);
@@ -142,7 +142,7 @@ TEST_F(LevelGeneratorTest, GeneratedMapLevelGeneratorGenMap) {
   Cfg.Seed = 0;
   Cfg.MapConfig = "test.cfg";
 
-  rogue::GeneratedMapLevelGenerator GMLG(Ctx, Cfg);
+  rogue::GeneratedMapLevelGenerator GMLG(Ctx, "", Cfg);
 
   auto Lvl = GMLG.generateLevel(0);
   EXPECT_EQ(Lvl->getLevelId(), 0);
@@ -156,12 +156,12 @@ TEST_F(LevelGeneratorTest, GeneratedMapLevelGeneratorGenMap) {
 }
 
 TEST_F(LevelGeneratorTest, CompositeMultiLevelGeneratorGenLevels) {
-  rogue::CompositeMultiLevelGenerator CMG(Ctx);
+  rogue::CompositeMultiLevelGenerator CMG(Ctx, "");
 
   const auto A = std::make_shared<rogue::EmptyLevelGenerator>(
-      Ctx, rogue::EmptyLevelGenerator::Config{{1, 1}});
+      Ctx, "", rogue::EmptyLevelGenerator::Config{{1, 1}});
   const auto B = std::make_shared<rogue::EmptyLevelGenerator>(
-      Ctx, rogue::EmptyLevelGenerator::Config{{2, 2}});
+      Ctx, "", rogue::EmptyLevelGenerator::Config{{2, 2}});
   CMG.addGenerator(A, 0);
   CMG.addGenerator(B, 1);
   CMG.addGenerator(A, 3);

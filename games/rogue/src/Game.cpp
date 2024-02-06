@@ -30,7 +30,8 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
       CraftingDb(CraftingDatabase::load(ItemDb, Cfg.CraftingDbConfig)),
       Crafter(ItemDb),
       Ctx({EvHub, ItemDb, EntityDb, LevelDb, CraftingDb, Crafter}),
-      LvlGen(LevelGeneratorLoader(Ctx).load(Cfg.Seed, Cfg.InitialLevelConfig)),
+      LvlGen(LevelGeneratorLoader(Ctx, Cfg.LevelDbConfig.parent_path())
+                 .load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
       UICtrl(Scr) {
   for (const auto &[RecipeId, Recipe] : CraftingDb.getRecipes()) {
@@ -359,9 +360,7 @@ void Game::loadSaveGame(const SaveGameInfo &SGI) {
   handleUpdates(/*IsTick=*/false);
 }
 
-void Game::storeSaveGame(const SaveGameInfo &SGI) {
-  World->storeSaveGame(SGI);
-}
+void Game::storeSaveGame(const SaveGameInfo &SGI) { World->storeSaveGame(SGI); }
 
 entt::registry &Game::getLvlReg() { return World->getCurrentLevelOrFail().Reg; }
 
