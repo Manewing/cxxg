@@ -356,7 +356,9 @@ void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
   }
 
   unsigned Ticks = -1U;
-  if (MinTicks > 0) {
+  if (MaxTicks == 0) {
+    Ticks = 0;
+  } else if (MinTicks != -1U) {
     Ticks = std::rand() % (MaxTicks - MinTicks + 1) + MinTicks;
   }
   auto Et = createTempDamage(Reg, DC, Pos, EffectTile, Ticks);
