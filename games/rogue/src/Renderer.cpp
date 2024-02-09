@@ -51,6 +51,9 @@ void Renderer::renderShadow(unsigned char Darkness) {
   VisibleMap.forEach([ShadowColor, this](auto Pos, auto &Tile) {
     if (IsVisibleMap.contains(Pos) && !IsVisibleMap.getTile(Pos)) {
       Tile.Color = ShadowColor;
+      if (!L.isLOSBlocked(Pos - Offset)) {
+        Tile.Char = '.';
+      }
     }
   });
 }
