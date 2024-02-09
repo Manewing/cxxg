@@ -34,6 +34,9 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
                  .load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
       UICtrl(Scr) {
+  // Configure base game
+  MaxNotifications = 4;
+
   for (const auto &[RecipeId, Recipe] : CraftingDb.getRecipes()) {
     Crafter.addRecipe(RecipeId, Recipe);
   }
