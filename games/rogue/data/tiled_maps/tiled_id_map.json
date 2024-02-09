@@ -136,7 +136,7 @@
         "key": "1",
         "tile": {
             "char": "1",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -144,7 +144,7 @@
         "key": "2",
         "tile": {
             "char": "2",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -164,7 +164,7 @@
         "key": "0",
         "tile": {
             "char": "0",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -172,7 +172,7 @@
         "key": "3",
         "tile": {
             "char": "3",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -180,7 +180,7 @@
         "key": "4",
         "tile": {
             "char": "4",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -188,7 +188,7 @@
         "key": "5",
         "tile": {
             "char": "5",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -196,7 +196,7 @@
         "key": "6",
         "tile": {
             "char": "6",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -204,7 +204,7 @@
         "key": "7",
         "tile": {
             "char": "7",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -212,7 +212,7 @@
         "key": "8",
         "tile": {
             "char": "8",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },
@@ -220,7 +220,7 @@
         "key": "9",
         "tile": {
             "char": "9",
-            "color": "#1d1d1d"
+            "color": "#131313"
         },
         "tile_type": "tile"
     },

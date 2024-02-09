@@ -228,8 +228,8 @@
           "effects": [
             {
               "effect_name": "null",
-              "max_delay": 30,
-              "min_delay": 10
+              "max_delay": 190,
+              "min_delay": 180
             },
             {
               "effect_name": "major_health_regen_effect",

@@ -1135,7 +1135,6 @@
         {
           "ap_cost": 20,
           "effect": "mind_vision_buff_comp",
-          "health_cost": 10,
           "mana_cost": 10,
           "type": "use_on"
         }
