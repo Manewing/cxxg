@@ -154,8 +154,12 @@ std::string getItemEffectDescription(const Item &It) {
 
 std::string getItemText(const Item &It) {
   std::stringstream SS;
-  SS << "Type: " << It.getType() << "\n---\n";
-  SS << getItemEffectDescription(It) << "---\n" << It.getDescription();
+  SS << "Type: " << It.getType() << "\n------\n"
+     << It.getDescription() << "\n------\n";
+  if (auto EhItFilter = It.getEnhanceFilterType()) {
+    SS << "Enhance filter: " << *EhItFilter << "\n------\n";
+  }
+  SS << getItemEffectDescription(It) << "------\n";
   return SS.str();
 }
 

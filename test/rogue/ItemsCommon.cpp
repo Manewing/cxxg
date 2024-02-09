@@ -26,6 +26,8 @@ DummyItems::DummyItems()
               {{{CF::Equipment}, ArmorEffect}, {{CF::Dismantle}, NullEffect}}),
       HelmetB(Id(0), "helmet_b", "desc", IT::Helmet, 1,
               {{{CF::Equipment}, ArmorEffect}}),
+      ChestPlateNoEffects(Id(0), "chest_plate_no_effects", "desc",
+                          IT::ChestPlate, 1, {{}}),
       SwordSkillSelf(Id(0), "sword_self", "desc", IT::Weapon, 1,
                      {{{CF::Equipment}, DamageEffect},
                       {{CF::Skill | CF::Self}, SetComp1Effect}}),
@@ -53,7 +55,7 @@ DummyItems::DummyItems()
       Potion(Id(0), "potion", "desc", IT::Consumable | IT::CraftingBase, 5,
              {{{CF::UseOn | CF::Self}, NullEffect}}),
       PlateCrafting(Id(0), "plate", "desc", IT::Crafting, 5,
-                    {{{CF::Equipment}, ArmorEffect}}),
+                    {{{CF::Equipment}, ArmorEffect}}, ItemType::ArmorMask),
       CharcoalCrafting(Id(0), "charcoal", "desc", IT::Crafting, 5,
                        {{{CF::UseOn | CF::Self}, CleansePoisonEffect}}),
       CraftingA(Id(0), "crafting_a", "desc", IT::Crafting, 5, {{}}),
@@ -63,12 +65,20 @@ DummyItems::DummyItems()
 
 ItemDatabase DummyItems::createItemDatabase() {
   ItemDatabase DB;
-  std::vector<ItemPrototype *> AllProtos = {
-      &this->HelmetA,    &this->HelmetB,        &this->Ring,
-      &this->CursedRing, &this->HealConsumable, &this->PoisonConsumable,
-      &this->Potion,     &this->PlateCrafting,  &this->CharcoalCrafting,
-      &this->CraftingA,  &this->CraftingB,      &this->CraftingC,
-      &this->CraftingD};
+  std::vector<ItemPrototype *> AllProtos = {&this->HelmetA,
+                                            &this->HelmetB,
+                                            &this->ChestPlateNoEffects,
+                                            &this->Ring,
+                                            &this->CursedRing,
+                                            &this->HealConsumable,
+                                            &this->PoisonConsumable,
+                                            &this->Potion,
+                                            &this->PlateCrafting,
+                                            &this->CharcoalCrafting,
+                                            &this->CraftingA,
+                                            &this->CraftingB,
+                                            &this->CraftingC,
+                                            &this->CraftingD};
   for (auto *Proto : AllProtos) {
     Proto->ItemId = DB.getNewItemId();
     DB.addItemProto(*Proto);

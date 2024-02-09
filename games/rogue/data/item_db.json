@@ -974,6 +974,9 @@
         }
       ],
       "description": "A rune spell that smites the target with enormous power",
+      "enhancement_type_filter": [
+        "weapon"
+      ],
       "max_stack_size": 1,
       "name": "Smiting I",
       "types": [
@@ -2131,6 +2134,9 @@
         }
       ],
       "description": "Rune spell that causes an explosion of light blinding enemies",
+      "enhancement_type_filter": [
+        "shield"
+      ],
       "max_stack_size": 1,
       "name": "Shield Flare I",
       "types": [
@@ -2245,13 +2251,6 @@
           "max_count": 1,
           "min_count": 1,
           "name": "Stomp I",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Shield Flare I",
           "type": "item",
           "weight": 5
         }

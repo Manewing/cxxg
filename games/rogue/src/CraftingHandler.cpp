@@ -89,11 +89,20 @@ CraftingHandler::tryCraft(const std::vector<Item> &Items) const {
   }
 
   // Filter out any invalid combinations
-  const auto IsValid = ((First.getType() & ItemType::CraftingBase) &&
+  const bool IsValid = ((First.getType() & ItemType::CraftingBase) &&
                         (Second.getType() & ItemType::Crafting)) ||
                        ((First.getType() & ItemType::EquipmentMask) &&
                         (Second.getType() & ItemType::Crafting));
   if (!IsValid) {
+    return std::nullopt;
+  }
+
+  const bool IsValidEnhancement =
+      std::all_of(Items.begin() + 1, Items.end(), [&First](const auto &Other) {
+        return First.getType() &
+               Other.getEnhanceFilterType().value_or(ItemType::AnyMask);
+      });
+  if (!IsValidEnhancement) {
     return std::nullopt;
   }
 

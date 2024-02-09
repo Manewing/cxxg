@@ -27,7 +27,8 @@ public:
   /// \param Effects Effects that the item has
   ItemPrototype(ItemProtoId ItemId, std::string Name, std::string Description,
                 ItemType Type, int MaxStackSize,
-                std::vector<EffectInfo> Effects);
+                std::vector<EffectInfo> Effects,
+                std::optional<ItemType> EnhanceTypeFilter = std::nullopt);
 
   EffectAttributes getAttributes() const;
   EffectAttributes getAttributes(CapabilityFlags Flags) const;
@@ -57,6 +58,9 @@ public:
   std::string Description;
   ItemType Type = ItemType::None;
   int MaxStackSize = 1;
+
+  /// If set item can only be used to enhance items of this type
+  std::optional<ItemType> EnhanceTypeFilter;
 
   std::vector<EffectInfo> Effects;
 };

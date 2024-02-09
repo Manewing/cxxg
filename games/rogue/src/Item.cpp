@@ -95,6 +95,13 @@ int Item::getMaxStackSize() const {
   return getProto().MaxStackSize;
 }
 
+const std::optional<ItemType> &Item::getEnhanceFilterType() const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->EnhanceTypeFilter;
+  }
+  return getProto().EnhanceTypeFilter;
+}
+
 std::vector<EffectInfo> Item::getAllEffects() const {
   if (Specialization && SpecOverrides) {
     return Specialization->Effects;

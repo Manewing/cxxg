@@ -29,6 +29,7 @@ public:
   std::string getDescription() const;
   ItemType getType() const;
   int getMaxStackSize() const;
+  const std::optional<ItemType> &getEnhanceFilterType() const;
 
   std::vector<EffectInfo> getAllEffects() const;
 

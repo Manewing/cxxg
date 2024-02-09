@@ -470,6 +470,17 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig,
       EffectInfos.push_back({Attrs, DB.getItemEffect(EffectName)});
     }
 
+    std::optional<ItemType> EnhanceTypeFilter;
+    if (ItemProtoJson.HasMember("enhancement_type_filter")) {
+      ItemType EnhanceType = ItemType::None;
+      for (const auto &ItemType :
+           ItemProtoJson["enhancement_type_filter"].GetArray()) {
+        const auto ItemTypeStr = ItemType.GetString();
+        EnhanceType |= ItemType::fromString(ItemTypeStr);
+      }
+      EnhanceTypeFilter = EnhanceType;
+    }
+
     std::unique_ptr<ItemSpecializations> Specialization;
     if (ItemProtoJson.HasMember("specializations")) {
       Specialization = std::make_unique<ItemSpecializations>();
@@ -490,7 +501,8 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig,
     }
 
     ItemPrototype Proto(DB.getNewItemId(), Name, Description, ItType,
-                        MaxStackSize, std::move(EffectInfos));
+                        MaxStackSize, std::move(EffectInfos),
+                        EnhanceTypeFilter);
     DB.addItemProto(Proto, Specialization.get(), Enhancements);
   }
 

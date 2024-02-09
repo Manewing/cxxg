@@ -31,6 +31,12 @@
               "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/item_type"
             }
           },
+          "enhancement_type_filter": {
+            "type": "array",
+            "items": {
+              "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/item_type"
+            }
+          },
           "capabilities": {
             "type": "array",
             "items": {

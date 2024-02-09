@@ -24,6 +24,7 @@ public:
     Weapon = 0x40,
     Shield = 0x80,
     Ranged = 0x100,
+    ArmorMask = Helmet | ChestPlate | Pants | Boots,
     EquipmentMask = 0xfff,
 
     /// Items that can be used as a basis for crafting a new item
