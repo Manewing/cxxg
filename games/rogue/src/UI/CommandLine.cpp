@@ -1,6 +1,9 @@
 #include <cxxg/Screen.h>
 #include <cxxg/Utils.h>
+#include <rogue/Components/Items.h>
+#include <rogue/Context.h>
 #include <rogue/Event.h>
+#include <rogue/ItemDatabase.h>
 #include <rogue/Level.h>
 #include <rogue/LevelGenerator.h>
 #include <rogue/UI/CommandLine.h>
@@ -96,6 +99,15 @@ void CommandLineController::draw(cxxg::Screen &Scr) const {
   BaseRectDecorator::draw(Scr);
 }
 
+namespace {
+bool startswith(const std::string_view &Str, const std::string_view &Prefix) {
+  if (Str.size() < Prefix.size()) {
+    return false;
+  }
+  return Str.substr(0, Prefix.size()) == Prefix;
+}
+} // namespace
+
 bool CommandLineController::handleCommandLine(const std::string &Cmd) {
   if (Cmd == "quit") {
     Ctrl.closeCommandLineUI();
@@ -121,7 +133,20 @@ bool CommandLineController::handleCommandLine(const std::string &Cmd) {
   } else if (Cmd == "delay_ticks") {
     Ctrl.DelayTicks = !Ctrl.DelayTicks;
     publish(DebugMessageEvent()
-              << "Delaying ticks: " + std::to_string(Ctrl.DelayTicks));
+            << "Delaying ticks: " + std::to_string(Ctrl.DelayTicks));
+  } else if (startswith(Cmd, "give_item ")) {
+    auto ItemName = Cmd.substr(10);
+    publish(DebugMessageEvent() << "Giving item: " + ItemName);
+    auto Player = Lvl.getPlayer();
+    auto &Inv = Lvl.Reg.get<InventoryComp>(Player);
+    const auto &ItemDb = Lvl.Reg.ctx().get<GameContext>().ItemDb;
+    try {
+      auto ItId = ItemDb.getItemId(ItemName);
+      Inv.Inv.addItem(ItemDb.createItem(ItId));
+    } catch (const std::exception &E) {
+      publish(DebugMessageEvent()
+              << "Failed to give item: " + std::string(E.what()));
+    }
   } else {
     publish(DebugMessageEvent() << "Unknown command: " + Cmd);
   }
