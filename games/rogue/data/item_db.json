@@ -373,8 +373,8 @@
         "color": "#f9fcff"
       },
       "magic_damage": 0.0,
-      "max_ticks": 0,
-      "min_ticks": 0,
+      "max_ticks": 1,
+      "min_ticks": 1,
       "name": "Shield Flare I",
       "phys_damage": 0.0,
       "radius": 4,
@@ -435,8 +435,8 @@
         "z_index": -2
       },
       "magic_damage": 0.0,
-      "max_ticks": 0,
-      "min_ticks": 0,
+      "max_ticks": 1,
+      "min_ticks": 1,
       "name": "Stomp I",
       "phys_damage": 10.0,
       "radius": 3,
