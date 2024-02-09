@@ -64,7 +64,7 @@ void createProjectile(entt::registry &Reg, const DamageComp &DC,
   VectorMovementComp VMC;
   VMC.Flying = true;
   VMC.KillOnWall = true;
-  VMC.Vector = (TargetPos - Pos).to<float>();
+  VMC.Vector = (TargetPos - Pos).to<float>().normalized();
   VMC.LastPos = Pos.to<float>();
   Reg.emplace<VectorMovementComp>(E, VMC);
   Reg.emplace<VisibleComp>(E);
