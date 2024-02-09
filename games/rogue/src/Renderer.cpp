@@ -95,14 +95,7 @@ void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
   auto &RenderedTile = RenderedLevelMap.getTile(AtPos);
 
   Tile.Color = RenderedTile.color();
-  switch (RenderedTile.kind()) {
-  case ' ': // FIXME define constants
-    Tile.Char = '.';
-    break;
-  default:
-    Tile.Char = RenderedTile.kind();
-    break;
-  }
+  Tile.Char = RenderedTile.kind();
 }
 
 bool Renderer::renderVisibleChar(const cxxg::types::ColoredChar &EffC,
