@@ -6,6 +6,7 @@
 #include <iosfwd>
 #include <numeric>
 #include <rogue/Types.h>
+#include <limits>
 #include <tuple>
 
 namespace rogue {
