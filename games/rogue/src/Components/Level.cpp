@@ -43,7 +43,7 @@ void DoorComp::openDoor(entt::registry &Reg, const entt::entity &Entity) {
   Reg.get<InteractableComp>(Entity).Actions.at(DC.ActionIdx).Msg = "Close door";
 
   auto &T = Reg.get<TileComp>(Entity);
-  T.ZIndex = -2;
+  T.T.ZIndex = -2;
   T.T = DC.OpenTile;
 }
 
@@ -55,7 +55,7 @@ void DoorComp::closeDoor(entt::registry &Reg, const entt::entity &Entity) {
   Reg.get<InteractableComp>(Entity).Actions.at(DC.ActionIdx).Msg = "Open door";
 
   auto &T = Reg.get<TileComp>(Entity);
-  T.ZIndex = 0;
+  T.T.ZIndex = 0;
   T.T = DC.ClosedTile;
 }
 

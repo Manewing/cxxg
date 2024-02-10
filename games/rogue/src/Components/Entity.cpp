@@ -13,11 +13,11 @@ namespace rogue {
 
 void createDropEntity(entt::registry &Reg, ymir::Point2d<int> Pos,
                       const Inventory &I) {
-  static constexpr Tile DropTile{{'o', cxxg::types::RgbColor{120, 90, 40}}};
+  static constexpr Tile DropTile{{'o', cxxg::types::RgbColor{120, 90, 40}}, -1};
 
   auto Entity = Reg.create();
   Reg.emplace<PositionComp>(Entity, Pos);
-  Reg.emplace<TileComp>(Entity, DropTile, -1);
+  Reg.emplace<TileComp>(Entity, DropTile);
   Reg.emplace<NameComp>(Entity, "Drop", "Drop containing items");
 
   // Copy inventory

@@ -127,7 +127,7 @@ bool Renderer::renderEffect(cxxg::types::ColoredChar EffC,
 
 void Renderer::renderEntities() {
   L.Reg.sort<TileComp>(
-      [](const auto &Lhs, const auto &Rhs) { return Lhs.ZIndex < Rhs.ZIndex; });
+      [](const auto &Lhs, const auto &Rhs) { return Lhs.T.ZIndex < Rhs.T.ZIndex; });
   L.Reg.sort<PositionComp, TileComp>();
   auto View =
       L.Reg.view<const PositionComp, const TileComp, const VisibleComp>();

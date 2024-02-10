@@ -65,8 +65,13 @@ void reapDeadEntity(entt::registry &Reg, EventHubConnector &EHC,
 }
 
 void reapDamageEntity(entt::registry &Reg, EventHubConnector &EHC,
-                      const entt::entity Entity, DamageComp &DC) {
-  if (DC.Ticks-- > 0 && DC.Hits > 0) {
+                      const entt::entity Entity, DamageComp &DC,
+                      System::UpdateType Type) {
+  const auto Ticks = DC.Ticks;
+  if (Type == System::UpdateType::Tick) {
+    DC.Ticks--;
+  }
+  if (Ticks > 0 && DC.Hits > 0) {
     return;
   }
   reapEntity(Reg, EHC, Entity);
@@ -87,8 +92,6 @@ void removeEmptyContainers(entt::registry &Reg, const entt::entity Entity,
 } // namespace
 
 void DeathSystem::update(UpdateType Type) {
-  (void)Type; // Always run
-
   // Handle dead entities
   auto DeadView = Reg.view<const HealthComp>();
   DeadView.each([this](const auto &Entity, const auto &HC) {
@@ -97,8 +100,8 @@ void DeathSystem::update(UpdateType Type) {
 
   // Handle damage components
   auto DmgView = Reg.view<DamageComp>();
-  DmgView.each([this](const auto &Entity, auto &DC) {
-    reapDamageEntity(Reg, *this, Entity, DC);
+  DmgView.each([this, Type](const auto &Entity, auto &DC) {
+    reapDamageEntity(Reg, *this, Entity, DC, Type);
   });
 
   // FIXME should this be done somewhere else?

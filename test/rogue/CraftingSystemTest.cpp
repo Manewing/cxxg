@@ -56,13 +56,35 @@ TEST_F(CraftingSystemTest, SimpleEquipmentEnhancement) {
   EXPECT_EQ(Result.getName(), "helmet_a");
   EXPECT_EQ(Result.StackSize, 1);
   EXPECT_EQ(Result.getMaxStackSize(), 1);
-  EXPECT_EQ(Result.getAllEffects().size(), 2);
+  ASSERT_EQ(Result.getAllEffects().size(), 2);
 
   auto ArmorBuff =
       dynamic_cast<const rogue::test::DummyItems::ArmorEffectType *>(
           Result.getAllEffects().at(0).Effect.get());
   ASSERT_NE(ArmorBuff, nullptr);
   EXPECT_EQ(ArmorBuff->Value, 2);
+}
+
+TEST_F(CraftingSystemTest, NullSkillEffectEnhancement) {
+  rogue::CraftingHandler System(Db);
+  auto Sword = Db.createItem(DummyItems.Sword.ItemId);
+  auto RSA = Db.createItem(DummyItems.RuneSpellAdjacent.ItemId);
+
+  auto ResultVec = System.tryCraft({Sword, RSA});
+  ASSERT_TRUE(ResultVec.has_value());
+  ASSERT_EQ(ResultVec->size(), 1);
+  const auto &Result = ResultVec->at(0);
+
+  EXPECT_EQ(Result.getType(), rogue::ItemType::Weapon);
+  EXPECT_EQ(Result.getName(), "sword");
+  EXPECT_EQ(Result.StackSize, 1);
+  EXPECT_EQ(Result.getMaxStackSize(), 1);
+  ASSERT_EQ(Result.getAllEffects().size(), 1);
+
+  auto SkillBuff =
+      dynamic_cast<const rogue::test::DummyItems::DamageEffectType *>(
+          Result.getAllEffects().at(0).Effect.get());
+  ASSERT_NE(SkillBuff, nullptr);
 }
 
 TEST_F(CraftingSystemTest, EnhancementFilterMismatch) {
@@ -255,7 +277,5 @@ TEST_F(CraftingSystemTest, NoItemDb) {
   auto ResultVec = System.tryCraft({A, B});
   EXPECT_FALSE(ResultVec.has_value());
 }
-
-
 
 } // namespace

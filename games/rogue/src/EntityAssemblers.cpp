@@ -122,10 +122,10 @@ void DoorCompAssembler::assemble(entt::registry &Reg,
   auto &TC = Reg.get_or_emplace<TileComp>(Entity);
   if (IsOpen) {
     TC.T = OpenTile;
-    TC.ZIndex = -2;
+    TC.T.ZIndex = -2;
   } else {
     TC.T = ClosedTile;
-    TC.ZIndex = 0;
+    TC.T.ZIndex = 0;
   }
 }
 
@@ -162,10 +162,10 @@ void LootedInteractCompAssembler::assemble(entt::registry &Reg,
   auto &TC = Reg.get_or_emplace<TileComp>(Entity);
   if (IsLooted) {
     TC.T = LootedTile;
-    TC.ZIndex = LootedTile.ZIndex;
+    TC.T.ZIndex = LootedTile.ZIndex;
   } else {
     TC.T = DefaultTile;
-    TC.ZIndex = DefaultTile.ZIndex;
+    TC.T.ZIndex = DefaultTile.ZIndex;
   }
 }
 
