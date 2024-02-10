@@ -963,7 +963,7 @@
     {
       "capabilities": [
         {
-          "effect": "damage_effect_10",
+          "effect": "major_damage_effect",
           "mana_cost": 10,
           "type": "ranged_use"
         }
@@ -1025,19 +1025,17 @@
         {
           "effect": "major_damage_effect",
           "health_cost": 10,
-          "type": "ranged_use"
-        },
-        {
-          "effect": "major_damage_effect",
-          "health_cost": 10,
           "type": "skill_ranged"
         }
       ],
       "description": "Sacrifice health to deal damage to the target",
+      "enhancement_type_filter": [
+        "armor_mask"
+      ],
       "max_stack_size": 1,
-      "name": "Scroll of holy sacrifice",
+      "name": "Holy Sacrifice I",
       "types": [
-        "consumable",
+        "quest",
         "crafting"
       ]
     },
@@ -1046,35 +1044,36 @@
         {
           "effect": "minor_poison_effect",
           "mana_cost": 5,
-          "type": "ranged_use"
+          "type": "skill_adjacent"
         }
       ],
       "description": "A scroll that poisons the target",
+      "enhancement_type_filter": [
+        "weapon"
+      ],
       "max_stack_size": 1,
-      "name": "Scroll of poison",
+      "name": "Poison I",
       "types": [
-        "consumable",
+        "quest",
         "crafting"
       ]
     },
     {
       "capabilities": [
         {
-          "effect": "major_health_regen_effect",
-          "health_cost": 10,
-          "type": "use_on"
-        },
-        {
-          "effect": "major_health_regen_effect",
+          "effect": "high_chance_to_apply_blind",
           "health_cost": 10,
           "type": "skill"
         }
       ],
       "description": "Sacrifice health to restore health over time",
+      "enhancement_type_filter": [
+        "armor_mask"
+      ],
       "max_stack_size": 1,
-      "name": "Scroll of sacrificial restoration",
+      "name": "Sacrificial Restoration I",
       "types": [
-        "consumable",
+        "quest",
         "crafting"
       ]
     },
@@ -1096,11 +1095,6 @@
     {
       "capabilities": [
         {
-          "effect": "major_bleeding_debuff_effect",
-          "mana_cost": 10,
-          "type": "adjacent_use"
-        },
-        {
           "ap_cost": 15,
           "effect": "major_bleeding_debuff_effect",
           "mana_cost": 10,
@@ -1108,25 +1102,18 @@
         }
       ],
       "description": "A cluster of small cuts causes strong bleeding on the target",
+      "enhancement_type_filter": [
+        "weapon"
+      ],
       "max_stack_size": 1,
-      "name": "Scroll of bleeding",
+      "name": "Bleeding I",
       "types": [
-        "consumable",
+        "quest",
         "crafting"
       ]
     },
     {
       "capabilities": [
-        {
-          "effect": "health_effect",
-          "mana_cost": 5,
-          "type": "use_on"
-        },
-        {
-          "effect": "minor_quick_health_regen_effect",
-          "mana_cost": 5,
-          "type": "use_on"
-        },
         {
           "ap_cost": 8,
           "effect": "health_effect",
@@ -1140,11 +1127,14 @@
           "type": "skill"
         }
       ],
-      "description": "A scroll that restores health",
+      "description": "A rune spell that restores health",
+      "enhancement_type_filter": [
+        "armor_mask"
+      ],
       "max_stack_size": 1,
-      "name": "Scroll of restoration",
+      "name": "Restoration I",
       "types": [
-        "consumable",
+        "quest",
         "crafting"
       ]
     },
@@ -1153,19 +1143,17 @@
         {
           "effect": "major_mana_effect",
           "health_cost": 10,
-          "type": "use_on"
-        },
-        {
-          "effect": "major_mana_effect",
-          "health_cost": 10,
           "type": "skill"
         }
       ],
-      "description": "A scroll that mana by sacrificing health",
+      "description": "Rune spell that gains mana by sacrificing health",
+      "enhancement_type_filter": [
+        "jewelry_mask"
+      ],
       "max_stack_size": 1,
-      "name": "Scroll of life tap",
+      "name": "Lifetap I",
       "types": [
-        "consumable",
+        "quest",
         "crafting"
       ]
     },
@@ -1449,15 +1437,10 @@
           "type": "skill"
         }
       ],
-      "description": "A ring made of iron",
+      "description": "A ring made of iron TODO",
+      "enhancements": "rare_jewelry_enhancements",
       "max_stack_size": 1,
       "name": "Iron Ring",
-      "specializations": [
-        {
-          "specialization": "rare_stats_buff_effect",
-          "type": "equipment"
-        }
-      ],
       "types": [
         "ring"
       ]
@@ -2899,14 +2882,14 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of poison",
+          "name": "Poison I",
           "type": "item",
           "weight": 5
         },
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of bleeding",
+          "name": "Bleeding I",
           "type": "item",
           "weight": 5
         },
@@ -2920,28 +2903,28 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of sacrificial restoration",
+          "name": "Sacrificial Restoration I",
           "type": "item",
           "weight": 5
         },
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of holy sacrifice",
+          "name": "Holy Sacrifice I",
           "type": "item",
           "weight": 5
         },
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of restoration",
+          "name": "Restoration I",
           "type": "item",
           "weight": 5
         },
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Scroll of life tap",
+          "name": "Lifetap I",
           "type": "item",
           "weight": 5
         },
@@ -3579,12 +3562,17 @@
       "rolls": 3,
       "slots": [
         {
-          "type": "null",
-          "weight": 50
+          "ref": "common_armor_enhancements",
+          "type": "table",
+          "weight": -1
         },
         {
           "type": "null",
-          "weight": 10
+          "weight": 100
+        },
+        {
+          "type": "null",
+          "weight": 50
         },
         {
           "max_count": 1,
@@ -3599,57 +3587,13 @@
           "weight": 5
         },
         {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of sacrificial restoration",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of poison",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of holy sacrifice",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of bleeding",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of restoration",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of life tap",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Armor Plating",
-          "type": "item",
+          "ref": "common_armor_enhancements",
+          "type": "table",
           "weight": 5
         },
         {
           "type": "null",
-          "weight": 1
+          "weight": 5
         }
       ]
     },
@@ -3780,16 +3724,21 @@
         }
       ]
     },
-    "rare_melee_weapon_enhancements": {
+    "rare_jewelry_enhancements": {
       "rolls": 3,
       "slots": [
         {
-          "type": "null",
-          "weight": 50
+          "ref": "common_jewelery_enhancements",
+          "type": "table",
+          "weight": -1
         },
         {
           "type": "null",
-          "weight": 10
+          "weight": 100
+        },
+        {
+          "type": "null",
+          "weight": 50
         },
         {
           "max_count": 1,
@@ -3804,29 +3753,52 @@
           "weight": 5
         },
         {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Spider Venom Oil",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Striking I",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Smiting I",
-          "type": "item",
+          "ref": "common_jewelery_enhancements",
+          "type": "table",
           "weight": 5
         },
         {
           "type": "null",
-          "weight": 1
+          "weight": 5
+        }
+      ]
+    },
+    "rare_melee_weapon_enhancements": {
+      "rolls": 3,
+      "slots": [
+        {
+          "ref": "common_weapon_enhancements",
+          "type": "table",
+          "weight": -1
+        },
+        {
+          "type": "null",
+          "weight": 100
+        },
+        {
+          "type": "null",
+          "weight": 50
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Great Orb of Upgrade",
+          "type": "item",
+          "weight": 10
+        },
+        {
+          "ref": "common_stat_orb",
+          "type": "table",
+          "weight": 5
+        },
+        {
+          "ref": "common_weapon_enhancements",
+          "type": "table",
+          "weight": 5
+        },
+        {
+          "type": "null",
+          "weight": 5
         }
       ]
     },
@@ -3866,14 +3838,7 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Stomp I",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Acidic Explosion I",
+          "name": "Sacrificial Restoration I",
           "type": "item",
           "weight": 5
         },
@@ -3881,6 +3846,34 @@
           "max_count": 1,
           "min_count": 1,
           "name": "Spikes I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Stomp I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Restoration I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Holy Sacrifice I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Acidic Explosion I",
           "type": "item",
           "weight": 5
         }
@@ -3916,6 +3909,13 @@
           "name": "Close Wounds I",
           "type": "item",
           "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Lifetap I",
+          "type": "item",
+          "weight": 5
         }
       ]
     },
@@ -3937,7 +3937,7 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Striking I",
+          "name": "Bleeding I",
           "type": "item",
           "weight": 5
         },
@@ -3945,6 +3945,20 @@
           "max_count": 1,
           "min_count": 1,
           "name": "Smiting I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Striking I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Poison I",
           "type": "item",
           "weight": 5
         }
