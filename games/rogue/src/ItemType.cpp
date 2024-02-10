@@ -21,6 +21,10 @@ std::optional<ItemType> ItemType::parseString(const std::string &Type) {
       {"consumable", ItemType::Consumable},
       {"quest", ItemType::Quest},
       {"crafting", ItemType::Crafting},
+      {"armor_mask", ItemType::ArmorMask},
+      {"jewelry_mask", ItemType::JewelryMask},
+      {"equipment_mask", ItemType::EquipmentMask},
+
   };
   if (const auto It = ItemTypes.find(Type); It != ItemTypes.end()) {
     return It->second;

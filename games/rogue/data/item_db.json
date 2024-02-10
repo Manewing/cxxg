@@ -74,6 +74,15 @@
       "damage_value": 10,
       "type": "damage_item_effect"
     },
+    "dex_3": {
+      "stats": {
+        "dex": 3,
+        "int": 0,
+        "str": 0,
+        "vit": 0
+      },
+      "type": "stats_buff_comp"
+    },
     "dex_5": {
       "stats": {
         "dex": 5,
@@ -133,6 +142,15 @@
       },
       "chance": 70.0,
       "type": "chance_on_hit_to_apply_blinded"
+    },
+    "int_3": {
+      "stats": {
+        "dex": 0,
+        "int": 3,
+        "str": 0,
+        "vit": 0
+      },
+      "type": "stats_buff_comp"
     },
     "int_5": {
       "stats": {
@@ -442,6 +460,15 @@
       "radius": 3,
       "type": "disc_area_hit_effect"
     },
+    "str_3": {
+      "stats": {
+        "dex": 0,
+        "int": 0,
+        "str": 3,
+        "vit": 0
+      },
+      "type": "stats_buff_comp"
+    },
     "str_5": {
       "stats": {
         "dex": 0,
@@ -474,6 +501,15 @@
       },
       "name": "Sweeping Strike I",
       "type": "sweeping_strike_effect"
+    },
+    "vit_3": {
+      "stats": {
+        "dex": 0,
+        "int": 0,
+        "str": 0,
+        "vit": 3
+      },
+      "type": "stats_buff_comp"
     },
     "vit_5": {
       "stats": {
@@ -775,7 +811,7 @@
         }
       ],
       "description": "A small sword",
-      "enhancements": "common_melee_weapon_enhancements",
+      "enhancements": "common_weapon_enhancements",
       "max_stack_size": 1,
       "name": "Small Sword",
       "types": [
@@ -798,7 +834,7 @@
         }
       ],
       "description": "A slender weapon, its blade shimmering as though forged from the essence of time itself. ",
-      "enhancements": "common_melee_weapon_enhancements",
+      "enhancements": "common_weapon_enhancements",
       "max_stack_size": 1,
       "name": "Eternal Dagger",
       "types": [
@@ -821,7 +857,7 @@
         }
       ],
       "description": "A blade of arcane power, it is said to have been forged by the first mages of the realm.",
-      "enhancements": "common_magic_melee_weapon_enhancements",
+      "enhancements": "common_weapon_enhancements",
       "max_stack_size": 1,
       "name": "Arcane Shardblade",
       "types": [
@@ -1187,6 +1223,10 @@
         }
       ],
       "description": "Can be used to enhance equipment with armor",
+      "enhancement_type_filter": [
+        "shield",
+        "armor_mask"
+      ],
       "max_stack_size": 99,
       "name": "Armor Plating",
       "types": [
@@ -1246,10 +1286,6 @@
     {
       "capabilities": [
         {
-          "effect": "armor_5",
-          "type": "equipment"
-        },
-        {
           "effect": "block_10",
           "type": "equipment"
         },
@@ -1263,14 +1299,9 @@
         }
       ],
       "description": "A shield of wood",
+      "enhancements": "common_shield_enhancements",
       "max_stack_size": 1,
       "name": "Wooden Shield",
-      "specializations": [
-        {
-          "specialization": "common_stats_buff_effect",
-          "type": "equipment"
-        }
-      ],
       "types": [
         "shield"
       ]
@@ -1818,7 +1849,10 @@
         }
       ],
       "description": "An oil that can be applied to a weapon, adding a possibility to poison",
-      "max_stack_size": 99,
+      "enhancement_type_filter": [
+        "weapon"
+      ],
+      "max_stack_size": 1,
       "name": "Spider Venom Oil",
       "types": [
         "crafting"
@@ -2071,6 +2105,9 @@
         }
       ],
       "description": "Rune spell that causes an acidic explosion",
+      "enhancement_type_filter": [
+        "armor_mask"
+      ],
       "max_stack_size": 1,
       "name": "Acidic Explosion I",
       "types": [
@@ -2092,6 +2129,9 @@
         }
       ],
       "description": "Rune spell that causes an explosion of spikes",
+      "enhancement_type_filter": [
+        "armor_mask"
+      ],
       "max_stack_size": 1,
       "name": "Spikes I",
       "types": [
@@ -2113,6 +2153,9 @@
         }
       ],
       "description": "A stone enchanted with rune magic",
+      "enhancement_type_filter": [
+        "armor_mask"
+      ],
       "max_stack_size": 1,
       "name": "Stomp I",
       "types": [
@@ -2141,6 +2184,194 @@
       "name": "Shield Flare I",
       "types": [
         "quest",
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
+          "ap_cost": 5.0,
+          "effect": "remove_mana_regen_buff",
+          "mana_cost": 5.0,
+          "type": "skill_ranged"
+        }
+      ],
+      "description": "Rune spell that removes mana regeneration buffs from a target",
+      "enhancement_type_filter": [
+        "amulet",
+        "ring"
+      ],
+      "max_stack_size": 1,
+      "name": "Arcane Lock I",
+      "types": [
+        "crafting",
+        "quest"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
+          "effect": "remove_health_regen_buff",
+          "health_cost": 5.0,
+          "type": "skill_ranged"
+        }
+      ],
+      "description": "Rune spell that ensnares the target's life force, by temporarily removing all health regeneration.",
+      "enhancement_type_filter": [
+        "amulet",
+        "ring"
+      ],
+      "max_stack_size": 1,
+      "name": "Blood Bind I",
+      "types": [
+        "quest",
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "remove_bleeding_debuff",
+          "mana_cost": 5.0,
+          "type": "skill_adjacent"
+        },
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        }
+      ],
+      "description": "Rune spell that closes the wounds of the target",
+      "enhancement_type_filter": [
+        "amulet",
+        "ring"
+      ],
+      "max_stack_size": 1,
+      "name": "Close Wounds I",
+      "types": [
+        "quest",
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
+          "effect": "remove_poison_debuff",
+          "mana_cost": 5.0,
+          "type": "skill_adjacent"
+        }
+      ],
+      "description": "Rune spell that cleanses poison from the target",
+      "enhancement_type_filter": [
+        "amulet",
+        "ring"
+      ],
+      "max_stack_size": 1,
+      "name": "Cleanse Poison I",
+      "types": [
+        "quest",
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "low_chance_to_apply_bleeding",
+          "type": "equipment"
+        }
+      ],
+      "description": "Enchanted shard of bone that can be attached to a weapon. It increases the likelihood of causing bleeding by adding razor-sharp edges to the blade.",
+      "enhancement_type_filter": [
+        "weapon"
+      ],
+      "max_stack_size": 1,
+      "name": "Ashen Bone Shard",
+      "types": [
+        "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dex_3",
+          "type": "equipment"
+        }
+      ],
+      "description": "Ring that's as light as a feather on the finger, enabling swift movements and precision that evades and strikes in equal measure.",
+      "enhancements": "common_jewelery_enhancements",
+      "max_stack_size": 1,
+      "name": "Swiftwind Loop",
+      "types": [
+        "ring"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "int_3",
+          "type": "equipment"
+        }
+      ],
+      "description": "Ring that deepens magical understanding, allowing the wearer to cast more powerful spells.",
+      "enhancements": "common_jewelery_enhancements",
+      "max_stack_size": 1,
+      "name": "Mind Weaver Ring",
+      "types": [
+        "ring"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "str_3",
+          "type": "equipment"
+        }
+      ],
+      "description": "Wearing this ring grants physical strength, turning even the simplest blow into a devastating strike.",
+      "enhancements": "common_jewelery_enhancements",
+      "max_stack_size": 1,
+      "name": "Might Band",
+      "types": [
+        "ring"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "vit_3",
+          "type": "equipment"
+        }
+      ],
+      "description": "Ring that encircles the wearer's finger with a protective aura, significantly enhancing their natural healing abilities and resilience.",
+      "enhancements": "common_jewelery_enhancements",
+      "max_stack_size": 1,
+      "name": "Lifeforce Ring",
+      "types": [
+        "ring"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_iron_equip",
+          "type": "dismantle"
+        }
+      ],
+      "description": "A base for a ring",
+      "max_stack_size": 99,
+      "name": "Iron Band",
+      "types": [
         "crafting"
       ]
     }
@@ -2194,65 +2425,21 @@
           "weight": 150
         },
         {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Orb of Upgrade",
-          "type": "item",
-          "weight": 10
-        },
-        {
-          "ref": "common_stat_orb",
+          "ref": "common_equip_enhancements",
           "type": "table",
-          "weight": 5
+          "weight": 15
         },
         {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of restoration",
-          "type": "item",
-          "weight": 5
+          "ref": "skills_i_armor",
+          "type": "table",
+          "weight": 15
         },
         {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of life tap",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of poison",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Scroll of bleeding",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
+          "max_count": 2,
           "min_count": 1,
           "name": "Armor Plating",
           "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Acidic Explosion I",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Stomp I",
-          "type": "item",
-          "weight": 5
+          "weight": 15
         }
       ]
     },
@@ -2487,6 +2674,23 @@
         }
       ]
     },
+    "common_equip_enhancements": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Orb of Upgrade",
+          "type": "item",
+          "weight": 10
+        },
+        {
+          "ref": "common_stat_orb",
+          "type": "table",
+          "weight": 5
+        }
+      ]
+    },
     "common_fruits": {
       "rolls": 2,
       "slots": [
@@ -2553,87 +2757,25 @@
         }
       ]
     },
-    "common_magic_melee_weapon_enhancements": {
+    "common_jewelery_enhancements": {
       "rolls": 2,
       "slots": [
+        {
+          "type": "null",
+          "weight": 250
+        },
         {
           "type": "null",
           "weight": 150
         },
         {
-          "type": "null",
-          "weight": 50
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Orb of Upgrade",
-          "type": "item",
+          "ref": "common_equip_enhancements",
+          "type": "table",
           "weight": 10
         },
         {
-          "ref": "common_stat_orb",
+          "ref": "skills_i_jewelry",
           "type": "table",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Spider Venom Oil",
-          "type": "item",
-          "weight": 5
-        }
-      ]
-    },
-    "common_melee_weapon_enhancements": {
-      "rolls": 2,
-      "slots": [
-        {
-          "type": "null",
-          "weight": 150
-        },
-        {
-          "type": "null",
-          "weight": 100
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Orb of Upgrade",
-          "type": "item",
-          "weight": 10
-        },
-        {
-          "ref": "common_stat_orb",
-          "type": "table",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Spider Venom Oil",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Striking I",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Smiting I",
-          "type": "item",
-          "weight": 5
-        },
-        {
-          "max_count": 1,
-          "min_count": 1,
-          "name": "Spikes I",
-          "type": "item",
           "weight": 5
         }
       ]
@@ -2837,6 +2979,64 @@
           "name": "Shield Flare I",
           "type": "item",
           "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Arcane Lock I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Blood Bind I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Cleanse Poison I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Close Wounds I",
+          "type": "item",
+          "weight": 5
+        }
+      ]
+    },
+    "common_shield_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 250
+        },
+        {
+          "type": "null",
+          "weight": 150
+        },
+        {
+          "ref": "common_equip_enhancements",
+          "type": "table",
+          "weight": 40
+        },
+        {
+          "ref": "skills_i_shield",
+          "type": "table",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Armor Plating",
+          "type": "item",
+          "weight": 5
         }
       ]
     },
@@ -2971,6 +3171,43 @@
           "name": "Wooden Log",
           "type": "item",
           "weight": 30
+        }
+      ]
+    },
+    "common_weapon_enhancements": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 150
+        },
+        {
+          "type": "null",
+          "weight": 100
+        },
+        {
+          "ref": "skills_i_weapon",
+          "type": "table",
+          "weight": 15
+        },
+        {
+          "ref": "common_equip_enhancements",
+          "type": "table",
+          "weight": 15
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Spider Venom Oil",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Ashen Bone Shard",
+          "type": "item",
+          "weight": 5
         }
       ]
     },
@@ -3620,6 +3857,96 @@
           "ref": "mixed_chest",
           "type": "table",
           "weight": 10
+        }
+      ]
+    },
+    "skills_i_armor": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Stomp I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Acidic Explosion I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Spikes I",
+          "type": "item",
+          "weight": 5
+        }
+      ]
+    },
+    "skills_i_jewelry": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Cleanse Poison I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Arcane Lock I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Blood Bind I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Close Wounds I",
+          "type": "item",
+          "weight": 5
+        }
+      ]
+    },
+    "skills_i_shield": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Shield Flare I",
+          "type": "item",
+          "weight": 5
+        }
+      ]
+    },
+    "skills_i_weapon": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Striking I",
+          "type": "item",
+          "weight": 5
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Smiting I",
+          "type": "item",
+          "weight": 5
         }
       ]
     }

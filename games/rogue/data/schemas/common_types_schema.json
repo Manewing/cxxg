@@ -19,7 +19,10 @@
         "crafting_base",
         "consumable",
         "quest",
-        "crafting"
+        "crafting",
+        "armor_mask",
+        "jewelry_mask",
+        "equipment_mask"
       ]
     },
     "capability_flags": {

@@ -2,7 +2,6 @@
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 
-#include <iostream>
 namespace rogue {
 
 static const std::optional<CraftingNode::CraftingResult> EmptyResult;
