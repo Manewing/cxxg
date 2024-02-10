@@ -25,6 +25,7 @@ public:
   void renderFogOfWar(const ymir::Map<bool, int> &SeenMap);
   void renderAllLineOfSight();
   void renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range);
+  void renderAllVisible();
   void renderVisible(ymir::Point2d<int> AtPos);
   bool renderVisibleChar(const cxxg::types::ColoredChar &EffC,
                          ymir::Point2d<int> AtPos);

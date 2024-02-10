@@ -72,6 +72,7 @@ int main(int Argc, char *Argv[]) {
     const auto CenterPos = ymir::Point2d<int>{Level->Map.getSize().W / 2,
                                               Level->Map.getSize().H / 2};
     rogue::Renderer Render(RenderSize, *Level, CenterPos);
+    Render.renderAllVisible();
     Render.renderEntities();
     RenderCollector.apply(Render);
     RenderCollector.clear();

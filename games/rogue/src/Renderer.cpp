@@ -85,6 +85,10 @@ void Renderer::renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range) {
       [this](auto Pos) { return L.isLOSBlocked(Pos); }, AtPos, Range);
 }
 
+void Renderer::renderAllVisible() {
+  IsVisibleMap.fill(true);
+}
+
 void Renderer::renderVisible(ymir::Point2d<int> AtPos) {
   if (!VisibleMap.contains(AtPos + Offset) ||
       !RenderedLevelMap.contains(AtPos)) {
