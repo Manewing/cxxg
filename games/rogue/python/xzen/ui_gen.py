@@ -34,6 +34,13 @@ def get_title(key: str, obj: Dict[str, Any]) -> str:
     return convert_snake_case_to_camel_case(key)
 
 
+def search_string(search_str: str, text: str) -> bool:
+    # Check if we can search case insensitive
+    if search_str.lower() == search_str:
+        return search_str in text.lower()
+    return search_str in text
+
+
 class BaseGeneratedEditor(BaseInterface):
     def __init__(
         self,
@@ -150,6 +157,7 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.enum_values = sorted(obj["enum"])
         self.value = self.enum_values[0]
+        self.text_value = ""
 
     def get_value(self) -> str:
         return self.value
@@ -165,20 +173,43 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
 
     def update_ui(self) -> None:
         self.w.combo.update(self.value)
+        filtered_enum_values = self.enum_values
+        if self.text_value:
+            filtered_enum_values = [
+                v for v in self.enum_values if search_string(self.text_value, v)
+            ]
+        self.w.combo.update(self.value, values=filtered_enum_values)
 
     def get_row(self) -> List[sg.Element]:
         row = [
             sg.Text(self.title, tooltip=self.description),
-            sg.Combo(
-                self.enum_values,
-                default_value=self.value,
-                enable_events=True,
-                readonly=True,
-                key=self.k.combo,
-                tooltip=self.description,
+            sg.Column(
+                [
+                    [
+                        sg.Combo(
+                            self.enum_values,
+                            default_value=self.value,
+                            enable_events=True,
+                            readonly=True,
+                            key=self.k.combo,
+                            tooltip=self.description,
+                        )
+                    ],
+                    [
+                        sg.InputText(
+                            default_text=self.text_value,
+                            enable_events=True,
+                            key=self.k.text,
+                            tooltip="Search",
+                        )
+                    ],
+                ],
+                expand_x=True,
+                expand_y=True,
             ),
         ]
         self.register_event(self.k.combo)
+        self.register_event(self.k.text)
         return row
 
     def handle_event(self, event: str, values: dict) -> bool:
@@ -186,6 +217,15 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
             self.set_value(
                 values[self.k.combo], trigger_handlers=True, update_ui=False
             )
+            return True
+        if event == self.k.text:
+            self.text_value = values[self.k.text]
+            for enum_value in self.enum_values:
+                if search_string(self.text_value, enum_value):
+                    self.set_value(
+                        enum_value, trigger_handlers=True, update_ui=True
+                    )
+                    return True
             return True
         return False
 
@@ -214,7 +254,7 @@ class LinkedGeneratedEnumEditor(GeneratedEnumEditor):
 
     def update_ui(self) -> None:
         self.enum_values = sorted(self.get_enum_values())
-        self.w.combo.update(self.value, values=self.enum_values)
+        super().update_ui()
 
 
 class NonRequiredEditor(BaseGeneratedEditor):
