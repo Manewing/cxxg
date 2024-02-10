@@ -460,5 +460,9 @@
     {
         "key": "rubble",
         "tile_type": "entity"
+    },
+    {
+        "key": "workbench_locked_door",
+        "tile_type": "entity"
     }
 ]

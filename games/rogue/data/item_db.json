@@ -1023,6 +1023,10 @@
     {
       "capabilities": [
         {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
           "effect": "major_damage_effect",
           "health_cost": 10,
           "type": "skill_ranged"
@@ -1041,6 +1045,10 @@
     },
     {
       "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
         {
           "effect": "minor_poison_effect",
           "mana_cost": 5,
@@ -1061,7 +1069,11 @@
     {
       "capabilities": [
         {
-          "effect": "high_chance_to_apply_blind",
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
+          "effect": "major_health_regen_effect",
           "health_cost": 10,
           "type": "skill"
         }
@@ -1095,6 +1107,10 @@
     {
       "capabilities": [
         {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
           "ap_cost": 15,
           "effect": "major_bleeding_debuff_effect",
           "mana_cost": 10,
@@ -1114,6 +1130,10 @@
     },
     {
       "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
         {
           "ap_cost": 8,
           "effect": "health_effect",
@@ -1140,6 +1160,10 @@
     },
     {
       "capabilities": [
+        {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
         {
           "effect": "major_mana_effect",
           "health_cost": 10,
@@ -2222,13 +2246,13 @@
     {
       "capabilities": [
         {
+          "effect": "dismantle_rune",
+          "type": "dismantle"
+        },
+        {
           "effect": "remove_bleeding_debuff",
           "mana_cost": 5.0,
           "type": "skill_adjacent"
-        },
-        {
-          "effect": "dismantle_rune",
-          "type": "dismantle"
         }
       ],
       "description": "Rune spell that closes the wounds of the target",
@@ -2356,6 +2380,20 @@
       "name": "Iron Band",
       "types": [
         "crafting"
+      ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "dismantle_iron_equip",
+          "type": "dismantle"
+        }
+      ],
+      "description": "Key to unlock work bench",
+      "max_stack_size": 1,
+      "name": "Workbench Key",
+      "types": [
+        "quest"
       ]
     }
   ],
@@ -3387,13 +3425,20 @@
         {
           "max_count": 1,
           "min_count": 1,
-          "name": "Sharp Rat Claws",
+          "name": "Workbench Key",
           "type": "item",
           "weight": -1
         },
         {
           "ref": "common_rat",
           "type": "table",
+          "weight": -1
+        },
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "Sharp Rat Claws",
+          "type": "item",
           "weight": -1
         }
       ]

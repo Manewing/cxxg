@@ -1061,6 +1061,20 @@
       "display_name": "Rubble",
       "from_template": "dummy_creature",
       "name": "rubble"
+    },
+    {
+      "assemblers": {
+        "door": {
+          "key": "Workbench Key"
+        },
+        "serialization_id": {
+          "id": 11001
+        }
+      },
+      "description": "A door",
+      "display_name": "Door",
+      "from_template": "l1_locked_door",
+      "name": "workbench_locked_door"
     }
   ]
 }
