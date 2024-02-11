@@ -12,7 +12,8 @@
           "is_open": false,
           "open_tile": {
             "char": "/",
-            "color": "#5e4028"
+            "color": "#5e4028",
+            "z_index": -5
           }
         },
         "position": true,
