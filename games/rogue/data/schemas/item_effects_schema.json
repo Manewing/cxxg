@@ -527,6 +527,10 @@
           "name": {
             "type": "string"
           },
+          "effect_name": {
+            "type": "string",
+            "description": "If set the effect given by name will be applied to entities in range"
+          },
           "effect_tile": {
             "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"
           }

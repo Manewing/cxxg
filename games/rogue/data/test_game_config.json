@@ -68,7 +68,7 @@
       "name": "Book of crafting"
     }
   ],
-  "initial_level_config": "levels/sewers/fat_rat.json",
+  "initial_level_config": "levels/fungus/l1.json",
   "item_db_config": "item_db.json",
   "level_db_config": "level_db.json"
 }

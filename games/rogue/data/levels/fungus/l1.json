@@ -1,0 +1,16 @@
+{
+    "entities": {},
+    "map": {
+      "levels": [
+        {
+          "config": "small_cave_entry.json",
+          "end": 0
+        },
+        {
+          "config": "small_cave.json",
+          "end": 1
+        }
+      ],
+      "type": "composite"
+    }
+  }

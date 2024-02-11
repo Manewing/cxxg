@@ -27,6 +27,22 @@
       "radius": 3,
       "type": "disc_area_hit_effect"
     },
+    "area_heal_i": {
+      "decrease_percent": 0.0,
+      "effect_name": "health_effect",
+      "effect_tile": {
+        "bg_color": "#007400",
+        "char": "+",
+        "color": "#c6ffb6"
+      },
+      "magic_damage": 0.0,
+      "max_ticks": 1,
+      "min_ticks": 1,
+      "name": "Area Heal I",
+      "phys_damage": 0.0,
+      "radius": 4,
+      "type": "disc_area_hit_effect"
+    },
     "armor_10": {
       "magic_armor": 0,
       "phys_armor": 10,
@@ -417,6 +433,11 @@
     "spawn_sewer_rat": {
       "chance": 100.0,
       "entity_name": "sewer_rat",
+      "type": "spawn_entity_effect"
+    },
+    "spawn_sporeling": {
+      "chance": 100.0,
+      "entity_name": "fungus_sporeling",
       "type": "spawn_entity_effect"
     },
     "spikes_i": {
@@ -2395,6 +2416,24 @@
       "types": [
         "quest"
       ]
+    },
+    {
+      "capabilities": [
+        {
+          "effect": "low_chance_to_apply_poison",
+          "type": "equipment"
+        },
+        {
+          "effect": "slow_ranged_2",
+          "type": "equipment"
+        }
+      ],
+      "description": "",
+      "max_stack_size": 1,
+      "name": "fungus_cap_turret",
+      "types": [
+        "ranged"
+      ]
     }
   ],
   "item_specializations": {
@@ -3403,6 +3442,26 @@
         }
       ]
     },
+    "ltb_common_fungus": {
+      "rolls": 2,
+      "slots": [
+        {
+          "type": "null",
+          "weight": 100
+        },
+        {
+          "type": "null",
+          "weight": 30
+        },
+        {
+          "max_count": 2,
+          "min_count": 1,
+          "name": "Rune Dust",
+          "type": "item",
+          "weight": 5
+        }
+      ]
+    },
     "ltb_fairy": {
       "rolls": 1,
       "slots": [
@@ -3439,6 +3498,23 @@
           "min_count": 1,
           "name": "Sharp Rat Claws",
           "type": "item",
+          "weight": -1
+        }
+      ]
+    },
+    "ltb_fungus_cap_turret": {
+      "rolls": 1,
+      "slots": [
+        {
+          "max_count": 1,
+          "min_count": 1,
+          "name": "fungus_cap_turret",
+          "type": "item",
+          "weight": -1
+        },
+        {
+          "ref": "ltb_common_fungus",
+          "type": "table",
           "weight": -1
         }
       ]

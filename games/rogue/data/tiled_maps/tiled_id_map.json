@@ -464,5 +464,46 @@
     {
         "key": "workbench_locked_door",
         "tile_type": "entity"
+    },
+    {
+        "key": "fungus_acidic_sporecap",
+        "tile_type": "entity"
+    },
+    {
+        "key": "ground_fungus_0",
+        "tile": {
+            "bg_color": "#1f0f2b",
+            "char": " ",
+            "color": "#1f0f2b"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "wall_fungus_0",
+        "tile": {
+            "char": "#",
+            "color": "#755bd2"
+        },
+        "tile_type": "tile"
+    },
+    {
+        "key": "fungus_fungal_hive",
+        "tile_type": "entity"
+    },
+    {
+        "key": "fungus_sporeling",
+        "tile_type": "entity"
+    },
+    {
+        "key": "fungus_cap_turret",
+        "tile_type": "entity"
+    },
+    {
+        "key": "fungus_golem",
+        "tile_type": "entity"
+    },
+    {
+        "key": "fungus_priest",
+        "tile_type": "entity"
     }
 ]

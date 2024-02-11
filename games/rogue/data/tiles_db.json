@@ -47,6 +47,11 @@
     "char": "~",
     "color": "#144c71"
   },
+  "ground_fungus_0": {
+    "char": " ",
+    "color": "#1f0f2b",
+    "bg_color": "#1f0f2b"
+  },
   "black": {
     "char": " ",
     "color": "#000000",
@@ -68,6 +73,10 @@
   "wall_sewers": {
     "char": "#",
     "color": "#534f3c"
+  },
+  "wall_fungus_0": {
+    "char": "#",
+    "color": "#755bd2"
   },
   "mossy_foliage": {
     "char": "\"",

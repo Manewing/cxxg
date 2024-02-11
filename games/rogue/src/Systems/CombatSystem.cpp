@@ -29,13 +29,15 @@ void applyCombatComps(entt::registry &Reg, entt::entity Attacker,
 }
 
 template <typename ChanceOnHitBuffType>
-void tryApplyChanceOnHitBuff(entt::registry &Reg, entt::entity Target,
+bool tryApplyChanceOnHitBuff(entt::registry &Reg, entt::entity Target,
                              entt::entity Source, entt::entity StorageEt) {
   if (auto *COHB = Reg.try_get<ChanceOnHitBuffType>(StorageEt)) {
     if (COHB->canApplyTo(Source, Target, Reg)) {
       COHB->applyTo(Source, Target, Reg);
+      return true;
     }
   }
+  return false;
 }
 
 void applyLifeSteal(entt::registry &Reg, entt::entity Source,

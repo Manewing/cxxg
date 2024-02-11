@@ -239,10 +239,15 @@ static std::shared_ptr<ItemEffect> createEffect(const ItemDatabase &DB,
              }
              auto DecreasePercent = V["decrease_percent"].GetDouble();
              auto T = parseTile(V["effect_tile"]);
+
+             std::optional<std::string> EffectName;
+             if (V.HasMember("effect_name")) {
+               EffectName = std::string(V["effect_name"].GetString());
+             }
              return std::make_shared<DiscAreaHitEffect>(
                  Name, Radius, PhysDamage, MagicDamage, Bleeding, Poison,
                  Blinded, T, DecreasePercent, MinTicks, MaxTicks, CanHurtSource,
-                 CanHurtFaction);
+                 CanHurtFaction, EffectName);
            }},
           {"smite_effect",
            [](const auto &, const auto &V) {
@@ -417,6 +422,7 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig,
 
   // Create effects
   const auto &EffectsJson = Doc["item_effects"].GetObject();
+  std::vector<SubEffectInterface *> SubEffectContainers;
   for (const auto &[K, V] : EffectsJson) {
     const auto EffectName = std::string(K.GetString());
     // Check if already registered
@@ -424,9 +430,27 @@ ItemDatabase ItemDatabase::load(const std::filesystem::path &ItemDbConfig,
       throw std::runtime_error("Duplicate item effect: " + EffectName);
     }
     auto Effect = createEffect(DB, V);
+    if (auto *SubEff = dynamic_cast<SubEffectInterface *>(Effect.get())) {
+      SubEffectContainers.push_back(SubEff);
+    }
     DB.Effects.emplace(EffectName, Effect);
   }
   addDefaultConstructEffects(DB.Effects);
+
+  // Fill in sub effects
+  for (auto *SubEff : SubEffectContainers) {
+    const auto &EffectName = SubEff->getEffectName();
+    if (!EffectName) {
+      // May not be used
+      continue;
+    }
+    const auto It = DB.Effects.find(*EffectName);
+    if (It == DB.Effects.end()) {
+      throw std::runtime_error("Sub effect references unknown effect: " +
+                               *EffectName);
+    }
+    SubEff->setEffect(It->second);
+  }
 
   // Create specializations
   std::map<std::string, std::shared_ptr<ItemSpecialization>> Specializations;
