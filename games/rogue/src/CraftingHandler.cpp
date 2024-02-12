@@ -2,7 +2,6 @@
 #include <rogue/ItemDatabase.h>
 #include <rogue/ItemEffect.h>
 
-#include <iostream>
 namespace rogue {
 
 static const std::optional<CraftingNode::CraftingResult> EmptyResult;
@@ -89,11 +88,20 @@ CraftingHandler::tryCraft(const std::vector<Item> &Items) const {
   }
 
   // Filter out any invalid combinations
-  const auto IsValid = ((First.getType() & ItemType::CraftingBase) &&
+  const bool IsValid = ((First.getType() & ItemType::CraftingBase) &&
                         (Second.getType() & ItemType::Crafting)) ||
                        ((First.getType() & ItemType::EquipmentMask) &&
                         (Second.getType() & ItemType::Crafting));
   if (!IsValid) {
+    return std::nullopt;
+  }
+
+  const bool IsValidEnhancement =
+      std::all_of(Items.begin() + 1, Items.end(), [&First](const auto &Other) {
+        return First.getType() &
+               Other.getEnhanceFilterType().value_or(ItemType::AnyMask);
+      });
+  if (!IsValidEnhancement) {
     return std::nullopt;
   }
 
@@ -214,7 +222,7 @@ Item CraftingHandler::craftEnhancedItem(const std::vector<Item> &Items) const {
   // specialization effects). The item specialization will not be copied (the
   // first item is already specialized).
   auto Special = std::make_shared<ItemPrototype>(
-      -1, First.getName(), First.getDescription(), First.getType(),
+      ItemProtoId(-1), First.getName(), First.getDescription(), First.getType(),
       First.getMaxStackSize(), std::vector<EffectInfo>{});
 
   // Combine effects from all other items

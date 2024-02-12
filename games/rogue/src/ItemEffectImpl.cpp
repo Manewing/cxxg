@@ -218,6 +218,18 @@ void SmiteEffect::applyTo(const entt::entity &SrcEt, const entt::entity &DstEt,
                                   DamagePercent / 100.0);
 }
 
+SubEffectInterface::SubEffectInterface(
+    const std::optional<std::string> &EffectName)
+    : EffectName(EffectName) {}
+
+const std::optional<std::string> &SubEffectInterface::getEffectName() const {
+  return EffectName;
+}
+
+void SubEffectInterface::setEffect(std::shared_ptr<ItemEffect> Effect) {
+  this->Effect = std::move(Effect);
+}
+
 DiscAreaHitEffect::DiscAreaHitEffect(
     std::string Name, unsigned Radius, StatValue PhysDamage,
     StatValue MagicDamage,
@@ -225,13 +237,14 @@ DiscAreaHitEffect::DiscAreaHitEffect(
     std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
     std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff, Tile EffectTile,
     double DecreasePercent, unsigned MinTicks, unsigned MaxTicks,
-    bool CanHurtSource, bool CanHurtFaction)
-    : Name(std::move(Name)), Radius(Radius), PhysDamage(PhysDamage),
-      MagicDamage(MagicDamage), BleedingDebuff(BleedingDebuff),
-      PoisonDebuff(PoisonDebuff), BlindedDebuff(BlindedDebuff),
-      EffectTile(EffectTile), DecreasePercent(DecreasePercent),
-      MinTicks(MinTicks), MaxTicks(MaxTicks), CanHurtSource(CanHurtSource),
-      CanHurtFaction(CanHurtFaction) {
+    bool CanHurtSource, bool CanHurtFaction,
+    const std::optional<std::string> &EffectName)
+    : SubEffectInterface(EffectName), Name(std::move(Name)), Radius(Radius),
+      PhysDamage(PhysDamage), MagicDamage(MagicDamage),
+      BleedingDebuff(BleedingDebuff), PoisonDebuff(PoisonDebuff),
+      BlindedDebuff(BlindedDebuff), EffectTile(EffectTile),
+      DecreasePercent(DecreasePercent), MinTicks(MinTicks), MaxTicks(MaxTicks),
+      CanHurtSource(CanHurtSource), CanHurtFaction(CanHurtFaction) {
   MaxTicks = std::max(MaxTicks, 1U);
   MinTicks = std::min(MinTicks, MaxTicks);
 }
@@ -285,10 +298,10 @@ std::string DiscAreaHitEffect::getDescription() const {
   return SS.str();
 }
 
-bool DiscAreaHitEffect::canApplyTo(const entt::entity &SrcEt,
-                                   const entt::entity &,
+bool DiscAreaHitEffect::canApplyTo(const entt::entity &,
+                                   const entt::entity &DstEt,
                                    entt::registry &Reg) const {
-  return Reg.all_of<PositionComp>(SrcEt);
+  return Reg.all_of<PositionComp>(DstEt);
 }
 
 namespace {
@@ -313,9 +326,13 @@ void doForEachTileInCircleAt(ymir::Point2d<int> AtPos, int Radius,
 
 } // namespace
 
-void DiscAreaHitEffect::applyTo(const entt::entity &SrcEt, const entt::entity &,
+void DiscAreaHitEffect::applyTo(const entt::entity &SrcEt,
+                                const entt::entity &DstEt,
                                 entt::registry &Reg) const {
-  auto &PC = Reg.get<PositionComp>(SrcEt);
+  auto &PC = Reg.get<PositionComp>(DstEt);
+
+  // Create damage effect for center
+  createDamageEt(Reg, SrcEt, PC.Pos, 1.0);
 
   // Special case for radius 1-2
   if (Radius >= 1) {
@@ -333,6 +350,10 @@ void DiscAreaHitEffect::applyTo(const entt::entity &SrcEt, const entt::entity &,
                             [this, &Reg, SrcEt, Factor](ymir::Point2d<int> P) {
                               createDamageEt(Reg, SrcEt, P, Factor);
                             });
+  }
+
+  if (Effect) {
+    handleApplyEffect(Reg, SrcEt, DstEt);
   }
 
   // Make sure effect will be rendered
@@ -355,7 +376,12 @@ void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
     DC.Faction = Reg.get<FactionComp>(SrcEt).Faction;
   }
 
-  unsigned Ticks = std::rand() % (MaxTicks - MinTicks + 1) + MinTicks;
+  unsigned Ticks = -1U;
+  if (MaxTicks == 0) {
+    Ticks = 0;
+  } else if (MinTicks != -1U) {
+    Ticks = std::rand() % (MaxTicks - MinTicks + 1) + MinTicks;
+  }
   auto Et = createTempDamage(Reg, DC, Pos, EffectTile, Ticks);
 
   if (BleedingDebuff) {
@@ -368,6 +394,30 @@ void DiscAreaHitEffect::createDamageEt(entt::registry &Reg,
 
   if (BlindedDebuff) {
     Reg.emplace<CoHTargetBlindedDebuffComp>(Et, *BlindedDebuff);
+  }
+}
+
+void DiscAreaHitEffect::handleApplyEffect(entt::registry &Reg,
+                                          const entt::entity &SrcEt,
+                                          const entt::entity &DstEt) const {
+  auto &PC = Reg.get<PositionComp>(DstEt);
+  auto *FC = Reg.try_get<FactionComp>(SrcEt);
+  for (auto TEt : Reg.view<PositionComp, FactionComp>()) {
+    auto &TFC = Reg.get<FactionComp>(TEt);
+    auto &TPC = Reg.get<PositionComp>(TEt);
+    if (!CanHurtSource && TEt == SrcEt) {
+      continue;
+    }
+    if (CanHurtFaction && FC && TFC.Faction != FC->Faction) {
+      continue;
+    } else if (!CanHurtFaction && FC && TFC.Faction == FC->Faction) {
+      continue;
+    }
+    if (static_cast<unsigned>((TPC.Pos - PC.Pos).length()) <= Radius) {
+      if (Effect->canApplyTo(SrcEt, TEt, Reg)) {
+        Effect->applyTo(SrcEt, TEt, Reg);
+      }
+    }
   }
 }
 

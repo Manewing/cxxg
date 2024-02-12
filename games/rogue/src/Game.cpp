@@ -34,6 +34,9 @@ Game::Game(cxxg::Screen &Scr, const GameConfig &Cfg)
                  .load(Cfg.Seed, Cfg.InitialLevelConfig)),
       World(GameWorld::create(LevelDb, *LvlGen, Cfg.InitialGameWorld)),
       UICtrl(Scr) {
+  // Configure base game
+  MaxNotifications = 4;
+
   for (const auto &[RecipeId, Recipe] : CraftingDb.getRecipes()) {
     Crafter.addRecipe(RecipeId, Recipe);
   }
@@ -275,11 +278,11 @@ bool Game::handleUpdates(bool IsTick) {
       break;
     }
 
-    auto SleepAfterDraw = REC.hasEvents();
     handleDrawLevel(true);
-    if (UICtrl.DelayTicks || SleepAfterDraw) {
-      cxxg::utils::sleep(200000);
+    if (UICtrl.DelayTicks || REC.hasEvents()) {
+      cxxg::utils::sleep(150000);
     }
+    REC.clear();
 
     // Clear stdin buffer
     cxxg::utils::getChar(false);
@@ -296,6 +299,7 @@ bool Game::handleUpdates(bool IsTick) {
 void Game::handleDraw() {
   if (GameRunning) {
     handleDrawLevel(false);
+    REC.clear();
   } else {
     handleDrawGameOver();
   }
@@ -532,12 +536,11 @@ void Game::handleDrawLevel(bool UpdateScreen) {
 
   auto &CurrentLevel = World->getCurrentLevelOrFail();
   Renderer Render(RenderSize, CurrentLevel, CenterPos);
-  Render.renderShadow(/*Darkness=*/30);
-  Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
   Render.renderAllLineOfSight();
   Render.renderEntities();
+  Render.renderShadow(/*Darkness=*/30);
+  Render.renderFogOfWar(CurrentLevel.getPlayerSeenMap());
   REC.apply(Render);
-  REC.clear();
 
   // Draw map
   Scr << Render.get();

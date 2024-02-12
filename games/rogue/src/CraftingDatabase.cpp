@@ -16,12 +16,12 @@ CraftingDatabase::load(const ItemDatabase &ItemDb,
   for (const auto &Recipe : Doc["recipes"].GetArray()) {
     auto Name = Recipe["name"].GetString();
 
-    std::vector<CraftingRecipe::ItemId> RequiredItems;
+    std::vector<ItemProtoId> RequiredItems;
     for (const auto &RequiredItem : Recipe["ingredients"].GetArray()) {
       RequiredItems.push_back(ItemDb.getItemId(RequiredItem.GetString()));
     }
 
-    std::vector<CraftingRecipe::ItemId> ResultItems;
+    std::vector<ItemProtoId> ResultItems;
     for (const auto &ResultItem : Recipe["results"].GetArray()) {
       ResultItems.push_back(ItemDb.getItemId(ResultItem.GetString()));
     }

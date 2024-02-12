@@ -6,6 +6,7 @@
 #include <rogue/EffectInfo.h>
 #include <rogue/ItemType.h>
 #include <vector>
+#include <rogue/Types.h>
 
 namespace rogue {
 
@@ -24,9 +25,10 @@ public:
   /// \param Type Type of the item
   /// \param MaxStackSize Maximum number of items of this type that can stack
   /// \param Effects Effects that the item has
-  ItemPrototype(int ItemId, std::string Name, std::string Description,
+  ItemPrototype(ItemProtoId ItemId, std::string Name, std::string Description,
                 ItemType Type, int MaxStackSize,
-                std::vector<EffectInfo> Effects);
+                std::vector<EffectInfo> Effects,
+                std::optional<ItemType> EnhanceTypeFilter = std::nullopt);
 
   EffectAttributes getAttributes() const;
   EffectAttributes getAttributes(CapabilityFlags Flags) const;
@@ -51,11 +53,14 @@ public:
   }
 
 public:
-  int ItemId = -1;
+  ItemProtoId ItemId = ItemProtoId(-1);
   std::string Name;
   std::string Description;
   ItemType Type = ItemType::None;
   int MaxStackSize = 1;
+
+  /// If set item can only be used to enhance items of this type
+  std::optional<ItemType> EnhanceTypeFilter;
 
   std::vector<EffectInfo> Effects;
 };

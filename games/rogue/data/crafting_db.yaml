@@ -60,6 +60,19 @@ recipes:
     results:
       - Small Sword
   - ingredients:
+      - Rune Stone
+      - Rune Stone
+      - Wooden Log
+      - Wooden Log
+      - Rune Stone
+      - Rune Stone
+      - Iron Ingot
+      - Iron Ingot
+      - Iron Ingot
+    name: Iron Sword
+    results:
+      - Iron Sword
+  - ingredients:
       - Wooden Log
       - Wooden Log
       - Leather Scrap
@@ -114,6 +127,51 @@ recipes:
     results:
       - Armor Plating
   - ingredients:
+      - Iron Ingot
+      - Rune Stone
+      - Rune Stone
+      - Iron Ingot
+    name: Iron Band
+    results:
+      - Iron Band
+  - ingredients:
+      - Glass Vial
+      - Arcane Liquid
+      - Herb of Vitality
+      - Rune Dust
+      - Iron Band
+    name: Lifeforce Ring
+    results:
+      - Lifeforce Ring
+  - ingredients:
+      - Glass Vial
+      - Arcane Liquid
+      - Herb of Strength
+      - Rune Dust
+      - Iron Band
+    name: Might Band
+    results:
+      - Might Band
+  - ingredients:
+      - Glass Vial
+      - Arcane Liquid
+      - Herb of Dexterity
+      - Rune Dust
+      - Iron Band
+    name: Swiftwind Loop
+    results:
+      - Swiftwind Loop
+  - ingredients:
+      - Glass Vial
+      - Arcane Liquid
+      - Herb of Intelligence
+      - Rune Dust
+      - Iron Band
+    name: Mind Weaver Ring
+    results:
+      - Mind Weaver Ring
+  - ingredients:
+      - Glass Vial
       - Arcane Liquid
       - Venomous Fang
       - Venomous Fang
@@ -124,6 +182,21 @@ recipes:
     name: Spider Venom Oil
     results:
       - Spider Venom Oil
+  - ingredients:
+      - Rune Dust
+      - Rune Dust
+      - Rune Dust
+      - Ash
+      - Ash
+      - Ash
+      - Bone
+      - Bone
+      - Bone
+      - Fire Stone
+    name: Ashen Bone Shard
+    results:
+      - Ashen Bone Shard
+      - Fire Stone
   - ingredients:
       - Glass Vial
       - Arcane Liquid

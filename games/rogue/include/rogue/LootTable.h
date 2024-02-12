@@ -3,15 +3,14 @@
 
 #include <memory>
 #include <vector>
+#include <rogue/Types.h>
 
 namespace rogue {
 
 class LootContainer {
 public:
-  using ItemId = int;
-
   struct LootReward {
-    ItemId ItId = -1;
+    ItemProtoId ItId = ItemProtoId(-1);
     unsigned Count = 0;
   };
 
@@ -29,14 +28,14 @@ inline bool operator==(const LootContainer::LootReward &Lhs,
 class LootItem : public LootContainer {
 public:
   LootItem() = delete;
-  LootItem(ItemId ItId, unsigned MinCount, unsigned MaxCount);
+  LootItem(ItemProtoId ItId, unsigned MinCount, unsigned MaxCount);
 
-  ItemId getItemId() const;
+  ItemProtoId getItemId() const;
 
   void fillLoot(std::vector<LootReward> &Loot) const final;
 
 private:
-  ItemId ItId;
+  ItemProtoId ItId;
   unsigned MinCount = 0;
   unsigned MaxCount = 0;
 };

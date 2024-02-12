@@ -5,14 +5,15 @@
 
 namespace {
 
+using PId = rogue::ItemProtoId;
 const auto NullEffect = std::make_shared<rogue::NullEffect>();
 
 const rogue::ItemPrototype
-    DummyConsumable(1, "consumable", "desc", rogue::ItemType::Consumable, 5,
+    DummyConsumable(PId(1), "consumable", "desc", rogue::ItemType::Consumable, 5,
                     {{{rogue::CapabilityFlags::UseOn}, NullEffect}});
 
 const rogue::ItemPrototype
-    DummyRing(2, "ring", "desc", rogue::ItemType::Ring, 1,
+    DummyRing(PId(2), "ring", "desc", rogue::ItemType::Ring, 1,
               {{{rogue::CapabilityFlags::Equipment}, NullEffect}});
 
 TEST(EquipmentSlotTest, Empty) {

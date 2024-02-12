@@ -13,6 +13,8 @@
 
 namespace {
 
+using CId = rogue::CraftingRecipeId;
+
 class InventoryHandlerTest : public ::testing::Test {
 public:
   void SetUp() override {
@@ -396,7 +398,7 @@ TEST_F(InventoryHandlerTest, TryCraftItems) {
   auto &Inv = Reg.emplace<rogue::InventoryComp>(Entity).Inv;
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   Crafter.addRecipe(
-      0,
+      CId(0),
       rogue::CraftingRecipe(
           "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
           {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
@@ -433,7 +435,7 @@ TEST_F(InventoryHandlerTest, TryCraftItemsForPlayer) {
 
   rogue::InventoryHandler InvHandler(Entity, Reg, Crafter);
   Crafter.addRecipe(
-      0,
+      CId(0),
       rogue::CraftingRecipe(
           "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
           {DummyItems.CraftingC.ItemId, DummyItems.CraftingD.ItemId}));
@@ -448,7 +450,7 @@ TEST_F(InventoryHandlerTest, TryCraftItemsForPlayer) {
   EXPECT_EQ(PlayerInv.getItem(0).getName(), "crafting_c");
   EXPECT_EQ(PlayerInv.getItem(1).getName(), "crafting_d");
 
-  EXPECT_EQ(PC.KnownRecipes, std::set<rogue::CraftingRecipeId>{0});
+  EXPECT_EQ(PC.KnownRecipes, std::set<rogue::CraftingRecipeId>{CId(0)});
 }
 
 TEST_F(InventoryHandlerTest, CanCraft) {
@@ -483,7 +485,7 @@ TEST_F(InventoryHandlerTest, TryCraft) {
   auto Recipe = rogue::CraftingRecipe(
       "dummy", {DummyItems.CraftingA.ItemId, DummyItems.CraftingB.ItemId},
       {DummyItems.CraftingC.ItemId});
-  Crafter.addRecipe(0, Recipe);
+  Crafter.addRecipe(CId(0), Recipe);
 
   EXPECT_FALSE(InvHandler.tryCraft(Recipe))
       << "Expect not to be able to craft if there is no inventory";

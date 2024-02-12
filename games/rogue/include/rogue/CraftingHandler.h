@@ -12,17 +12,40 @@ class ItemDatabase;
 
 namespace rogue {
 
+/// Crafting recipes are stored in a tree-like structure. Each node stores a
+/// mapping of item Id that is required to craft the results defined in
+/// subsequent nodes.
+///
+/// For example:
+///
+///   {Root}
+///    |
+///    +-- Wood -> {Node 1}
+///    |           |
+///    |           +-- Iron  -> {Node 2}
+///    |           |            +-{Results: Iron Axe}
+///    |           |
+///    |           +-- Stone -> {Node 3}
+///    |                         +-{Results: Stone axe}
+///    +-- Iron -> {Node 4}      |
+///                |             +- Rune Stone -> {Node 5}
+///                |                              +-{Results: Rune Axe}
+///                |
+///                +-- Stone -> {Node 6}
+///                              +-{Results: Flint and Steel}
 struct CraftingNode {
-  using ItemId = int;
-
   struct CraftingResult {
     CraftingRecipeId RecipeId;
-    std::vector<ItemId> Items;
+    std::vector<ItemProtoId> Items;
   };
 
+  /// Each node may define a result, which is a list of items that are crafted
+  /// when the node is reached
   std::optional<CraftingResult> Result;
 
-  std::map<ItemId, CraftingNode> Children;
+  /// Children of the nodes, key is the item Id required to continue to child
+  /// node.
+  std::map<ItemProtoId, CraftingNode> Children;
 
   const std::optional<CraftingResult> &
   search(const std::vector<Item> &Items) const;

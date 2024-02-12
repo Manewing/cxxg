@@ -47,7 +47,7 @@ std::string getQualifierNameForItem(const Item &It, CapabilityFlags Flags) {
 
 } // namespace
 
-int Item::getId() const { return getProto().ItemId; }
+ItemProtoId Item::getId() const { return getProto().ItemId; }
 
 const std::string &Item::getName() const {
   if (!Specialization || !SpecOverrides) {
@@ -93,6 +93,13 @@ int Item::getMaxStackSize() const {
     return Specialization->MaxStackSize;
   }
   return getProto().MaxStackSize;
+}
+
+const std::optional<ItemType> &Item::getEnhanceFilterType() const {
+  if (Specialization && SpecOverrides) {
+    return Specialization->EnhanceTypeFilter;
+  }
+  return getProto().EnhanceTypeFilter;
 }
 
 std::vector<EffectInfo> Item::getAllEffects() const {

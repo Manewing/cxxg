@@ -32,6 +32,7 @@ public:
   bool hasEvents() const;
 
 private:
+  bool HasEvents = false;
   std::vector<std::function<void(Renderer &)>> RenderFns;
 };
 

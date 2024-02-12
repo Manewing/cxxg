@@ -6,6 +6,7 @@
 #include <rogue/Tile.h>
 #include <ymir/Map.hpp>
 #include <ymir/Types.hpp>
+#include <entt/entt.hpp>
 
 namespace rogue {
 class Level;
@@ -24,16 +25,17 @@ public:
   void renderFogOfWar(const ymir::Map<bool, int> &SeenMap);
   void renderAllLineOfSight();
   void renderLineOfSight(ymir::Point2d<int> AtPos, unsigned int Range);
+  void renderAllVisible();
   void renderVisible(ymir::Point2d<int> AtPos);
-  void renderVisibleChar(const cxxg::types::ColoredChar &EffC,
+  bool renderVisibleChar(const cxxg::types::ColoredChar &EffC,
                          ymir::Point2d<int> AtPos);
-  void renderEffect(cxxg::types::ColoredChar EffC, ymir::Point2d<int> AtPos);
+  bool renderEffect(cxxg::types::ColoredChar EffC, ymir::Point2d<int> AtPos);
   void renderEntities();
 
   const ymir::Map<cxxg::types::ColoredChar> &get() const { return VisibleMap; }
 
 protected:
-  void renderVisibleEntity(const PositionComp &PC, const TileComp &T,
+  void renderVisibleEntity(entt::entity Entity, const PositionComp &PC, const TileComp &T,
                            const VisibleComp &VC);
 
 private:

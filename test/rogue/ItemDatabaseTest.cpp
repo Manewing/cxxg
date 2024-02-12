@@ -3,11 +3,13 @@
 
 namespace {
 
+using PId = rogue::ItemProtoId;
+
 TEST(ItemDatabaseTest, Empty) {
   rogue::ItemDatabase Db;
   EXPECT_THROW(Db.getItemId("foo"), std::out_of_range);
   EXPECT_THROW(Db.getRandomItemId(), std::out_of_range);
-  EXPECT_THROW(Db.createItem(0), std::out_of_range);
+  EXPECT_THROW(Db.createItem(PId(0)), std::out_of_range);
 }
 
 TEST(ItemDatabaseTest, AddLootTable) {

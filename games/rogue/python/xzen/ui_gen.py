@@ -34,6 +34,13 @@ def get_title(key: str, obj: Dict[str, Any]) -> str:
     return convert_snake_case_to_camel_case(key)
 
 
+def search_string(search_str: str, text: str) -> bool:
+    # Check if we can search case insensitive
+    if search_str.lower() == search_str:
+        return search_str in text.lower()
+    return search_str in text
+
+
 class BaseGeneratedEditor(BaseInterface):
     def __init__(
         self,
@@ -150,6 +157,7 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
         super().__init__(key=key, obj=obj, parent=parent, prefix=prefix)
         self.enum_values = sorted(obj["enum"])
         self.value = self.enum_values[0]
+        self.text_value = ""
 
     def get_value(self) -> str:
         return self.value
@@ -165,20 +173,43 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
 
     def update_ui(self) -> None:
         self.w.combo.update(self.value)
+        filtered_enum_values = self.enum_values
+        if self.text_value:
+            filtered_enum_values = [
+                v for v in self.enum_values if search_string(self.text_value, v)
+            ]
+        self.w.combo.update(self.value, values=filtered_enum_values)
 
     def get_row(self) -> List[sg.Element]:
         row = [
             sg.Text(self.title, tooltip=self.description),
-            sg.Combo(
-                self.enum_values,
-                default_value=self.value,
-                enable_events=True,
-                readonly=True,
-                key=self.k.combo,
-                tooltip=self.description,
+            sg.Column(
+                [
+                    [
+                        sg.Combo(
+                            self.enum_values,
+                            default_value=self.value,
+                            enable_events=True,
+                            readonly=True,
+                            key=self.k.combo,
+                            tooltip=self.description,
+                        )
+                    ],
+                    [
+                        sg.InputText(
+                            default_text=self.text_value,
+                            enable_events=True,
+                            key=self.k.text,
+                            tooltip="Search",
+                        )
+                    ],
+                ],
+                expand_x=True,
+                expand_y=True,
             ),
         ]
         self.register_event(self.k.combo)
+        self.register_event(self.k.text)
         return row
 
     def handle_event(self, event: str, values: dict) -> bool:
@@ -186,6 +217,15 @@ class GeneratedEnumEditor(BaseGeneratedEditor):
             self.set_value(
                 values[self.k.combo], trigger_handlers=True, update_ui=False
             )
+            return True
+        if event == self.k.text:
+            self.text_value = values[self.k.text]
+            for enum_value in self.enum_values:
+                if search_string(self.text_value, enum_value):
+                    self.set_value(
+                        enum_value, trigger_handlers=True, update_ui=True
+                    )
+                    return True
             return True
         return False
 
@@ -214,7 +254,7 @@ class LinkedGeneratedEnumEditor(GeneratedEnumEditor):
 
     def update_ui(self) -> None:
         self.enum_values = sorted(self.get_enum_values())
-        self.w.combo.update(self.value, values=self.enum_values)
+        super().update_ui()
 
 
 class NonRequiredEditor(BaseGeneratedEditor):
@@ -1019,8 +1059,14 @@ class JSONFileManagerInterface(BaseInterface):
                     key=self.k.load,
                     expand_x=True,
                 ),
+                sg.Button(
+                    "Load From",
+                    key=self.k.load_from,
+                    expand_x=True,
+                ),
             ]
             self.register_event(self.k.load)
+            self.register_event(self.k.load_from)
 
         if self._on_save is not None:
             toolbar += [
@@ -1075,7 +1121,13 @@ class JSONFileManagerInterface(BaseInterface):
             return
         self._save()
 
-    def _handle_load(self) -> None:
+    def _load(self) -> None:
+        if not self._on_load:
+            raise ValueError("Load callback not set")
+        self._on_load(self._file_path)
+        sg.popup(f"Loaded {self._title} from: {self._file_path}")
+
+    def _handle_load_from(self) -> None:
         if not self._on_load:
             raise ValueError("Load callback not set")
         filename = sg.popup_get_file(
@@ -1086,8 +1138,13 @@ class JSONFileManagerInterface(BaseInterface):
         )
         if filename:
             self._set_file_path(filename)
-            self._on_load(filename)
-            sg.popup(f"Loaded {self._title} from: {filename}")
+            self._load()
+
+    def _handle_load(self) -> None:
+        if not self._file_path:
+            self._handle_load_from()
+            return
+        self._load()
 
     def handle_event(self, event: str, values: dict) -> bool:
         if super().handle_event(event, values):
@@ -1100,6 +1157,9 @@ class JSONFileManagerInterface(BaseInterface):
             return True
         if event == self.k.load:
             self._handle_load()
+            return True
+        if event == self.k.load_from:
+            self._handle_load_from()
             return True
         return False
 

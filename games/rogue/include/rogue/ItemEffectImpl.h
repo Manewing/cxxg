@@ -173,7 +173,20 @@ private:
   double DamagePercent = 0.0;
 };
 
-class DiscAreaHitEffect : public ItemEffect {
+class SubEffectInterface {
+public:
+  SubEffectInterface() = default;
+  explicit SubEffectInterface(const std::optional<std::string> &EffectName);
+  virtual ~SubEffectInterface() = default;
+  const std::optional<std::string> &getEffectName() const;
+  virtual void setEffect(std::shared_ptr<ItemEffect> Effect);
+
+protected:
+  std::optional<std::string> EffectName;
+  std::shared_ptr<ItemEffect> Effect = nullptr;
+};
+
+class DiscAreaHitEffect : public ItemEffect, public SubEffectInterface {
 public:
   DiscAreaHitEffect() = default;
   DiscAreaHitEffect(std::string Name, unsigned Radius, StatValue PhysDamage,
@@ -182,7 +195,8 @@ public:
                     std::optional<CoHTargetPoisonDebuffComp> PoisonDebuff,
                     std::optional<CoHTargetBlindedDebuffComp> BlindedDebuff,
                     Tile EffectTile, double DecreasePercent, unsigned MinTicks,
-                    unsigned MaxTicks, bool CanHurtSource, bool CanHurtFaction);
+                    unsigned MaxTicks, bool CanHurtSource, bool CanHurtFaction,
+                    const std::optional<std::string> &EffectName);
 
   std::shared_ptr<ItemEffect> clone() const final;
   std::string getName() const final;
@@ -195,12 +209,16 @@ public:
   template <class Archive> void serialize(Archive &Ar) {
     Ar(Name, Radius, PhysDamage, MagicDamage, BleedingDebuff, PoisonDebuff,
        BlindedDebuff, EffectTile, DecreasePercent, MinTicks, MaxTicks,
-       CanHurtSource, CanHurtFaction);
+       CanHurtSource, CanHurtFaction, Effect);
   }
 
 protected:
   void createDamageEt(entt::registry &Reg, const entt::entity &SrcEt,
                       ymir::Point2d<int> Pos, double DecreaseFactor) const;
+
+  /// Handle extra effect to be applied to entities within range
+  void handleApplyEffect(entt::registry &Reg, const entt::entity &SrcEt,
+                         const entt::entity &DstEt) const;
 
 private:
   std::string Name;

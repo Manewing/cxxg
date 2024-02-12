@@ -31,14 +31,16 @@ void Inventory::addItem(Item It) {
       }
     }
   }
+
+  auto InvMaxSize = MaxStackSize;
   if (MaxStackSize == 0) {
-    Items.push_back(It);
-    return;
+    InvMaxSize = std::numeric_limits<unsigned>::max();
   }
+
   auto RemainingStacks = It.StackSize;
   while (RemainingStacks > 0) {
-    auto Stacks =
-        std::min(static_cast<unsigned>(RemainingStacks), MaxStackSize);
+    auto Stacks = std::min(static_cast<unsigned>(RemainingStacks), InvMaxSize);
+    Stacks = std::min(Stacks, static_cast<unsigned>(It.getMaxStackSize()));
     It.StackSize = Stacks;
     Items.push_back(It);
     RemainingStacks -= Stacks;

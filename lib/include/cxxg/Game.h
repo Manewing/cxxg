@@ -89,6 +89,10 @@ protected:
 
   unsigned TickDelayUs = 0;
 
+  /// Maximum number of notifications to display, before cutting off (default:
+  /// no limit)
+  std::optional<std::size_t> MaxNotifications;
+
   /// Random engine for generating random numbers in games
   ::std::default_random_engine RndEngine;
 

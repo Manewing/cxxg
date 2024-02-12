@@ -24,6 +24,34 @@
     "color": "#533116",
     "bg_color": "#382626"
   },
+  "ground_sewers_0": {
+    "char": " ",
+    "color": "#222222",
+    "bg_color": "#0a0a0a"
+  },
+  "ground_sewers_water_bg_0": {
+    "char": " ",
+    "color": "#222222",
+    "bg_color": "#0f0f20"
+  },
+  "ground_sewers_water_bg_1": {
+    "char": " ",
+    "color": "#222222",
+    "bg_color": "#121230"
+  },
+  "ground_sewers_water_0": {
+    "char": "~",
+    "color": "#126265"
+  },
+  "ground_sewers_water_1": {
+    "char": "~",
+    "color": "#144c71"
+  },
+  "ground_fungus_0": {
+    "char": " ",
+    "color": "#1f0f2b",
+    "bg_color": "#1f0f2b"
+  },
   "black": {
     "char": " ",
     "color": "#000000",
@@ -42,6 +70,14 @@
     "color": "#382626",
     "bg_color": "#533116"
   },
+  "wall_sewers": {
+    "char": "#",
+    "color": "#534f3c"
+  },
+  "wall_fungus_0": {
+    "char": "#",
+    "color": "#755bd2"
+  },
   "mossy_foliage": {
     "char": "\"",
     "color": "#5a8551"
@@ -56,43 +92,43 @@
   },
   "1": {
     "char": "1",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "2": {
     "char": "2",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "3": {
     "char": "3",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "4": {
     "char": "4",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "5": {
     "char": "5",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "6": {
     "char": "6",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "7": {
     "char": "7",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "8": {
     "char": "8",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "9": {
     "char": "9",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "0": {
     "char": "0",
-    "color": "#1d1d1d"
+    "color": "#131313"
   },
   "spider_lair_wall": {
     "char": "#",

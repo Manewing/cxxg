@@ -12,7 +12,8 @@
           "is_open": false,
           "open_tile": {
             "char": "/",
-            "color": "#5e4028"
+            "color": "#5e4028",
+            "z_index": -5
           }
         },
         "position": true,
@@ -228,13 +229,13 @@
           "effects": [
             {
               "effect_name": "null",
-              "max_delay": 100,
-              "min_delay": 80
+              "max_delay": 190,
+              "min_delay": 180
             },
             {
               "effect_name": "major_health_regen_effect",
-              "max_delay": 90,
-              "min_delay": 80
+              "max_delay": 40,
+              "min_delay": 10
             }
           ]
         },
@@ -245,8 +246,8 @@
         "stats": {
           "dex": 2,
           "int": 0,
-          "str": 6,
-          "vit": 10
+          "str": 4,
+          "vit": 20
         },
         "tile": {
           "char": "R",
@@ -320,6 +321,9 @@
     },
     {
       "assemblers": {
+        "inventory": {
+          "loot_table": "ltb_hatchling"
+        },
         "stats": {
           "dex": 10,
           "int": 0,
@@ -577,6 +581,7 @@
     },
     {
       "assemblers": {
+        "block_los": true,
         "stats": {
           "dex": 0,
           "int": 0,
@@ -654,6 +659,8 @@
     },
     {
       "assemblers": {
+        "faction": "nature",
+        "health": true,
         "inventory": {
           "loot_table": "common_fruits"
         },
@@ -1029,6 +1036,233 @@
       "display_name": "Changeling",
       "from_template": "hostile_creature",
       "name": "changeling"
+    },
+    {
+      "assemblers": {
+        "auto_equip": true,
+        "block_los": true,
+        "drop_equipment": false,
+        "equipment": true,
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_rubble"
+        },
+        "stats": {
+          "dex": 0,
+          "int": 0,
+          "str": 0,
+          "vit": 10
+        },
+        "tile": {
+          "char": "#",
+          "color": "#646161"
+        }
+      },
+      "description": "A large pile of rubble enough force might remove it",
+      "display_name": "Rubble",
+      "from_template": "dummy_creature",
+      "name": "rubble"
+    },
+    {
+      "assemblers": {
+        "door": {
+          "key": "Workbench Key"
+        },
+        "serialization_id": {
+          "id": 11001
+        }
+      },
+      "description": "A door",
+      "display_name": "Door",
+      "from_template": "l1_locked_door",
+      "name": "workbench_locked_door"
+    },
+    {
+      "assemblers": {
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_common_fungus"
+        },
+        "race": "creature",
+        "stats": {
+          "dex": 0,
+          "int": 0,
+          "str": 0,
+          "vit": 1
+        }
+      },
+      "from_template": "dummy_creature",
+      "name": "fungus_dummy_base"
+    },
+    {
+      "assemblers": {
+        "faction": "nature",
+        "inventory": {
+          "loot_table": "ltb_common_fungus"
+        },
+        "race": "creature"
+      },
+      "from_template": "hostile_creature",
+      "name": "fungus_creature_base"
+    },
+    {
+      "assemblers": {
+        "effect_executor": {
+          "effects": [
+            {
+              "effect_name": "acid_splash_i",
+              "max_delay": 130,
+              "min_delay": 70
+            }
+          ]
+        },
+        "faction": "nature",
+        "inventory": {},
+        "race": "creature",
+        "stats": {},
+        "tile": {
+          "char": "a",
+          "color": "#bc3aea"
+        }
+      },
+      "description": "A stationary fungus that periodically explodes, spraying acid around it.",
+      "display_name": "Acidic Sporecap",
+      "from_template": "fungus_dummy_base",
+      "name": "fungus_acidic_sporecap"
+    },
+    {
+      "assemblers": {
+        "effect_executor": {
+          "effects": [
+            {
+              "effect_name": "null",
+              "max_delay": 300,
+              "min_delay": 200
+            },
+            {
+              "effect_name": "spawn_sporeling",
+              "max_delay": 80,
+              "min_delay": 40
+            },
+            {
+              "effect_name": "spawn_sporeling",
+              "max_delay": 80,
+              "min_delay": 40
+            },
+            {
+              "effect_name": "spawn_sporeling",
+              "max_delay": 80,
+              "min_delay": 40
+            }
+          ]
+        },
+        "stats": {
+          "vit": 4
+        },
+        "tile": {
+          "bg_color": "#7766e9",
+          "char": "H",
+          "color": "#40285a"
+        }
+      },
+      "description": "A hive of fungal creatures",
+      "display_name": "Fungal Hive",
+      "from_template": "fungus_dummy_base",
+      "name": "fungus_fungal_hive"
+    },
+    {
+      "assemblers": {
+        "stats": {
+          "dex": 6,
+          "int": 0,
+          "str": 2,
+          "vit": 2
+        },
+        "tile": {
+          "char": "s",
+          "color": "#6aa0e5"
+        }
+      },
+      "description": "A small, agile mushroom creature with sharp, spore-covered tendrils",
+      "display_name": "Fungus Sporeling",
+      "from_template": "fungus_creature_base",
+      "name": "fungus_sporeling"
+    },
+    {
+      "assemblers": {
+        "stats": {
+          "dex": 4,
+          "int": 0,
+          "str": 3,
+          "vit": 10
+        },
+        "tile": {
+          "char": "G",
+          "color": "#7a70da"
+        }
+      },
+      "description": "A hive of fungal creatures",
+      "display_name": "Fungal Golem",
+      "from_template": "fungus_creature_base",
+      "name": "fungus_golem"
+    },
+    {
+      "assemblers": {
+        "auto_equip": true,
+        "drop_equipment": false,
+        "equipment": true,
+        "inventory": {
+          "loot_table": "ltb_fungus_cap_turret"
+        },
+        "search_ai": false,
+        "stats": {
+          "dex": 1,
+          "int": 0,
+          "str": 0,
+          "vit": 2
+        },
+        "tile": {
+          "char": "c",
+          "color": "#c347e6"
+        },
+        "wander_ai": false
+      },
+      "description": "A aggressive mushroom that attacks from distance",
+      "display_name": "Fungal Cap Turret",
+      "from_template": "fungus_creature_base",
+      "name": "fungus_cap_turret"
+    },
+    {
+      "assemblers": {
+        "effect_executor": {
+          "effects": [
+            {
+              "effect_name": "minor_health_regen_effect",
+              "max_delay": 40,
+              "min_delay": 20
+            },
+            {
+              "effect_name": "area_heal_i",
+              "max_delay": 40,
+              "min_delay": 20
+            }
+          ]
+        },
+        "stats": {
+          "dex": 2,
+          "int": 0,
+          "str": 1,
+          "vit": 10
+        },
+        "tile": {
+          "char": "p",
+          "color": "#ff37ff"
+        }
+      },
+      "description": "A fungus that uses spore magic to strengthen other fungi, making them tougher and more powerful in battle. ",
+      "display_name": "Fungal Priest",
+      "from_template": "fungus_creature_base",
+      "name": "fungus_priest"
     }
   ]
 }

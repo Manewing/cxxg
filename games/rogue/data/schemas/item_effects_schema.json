@@ -500,12 +500,12 @@
           },
           "min_ticks": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 0,
             "description": "Minimum ticks the damage component persists after the effect is applied"
           },
           "max_ticks": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 0,
             "description": "Maximum ticks the damage component persists after the effect is applied"
           },
           "can_hurt_source": {
@@ -526,6 +526,10 @@
           },
           "name": {
             "type": "string"
+          },
+          "effect_name": {
+            "type": "string",
+            "description": "If set the effect given by name will be applied to entities in range"
           },
           "effect_tile": {
             "$ref": "https://rogue-todo.com/common_types_schema.json#/defs/tile"

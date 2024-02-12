@@ -4,6 +4,7 @@
 #include <rogue/Renderer.h>
 
 namespace rogue {
+
 void RenderEventCollector::setEventHub(EventHub *EH) {
   EventHubConnector::setEventHub(EH);
   EH->subscribe(*this, &RenderEventCollector::onEntityAttackEvent);
@@ -21,8 +22,8 @@ void RenderEventCollector::onEntityAttackEvent(const EntityAttackEvent &E) {
     return;
   }
   auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos](Renderer &R) {
-    R.renderEffect(
+  RenderFns.push_back([this, AtPos](Renderer &R) {
+    HasEvents |= R.renderEffect(
         cxxg::types::ColoredChar{'*', cxxg::types::RgbColor{155, 20, 20}},
         AtPos);
   });
@@ -34,8 +35,8 @@ void RenderEventCollector::onDetectTargetEvent(const DetectTargetEvent &E) {
     return;
   }
   auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos](Renderer &R) {
-    R.renderEffect(
+  RenderFns.push_back([this, AtPos](Renderer &R) {
+    HasEvents |= R.renderEffect(
         cxxg::types::ColoredChar{'!', cxxg::types::RgbColor{173, 161, 130}},
         AtPos);
   });
@@ -47,15 +48,15 @@ void RenderEventCollector::onLostTargetEvent(const LostTargetEvent &E) {
     return;
   }
   auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos](Renderer &R) {
-    R.renderEffect(
+  RenderFns.push_back([this, AtPos](Renderer &R) {
+    HasEvents |= R.renderEffect(
         cxxg::types::ColoredChar{'?', cxxg::types::RgbColor{56, 55, 89}},
         AtPos);
   });
 }
 
 void RenderEventCollector::onEffectDelayEvent(const EffectDelayEvent &) {
-  RenderFns.push_back([](Renderer &) {});
+  RenderFns.push_back([this](Renderer &) { HasEvents = true; });
 }
 
 void RenderEventCollector::onBuffAppliedEvent(const BuffAppliedEvent &E) {
@@ -64,13 +65,13 @@ void RenderEventCollector::onBuffAppliedEvent(const BuffAppliedEvent &E) {
     return;
   }
   auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos, IsCombat = E.IsCombat](Renderer &R) {
+  RenderFns.push_back([this, AtPos, IsCombat = E.IsCombat](Renderer &R) {
     if (IsCombat) {
-      R.renderEffect(
+      HasEvents |= R.renderEffect(
           cxxg::types::ColoredChar{'v', cxxg::types::RgbColor{100, 10, 10}},
           AtPos);
     } else {
-      R.renderEffect(
+      HasEvents |= R.renderEffect(
           cxxg::types::ColoredChar{'^', cxxg::types::RgbColor{10, 100, 10}},
           AtPos);
     }
@@ -83,8 +84,8 @@ void RenderEventCollector::onBuffExpiredEvent(const BuffExpiredEvent &E) {
     return;
   }
   auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos](Renderer &R) {
-    R.renderEffect(
+  RenderFns.push_back([this, AtPos](Renderer &R) {
+    HasEvents |= R.renderEffect(
         cxxg::types::ColoredChar{';', cxxg::types::RgbColor{100, 100, 100}},
         AtPos);
   });
@@ -97,13 +98,13 @@ void RenderEventCollector::onBuffApplyEffectEvent(
     return;
   }
   auto const AtPos = PC->Pos;
-  RenderFns.push_back([AtPos, IsReduce = E.IsReduce](Renderer &R) {
+  RenderFns.push_back([this, AtPos, IsReduce = E.IsReduce](Renderer &R) {
     if (IsReduce) {
-      R.renderEffect(
+      HasEvents |= R.renderEffect(
           cxxg::types::ColoredChar{'-', cxxg::types::RgbColor{100, 10, 10}},
           AtPos);
     } else {
-      R.renderEffect(
+      HasEvents |= R.renderEffect(
           cxxg::types::ColoredChar{'+', cxxg::types::RgbColor{10, 100, 10}},
           AtPos);
     }
@@ -116,8 +117,11 @@ void RenderEventCollector::apply(Renderer &R) {
   }
 }
 
-void RenderEventCollector::clear() { RenderFns.clear(); }
+void RenderEventCollector::clear() {
+  RenderFns.clear();
+  HasEvents = false;
+}
 
-bool RenderEventCollector::hasEvents() const { return !RenderFns.empty(); }
+bool RenderEventCollector::hasEvents() const { return HasEvents; }
 
 } // namespace rogue

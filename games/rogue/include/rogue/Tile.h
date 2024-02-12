@@ -43,7 +43,7 @@ struct Tile {
   const char &kind() const { return T.Char; }
   const cxxg::types::TermColor &color() const { return T.Color; }
 
-  // FIXME this is duplicated in TileComp
+  /// Higher z-index means closer to user (overlaps)
   int ZIndex = 0;
 
   template <class Archive> void serialize(Archive &Ar) { Ar(T, ZIndex); }

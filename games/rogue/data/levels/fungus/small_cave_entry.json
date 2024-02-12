@@ -1,0 +1,8 @@
+{
+  "map": {
+    "type": "tiled",
+    "tiled_map_file": "small_cave_entry.tmj",
+    "tiled_id_map_file": "../../tiled_maps/tiled_id_map.json"
+  },
+  "entities": {}
+}

@@ -7,14 +7,15 @@ types::Size Screen::getTerminalSize() {
   return ::cxxg::utils::getTerminalSize();
 }
 
-Screen::Screen(types::Size S, ::std::ostream &Out)
+Screen::Screen(types::Size S, ::std::ostream &Out, bool SetupTerminal)
     : Out(Out), DummyRow(0), Size({0, 0}) {
-  utils::setupTerminal();
+  if (SetupTerminal) {
+    utils::setupTerminal();
+    utils::registerWindowResizeHandler(
+        [this](types::Size NewSize) { resize(NewSize); });
+  }
 
   resize(S);
-
-  utils::registerWindowResizeHandler(
-      [this](types::Size NewSize) { resize(NewSize); });
 }
 
 void Screen::resize(types::Size S) {

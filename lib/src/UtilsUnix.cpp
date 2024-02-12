@@ -90,7 +90,11 @@ int getCharBlockHandleEscape() {
 
 } // namespace
 
-void setupTerminal() {}
+void setupTerminal() {
+  if (isatty(STDIN_FILENO) == 0 || isatty(STDOUT_FILENO) == 0) {
+    THROW_CXXG_ERROR("Start this program from a terminal");
+  }
+}
 
 void registerWindowResizeHandler(
     ::std::function<void(cxxg::types::Size)> const &Handler) {

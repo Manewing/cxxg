@@ -33,7 +33,7 @@ void dumpLootTableRewards(const rogue::ItemDatabase &ItemDb,
     }
   }
 
-  std::vector<std::pair<unsigned, int>> SortedCounts;
+  std::vector<std::pair<unsigned, rogue::ItemProtoId>> SortedCounts;
   for (auto &Pair : ItemIdCounts) {
     SortedCounts.emplace_back(Pair.second, Pair.first);
   }
@@ -86,7 +86,7 @@ int handleLootTable(const rogue::ItemDatabase &ItemDb, int Argc, char *Argv[]) {
   return 0;
 }
 
-void dumpItemCreations(const rogue::ItemDatabase &ItemDb, int ItemId,
+void dumpItemCreations(const rogue::ItemDatabase &ItemDb, rogue::ItemProtoId ItemId,
                        unsigned Rolls) {
   static const std::string LineSep(80, '-');
   for (std::size_t I = 0; I < Rolls; I++) {

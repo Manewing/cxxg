@@ -5,8 +5,10 @@
 
 namespace {
 
+using PId = rogue::ItemProtoId;
+
 const rogue::ItemPrototype DummyConsumable(
-    1, "consumable", "desc", rogue::ItemType::Consumable, 5,
+    PId(1), "consumable", "desc", rogue::ItemType::Consumable, 5,
     {{{rogue::CapabilityFlags::UseOn}, std::make_shared<rogue::NullEffect>()}});
 
 TEST(InventoryTest, Empty) {
@@ -42,6 +44,18 @@ TEST(InventoryTest, AddItem) {
   EXPECT_EQ(Inv.getItem(0).StackSize, 5);
   EXPECT_EQ(Inv.getItem(1).StackSize, 5);
   EXPECT_EQ(Inv.getItem(2).StackSize, 2);
+  EXPECT_EQ(Inv.getItemIndexForId(1), 0);
+}
+
+TEST(InventoryTest, AddItemWithExcessStackSize) {
+  rogue::Inventory Inv;
+  rogue::Item It(DummyConsumable, 10);
+  Inv.addItem(It);
+  ASSERT_EQ(Inv.size(), 2) << Inv;
+  EXPECT_EQ(Inv.getItem(0).StackSize, 5);
+  EXPECT_EQ(Inv.getItem(0).getName(), "consumable");
+  EXPECT_EQ(Inv.getItem(1).StackSize, 5);
+  EXPECT_EQ(Inv.getItem(1).getName(), "consumable");
   EXPECT_EQ(Inv.getItemIndexForId(1), 0);
 }
 

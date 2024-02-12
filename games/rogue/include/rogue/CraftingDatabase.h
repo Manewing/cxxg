@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <map>
 #include <vector>
+#include <rogue/Types.h>
 
 namespace rogue {
 class ItemDatabase;
@@ -11,26 +12,21 @@ class ItemDatabase;
 
 namespace rogue {
 
-using CraftingRecipeId = int;
-
 class CraftingRecipe {
 public:
-  using ItemId = int;
-
-public:
-  CraftingRecipe(std::string Name, std::vector<ItemId> RequiredItems,
-                 std::vector<ItemId> ResultItems)
+  CraftingRecipe(std::string Name, std::vector<ItemProtoId> RequiredItems,
+                 std::vector<ItemProtoId> ResultItems)
       : Name(std::move(Name)), RequiredItems(std::move(RequiredItems)),
         ResultItems(std::move(ResultItems)) {}
 
   const std::string &getName() const { return Name; }
-  const std::vector<ItemId> &getRequiredItems() const { return RequiredItems; }
-  const std::vector<ItemId> &getResultItems() const { return ResultItems; }
+  const std::vector<ItemProtoId> &getRequiredItems() const { return RequiredItems; }
+  const std::vector<ItemProtoId> &getResultItems() const { return ResultItems; }
 
 private:
   std::string Name;
-  std::vector<ItemId> RequiredItems;
-  std::vector<ItemId> ResultItems;
+  std::vector<ItemProtoId> RequiredItems;
+  std::vector<ItemProtoId> ResultItems;
 };
 
 class CraftingDatabase {

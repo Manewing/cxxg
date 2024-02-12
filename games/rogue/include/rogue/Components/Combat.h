@@ -73,6 +73,8 @@ struct DamageComp {
   entt::entity Source = entt::null;
   StatValue PhysDamage = 0;
   StatValue MagicDamage = 0;
+
+  /// Number of times the damage component can hit
   int Hits = 1;
 
   /// Number of ticks before the damage component will be removed

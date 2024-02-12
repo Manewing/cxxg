@@ -50,7 +50,7 @@ class SelectLootTableViewer(ListEditorBase):
             values=sorted(item_db.get_loot_table_names()),
             on_add_item=self.on_add_item,
             on_rm_item=self.on_rm_item,
-            size=(40, 35),
+            size=(50, 35),
         )
         self.item_db = item_db
         self.loot_info_wrapper = loot_info_wrapper
@@ -190,7 +190,7 @@ class SelectItemTableViewer(ListEditorBase):
             values=item_db.get_item_names(),
             on_add_item=self.on_add_item,
             on_rm_item=self.on_rm_item,
-            size=(40, 35),
+            size=(50, 35),
         )
         self.item_db = item_db
         self.loot_info_wrapper = loot_info_wrapper
@@ -264,7 +264,7 @@ class SelectItemEffectViewer(ListEditorBase):
             values=item_db.get_item_effect_names(),
             on_add_item=self.on_add_item,
             on_rm_item=self.on_rm_item,
-            size=(40, 35),
+            size=(50, 35),
         )
         self.item_db = item_db
 

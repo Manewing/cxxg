@@ -19,6 +19,12 @@
           "level_config": "levels/arachnoth/l1.json",
           "type": "level",
           "weight": 5
+        },
+        {
+          "game_world": "multi_level_dungeon",
+          "level_config": "levels/fungus/l1.json",
+          "type": "level",
+          "weight": 5
         }
       ]
     },

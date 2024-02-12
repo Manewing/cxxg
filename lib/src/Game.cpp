@@ -41,6 +41,10 @@ void Game::handleDraw() {
 }
 
 void Game::handleShowNotifications(bool Clear) {
+  if (MaxNotifications && Notifications.size() > *MaxNotifications) {
+    Notifications.erase(Notifications.begin(),
+                        Notifications.end() - *MaxNotifications);
+  }
   for (size_t L = 0; L < Notifications.size(); L++) {
     // get position for warning
     auto Y = Scr.getSize().Y - Notifications.size() + L;

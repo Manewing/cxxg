@@ -96,6 +96,12 @@ TEST(BuffsTest, TimedBuffTickActive) {
 
 struct TestDiminishingReturnsValueGenBuff
     : public rogue::DiminishingReturnsValueGenBuff {
+
+  TestDiminishingReturnsValueGenBuff()
+      : rogue::DiminishingReturnsValueGenBuff() {
+    Coeff = 20.0f;
+  }
+
   std::string getApplyDesc() const override {
     return "Apply: " + getParamApplyDesc("Inc. by ", "<;>", "P");
   }
@@ -179,7 +185,7 @@ TEST(BuffsTest, DiminishingReturnsValueGenBuffAdd) {
   A.add(B);
   EXPECT_EQ(A.TickPeriod, 2);
   EXPECT_EQ(A.TicksLeft, 0);
-  EXPECT_NEAR(A.TickAmount, 0.512, 0.001);
+  EXPECT_NEAR(A.TickAmount, 0.523, 0.001);
   EXPECT_EQ(A.TickPeriodsLeft, 2);
   EXPECT_NEAR(A.RealDuration, 4.190, 0.001);
   EXPECT_EQ(A.totalTicksLeft(), 4);
@@ -189,7 +195,7 @@ TEST(BuffsTest, DiminishingReturnsValueGenBuffAdd) {
   A.add(B);
   EXPECT_EQ(A.TickPeriod, 2);
   EXPECT_EQ(A.TicksLeft, 0);
-  EXPECT_NEAR(A.TickAmount, 0.502, 0.001);
+  EXPECT_NEAR(A.TickAmount, 0.504, 0.001);
   EXPECT_EQ(A.TickPeriodsLeft, 2);
   EXPECT_NEAR(A.RealDuration, 4.190, 0.001);
   EXPECT_EQ(A.totalTicksLeft(), 4);
@@ -199,7 +205,7 @@ TEST(BuffsTest, DiminishingReturnsValueGenBuffAdd) {
   A.add(B);
   EXPECT_EQ(A.TickPeriod, 2);
   EXPECT_EQ(A.TicksLeft, 0);
-  EXPECT_NEAR(A.TickAmount, 0.502, 0.001);
+  EXPECT_NEAR(A.TickAmount, 0.504, 0.001);
   EXPECT_EQ(A.TickPeriodsLeft, 4);
   EXPECT_NEAR(A.RealDuration, 8.166, 0.001);
   EXPECT_EQ(A.totalTicksLeft(), 8);
@@ -209,7 +215,7 @@ TEST(BuffsTest, DiminishingReturnsValueGenBuffAdd) {
   A.add(B);
   EXPECT_EQ(A.TickPeriod, 2);
   EXPECT_EQ(A.TicksLeft, 0);
-  EXPECT_NEAR(A.TickAmount, 0.502, 0.001);
+  EXPECT_NEAR(A.TickAmount, 0.504, 0.001);
   EXPECT_EQ(A.TickPeriodsLeft, 4);
   EXPECT_NEAR(A.RealDuration, 8.181, 0.001);
   EXPECT_EQ(A.totalTicksLeft(), 8);

@@ -173,6 +173,9 @@ public:
 
   ItemPrototype HelmetA;
   ItemPrototype HelmetB;
+  ItemPrototype ChestPlateNoEffects;
+  ItemPrototype Sword;
+  ItemPrototype RuneSpellAdjacent;
   ItemPrototype SwordSkillSelf;
   ItemPrototype SwordSkillAdjacent;
   ItemPrototype SwordSkillAll;

@@ -1,36 +1,8 @@
 {
-  "entities": {
-    "+": "closed_door",
-    "<": "level_entry",
-    "H": "level_exit",
-    "R": "fat_rat",
-    "v": "common_vase"
-  },
   "map": {
-    "char_info": {
-      " ": {
-        "layer": "ground",
-        "tile": {
-          "char": " ",
-          "color": "#222222"
-        }
-      },
-      "#": {
-        "layer": "walls",
-        "tile": {
-          "char": "#",
-          "color": "#737373"
-        }
-      }
-    },
-    "default_char": {
-      "layer": "ground",
-      "tile": {
-        "char": " ",
-        "color": "#222222"
-      }
-    },
-    "map_file": "fat_rat.map",
-    "type": "designed"
-  }
+    "tiled_map_file": "fat_rat.tmj",
+    "tiled_id_map_file": "../../tiled_maps/tiled_id_map.json",
+    "type": "tiled"
+  },
+  "entities": {}
 }

@@ -1,0 +1,15 @@
+{
+  "entities": {
+    "%": "common_skeletal_remains",
+    "<": "level_entry",
+    "H": "level_exit",
+    "a": "fungus_acidic_sporecap",
+    "s": "fungus_sporeling",
+    "v": "common_vase",
+    "w": "common_arcane_workshop"
+  },
+  "map": {
+    "config": "small_cave.cfg",
+    "type": "generated"
+  }
+}

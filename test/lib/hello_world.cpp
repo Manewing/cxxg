@@ -6,7 +6,7 @@ namespace {
 TEST(cxxg, HelloWorld) {
   // buffer in string stream to check results later
   ::std::stringstream SS;
-  ::cxxg::Screen Screen(::cxxg::types::Size{80, 24}, SS);
+  ::cxxg::Screen Screen(::cxxg::types::Size{80, 24}, SS, false);
 
   // string stream for generating reference
   ::std::string EmptyStr;
