@@ -30,7 +30,9 @@ public:
   /// Constructs new screen with given size and output stream
   /// @param[in] Size - Size of the screen in rows and columns
   /// @param[in] Out  - Output stream (default = ::std::cout)
-  Screen(types::Size Size, ::std::ostream &Out = ::std::cout);
+  /// @param[in] SetupTerminal - If true, sets up the terminal (default = true)
+  Screen(types::Size Size, ::std::ostream &Out = ::std::cout,
+         bool SetupTerminal = true);
 
   /// Resets the screen to the new size
   /// @param[in] Size - New size of the screen

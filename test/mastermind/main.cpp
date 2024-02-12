@@ -40,7 +40,7 @@ TEST(MasterMind, Guess) {
 
 // check random code generation
 TEST(MasterMind, RandomCode) {
-  cxxg::Screen Scr(cxxg::types::Size{100, 100});
+  cxxg::Screen Scr(cxxg::types::Size{100, 100}, std::cout, false);
   ::MasterMind MM(Scr);
 
   EXPECT_EQ(::MasterMind::isValidGuess(MM.getRandomCode(1, 1)), true);
